@@ -32,3 +32,7 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["python3", "serve.py", "--port", "5000", "--week", "2026-05-04", "--csv", "Sessions Performance Data.csv"]
