@@ -1,13 +1,20 @@
 """
 app.py — Flask WSGI entrypoint for Studio Scheduler.
 Replaces serve.py's raw HTTP server for autoscale deployment.
-The Generate pipeline is only available when running locally.
+
+Week and CSV are read from env vars PIPELINE_WEEK / PIPELINE_CSV,
+falling back to sensible defaults (next Monday, bundled CSV).
 """
 import json
 import os
+import subprocess
+import sys
+import threading
+import time as _time
+from datetime import date, timedelta
 from pathlib import Path
 
-from flask import Flask, Response, jsonify, request, send_file
+from flask import Flask, Response, request
 
 from rule_config import build_rules_catalog, load_rules_config, update_rules_config
 
@@ -26,6 +33,21 @@ MIME = {
     ".png": "image/png",
     ".svg": "image/svg+xml",
 }
+
+# ── Pipeline defaults ─────────────────────────────────────────
+
+def _next_monday() -> str:
+    today = date.today()
+    days_ahead = (7 - today.weekday()) % 7 or 7
+    return (today + timedelta(days=days_ahead)).strftime("%Y-%m-%d")
+
+PIPELINE_CSV = os.environ.get("PIPELINE_CSV", "Sessions Performance Data.csv")
+PIPELINE_WEEK = os.environ.get("PIPELINE_WEEK") or _next_monday()
+
+# In-memory pipeline state (per worker process)
+_pipeline_state = {"running": False, "pid": None, "started": None, "message": "Idle"}
+
+# ── Flask app ─────────────────────────────────────────────────
 
 app = Flask(__name__, static_folder=None)
 
@@ -55,7 +77,23 @@ def rules_config():
 
 @app.route("/api/pipeline-status")
 def pipeline_status():
-    return _json({"running": False, "status": "idle", "message": "Idle"})
+    msg = _pipeline_state["message"]
+    running = _pipeline_state["running"]
+    if running:
+        status = "running"
+    elif "Complete" in msg or "complete" in msg:
+        status = "done"
+    elif "Failed" in msg or "failed" in msg or "Error" in msg:
+        status = "failed"
+    else:
+        status = "idle"
+    return _json({
+        "running": running,
+        "status": status,
+        "pid": _pipeline_state["pid"],
+        "started": _pipeline_state["started"],
+        "message": msg,
+    })
 
 
 @app.route("/api/trainer-profiles")
@@ -110,10 +148,66 @@ def save_rules():
 
 @app.route("/api/run-pipeline", methods=["POST"])
 def run_pipeline():
-    return _json({
-        "ok": False,
-        "error": "Schedule generation is only available when running the app locally.",
-    }, 503)
+    if _pipeline_state["running"]:
+        return _json({
+            "ok": True,
+            "already_running": True,
+            "message": "Pipeline is already running. Please wait.",
+        })
+
+    csv_path = PIPELINE_CSV
+    week = PIPELINE_WEEK
+    cmd = [
+        sys.executable, str(PROJECT_ROOT / "orchestrator.py"),
+        "--csv", csv_path,
+        "--week", week,
+    ]
+    print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(PROJECT_ROOT),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        _pipeline_state["running"] = True
+        _pipeline_state["pid"] = proc.pid
+        _pipeline_state["started"] = _time.time()
+        _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
+
+        def _monitor(p, state):
+            stages = [
+                "Running — Agent 1: Ingesting data...",
+                "Running — Agent 2: Analysing history...",
+                "Running — Agent 3: Scoring slots...",
+                "Running — Agent 4: Applying rules...",
+                "Running — Agent 5: AI planning...",
+                "Running — Agent 6: Building report...",
+            ]
+            idx = 0
+            while p.poll() is None:
+                _time.sleep(15)
+                idx = min(idx + 1, len(stages) - 1)
+                state["message"] = stages[idx]
+            if p.returncode == 0:
+                state["message"] = "Complete — reload to see new schedule."
+            else:
+                state["message"] = f"Failed (exit {p.returncode}). Check server logs."
+            state["running"] = False
+            state["pid"] = None
+
+        t = threading.Thread(target=_monitor, args=(proc, _pipeline_state), daemon=True)
+        t.start()
+
+        return _json({
+            "ok": True,
+            "pid": proc.pid,
+            "message": "Pipeline started. Results ready in ~2 minutes.",
+        })
+    except Exception as e:
+        _pipeline_state["running"] = False
+        return _json({"error": str(e)}, 500)
 
 
 @app.route("/api/save-trainer-profiles", methods=["POST"])
