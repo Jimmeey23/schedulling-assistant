@@ -7723,9 +7723,21 @@ function runPipelineFromHeader(){
   btn.disabled=true;
   btn.classList.add("loading");
   fetch("/api/run-pipeline",{method:"POST"})
-    .then(r=>r.json())
-    .then(res=>{
-      if(res.ok){
+    .then(r=>{
+      const status=r.status;
+      return r.json().then(res=>({res,status}));
+    })
+    .then(({res,status})=>{
+      if(status===503||res.ok===false){
+        // Hosted mode — pipeline not available
+        btn.disabled=false;btn.classList.remove("loading");
+        btn.title=res.error||"Schedule generation is only available when running locally.";
+        const bar=document.getElementById("pipeline-bar");
+        const msg=document.getElementById("pb-msg");
+        if(bar){bar.className="visible warn";}
+        if(msg){msg.textContent="Generate is only available in the local development environment.";}
+        showToast("Generate is only available when running the app locally","warn");
+      } else if(res.ok){
         showToast("Pipeline started — results ready in ~2 min","");
         pollPipelineStatus();
       } else {
