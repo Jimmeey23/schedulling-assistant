@@ -118,4 +118,4 @@ Additional fields added per metric row:
 - **Generate button** — triggers pipeline re-run with live progress bar and stage labels
 - **Pipeline status bar** — polls `/api/pipeline-status` every 8s while running
 - **Toast notifications** — success/warning/error feedback for all actions
-- Floating **Rules FAB** (bottom-right) — shortcut to the Rules tab
+- Filter bar collapses automatically when switching to Rules view

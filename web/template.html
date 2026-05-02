@@ -381,9 +381,86 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .th-lbl{font-size:10px;color:var(--text-muted);margin-bottom:4px;font-weight:500}
 .th-val{font-size:15px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
 .score-ring-lg svg text{font-family:'Inter',sans-serif}
+
+/* GENERATE BUTTON */
+.gen-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 16px;
+  background:var(--primary);color:#fff;border:none;border-radius:var(--r8);
+  font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;transition:background 0.1s;white-space:nowrap;
+}
+.gen-btn:hover{background:var(--primary-600)}
+.gen-btn:disabled{background:#9CA3AF;cursor:not-allowed}
+.gen-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:none}
+.gen-btn.loading .gen-spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PIPELINE STATUS BAR */
+#pipeline-bar{
+  display:none;background:var(--primary);color:#fff;
+  padding:7px 24px;font-size:12px;font-weight:600;
+  align-items:center;justify-content:space-between;gap:8px;
+}
+#pipeline-bar.visible{display:flex}
+#pipeline-bar.error{background:#DC2626}
+#pipeline-bar.warn{background:#D97706}
+.pb-msg{flex:1}
+.pb-reload{padding:3px 10px;border-radius:100px;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
+.pb-reload:hover{background:rgba(255,255,255,0.35)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#111827;color:#F9FAFB;padding:10px 18px;border-radius:var(--r8);
+  font-size:13px;font-weight:500;z-index:1000;
+  opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;
+  white-space:nowrap;box-shadow:var(--sh-lg);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#7F1D1B;color:#FEE2E2}
+.toast.warn{background:#92400E;color:#FEF3C7}
+
+/* RULES VIEW */
+.rules-view{max-width:860px;margin:0 auto;padding-bottom:48px}
+.rv-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.rv-title{font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.3px}
+.rv-sub{font-size:12px;color:var(--text-muted);margin-top:3px}
+.rv-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rv-run-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:var(--r8);font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background 0.1s}
+.rv-run-btn:hover{background:var(--primary-600)}
+.rv-status{font-size:12px;color:var(--text-muted);font-style:italic;min-height:18px}
+.rv-group{background:#fff;border:1px solid var(--border);border-radius:var(--r12);margin-bottom:12px;overflow:hidden;box-shadow:var(--sh-sm)}
+.rv-group-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.rv-group-left{flex:1}
+.rv-group-title{font-size:13px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.rv-group-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.45}
+.rv-count{display:inline-flex;align-items:center;gap:4px;background:var(--primary-mid);color:var(--primary);border-radius:100px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:5px}
+.rv-rule{padding:12px 16px;border-bottom:1px solid var(--border)}
+.rv-rule:last-child{border-bottom:none}
+.rv-rule.off{opacity:0.65;background:var(--surface)}
+.rv-rule-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.rv-rule-title{font-size:12px;font-weight:700;color:var(--text)}
+.rv-rule-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.rv-rule-chip{padding:2px 7px;background:var(--surface2);color:var(--text-muted);border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+.rv-toggle{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+.rv-toggle input{opacity:0;width:0;height:0}
+.rv-track{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border-strong);border-radius:100px;transition:0.2s}
+.rv-toggle input:checked+.rv-track{background:var(--primary)}
+.rv-knob{position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.rv-toggle input:checked~.rv-knob{transform:translateX(16px)}
+.rv-textarea{width:100%;min-height:64px;border-radius:var(--r6);border:1px solid var(--border);background:#fff;color:var(--text);padding:8px 10px;font-size:12px;font-family:'Inter',sans-serif;line-height:1.45;resize:vertical}
+.rv-textarea:focus{outline:none;border-color:var(--primary-600)}
+.rv-rule-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.rv-hint{font-size:10px;color:var(--text-light)}
+.rv-btns{display:flex;gap:5px}
+.rv-btn{padding:5px 10px;border-radius:var(--r6);border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.rv-btn:hover{background:var(--surface);color:var(--text)}
+.rv-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.rv-btn.primary:hover{background:var(--primary-600)}
 </style>
 </head>
 <body>
+<div class="toast" id="toast"></div>
 
 <header class="app-header">
   <div class="hdr-left">
@@ -393,8 +470,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="hdr-sub">Physique 57 India</div>
     </div>
   </div>
-  <div class="week-badge" id="week-badge">Week of —</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="week-badge" id="week-badge">Week of —</div>
+    <button class="gen-btn" id="gen-btn" onclick="runPipelineFromHeader()">
+      <span class="gen-spinner" id="gen-spinner"></span>
+      &#9654; Generate
+    </button>
+  </div>
 </header>
+
+<div id="pipeline-bar">
+  <span class="pb-msg" id="pb-msg"></span>
+  <button class="pb-reload" onclick="location.reload()">Reload</button>
+</div>
 
 <div class="loc-bar" id="loc-bar"></div>
 
@@ -406,6 +494,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <button class="vbtn" id="vbtn-trainer" onclick="setView('trainer')">◉ Trainer</button>
     <button class="vbtn" id="vbtn-cross" onclick="setView('cross')">⊕ Cross-Location</button>
     <button class="vbtn" id="vbtn-analytics" onclick="setView('analytics')">▦ Analytics</button>
+    <button class="vbtn" id="vbtn-rules" onclick="setView('rules')">&#9881; Rules</button>
   </div>
   <div class="ctrl-right">
     <div id="iter-row" style="display:flex;gap:3px"></div>
@@ -758,6 +847,11 @@ function setView(v){
   document.querySelectorAll(".vbtn").forEach(b=>b.classList.remove("active"));
   const el=document.getElementById("vbtn-"+v);
   if(el)el.classList.add("active");
+  // Hide loc/filter bars when in Rules view
+  const locBarTop = v==="rules"?"none":"";
+  document.getElementById("loc-bar").style.display=locBarTop;
+  document.getElementById("filter-panel").style.display=v==="rules"?"none":"";
+  document.querySelector(".ctrl-right").style.display=v==="rules"?"none":"";
   renderView();
 }
 
@@ -766,12 +860,13 @@ function renderView(){
   area.innerHTML="";
   const slots=_loc?getSlots(_loc):[];
   const filtered=filterSlots(slots);
-  if(_view==="grid")     renderGrid(area,filtered,slots);
+  if(_view==="grid")          renderGrid(area,filtered,slots);
   else if(_view==="timeline") renderTimeline(area,filtered);
   else if(_view==="list")     renderList(area,filtered);
   else if(_view==="trainer")  renderTrainer(area,filtered);
   else if(_view==="cross")    renderCrossLocation(area);
   else if(_view==="analytics")renderAnalytics(area,slots);
+  else if(_view==="rules")    renderRulesView(area);
 }
 
 // ============================================================
@@ -1395,6 +1490,227 @@ function init(){
 document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 window.addEventListener("DOMContentLoaded",init);
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type, duration){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.className="toast"+(type?" "+type:"");
+  requestAnimationFrame(()=>t.classList.add("show"));
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.remove("show"), duration||3000);
+}
+
+// ============================================================
+// PIPELINE — Generate button & status bar
+// ============================================================
+let _pipelinePoller=null;
+
+function runPipelineFromHeader(){
+  const btn=document.getElementById("gen-btn");
+  btn.disabled=true;
+  btn.classList.add("loading");
+  fetch("/api/run-pipeline",{method:"POST"})
+    .then(r=>r.json())
+    .then(res=>{
+      if(res.ok){
+        showToast("Pipeline started — results ready in ~2 min","");
+        pollPipelineStatus();
+      } else {
+        showToast("Error: "+(res.error||"Unknown error"),"error");
+        btn.disabled=false;btn.classList.remove("loading");
+      }
+    })
+    .catch(()=>{
+      showToast("Server offline — try again","warn");
+      btn.disabled=false;btn.classList.remove("loading");
+    });
+}
+
+function pollPipelineStatus(){
+  if(_pipelinePoller)clearInterval(_pipelinePoller);
+  _pipelinePoller=setInterval(()=>{
+    fetch("/api/pipeline-status")
+      .then(r=>r.json())
+      .then(d=>{
+        const bar=document.getElementById("pipeline-bar");
+        const msg=document.getElementById("pb-msg");
+        const btn=document.getElementById("gen-btn");
+        if(d.status==="running"){
+          bar.className="visible";
+          msg.textContent=d.message||"Pipeline running…";
+        } else if(d.status==="done"){
+          clearInterval(_pipelinePoller);_pipelinePoller=null;
+          bar.className="visible";
+          msg.textContent=d.message||"Schedule ready — reload to see new results";
+          btn.disabled=false;btn.classList.remove("loading");
+          showToast("Schedule updated — reload to see results","");
+        } else if(d.status==="failed"){
+          clearInterval(_pipelinePoller);_pipelinePoller=null;
+          bar.className="visible error";
+          msg.textContent="Failed (exit "+d.exit_code+"). Check server logs.";
+          btn.disabled=false;btn.classList.remove("loading");
+          showToast("Pipeline failed — check logs","error");
+        } else {
+          bar.className="";
+        }
+      })
+      .catch(()=>{});
+  },4000);
+}
+
+// ============================================================
+// RULES VIEW
+// ============================================================
+let _rulesCatalog=null;
+
+function rvEscapeHtml(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function rvEscapeAttr(v){return rvEscapeHtml(v).replace(/\n/g,"&#10;");}
+
+function renderRulesView(area){
+  const wrap=document.createElement("div");
+  wrap.className="rules-view";
+  wrap.innerHTML=`
+    <div class="rv-header">
+      <div>
+        <div class="rv-title">Scheduling Rules</div>
+        <div class="rv-sub">Enable or disable rule categories and individual rules. Edit rule text used by the AI planner.</div>
+      </div>
+      <div class="rv-actions">
+        <span class="rv-status" id="rv-status"></span>
+        <button class="rv-run-btn" id="rv-run-btn" onclick="rvRunPipeline()">&#9654; Re-run Pipeline</button>
+      </div>
+    </div>
+    <div id="rv-groups"><div style="padding:20px;color:var(--text-muted);font-size:13px">Loading rules…</div></div>`;
+  area.appendChild(wrap);
+  rvLoadRules();
+}
+
+function setRVStatus(msg,tone){
+  const el=document.getElementById("rv-status");
+  if(!el)return;
+  el.style.color=tone==="ok"?"var(--green)":tone==="error"?"var(--red)":"var(--text-muted)";
+  el.textContent=msg||"";
+}
+
+function rvRunPipeline(){
+  const btn=document.getElementById("rv-run-btn");
+  if(btn){btn.disabled=true;btn.textContent="Starting…";}
+  fetch("/api/run-pipeline",{method:"POST"})
+    .then(r=>r.json())
+    .then(res=>{
+      if(res.ok){
+        setRVStatus("Pipeline started — reload in ~2 min to see results","ok");
+        if(btn){btn.disabled=false;btn.textContent="▶ Re-run Pipeline";}
+        pollPipelineStatus();
+      } else {
+        setRVStatus("Error: "+(res.error||"unknown"),"error");
+        if(btn){btn.disabled=false;btn.textContent="▶ Re-run Pipeline";}
+      }
+    })
+    .catch(()=>{
+      setRVStatus("Server offline","error");
+      if(btn){btn.disabled=false;btn.textContent="▶ Re-run Pipeline";}
+    });
+}
+
+function rvLoadRules(){
+  fetch("/api/rules-config")
+    .then(r=>r.json())
+    .then(data=>{
+      _rulesCatalog=data;
+      rvRenderCatalog();
+      setRVStatus("Rules loaded","ok");
+    })
+    .catch(()=>setRVStatus("Could not load rules","error"));
+}
+
+function rvRenderCatalog(){
+  const host=document.getElementById("rv-groups");
+  if(!host)return;
+  if(!_rulesCatalog||!Array.isArray(_rulesCatalog.groups)){
+    host.innerHTML='<div style="padding:20px;color:var(--text-muted)">No rule catalog available.</div>';
+    return;
+  }
+  host.innerHTML="";
+  _rulesCatalog.groups.forEach(group=>{
+    const enabled=(group.rules||[]).filter(r=>r.enabled).length;
+    const total=(group.rules||[]).length;
+    const gEl=document.createElement("div");
+    gEl.className="rv-group";
+    gEl.innerHTML=`
+      <div class="rv-group-hdr">
+        <div class="rv-group-left">
+          <div class="rv-group-title">${rvEscapeHtml(group.label)}</div>
+          <div class="rv-group-desc">${rvEscapeHtml(group.description||"")}</div>
+          <span class="rv-count">${enabled}/${total} enabled</span>
+        </div>
+        <label class="rv-toggle" title="${group.enabled?"Disable":"Enable"} category">
+          <input type="checkbox" ${group.enabled?"checked":""} onchange="rvSaveCategory('${group.id}',this.checked)">
+          <div class="rv-track"></div><div class="rv-knob"></div>
+        </label>
+      </div>
+      <div class="rv-rules-list" id="rv-list-${group.id}"></div>`;
+    const listEl=gEl.querySelector(".rv-rules-list");
+    (group.rules||[]).forEach(rule=>{
+      const rEl=document.createElement("div");
+      rEl.className="rv-rule"+(rule.enabled?"":" off");
+      rEl.id="rv-rule-"+rule.id;
+      rEl.innerHTML=`
+        <div class="rv-rule-top">
+          <div>
+            <div class="rv-rule-title">${rvEscapeHtml(rule.title||rule.id)}</div>
+            <div class="rv-rule-meta">
+              <span class="rv-rule-chip">${rvEscapeHtml(rule.id)}</span>
+              ${rule.type?`<span class="rv-rule-chip">${rvEscapeHtml(rule.type.replace(/_/g," "))}</span>`:""}
+            </div>
+          </div>
+          <label class="rv-toggle">
+            <input type="checkbox" ${rule.enabled?"checked":""} onchange="rvSaveRule('${rule.id}',this.checked)">
+            <div class="rv-track"></div><div class="rv-knob"></div>
+          </label>
+        </div>
+        <textarea class="rv-textarea" id="rv-text-${rule.id}" data-default="${rvEscapeAttr(rule.description||"")}">${rvEscapeHtml(rule.description||"")}</textarea>
+        <div class="rv-rule-actions">
+          <span class="rv-hint">Edit the rule copy used by the AI scheduler.</span>
+          <div class="rv-btns">
+            <button class="rv-btn" onclick="rvResetText('${rule.id}')">Reset</button>
+            <button class="rv-btn primary" onclick="rvSaveText('${rule.id}')">Save</button>
+          </div>
+        </div>`;
+      listEl.appendChild(rEl);
+    });
+    host.appendChild(gEl);
+  });
+}
+
+function rvPostUpdate(payload,successMsg,rerender){
+  fetch("/api/save-rules",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+    .then(r=>r.json())
+    .then(res=>{
+      if(!res.ok&&res.error)throw new Error(res.error);
+      if(res.catalog){_rulesCatalog=res.catalog;}
+      if(rerender)rvRenderCatalog();
+      setRVStatus(successMsg||"Saved","ok");
+      showToast(successMsg||"Saved","");
+    })
+    .catch(err=>setRVStatus(err&&err.message?err.message:"Save failed","error"));
+}
+
+function rvSaveCategory(id,enabled){rvPostUpdate({categories:{[id]:{enabled:enabled}}},"Category saved",true);}
+function rvSaveRule(id,enabled){rvPostUpdate({rules:{[id]:{enabled:enabled}}},"Rule saved",true);}
+function rvSaveText(id){
+  const el=document.getElementById("rv-text-"+id);
+  if(!el)return;
+  rvPostUpdate({rules:{[id]:{description:el.value}}},"Rule text saved",false);
+}
+function rvResetText(id){
+  const el=document.getElementById("rv-text-"+id);
+  if(!el)return;
+  el.value=el.dataset.default||"";
+}
 </script>
 </body>
 </html>
