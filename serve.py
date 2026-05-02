@@ -206,6 +206,7 @@ def main():
     RulesHandler.pipeline_week = args.week
     RulesHandler.pipeline_csv = args.csv
 
+    HTTPServer.allow_reuse_address = True
     server = HTTPServer(("", args.port), RulesHandler)
     print(f"\n  Studio Scheduler — serving at http://localhost:{args.port}")
     print(f"  Pipeline week: {args.week} | CSV: {args.csv}")
