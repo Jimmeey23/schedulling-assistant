@@ -73,11 +73,22 @@ class RulesHandler(BaseHTTPRequestHandler):
 
         # API: pipeline status
         if path == "/api/pipeline-status":
+            msg = _pipeline_state["message"]
+            running = _pipeline_state["running"]
+            if running:
+                status = "running"
+            elif "Complete" in msg or "complete" in msg:
+                status = "done"
+            elif "Failed" in msg or "failed" in msg or "Error" in msg:
+                status = "failed"
+            else:
+                status = "idle"
             self._send_json(200, {
-                "running": _pipeline_state["running"],
+                "running": running,
+                "status": status,
                 "pid": _pipeline_state["pid"],
                 "started": _pipeline_state["started"],
-                "message": _pipeline_state["message"],
+                "message": msg,
             })
             return
 

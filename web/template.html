@@ -1791,30 +1791,42 @@ function runPipelineFromHeader(){
 
 function pollPipelineStatus(){
   if(_pipelinePoller)clearInterval(_pipelinePoller);
+  const TIMEOUT_MS=5*60*1000;
+  const started=Date.now();
   _pipelinePoller=setInterval(()=>{
+    if(Date.now()-started>TIMEOUT_MS){
+      clearInterval(_pipelinePoller);_pipelinePoller=null;
+      const btn=document.getElementById("gen-btn");
+      if(btn){btn.disabled=false;btn.classList.remove("loading");}
+      showToast("Pipeline timed out — check server logs","warn");
+      return;
+    }
     fetch("/api/pipeline-status")
       .then(r=>r.json())
       .then(d=>{
         const bar=document.getElementById("pipeline-bar");
         const msg=document.getElementById("pb-msg");
         const btn=document.getElementById("gen-btn");
-        if(d.status==="running"){
-          bar.className="visible";
-          msg.textContent=d.message||"Pipeline running…";
-        } else if(d.status==="done"){
+        const status=d.status||(d.running?"running":"idle");
+        if(status==="running"){
+          if(bar)bar.className="visible";
+          if(msg)msg.textContent=d.message||"Pipeline running…";
+        } else if(status==="done"){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
-          bar.className="visible";
-          msg.textContent=d.message||"Schedule ready — reload to see new results";
-          btn.disabled=false;btn.classList.remove("loading");
+          if(bar)bar.className="visible";
+          if(msg)msg.textContent=d.message||"Schedule ready — reload to see new results";
+          if(btn){btn.disabled=false;btn.classList.remove("loading");}
           showToast("Schedule updated — reload to see results","");
-        } else if(d.status==="failed"){
+        } else if(status==="failed"){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
-          bar.className="visible error";
-          msg.textContent="Failed (exit "+d.exit_code+"). Check server logs.";
-          btn.disabled=false;btn.classList.remove("loading");
+          if(bar){bar.className="visible error";}
+          if(msg)msg.textContent=d.message||"Pipeline failed. Check server logs.";
+          if(btn){btn.disabled=false;btn.classList.remove("loading");}
           showToast("Pipeline failed — check logs","error");
         } else {
-          bar.className="";
+          if(bar)bar.className="";
+          if(btn){btn.disabled=false;btn.classList.remove("loading");}
+          clearInterval(_pipelinePoller);_pipelinePoller=null;
         }
       })
       .catch(()=>{});
