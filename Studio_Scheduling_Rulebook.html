@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Scheduling Rulebook — Single Source of Truth</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #111010;
+  --bg: #f5f2ec;
+  --bg2: #ece8e0;
+  --white: #ffffff;
+  --border: #ddd8ce;
+
+  /* Location colours */
+  --kw: #1a4f6e;       --kw-l: #e8f2f8;  --kw-m: #3d8ab5;
+  --su: #6b1a2a;       --su-l: #f8e8eb;  --su-m: #b53d5a;
+  --ke: #3d5c1a;       --ke-l: #edf5e8;  --ke-m: #6b9e3d;
+
+  --gold: #c9913a;     --gold-l: #fdf4e8;
+  --slate: #3a4a5a;    --slate-l: #eef1f5;
+  --rose: #7a2030;     --rose-l: #faeaed;
+  --teal: #1a5f5f;     --teal-l: #e8f5f5;
+  --amber: #8a5010;    --amber-l: #fdf2e4;
+  --emerald: #1a5c30;  --emerald-l: #e8f5ed;
+  --purple: #4a2070;   --purple-l: #f0eaf8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+/* ──── HERO ──── */
+.hero {
+  background: var(--ink);
+  color: #f5f2ec;
+  padding: 52px 56px 44px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -120px; top: -120px;
+  width: 480px; height: 480px;
+  border: 80px solid rgba(201,145,58,0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 4.5vw, 52px);
+  line-height: 1.08;
+  margin-bottom: 14px;
+}
+.hero h1 i { color: var(--gold); font-style: italic; }
+.hero p {
+  font-size: 14px;
+  color: rgba(245,242,236,0.6);
+  max-width: 560px;
+  margin-bottom: 36px;
+}
+.hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+.hs { display: flex; flex-direction: column; }
+.hs-v { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold); }
+.hs-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(245,242,236,.45); }
+
+/* ──── TAB NAV ──── */
+.tab-nav {
+  background: var(--ink);
+  display: flex;
+  border-top: 1px solid rgba(201,145,58,.15);
+  overflow-x: auto;
+  padding: 0 56px;
+  gap: 0;
+}
+.tab-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(245,242,236,.4);
+  padding: 15px 22px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+}
+.tab-btn:hover { color: rgba(245,242,236,.75); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-btn[data-tab="kwality"].active { color: var(--kw-m); border-bottom-color: var(--kw-m); }
+.tab-btn[data-tab="supreme"].active { color: var(--su-m); border-bottom-color: var(--su-m); }
+.tab-btn[data-tab="kenkere"].active { color: var(--ke-m); border-bottom-color: var(--ke-m); }
+
+/* ──── TAB CONTENT ──── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ──── LAYOUT ──── */
+.content { max-width: 1360px; margin: 0 auto; padding: 48px 56px 80px; }
+
+/* ──── SECTION HEADING ──── */
+.sec-head {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 2.5px solid var(--ink);
+}
+.sec-head-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.sec-head h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3.5vw, 32px);
+}
+.sec-sub { color: #666; font-size: 13px; max-width: 720px; margin-top: 6px; }
+
+/* ──── LOCATION BANNER ──── */
+.loc-banner {
+  border-radius: 6px;
+  padding: 24px 32px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.lb-kw { background: linear-gradient(135deg, var(--kw), #0d3348); color: #fff; }
+.lb-su { background: linear-gradient(135deg, var(--su), #400f18); color: #fff; }
+.lb-ke { background: linear-gradient(135deg, var(--ke), #243810); color: #fff; }
+
+.lb-info { flex: 1; }
+.lb-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; opacity: .65; margin-bottom: 4px; }
+.lb-title { font-family: 'Playfair Display', serif; font-size: 22px; }
+.lb-desc { font-size: 12.5px; opacity: .7; margin-top: 4px; max-width: 480px; }
+.lb-stats { display: flex; gap: 28px; flex-shrink: 0; }
+.lb-stat { text-align: center; }
+.lb-sv { font-family: 'Playfair Display', serif; font-size: 22px; }
+.lb-sl { font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: .15em; text-transform: uppercase; opacity: .6; }
+
+/* ──── GRID ──── */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px,1fr)); gap: 18px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; margin-bottom: 24px; }
+
+/* ──── RULE CARD ──── */
+.rc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.rc::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.rc.c-kw::before  { background: var(--kw); }
+.rc.c-su::before  { background: var(--su); }
+.rc.c-ke::before  { background: var(--ke); }
+.rc.c-gold::before { background: var(--gold); }
+.rc.c-slate::before { background: var(--slate); }
+.rc.c-rose::before { background: var(--rose); }
+.rc.c-teal::before { background: var(--teal); }
+.rc.c-amber::before { background: var(--amber); }
+.rc.c-emerald::before { background: var(--emerald); }
+.rc.c-purple::before { background: var(--purple); }
+
+.rc-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.rc.c-kw .rc-label { color: var(--kw); }
+.rc.c-su .rc-label { color: var(--su); }
+.rc.c-ke .rc-label { color: var(--ke); }
+.rc.c-gold .rc-label { color: var(--amber); }
+.rc.c-slate .rc-label { color: var(--slate); }
+.rc.c-rose .rc-label { color: var(--rose); }
+.rc.c-teal .rc-label { color: var(--teal); }
+.rc.c-amber .rc-label { color: var(--amber); }
+.rc.c-emerald .rc-label { color: var(--emerald); }
+.rc.c-purple .rc-label { color: var(--purple); }
+
+.rc h4 { font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
+.rc ul { padding-left: 16px; }
+.rc li { margin-bottom: 5px; font-size: 12.5px; color: #333; }
+.rc p { font-size: 12.5px; color: #333; }
+
+/* ──── SUBSECTION ──── */
+.subsec { margin-top: 40px; margin-bottom: 20px; }
+.subsec h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  border-left: 4px solid var(--gold);
+  padding-left: 14px;
+  margin-bottom: 14px;
+}
+
+/* ──── TRAINER TABLE ──── */
+.t-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 28px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead tr { background: var(--ink); color: #f5f2ec; }
+thead th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 11px 14px;
+  text-align: left;
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:nth-child(even) { background: var(--bg); }
+tbody tr:hover { background: var(--gold-l); }
+td { padding: 10px 14px; vertical-align: top; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+
+/* ──── TAGS ──── */
+.tag {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin: 1px 2px 1px 0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.t-barre   { background: var(--teal-l); color: var(--teal); border: 1px solid #b0d8d8; }
+.t-power   { background: var(--rose-l); color: var(--rose); border: 1px solid #dbb0b8; }
+.t-strength{ background: var(--slate-l); color: var(--slate); border: 1px solid #bfc8d8; }
+.t-mat     { background: var(--amber-l); color: var(--amber); border: 1px solid #d8c0a0; }
+.t-fit     { background: var(--emerald-l); color: var(--emerald); border: 1px solid #a8d0b8; }
+.t-found   { background: var(--purple-l); color: var(--purple); border: 1px solid #c0a8e0; }
+.t-day     { background: var(--bg2); color: var(--ink); border: 1px solid var(--border); }
+.t-off     { background: #fee; color: #900; border: 1px solid #f0b0b0; text-decoration: line-through; }
+.t-hi      { background: var(--gold-l); color: var(--amber); border: 1px solid #e0c090; font-weight: 700; }
+
+/* ──── CALLOUT ──── */
+.callout {
+  padding: 14px 18px;
+  border-radius: 4px;
+  border-left: 4px solid;
+  margin: 16px 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.callout strong { display: block; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; }
+.co-info  { background: var(--teal-l); border-color: var(--teal); color: #0d3535; }
+.co-warn  { background: var(--amber-l); border-color: var(--gold); color: #5c3010; }
+.co-risk  { background: var(--rose-l); border-color: var(--rose); color: #5a0f1f; }
+.co-good  { background: var(--emerald-l); border-color: var(--emerald); color: #0d3520; }
+.co-purple{ background: var(--purple-l); border-color: var(--purple); color: #2a1040; }
+
+/* ──── FILL METER ──── */
+.fill-bar-wrap { background: var(--bg2); border-radius: 20px; height: 8px; overflow: hidden; display: inline-block; width: 80px; vertical-align: middle; margin-left: 6px; }
+.fill-bar { height: 100%; border-radius: 20px; }
+.fb-low  { background: #e0a0a0; }
+.fb-mid  { background: #e0c070; }
+.fb-high { background: #80c090; }
+
+/* ──── SCHEDULE GRID ──── */
+.sched-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7,1fr);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  font-size: 10px;
+  margin-bottom: 24px;
+}
+.sg-col-head {
+  background: var(--ink);
+  color: #f5f2ec;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  text-align: center;
+}
+.sg-time {
+  background: var(--bg2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #666;
+  padding: 6px 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+.sg-cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5px;
+  min-height: 56px;
+}
+.sg-entry {
+  font-size: 9px;
+  padding: 3px 5px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+  line-height: 1.3;
+  font-family: 'JetBrains Mono', monospace;
+}
+.sge-barre { background: var(--teal-l); color: var(--teal); }
+.sge-power { background: var(--rose-l); color: var(--rose); }
+.sge-mat   { background: var(--amber-l); color: var(--amber); }
+.sge-strength { background: var(--slate-l); color: var(--slate); }
+.sge-found { background: var(--purple-l); color: var(--purple); }
+
+/* ──── DIVIDER ──── */
+hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+/* ──── OPPORTUNITY CARD ──── */
+.opp-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.opp-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--gold);
+  line-height: 1;
+  min-width: 32px;
+}
+.opp-body h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.opp-body p { font-size: 12px; color: #555; }
+.opp-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 6px;
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+.ob-now { background: #fde8e8; color: #900; }
+.ob-soon { background: var(--amber-l); color: var(--amber); }
+.ob-plan { background: var(--teal-l); color: var(--teal); }
+
+/* ──── UNIVERSAL RULES ──── */
+.ur { counter-reset: ur-c; }
+.ur-item {
+  display: flex;
+  gap: 16px;
+  padding: 15px 18px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+.ur-item::before {
+  counter-increment: ur-c;
+  content: "0" counter(ur-c);
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--gold);
+  min-width: 30px;
+  line-height: 1;
+}
+.ur-item h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.ur-item p { font-size: 12px; color: #555; }
+
+/* ──── CLASS LEVELS ──── */
+.cl-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.cl-head {
+  background: var(--bg2);
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cl-body { padding: 14px 16px; }
+.cl-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.cl-name { font-weight: 600; min-width: 180px; }
+.cl-level {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.cl-all     { background: var(--emerald-l); color: var(--emerald); }
+.cl-select  { background: var(--amber-l); color: var(--amber); }
+.cl-excl    { background: var(--rose-l); color: var(--rose); }
+
+/* ──── PRINT ──── */
+@media print {
+  .tab-nav, .tab-btn { display: none; }
+  .tab-panel { display: block !important; page-break-before: always; }
+  .hero { print-color-adjust: exact; }
+}
+
+@media (max-width: 768px) {
+  .hero, .content { padding-left: 20px; padding-right: 20px; }
+  .tab-nav { padding: 0 20px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .lb-stats { display: none; }
+  .sched-grid { font-size: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HERO ═══════ -->
+<header class="hero">
+  <div class="hero-label">📋 Single Source of Truth · Version 2.0 · Derived from 20,786 Sessions</div>
+  <h1>Studio Scheduling<br><i>Rulebook</i></h1>
+  <p>Authoritative scheduling guide for all 3 locations — trainers, qualifications, preferred days, class mix, timings, and optimisation opportunities. Jan 2024 – May 2026 data.</p>
+  <div class="hero-stats">
+    <div class="hs"><span class="hs-v">20,786</span><span class="hs-l">Session records</span></div>
+    <div class="hs"><span class="hs-v">3</span><span class="hs-l">Studio locations</span></div>
+    <div class="hs"><span class="hs-v">30</span><span class="hs-l">Active trainers</span></div>
+    <div class="hs"><span class="hs-v">19</span><span class="hs-l">Class formats</span></div>
+    <div class="hs"><span class="hs-v">35%</span><span class="hs-l">Avg fill rate</span></div>
+  </div>
+</header>
+
+<!-- ═══════ TAB NAV ═══════ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="universal">🌐 Universal Rules</button>
+  <button class="tab-btn" data-tab="kwality">🔵 Kwality House</button>
+  <button class="tab-btn" data-tab="supreme">🔴 Supreme HQ</button>
+  <button class="tab-btn" data-tab="kenkere">🟢 Kenkere House</button>
+  <button class="tab-btn" data-tab="trainers">👤 Trainer Profiles</button>
+  <button class="tab-btn" data-tab="classes">📚 Class Formats</button>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 1: UNIVERSAL RULES
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-universal">
+<div class="content">
+
+  <div class="sec-head">
+    <div class="sec-head-label" style="color:var(--gold)">Section 01 · Foundation</div>
+    <h2>Universal Scheduling Rules</h2>
+    <p class="sec-sub">These rules govern all three locations without exception. A location-specific rule can add to these, but never contradict them.</p>
+  </div>
+
+  <div class="subsec"><h3>Core Scheduling Principles</h3></div>
+  <div class="ur">
+    <div class="ur-item"><div><h4>Barre 57 is the Studio's Backbone — Never Below 25% of Weekly Classes</h4><p>Across all locations, Barre 57 constitutes 25–38% of all sessions. It must form the majority block of every weekly schedule. On any given day, a minimum of 2 Barre 57 slots must be filled on weekdays, and 1 on Sundays.</p></div></div>
+    <div class="ur-item"><div><h4>Three Time Bands Must Always Be Covered on Weekdays</h4><p><strong>Morning Band 07:00–09:30</strong> | <strong>Midday Band 10:00–12:30</strong> | <strong>Evening Band 17:30–20:00.</strong> All three bands must have at least one class every weekday at every location. Sundays may skip the Evening Band.</p></div></div>
+    <div class="ur-item"><div><h4>Saturday is Maximum-Intensity Day — Never Understaff It</h4><p>Saturday is the highest or joint-highest session day across all three studios. Schedule the maximum number of Tier 1 trainers on Saturday. Never leave Saturday with a reduced schedule or Tier 3-only coverage.</p></div></div>
+    <div class="ur-item"><div><h4>Sunday is a Reduced Schedule — Afternoons First</h4><p>Sunday consistently has the lowest volume (20–30% below peak days). Maximum 5–6 classes on Sunday. Favour the 10:00–12:00 and 16:00–18:30 windows. Do not start Sunday before 10:00 AM.</p></div></div>
+    <div class="ur-item"><div><h4>Only Qualified Trainers May Teach Specialist Formats</h4><p>PowerCycle, Strength Lab, Pre/Post Natal, and Foundations are specialist formats. They must only be assigned to trainers with confirmed history in that class type. See the Trainer Profiles tab for per-trainer qualifications.</p></div></div>
+    <div class="ur-item"><div><h4>Express Classes Must Be Paired With Full-Length Equivalents on the Same Day</h4><p>Barre 57 Express, Cardio Barre Express, Mat 57 Express, and PowerCycle Express are shortened variants (30–45 min). When scheduling any Express class, a full-length version of the same type must also run that day at another time slot.</p></div></div>
+    <div class="ur-item"><div><h4>Recovery is a Post-Intensity Class — Never the First Slot of the Day</h4><p>Studio Recovery must always follow a high-energy class in the daily lineup. Best placed on weekend afternoons (12:30–16:00). Never schedule it as the opening class of any day.</p></div></div>
+    <div class="ur-item"><div><h4>Foundations Belongs in Off-Peak Slots</h4><p>Foundations classes are beginner entry points. They should be placed in lower-demand times (early morning or mid-afternoon), never in the 11:30 or 19:15 peak slots which draw the most experienced attendees.</p></div></div>
+    <div class="ur-item"><div><h4>No Trainer Should Teach More Than 3 Back-to-Back Classes</h4><p>Historical data shows max 4–5 classes per trainer per day, but quality drops beyond 3 consecutive. Build at least a 30-minute gap between any trainer's third consecutive class. Never schedule a trainer for more than 4 classes in one day.</p></div></div>
+    <div class="ur-item"><div><h4>Trainer Substitution Must Respect Class Certification</h4><p>Step 1: Same tier, same class type. Step 2: One tier lower, same class type. Step 3: Cross-location trainer with ≥30 sessions at that location. Specialist classes (PowerCycle, Strength Lab, Pre/Post Natal) cannot be substituted with non-certified trainers under any circumstance.</p></div></div>
+  </div>
+
+  <hr>
+
+  <div class="subsec"><h3>Day-of-Week Scheduling Norms (All Locations)</h3></div>
+  <div class="grid-2">
+    <div class="rc c-gold">
+      <div class="rc-label">📅 Weekday Volume Tiers</div>
+      <h4>Session Load by Day</h4>
+      <ul>
+        <li><strong>PEAK days (Max load):</strong> Monday, Thursday, Saturday — schedule full roster</li>
+        <li><strong>STRONG days:</strong> Tuesday, Wednesday — 90% of peak roster</li>
+        <li><strong>MODERATE days:</strong> Friday — 80% of peak, light evening</li>
+        <li><strong>LIGHT day:</strong> Sunday — 50–60% of peak, afternoon-forward</li>
+      </ul>
+    </div>
+    <div class="rc c-slate">
+      <div class="rc-label">🕐 Slot Priority Hierarchy</div>
+      <h4>Fill Order for Available Trainers</h4>
+      <ul>
+        <li><strong>Priority 1 (Always fill):</strong> Peak midday (11:00–11:30), Prime evening (19:00–19:30)</li>
+        <li><strong>Priority 2 (Fill next):</strong> Morning block (08:00–09:30), Early evening (17:45–18:15)</li>
+        <li><strong>Priority 3 (Fill if available):</strong> Early morning (07:00–07:30), Late evening (20:00)</li>
+        <li><strong>Priority 4 (Optional):</strong> Mid-afternoon (13:00–16:00) — location dependent</li>
+      </ul>
+    </div>
+    <div class="rc c-rose">
+      <div class="rc-label">🚫 Absolute Prohibitions (All Locations)</div>
+      <h4>Never-Do Rules</h4>
+      <ul>
+        <li>Never schedule PowerCycle at Kenkere House</li>
+        <li>Never schedule Strength Lab outside Kwality House</li>
+        <li>Never schedule Pre/Post Natal outside Kwality House</li>
+        <li>Never assign specialist classes to non-certified trainers</li>
+        <li>Never leave the peak midday slot empty at any location</li>
+        <li>Never schedule Recovery as the first class of the day</li>
+        <li>Never schedule Foundations in a peak timeslot</li>
+        <li>Never roster a trainer at a location with <30 sessions history</li>
+      </ul>
+    </div>
+    <div class="rc c-emerald">
+      <div class="rc-label">✅ Always-Do Rules (All Locations)</div>
+      <h4>Non-Negotiable Positives</h4>
+      <ul>
+        <li>Always have a Barre 57 class before 10:00 AM every day</li>
+        <li>Always have a Barre 57 or Cardio Barre in the 19:00–19:30 window on weekdays</li>
+        <li>Always pair Express classes with full-length versions on the same day</li>
+        <li>Always assign a Tier 1 trainer to the primary peak slot</li>
+        <li>Always have maximum trainer availability on Saturdays</li>
+        <li>Always confirm trainer qualification before specialist class assignment</li>
+        <li>Always schedule at least 1 beginner-accessible class per day (Foundations or Barre 57 in off-peak)</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="subsec"><h3>Class Mix Standards (All Locations)</h3></div>
+  <div class="grid-3">
+    <div class="rc c-teal">
+      <div class="rc-label">🧘 Barre 57 Family</div>
+      <h4>Target: 45–55% of weekly classes</h4>
+      <ul>
+        <li>Barre 57 (full): 25–38% — daily anchor</li>
+        <li>Cardio Barre: 10–12% — 1 per day</li>
+        <li>Back Body Blaze: 3–5% — morning only</li>
+        <li>Amped Up!: 2–3% — optional premium</li>
+        <li>All Express variants: pair with full version</li>
+      </ul>
+    </div>
+    <div class="rc c-mat">
+      <div class="rc-label">🧎 Mat & Recovery</div>
+      <h4>Target: 12–18% of weekly classes</h4>
+      <ul>
+        <li>Mat 57: 6–8% — midday preferred</li>
+        <li>FIT: 5–7% — morning preferred</li>
+        <li>Recovery: 2–3% — weekends only</li>
+        <li>SWEAT In 30: 2–3% — replace Express occasionally</li>
+        <li>Pre/Post Natal: Kwality only; 2–4% there</li>
+      </ul>
+    </div>
+    <div class="rc c-rose">
+      <div class="rc-label">🚴 PowerCycle (Kwality & Supreme Only)</div>
+      <h4>Target: 8–25% (location-specific)</h4>
+      <ul>
+        <li>Kwality: 8–10% of weekly classes</li>
+        <li>Supreme HQ: 25–28% — equal to Barre</li>
+        <li>Kenkere: 0% — never offered</li>
+        <li>Evening slots only (17:30–20:00)</li>
+        <li>Express pairs with full version same day</li>
+      </ul>
+    </div>
+    <div class="rc c-purple">
+      <div class="rc-label">🌱 Foundations (Beginner)</div>
+      <h4>Target: 3–7% (higher at Kenkere)</h4>
+      <ul>
+        <li>Kenkere: 7% — daily beginner class</li>
+        <li>Kwality: 3% — 2–3× per week</li>
+        <li>Supreme: 2–3% — 2× per week</li>
+        <li>Always off-peak slots (07:15 or early afternoon)</li>
+        <li>Qualified trainers only — see Trainer Profiles</li>
+      </ul>
+    </div>
+    <div class="rc c-slate">
+      <div class="rc-label">💪 Strength Lab (Kwality Only)</div>
+      <h4>Target: 6–8% at Kwality House</h4>
+      <ul>
+        <li>Kwality House only — never elsewhere</li>
+        <li>Atulan Purohit exclusively</li>
+        <li>Mon/Wed evenings only (18:00–19:30)</li>
+        <li>Max 2× per week</li>
+        <li>Full Body / Push / Pull variants</li>
+      </ul>
+    </div>
+    <div class="rc c-amber">
+      <div class="rc-label">📊 Capacity Standards</div>
+      <h4>Class Size Rules by Location</h4>
+      <ul>
+        <li>Kwality House: cap 15–20 | avg fill 38%</li>
+        <li>Supreme HQ: cap 13–15 | avg fill 36%</li>
+        <li>Kenkere House: cap 10–12 | avg fill 32%</li>
+        <li>Never exceed location cap regardless of demand</li>
+        <li>Flag any class consistently above 80% fill for capacity review</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 2: KWALITY HOUSE
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-kwality">
+<div class="content">
+
+  <div class="loc-banner lb-kw">
+    <div class="lb-info">
+      <div class="lb-label">📍 Kemps Corner · Mumbai</div>
+      <div class="lb-title">Kwality House</div>
+      <div class="lb-desc">Flagship Mumbai location. Broadest class offering including PowerCycle, Strength Lab, Pre/Post Natal. Largest trainer roster. Highest avg check-in (5.6).</div>
+    </div>
+    <div class="lb-stats">
+      <div class="lb-stat"><div class="lb-sv">7,953</div><div class="lb-sl">Total sessions</div></div>
+      <div class="lb-stat"><div class="lb-sv">9.4</div><div class="lb-sl">Avg/day</div></div>
+      <div class="lb-stat"><div class="lb-sv">5.6</div><div class="lb-sl">Avg check-in</div></div>
+      <div class="lb-stat"><div class="lb-sv">38%</div><div class="lb-sl">Fill rate</div></div>
+    </div>
+  </div>
+
+  <!-- LOCATION RULES -->
+  <div class="subsec"><h3>Location-Specific Scheduling Rules</h3></div>
+  <div class="grid-2">
+    <div class="rc c-kw">
+      <div class="rc-label">📅 Session Volume by Day</div>
+      <h4>Daily Class Targets</h4>
+      <ul>
+        <li><strong>Monday (1,338):</strong> 10–11 classes. Peak weekday. Full roster.</li>
+        <li><strong>Thursday (1,280):</strong> 10 classes. Second busiest. Full roster.</li>
+        <li><strong>Wednesday (1,226):</strong> 10 classes. Strong midweek.</li>
+        <li><strong>Tuesday (1,217):</strong> 9–10 classes. High demand.</li>
+        <li><strong>Saturday (1,180):</strong> 9–10 classes. Peak weekend.</li>
+        <li><strong>Friday (1,068):</strong> 8–9 classes. Lighter end-of-week.</li>
+        <li><strong>Sunday (644):</strong> 5–6 classes. Afternoons only. Reduced roster.</li>
+      </ul>
+    </div>
+    <div class="rc c-gold">
+      <div class="rc-label">🕐 Peak Time Slots (by session volume)</div>
+      <h4>Must-Fill Slots — In Priority Order</h4>
+      <ul>
+        <li><strong>11:30 AM</strong> — 799 sessions, 36% fill → Always fill, Tier 1 trainer</li>
+        <li><strong>19:15 PM</strong> — 679 sessions, 42.6% fill → Prime evening</li>
+        <li><strong>07:30 AM</strong> — 661 sessions → Strong morning demand</li>
+        <li><strong>10:15 AM</strong> — 575 sessions, 47.7% fill → Highest fill rate slot</li>
+        <li><strong>17:45 PM</strong> — 540 sessions, 41.4% fill → Early evening must-have</li>
+        <li><strong>09:00 AM</strong> — 529 sessions, 48% fill → Top fill rate alongside 10:15</li>
+        <li><strong>08:30 AM</strong> — 394 sessions, 46.6% fill → Strong backup morning</li>
+        <li><strong>18:00 PM</strong> — 422 sessions → Evening secondary</li>
+      </ul>
+    </div>
+    <div class="rc c-teal">
+      <div class="rc-label">🧘 Class Mix Rules</div>
+      <h4>Weekly Allocation Targets</h4>
+      <ul>
+        <li><strong>Barre 57 (25%):</strong> 2–3 per day Mon–Thu, 2 on Fri–Sat, 1 on Sun</li>
+        <li><strong>Cardio Barre (10%):</strong> 1 daily, evenings preferred</li>
+        <li><strong>PowerCycle (9%):</strong> 1 daily, evening slots (17:30–19:30)</li>
+        <li><strong>Mat 57 (6.5%):</strong> 1 on Mon, Wed, Sat, Sun minimum</li>
+        <li><strong>FIT (6.2%):</strong> 1 daily, morning preference (07:30–09:00)</li>
+        <li><strong>Strength Lab (7%):</strong> Mon/Wed evenings only, Atulan only</li>
+        <li><strong>Pre/Post Natal (3%):</strong> Mon–Fri mornings; Anisha/Mrigakshi only</li>
+        <li><strong>Foundations (3%):</strong> 2–3× per week, off-peak slots</li>
+        <li><strong>Amped Up! (3%):</strong> 1–2× per week; Reshma or Rohan only</li>
+      </ul>
+    </div>
+    <div class="rc c-rose">
+      <div class="rc-label">⚠️ Location-Specific Constraints</div>
+      <h4>Kwality House Non-Negotiables</h4>
+      <ul>
+        <li>11:30 AM slot must always be filled with a Tier 1 trainer</li>
+        <li>Anisha Shah: Mon/Tue/Wed only — never Thu/Sat/Sun</li>
+        <li>Mrigakshi Jaiswal: Thu/Fri only — never other days at this location</li>
+        <li>Pranjali Jain owns Saturday 10:15–12:30 block</li>
+        <li>Rohan Dahima owns Thursday morning (09:15, 10:15) block</li>
+        <li>Strength Lab: Atulan Purohit exclusively, Mon/Wed evenings</li>
+        <li>Pre/Post Natal: Anisha Shah (Mon–Wed), Mrigakshi Jaiswal (Thu–Fri)</li>
+        <li>Monday has highest fill rate (42.4%) — max Tier 1 on Mondays</li>
+      </ul>
+    </div>
+    <div class="rc c-emerald">
+      <div class="rc-label">📊 Fill Rate Intelligence</div>
+      <h4>Attendance Performance by Day</h4>
+      <ul>
+        <li><strong>Monday: 42.4%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:85%"></span></span> → Best fill day</li>
+        <li><strong>Tuesday: 41.8%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:84%"></span></span></li>
+        <li><strong>Sunday: 40.2%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:80%"></span></span> → Good for a light day</li>
+        <li><strong>Saturday: 38.2%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:76%"></span></span></li>
+        <li><strong>Wednesday: 40.5%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:81%"></span></span></li>
+        <li><strong>Friday: 36.3%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:72%"></span></span></li>
+        <li><strong>Thursday: 33.5%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:67%"></span></span> → Lowest fill despite high volume</li>
+      </ul>
+    </div>
+    <div class="rc c-purple">
+      <div class="rc-label">🔮 Optimisation Opportunities</div>
+      <h4>Specific Growth Levers</h4>
+      <ul>
+        <li>Thursday fill (33.5%) is below expectation — test different trainer assignments vs. high-volume days to identify gap</li>
+        <li>10:15 AM slot has 47.7% fill — the studio's best-performing window. Add a second 10:15 class on Mon/Tue if trainer available</li>
+        <li>08:30 AM also has 46.6% fill — high demand, relatively low volume (394 sessions). Expand to Thu/Fri</li>
+        <li>Sunday has surprisingly good fill (40.2%) vs. low class count — opportunity to add 1–2 more Sunday slots at 10:00 and 16:00</li>
+        <li>Anisha Shah's avg check-in of 7.7 is the highest at this location — expand her to occasional Friday morning slots</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TRAINER RULES TABLE -->
+  <div class="subsec"><h3>Trainer Scheduling Rules — Kwality House</h3></div>
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Trainer</th>
+          <th>Tier</th>
+          <th>Work Days</th>
+          <th>Days Off Pattern</th>
+          <th>Time Window</th>
+          <th>Avg Classes/Day</th>
+          <th>Avg Check-in</th>
+          <th>Qualified Class Levels</th>
+          <th>Location Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Rohan Dahima</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Fri</span><span class="tag t-off">Sat</span></td>
+          <td>07:30–19:30</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>6.8</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-power">PowerCycle</span><span class="tag t-strength">Strength Lab</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Thu morning block (09:15, 10:15). Sun 11:30 anchor.</td>
+        </tr>
+        <tr>
+          <td>Pranjali Jain</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:15</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>6.7</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Sat 10:15–12:30. Mon/Wed evenings. Pre/Post Natal qualified.</td>
+        </tr>
+        <tr>
+          <td>Reshma Sharma</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span></td>
+          <td>07:15–19:30</td>
+          <td>2.4 (max 4)</td>
+          <td><strong>6.2</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>Tue morning specialist (08:30, 11:00). Strong Sat presence. Amped Up! specialist.</td>
+        </tr>
+        <tr>
+          <td>Richard D'Costa</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td>—</td>
+          <td>07:15–19:15</td>
+          <td>2.3 (max 4)</td>
+          <td><strong>4.3</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>Early morning specialist. Tue 07:30 anchor. Most days available.</td>
+        </tr>
+        <tr>
+          <td>Atulan Purohit</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Fri</span></td>
+          <td><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:30</td>
+          <td>2.3 (max 4)</td>
+          <td><strong>5.3</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td><strong>SOLE Strength Lab trainer at this location.</strong> Mon/Wed evenings for SL. No PowerCycle at Kwality.</td>
+        </tr>
+        <tr>
+          <td>Anisha Shah</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:15</td>
+          <td>1.9 (max 3)</td>
+          <td><strong>7.7 ★</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>Highest avg attendance (7.7). Mon–Wed ONLY. Pre/Post Natal specialist. Morning + evening dual-slot days.</td>
+        </tr>
+        <tr>
+          <td>Mrigakshi Jaiswal</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span></td>
+          <td><span class="tag t-off">Wed</span><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:15</td>
+          <td>2.3 (max 3)</td>
+          <td><strong>5.9</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span></td>
+          <td>Thu/Fri ONLY. Early morning specialist. Pre/Post Natal qualified. Back Body Blaze primary format.</td>
+        </tr>
+        <tr>
+          <td>Karan Bhatia</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Sun</span></td>
+          <td>07:30–19:15</td>
+          <td>2.1 (max 3)</td>
+          <td><strong>3.6</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-power">PowerCycle</span><span class="tag t-found">Foundations</span></td>
+          <td>Evening specialist (17:45, 19:00). Wed/Thu primary. Sat 11:30 secondary.</td>
+        </tr>
+        <tr>
+          <td>Vivaran Dhasmana</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span></td>
+          <td><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:30</td>
+          <td>2.3 (max 3)</td>
+          <td><strong>5.3</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>Thu/Fri evenings primary. Tue mornings secondary. Cardio Barre Plus specialist.</td>
+        </tr>
+        <tr>
+          <td>Karanvir Bhatia</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Mon</span></td>
+          <td>07:30–19:15</td>
+          <td>2.2 (max 4)</td>
+          <td><strong>4.9</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-found">Foundations</span></td>
+          <td>Weekend afternoon owner (Sun 16:00, 17:15). Sat secondary.</td>
+        </tr>
+        <tr>
+          <td>Cauveri Vikrant</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Fri</span></td>
+          <td>07:30–19:30</td>
+          <td>2.4 (max 5)</td>
+          <td><strong>6.0</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span></td>
+          <td>Sat mornings primary. PowerCycle qualified. Wed/Thu secondary.</td>
+        </tr>
+        <tr>
+          <td>Janhavi Jain</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span></td>
+          <td>—</td>
+          <td>07:30–19:15</td>
+          <td>2.0 (max 3)</td>
+          <td><strong>4.1</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Mixed morning/evening schedule. SWEAT In 30 specialist. Pre/Post Natal qualified.</td>
+        </tr>
+        <tr>
+          <td>Simonelle De Vitre</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span></td>
+          <td>07:30–19:15</td>
+          <td>1.8 (max 3)</td>
+          <td><strong>5.4</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span></td>
+          <td>Mon early morning anchor. Sat afternoon backup.</td>
+        </tr>
+        <tr>
+          <td>Nishanth Raj</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Thu</span></td>
+          <td><span class="tag t-off">Wed</span><span class="tag t-off">Fri</span></td>
+          <td>07:30–19:15</td>
+          <td>2.1 (max 3)</td>
+          <td><strong>3.4</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>Tue/Thu evening filler. Not a morning trainer at this location.</td>
+        </tr>
+        <tr>
+          <td>Bret Saldanha</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Thu</span></td>
+          <td>07:30–19:30</td>
+          <td>1.6 (max 3)</td>
+          <td><strong>3.2</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>PowerCycle specialist exclusively. Fri mornings primary.</td>
+        </tr>
+        <tr>
+          <td>Anmol Sharma</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Fri</span><span class="tag t-day">Sun</span></td>
+          <td>—</td>
+          <td>08:00–19:30</td>
+          <td>1.2 (max 3)</td>
+          <td><strong>3.5</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>PowerCycle evening slots. Sun 17:00 anchor. Low avg — off-peak only.</td>
+        </tr>
+        <tr>
+          <td>Simran Dutt</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Tue</span><span class="tag t-off">Thu</span></td>
+          <td>08:30–19:15</td>
+          <td>2.0 (max 2)</td>
+          <td><strong>4.5</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-mat">Mat 57</span><span class="tag t-barre">Cardio Barre Exp.</span></td>
+          <td>Weekend afternoon specialist. Consistent 16:00–18:00 window.</td>
+        </tr>
+        <tr>
+          <td>Raunak Khemuka</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Fri</span></td>
+          <td>08:00–19:30</td>
+          <td>1.4 (max 3)</td>
+          <td><strong>3.0</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>Sun midday anchor. Low volume. Off-peak PowerCycle slots only.</td>
+        </tr>
+        <tr>
+          <td>Saniya Jaiswal</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Fri</span><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:30–19:15</td>
+          <td>2.1 (max 3)</td>
+          <td><strong>5.8</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Back Body Blaze</span><span class="tag t-fit">FIT</span><span class="tag t-mat">Mat 57</span></td>
+          <td>Good avg attendance (5.8). Thu/Mon only. Pre/Post Natal qualified.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout co-warn">
+    <strong>⚡ Key Kwality House Insight</strong>
+    Thursday has the second-highest session count but the lowest fill rate (33.5%) — suggesting classes are scheduled beyond demand. Consider trimming 1–2 Thursday slots or experimenting with different class types to lift fill rates. The Mon/Tue/Wed block consistently outperforms.
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 3: SUPREME HQ
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-supreme">
+<div class="content">
+
+  <div class="loc-banner lb-su">
+    <div class="lb-info">
+      <div class="lb-label">📍 Bandra · Mumbai</div>
+      <div class="lb-title">Supreme HQ</div>
+      <div class="lb-desc">The only location where PowerCycle equals Barre 57 at ~25% each. Fitness-forward audience. Evening-heavy demand. Most complex trainer rotation.</div>
+    </div>
+    <div class="lb-stats">
+      <div class="lb-stat"><div class="lb-sv">6,859</div><div class="lb-sl">Total sessions</div></div>
+      <div class="lb-stat"><div class="lb-sv">9.8</div><div class="lb-sl">Avg/day</div></div>
+      <div class="lb-stat"><div class="lb-sv">4.6</div><div class="lb-sl">Avg check-in</div></div>
+      <div class="lb-stat"><div class="lb-sv">36%</div><div class="lb-sl">Fill rate</div></div>
+    </div>
+  </div>
+
+  <div class="callout co-risk">
+    <strong>🔴 Critical Location-Specific Rule — Supreme HQ</strong>
+    This is the ONLY studio where PowerCycle must be treated as an equal pillar to Barre 57. Both must receive 2–3 classes per day on weekdays. Cauveri Vikrant is the primary PowerCycle trainer — she must be first-choice for all PowerCycle slots. Do not let any day have fewer than 2 PowerCycle offerings.
+  </div>
+
+  <div class="subsec"><h3>Location-Specific Scheduling Rules</h3></div>
+  <div class="grid-2">
+    <div class="rc c-su">
+      <div class="rc-label">📅 Session Volume by Day</div>
+      <h4>Daily Class Targets</h4>
+      <ul>
+        <li><strong>Thursday (1,070):</strong> 10–11 classes. Peak day. Full roster.</li>
+        <li><strong>Saturday (1,061):</strong> 10 classes. Weekend peak. Full roster.</li>
+        <li><strong>Monday (1,060):</strong> 10 classes. Near-equal to peak days.</li>
+        <li><strong>Tuesday (1,043):</strong> 9–10 classes. Strong weekday.</li>
+        <li><strong>Friday (1,014):</strong> 9 classes. Active end-of-week.</li>
+        <li><strong>Wednesday (957):</strong> 8–9 classes. Moderate volume.</li>
+        <li><strong>Sunday (654):</strong> 5–6 classes. Afternoon-heavy reduced schedule.</li>
+      </ul>
+    </div>
+    <div class="rc c-gold">
+      <div class="rc-label">🕐 Peak Time Slots (by session volume)</div>
+      <h4>Must-Fill Slots — In Priority Order</h4>
+      <ul>
+        <li><strong>18:00 PM</strong> — 559 sessions, 32% fill → Top slot; always Tier 1</li>
+        <li><strong>11:00 AM</strong> — 510 sessions, 43.2% fill → Best midday fill rate</li>
+        <li><strong>09:00 AM</strong> — 444 sessions, 39.8% fill → Strong morning</li>
+        <li><strong>19:15 PM</strong> — 429 sessions, 37.1% fill → Late evening</li>
+        <li><strong>19:30 PM</strong> — 403 sessions, 43.5% fill → Highest evening fill</li>
+        <li><strong>09:30 AM</strong> — 349 sessions, 46.7% fill → Best fill slot overall</li>
+        <li><strong>10:15 AM</strong> — 349 sessions, 40.8% fill → Mid-morning</li>
+        <li><strong>08:00 AM</strong> — 314 sessions, 41.2% fill → Strong early</li>
+      </ul>
+    </div>
+    <div class="rc c-teal">
+      <div class="rc-label">🧘 Class Mix Rules — Bandra Specific</div>
+      <h4>Weekly Allocation Targets</h4>
+      <ul>
+        <li><strong>Barre 57 (26%):</strong> 2–3 per day Mon–Sat, 1–2 on Sun</li>
+        <li><strong>PowerCycle (25%):</strong> 2–3 per day — EQUAL to Barre. Evening slots primary.</li>
+        <li><strong>Cardio Barre (10%):</strong> 1 daily, evenings</li>
+        <li><strong>FIT (7.4%):</strong> 1 daily, mornings</li>
+        <li><strong>Mat 57 (6.5%):</strong> 3–4× per week, midday</li>
+        <li><strong>PowerCycle Express (6.5%):</strong> Pair with full PowerCycle days</li>
+        <li><strong>Back Body Blaze (3%):</strong> 2× per week, mornings</li>
+        <li><strong>Recovery (2.4%):</strong> Weekend afternoons only</li>
+        <li><strong>Foundations (2–3%):</strong> 2× per week, off-peak</li>
+      </ul>
+    </div>
+    <div class="rc c-rose">
+      <div class="rc-label">⚠️ Location-Specific Constraints</div>
+      <h4>Supreme HQ Non-Negotiables</h4>
+      <ul>
+        <li>Cauveri Vikrant is first-choice for ALL PowerCycle slots</li>
+        <li>Anisha Shah: THURSDAYS ONLY — never schedule any other day at Bandra</li>
+        <li>Vivaran Dhasmana owns Tue/Wed morning blocks (07:30–11:00)</li>
+        <li>Karan Bhatia owns Sunday 10:15 and 11:30 blocks</li>
+        <li>Atulan Purohit owns Fri/Sat morning block (09:00–11:30)</li>
+        <li>Mrigakshi Jaiswal: Mon/Tue/Wed evenings only — not available other days here</li>
+        <li>18:00 PM slot must always have Tier 1 trainer on weekdays</li>
+        <li>No Strength Lab. No Pre/Post Natal at this location.</li>
+      </ul>
+    </div>
+    <div class="rc c-emerald">
+      <div class="rc-label">📊 Fill Rate Intelligence</div>
+      <h4>Attendance Performance by Day</h4>
+      <ul>
+        <li><strong>Saturday: 40.1%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:80%"></span></span> → Best fill day</li>
+        <li><strong>Sunday: 39.2%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:78%"></span></span> → Good for a light day</li>
+        <li><strong>Tuesday: 38.4%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:77%"></span></span></li>
+        <li><strong>Thursday: 37.3%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:75%"></span></span></li>
+        <li><strong>Monday: 33.7%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:67%"></span></span></li>
+        <li><strong>Wednesday: 32.7%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-low" style="width:65%"></span></span></li>
+        <li><strong>Friday: 31.2%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-low" style="width:62%"></span></span> → Lowest fill day</li>
+      </ul>
+    </div>
+    <div class="rc c-purple">
+      <div class="rc-label">🔮 Optimisation Opportunities</div>
+      <h4>Specific Growth Levers</h4>
+      <ul>
+        <li>09:30 AM has the highest fill rate (46.7%) but only 349 sessions — the studio's most underserved high-demand slot. Expand 09:30 to 5 days/week</li>
+        <li>Friday fill (31.2%) is the weakest day — test different trainer/class assignments or reduce Friday class count by 1–2</li>
+        <li>18:00 PM slot has the highest volume (559) but only 32% fill — suggests capacity is too high. Reduce cap to 12 for this slot</li>
+        <li>Wednesday fill (32.7%) is below average — audit Wednesday class variety; Mrigakshi Jaiswal's evening sessions are underperforming vs. her Kwality numbers</li>
+        <li>Anisha Shah's Thu-only block at Bandra averages 6.1 check-in — consider a second Thu-only trainer to extend her proven morning block format</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>Trainer Scheduling Rules — Supreme HQ, Bandra</h3></div>
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Trainer</th>
+          <th>Tier</th>
+          <th>Work Days</th>
+          <th>Days Off Pattern</th>
+          <th>Time Window</th>
+          <th>Avg Classes/Day</th>
+          <th>Avg Check-in</th>
+          <th>Qualified Class Levels</th>
+          <th>Location Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Vivaran Dhasmana</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span><span class="tag t-off">Sun</span></td>
+          <td>07:00–20:00</td>
+          <td>2.6 (max 4)</td>
+          <td><strong>5.9</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Tue/Wed morning blocks (07:30–11:00). Mon/Wed evenings secondary. Back Body Blaze specialist.</td>
+        </tr>
+        <tr>
+          <td>Karanvir Bhatia</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Wed</span><span class="tag t-off">Sun</span></td>
+          <td>07:00–20:00</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>4.3</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Evening specialist (17:45–19:30) across most weekdays. 5-day availability.</td>
+        </tr>
+        <tr>
+          <td>Cauveri Vikrant</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Tue</span></td>
+          <td>07:30–19:45</td>
+          <td>2.2 (max 3)</td>
+          <td><strong>5.4</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle ★</span><span class="tag t-fit">FIT</span></td>
+          <td><strong>PRIMARY PowerCycle trainer — 67% of her sessions are PowerCycle.</strong> First-choice for all PC slots. Mon/Thu/Fri/Sun availability.</td>
+        </tr>
+        <tr>
+          <td>Karan Bhatia</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td>—</td>
+          <td>07:00–20:00</td>
+          <td>2.1 (max 4)</td>
+          <td><strong>3.8</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-power">PowerCycle</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Sunday morning block (10:15, 11:30). Weekend midday specialist. Mon evening secondary.</td>
+        </tr>
+        <tr>
+          <td>Atulan Purohit</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:30</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>5.3</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Fri/Sat morning block (09:00–11:30). Thu evening secondary. No Strength Lab at this location.</td>
+        </tr>
+        <tr>
+          <td>Mrigakshi Jaiswal</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–20:00</td>
+          <td>2.2 (max 4)</td>
+          <td><strong>5.0</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Mon/Tue/Wed ONLY at Bandra. Evening specialist (18:00–20:00). 19:30 is primary anchor.</td>
+        </tr>
+        <tr>
+          <td>Reshma Sharma</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Tue</span></td>
+          <td>07:00–19:30</td>
+          <td>2.4 (max 3)</td>
+          <td><strong>4.8</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Versatile 5-day trainer. PowerCycle and Barre equally split. Sun midday specialist.</td>
+        </tr>
+        <tr>
+          <td>Rohan Dahima</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:30</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>4.5</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Sat afternoon anchor (17:00, 18:30). Wed morning secondary.</td>
+        </tr>
+        <tr>
+          <td>Richard D'Costa</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Wed</span></td>
+          <td>07:15–19:30</td>
+          <td>2.2 (max 3)</td>
+          <td><strong>3.5</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Sunday afternoon anchor (17:00–18:30). Mon/Sat backfill. Also Tue/Fri available.</td>
+        </tr>
+        <tr>
+          <td>Pranjali Jain</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Fri</span><span class="tag t-day">Mon</span></td>
+          <td><span class="tag t-off">Sat</span></td>
+          <td>07:15–19:30</td>
+          <td>2.4 (max 3)</td>
+          <td><strong>3.7</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Tue/Fri early morning specialist (07:15–09:30). Fri evenings secondary. No Sat at Bandra.</td>
+        </tr>
+        <tr>
+          <td>Anisha Shah</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Thu</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–12:00</td>
+          <td>2.7 (max 4)</td>
+          <td><strong>6.1</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span></td>
+          <td><strong>THURSDAYS ONLY. Never any other day.</strong> Teaches 08:00–11:00 block on Thursdays. Do not assign Fri–Sun.</td>
+        </tr>
+        <tr>
+          <td>Simonelle De Vitre</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Thu</span></td>
+          <td>07:15–20:00</td>
+          <td>2.3 (max 5)</td>
+          <td><strong>3.5</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-mat">Mat 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-power">PowerCycle</span></td>
+          <td>Late evening specialist (19:15–20:00). Tue/Wed only. Recovery qualified.</td>
+        </tr>
+        <tr>
+          <td>Saniya Jaiswal</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Fri</span></td>
+          <td><span class="tag t-off">Sat</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–20:00</td>
+          <td>2.4 (max 3)</td>
+          <td><strong>3.4</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Morning backup trainer (Tue/Fri). Good versatility. No weekends.</td>
+        </tr>
+        <tr>
+          <td>Nishanth Raj</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Thu</span></td>
+          <td>08:30–19:15</td>
+          <td>2.0 (max 3)</td>
+          <td><strong>2.6</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>Weekend-only backup. Sat afternoon and Fri morning alternates. Lowest avg at Bandra.</td>
+        </tr>
+        <tr>
+          <td>Simran Dutt</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Sun</span></td>
+          <td>07:15–19:15</td>
+          <td>1.8 (max 3)</td>
+          <td><strong>2.5</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span></td>
+          <td>Off-peak supplemental filler only. Low avg attendance — avoid peak slots.</td>
+        </tr>
+        <tr>
+          <td>Anmol Sharma</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Fri</span><span class="tag t-off">Sun</span></td>
+          <td>08:00–19:30</td>
+          <td>1.7 (max 3)</td>
+          <td><strong>3.3</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>PowerCycle backup. Evening slots only. Mon/Thu/Sat.</td>
+        </tr>
+        <tr>
+          <td>Bret Saldanha</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Wed</span><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span></td>
+          <td>08:00–19:30</td>
+          <td>1.8 (max 2)</td>
+          <td><strong>2.7</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>Mon morning PowerCycle backup. Low priority for peak slots.</td>
+        </tr>
+        <tr>
+          <td>Raunak Khemuka</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Thu</span><span class="tag t-off">Sun</span></td>
+          <td>08:00–19:30</td>
+          <td>1.3 (max 2)</td>
+          <td><strong>1.7</strong></td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>Lowest avg attendance (1.7). Use only for very off-peak slots. Avoid any peak window.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout co-good">
+    <strong>✅ Supreme HQ Identity Statement</strong>
+    Bandra is the studio's PowerCycle hub. Every scheduling decision must protect the dual Barre+PowerCycle identity. The 09:30 AM slot is the most efficient (46.7% fill) but significantly underused — expanding it to 5 days is the single highest-ROI scheduling change available at this location.
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 4: KENKERE HOUSE
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-kenkere">
+<div class="content">
+
+  <div class="loc-banner lb-ke">
+    <div class="lb-info">
+      <div class="lb-label">📍 Bengaluru</div>
+      <div class="lb-title">Kenkere House</div>
+      <div class="lb-desc">Bengaluru's Barre-first community studio. Strongest Foundations offering. No PowerCycle. Smaller class sizes. Kajol Kanchan and Pushyank Nahar are the anchors.</div>
+    </div>
+    <div class="lb-stats">
+      <div class="lb-stat"><div class="lb-sv">5,481</div><div class="lb-sl">Total sessions</div></div>
+      <div class="lb-stat"><div class="lb-sv">6.5</div><div class="lb-sl">Avg/day</div></div>
+      <div class="lb-stat"><div class="lb-sv">3.8</div><div class="lb-sl">Avg check-in</div></div>
+      <div class="lb-stat"><div class="lb-sv">32%</div><div class="lb-sl">Fill rate</div></div>
+    </div>
+  </div>
+
+  <div class="callout co-info">
+    <strong>🟢 Critical Location-Specific Rule — Kenkere House</strong>
+    This is a Barre-first, community studio. PowerCycle is NEVER offered here. Foundations has a higher proportion (7%) than any other location — it serves as the beginner funnel. The Saturday morning block (09:00–11:00) is the studio's commercial peak and must always be staffed by Kajol or Pushyank.
+  </div>
+
+  <div class="subsec"><h3>Location-Specific Scheduling Rules</h3></div>
+  <div class="grid-2">
+    <div class="rc c-ke">
+      <div class="rc-label">📅 Session Volume by Day</div>
+      <h4>Daily Class Targets</h4>
+      <ul>
+        <li><strong>Saturday (896):</strong> 7–8 classes. Busiest day. Full roster.</li>
+        <li><strong>Wednesday (862):</strong> 7 classes. Strong midweek.</li>
+        <li><strong>Thursday (855):</strong> 7 classes. Near-equal to Wed.</li>
+        <li><strong>Tuesday (821):</strong> 7 classes. Active weekday.</li>
+        <li><strong>Monday (834):</strong> 7 classes. Solid weekday opener.</li>
+        <li><strong>Friday (701):</strong> 6 classes. Lighter day.</li>
+        <li><strong>Sunday (512):</strong> 4–5 classes. Afternoon-only. Reduced roster.</li>
+      </ul>
+    </div>
+    <div class="rc c-gold">
+      <div class="rc-label">🕐 Peak Time Slots (by session volume)</div>
+      <h4>Must-Fill Slots — In Priority Order</h4>
+      <ul>
+        <li><strong>09:00 AM</strong> — 619 sessions, 34.9% fill → Top slot; Tier 1 trainer</li>
+        <li><strong>17:00 PM</strong> — 554 sessions, 33.4% fill → Prime afternoon-evening</li>
+        <li><strong>11:00 AM</strong> — 549 sessions, 28.1% fill → Midday standard</li>
+        <li><strong>07:15 AM</strong> — 476 sessions, 31.6% fill → Strong early morning</li>
+        <li><strong>18:15 PM</strong> — 396 sessions, 36.7% fill → Best evening fill rate</li>
+        <li><strong>10:00 AM</strong> — 144 sessions, 56.5% fill → HIGHEST fill rate slot overall</li>
+        <li><strong>10:15 AM</strong> — 176 sessions, 41.2% fill → High-demand midmorning</li>
+        <li><strong>19:15 PM</strong> — 179 sessions, 38.5% fill → Evening secondary</li>
+      </ul>
+    </div>
+    <div class="rc c-teal">
+      <div class="rc-label">🧘 Class Mix Rules</div>
+      <h4>Weekly Allocation Targets</h4>
+      <ul>
+        <li><strong>Barre 57 (37.6%):</strong> 3 per day Mon–Sat, 2 on Sun — dominant class</li>
+        <li><strong>Cardio Barre (19.6%):</strong> 1–2 daily; nearly 1 in 5 classes</li>
+        <li><strong>Mat 57 (9.9%):</strong> Daily midday (11:00)</li>
+        <li><strong>Foundations (7%):</strong> 1 daily — highest Foundations % of all studios</li>
+        <li><strong>FIT (5.3%):</strong> 3–4× per week, mornings</li>
+        <li><strong>Back Body Blaze (4.2%):</strong> 3× per week, mornings</li>
+        <li><strong>Recovery (3.2%):</strong> Weekend afternoons only</li>
+        <li><strong>SWEAT In 30 / Express (2–3%):</strong> Supplemental filler</li>
+        <li><strong>PowerCycle: 0%</strong> — NEVER offered at Kenkere</li>
+      </ul>
+    </div>
+    <div class="rc c-rose">
+      <div class="rc-label">⚠️ Location-Specific Constraints</div>
+      <h4>Kenkere House Non-Negotiables</h4>
+      <ul>
+        <li>PowerCycle is NEVER scheduled here — ever, for any reason</li>
+        <li>Kajol Kanchan is the 6-day anchor — never reduce her allocation without coverage</li>
+        <li>Pushyank Nahar owns Mon/Tue/Thu morning blocks (07:15, 09:00, 11:00)</li>
+        <li>Shruti Kulkarni owns Thu/Fri mornings and Sunday midday</li>
+        <li>Veena Narasimhan: weekends ONLY, afternoons only (16:00–17:15)</li>
+        <li>Chaitanya Nahar: Mon/Sat/Sun afternoons only (16:00–18:45)</li>
+        <li>09:00 AM must always be filled with a Tier 1 trainer</li>
+        <li>Saturday 09:00–11:00 block is the commercial peak — Kajol or Pushyank only</li>
+        <li>Foundations must only be taught by: Shruti Kulkarni, Poojitha Bhaskar, Siddhartha Kusuma, Shruti Suresh, Pushyank Nahar or Kajol Kanchan</li>
+      </ul>
+    </div>
+    <div class="rc c-emerald">
+      <div class="rc-label">📊 Fill Rate Intelligence</div>
+      <h4>Attendance Performance by Day</h4>
+      <ul>
+        <li><strong>Saturday: 40.6%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-high" style="width:81%"></span></span> → Best fill day by far</li>
+        <li><strong>Sunday: 38.0%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:76%"></span></span> → Good for a light day</li>
+        <li><strong>Tuesday: 30.7%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:61%"></span></span></li>
+        <li><strong>Wednesday: 30.4%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-mid" style="width:61%"></span></span></li>
+        <li><strong>Thursday: 29.1%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-low" style="width:58%"></span></span></li>
+        <li><strong>Friday: 28.3%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-low" style="width:57%"></span></span></li>
+        <li><strong>Monday: 26.7%</strong> <span class="fill-bar-wrap"><span class="fill-bar fb-low" style="width:53%"></span></span> → Weakest fill day</li>
+      </ul>
+    </div>
+    <div class="rc c-purple">
+      <div class="rc-label">🔮 Optimisation Opportunities</div>
+      <h4>Specific Growth Levers</h4>
+      <ul>
+        <li>10:00 AM slot has 56.5% fill — highest of any slot at any location. Only 144 sessions. Dramatically expand the 10:00 AM slot to 5 days/week immediately</li>
+        <li>Monday fill (26.7%) is the weakest — try shifting 1–2 Monday classes to the higher-demand 10:00–10:15 window</li>
+        <li>16:00 slot has only 22.4% fill — consider retiring 1–2 of the 245 sessions at 16:00 and redeploying trainers to the 10:00 or 18:15 slots</li>
+        <li>Saturday/Sunday fill rate jumps to 38–40% — this is a Bengaluru weekend audience that wants more classes. Consider adding a 4th Saturday morning slot</li>
+        <li>19:15 PM has only 179 sessions but 38.5% fill — there is latent late evening demand at Kenkere that is underserved</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>Trainer Scheduling Rules — Kenkere House</h3></div>
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Trainer</th>
+          <th>Tier</th>
+          <th>Work Days</th>
+          <th>Days Off Pattern</th>
+          <th>Time Window</th>
+          <th>Avg Classes/Day</th>
+          <th>Avg Check-in</th>
+          <th>Qualified Class Levels</th>
+          <th>Location Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Kajol Kanchan</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span><span class="tag t-day">Tue</span></td>
+          <td>—</td>
+          <td>07:00–19:30</td>
+          <td>2.5 (max 4)</td>
+          <td><strong>4.5</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Studio anchor. 6-day availability. Mon/Wed/Sat mornings + evenings primary. Saturday 09:00 mandatory assignment.</td>
+        </tr>
+        <tr>
+          <td>Shruti Kulkarni</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td>—</td>
+          <td>07:00–19:30</td>
+          <td>2.3 (max 4)</td>
+          <td><strong>3.8</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Thu/Fri morning anchor. Sun midday specialist. 6-day availability. Back Body Blaze specialist. Foundations certified.</td>
+        </tr>
+        <tr>
+          <td>Pushyank Nahar</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span></td>
+          <td><span class="tag t-off">Sun</span></td>
+          <td>07:00–19:30</td>
+          <td>2.5 (max 5)</td>
+          <td><strong>4.0</strong></td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Owns Mon/Tue/Thu morning blocks (07:15, 09:00, 11:00). Thu 17:00+18:15 evening pair. Sat morning backup for Kajol. Sunday off.</td>
+        </tr>
+        <tr>
+          <td>Siddhartha Kusuma</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Fri</span></td>
+          <td>07:15–19:30</td>
+          <td>2.1 (max 4)</td>
+          <td><strong>3.3</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>Tue/Wed mornings. Wed/Sun afternoons. Foundations certified.</td>
+        </tr>
+        <tr>
+          <td>Shruti Suresh</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Wed</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td>—</td>
+          <td>07:00–19:30</td>
+          <td>2.0 (max 3)</td>
+          <td><strong>2.7</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-found">Foundations</span></td>
+          <td>Morning and early afternoons. 6-day availability. Foundations certified. Lower avg — avoid 09:00 peak.</td>
+        </tr>
+        <tr>
+          <td>Poojitha Bhaskar</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Wed</span></td>
+          <td>07:15–19:15</td>
+          <td>2.1 (max 3)</td>
+          <td><strong>2.4</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>Low avg attendance (2.4) — morning backup only. Foundations certified. Avoid peak 09:00 slot.</td>
+        </tr>
+        <tr>
+          <td>Karan Bhatia</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Thu</span><span class="tag t-day">Fri</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Wed</span><span class="tag t-off">Sat</span></td>
+          <td>07:15–19:30</td>
+          <td>2.1 (max 3)</td>
+          <td><strong>3.4</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>Visiting from Mumbai. Part-time at Kenkere. Tue/Fri mornings preferred.</td>
+        </tr>
+        <tr>
+          <td>Vivaran Dhasmana</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Tue</span><span class="tag t-day">Wed</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Fri</span></td>
+          <td>07:15–19:15</td>
+          <td>1.9 (max 4)</td>
+          <td><strong>4.5</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-found">Foundations</span></td>
+          <td>Visiting from Mumbai studios. Sat mornings anchor when available. Good avg attendance.</td>
+        </tr>
+        <tr>
+          <td>Chaitanya Nahar</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Mon</span><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Tue</span><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span></td>
+          <td>08:30–19:30</td>
+          <td>1.8 (max 2)</td>
+          <td><strong>2.8</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span></td>
+          <td>Weekend + Monday afternoon/evening ONLY. Never schedule mornings. Recovery qualified.</td>
+        </tr>
+        <tr>
+          <td>Veena Narasimhan</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td><span class="tag t-day">Sat</span><span class="tag t-day">Sun</span></td>
+          <td><span class="tag t-off">Mon</span><span class="tag t-off">Tue</span><span class="tag t-off">Wed</span><span class="tag t-off">Thu</span><span class="tag t-off">Fri</span></td>
+          <td>16:00–17:15</td>
+          <td>2.0 (max 2)</td>
+          <td><strong>2.9</strong></td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-found">Foundations</span></td>
+          <td>Weekends ONLY. Strictly afternoon slots (16:00 and 17:15). No other windows.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout co-good">
+    <strong>✅ Kenkere House Identity Statement</strong>
+    Kenkere is a Barre-pure studio with a strong community character. Its 10:00 AM slot has a 56.5% fill rate — the highest efficiency of any slot across all three studios — and is massively underexploited with only 144 sessions. Expanding this slot to daily is the #1 growth action for this location.
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 5: TRAINER PROFILES
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-trainers">
+<div class="content">
+
+  <div class="sec-head">
+    <div class="sec-head-label" style="color:var(--gold)">Section 05 · Trainer Master Reference</div>
+    <h2>Trainer Qualification & Location Profiles</h2>
+    <p class="sec-sub">Cross-location view of every trainer's qualifications, home studio, and scheduling eligibility. Use this before any substitution or new assignment.</p>
+  </div>
+
+  <div class="subsec"><h3>Qualification Key</h3></div>
+  <div class="grid-3" style="margin-bottom:28px">
+    <div><span class="tag t-barre">All Barre</span> — All Barre 57 family formats including Express, Cardio, Back Body Blaze, Amped Up!, Cardio Barre Plus</div>
+    <div><span class="tag t-mat">Mat 57</span> — Mat 57 (full + Express)</div>
+    <div><span class="tag t-fit">FIT / Specialty</span> — Studio FIT, SWEAT In 30, HIIT, Recovery</div>
+    <div><span class="tag t-power">PowerCycle</span> — Full PowerCycle + Express</div>
+    <div><span class="tag t-strength">Strength Lab</span> — Full Body, Push, Pull variants</div>
+    <div><span class="tag t-found">Foundations</span> — Beginner entry class</div>
+  </div>
+
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Trainer</th>
+          <th>Primary Location(s)</th>
+          <th>Class Qualifications</th>
+          <th>Pre/Post Natal</th>
+          <th>Strength Lab</th>
+          <th>Overall Tier</th>
+          <th>Multi-Location?</th>
+          <th>Key Restriction</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anisha Shah</td>
+          <td>Kwality (Mon–Wed)<br>Supreme (Thu only)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Specialist</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — split Kwality/Supreme</td>
+          <td>Kwality: Mon–Wed only. Bandra: Thu only. Never other days.</td>
+        </tr>
+        <tr>
+          <td>Rohan Dahima</td>
+          <td>Kwality (primary)<br>Supreme (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>At Kwality: Mon–Sun excl. Fri/Sat. At Supreme: Wed–Sat only.</td>
+        </tr>
+        <tr>
+          <td>Pranjali Jain</td>
+          <td>Kwality (primary)<br>Supreme (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Qualified</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>No Sat at Supreme HQ. Kwality Sat 10:15–12:30 is reserved.</td>
+        </tr>
+        <tr>
+          <td>Reshma Sharma</td>
+          <td>Kwality (primary)<br>Supreme (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Qualified</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>No Thu/Fri at Kwality. No Tue at Supreme.</td>
+        </tr>
+        <tr>
+          <td>Richard D'Costa</td>
+          <td>Kwality (primary)<br>Supreme (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Qualified</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>No Wed at Supreme. High versatility across both locations.</td>
+        </tr>
+        <tr>
+          <td>Atulan Purohit</td>
+          <td>Kwality (primary)<br>Supreme (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>✅ Specialist</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>SOLE Strength Lab trainer. At Kwality Mon/Wed/Fri. At Supreme Thu/Fri/Sat only. No PowerCycle.</td>
+        </tr>
+        <tr>
+          <td>Mrigakshi Jaiswal</td>
+          <td>Kwality (Thu/Fri)<br>Supreme (Mon/Tue/Wed)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span></td>
+          <td>✅ Specialist</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — split days across both</td>
+          <td>Kwality: Thu/Fri only. Supreme: Mon/Tue/Wed only. Pre/Post Natal specialist.</td>
+        </tr>
+        <tr>
+          <td>Cauveri Vikrant</td>
+          <td>Supreme (primary)<br>Kwality (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle ★</span><span class="tag t-fit">FIT</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>PRIMARY PowerCycle trainer. Supreme: Mon/Thu/Fri/Sun. Kwality: Wed/Thu/Sat/Sun. No Tue at Supreme.</td>
+        </tr>
+        <tr>
+          <td>Vivaran Dhasmana</td>
+          <td>Supreme (primary)<br>Kwality (secondary)<br>Kenkere (visiting)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-strength">Strength Lab</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>✅ Qualified</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>Yes — all 3 locations</td>
+          <td>Supreme: Mon/Tue/Wed/Sat. Kwality: Tue/Wed/Thu/Fri. Kenkere: visiting.</td>
+        </tr>
+        <tr>
+          <td>Karanvir Bhatia</td>
+          <td>Supreme (primary)<br>Kwality (secondary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag t-hi">Tier 1/2</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>Supreme: Mon/Tue/Thu/Fri/Sat. Kwality: Tue/Fri/Sat/Sun.</td>
+        </tr>
+        <tr>
+          <td>Karan Bhatia</td>
+          <td>Kwality, Supreme, Kenkere</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-power">PowerCycle</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td>Yes — all 3</td>
+          <td>Kwality: Wed/Thu/Fri/Sat. Supreme: Mon/Wed/Sat/Sun. Kenkere: visiting trainer.</td>
+        </tr>
+        <tr>
+          <td>Kajol Kanchan</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>No — Kenkere only</td>
+          <td>6-day anchor. Never moved to Mumbai without coverage arranged at Kenkere.</td>
+        </tr>
+        <tr>
+          <td>Pushyank Nahar</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>No — Kenkere only</td>
+          <td>6-day. Owns Mon/Tue/Thu mornings. Sunday off.</td>
+        </tr>
+        <tr>
+          <td>Shruti Kulkarni</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag t-hi">Tier 1</span></td>
+          <td>No — Kenkere only</td>
+          <td>Thu/Fri mornings + Sun midday anchor. Back Body Blaze specialist.</td>
+        </tr>
+        <tr>
+          <td>Siddhartha Kusuma</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td>No — Kenkere only</td>
+          <td>Tue/Wed mornings + afternoons. Mon/Fri off at Kenkere.</td>
+        </tr>
+        <tr>
+          <td>Shruti Suresh</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td>No — Kenkere only</td>
+          <td>6-day availability. Mornings + early afternoons. Foundations certified.</td>
+        </tr>
+        <tr>
+          <td>Janhavi Jain</td>
+          <td>Kwality (primary)</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Qualified</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td>Limited Supreme (minimal sessions)</td>
+          <td>Tue/Wed/Thu/Fri at Kwality. SWEAT In 30 specialist.</td>
+        </tr>
+        <tr>
+          <td>Bret Saldanha</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>PowerCycle only. Low avg attendance. Off-peak slots only.</td>
+        </tr>
+        <tr>
+          <td>Anmol Sharma</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>PowerCycle evening specialist. Off-peak slots only.</td>
+        </tr>
+        <tr>
+          <td>Raunak Khemuka</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-power">PowerCycle only</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>Lowest avg attendance (1.7 at Supreme). Strictly off-peak fillers.</td>
+        </tr>
+        <tr>
+          <td>Veena Narasimhan</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>No — Kenkere only</td>
+          <td>Weekends ONLY. 16:00–17:15 window ONLY. No other slots.</td>
+        </tr>
+        <tr>
+          <td>Chaitanya Nahar</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>No — Kenkere only</td>
+          <td>Mon/Sat/Sun afternoons only (16:00–18:45). Never mornings.</td>
+        </tr>
+        <tr>
+          <td>Poojitha Bhaskar</td>
+          <td>Kenkere (exclusive)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--slate-l);color:var(--slate);border:1px solid #bfc8d8">Tier 2</span></td>
+          <td>No — Kenkere only</td>
+          <td>Low avg (2.4). Morning backup only. Foundations certified.</td>
+        </tr>
+        <tr>
+          <td>Simonelle De Vitre</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-power">PowerCycle</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>Late evening specialist. Kwality: Mon/Wed/Sat. Supreme: Tue/Wed only.</td>
+        </tr>
+        <tr>
+          <td>Nishanth Raj</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>Kwality: Tue/Thu evenings. Supreme: Mon/Fri/Sat. Low avg at both.</td>
+        </tr>
+        <tr>
+          <td>Simran Dutt</td>
+          <td>Kwality + Supreme</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre</span><span class="tag t-mat">Mat 57</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — both Mumbai</td>
+          <td>Off-peak supplemental only. Very low avg at Supreme (2.5).</td>
+        </tr>
+        <tr>
+          <td>Saniya Jaiswal</td>
+          <td>Kwality + Supreme + Kenkere</td>
+          <td><span class="tag t-barre">All Barre</span><span class="tag t-mat">Mat 57</span><span class="tag t-fit">FIT</span><span class="tag t-found">Foundations</span></td>
+          <td>✅ Qualified</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>Yes — all 3</td>
+          <td>Kwality: Mon/Thu. Supreme: Tue/Wed/Fri. Kenkere: visiting. Good versatility.</td>
+        </tr>
+        <tr>
+          <td>Upasna Paranjpe</td>
+          <td>Kwality (limited)</td>
+          <td><span class="tag t-barre">Barre 57</span><span class="tag t-barre">Cardio Barre Exp.</span><span class="tag t-found">Foundations</span></td>
+          <td>❌</td>
+          <td>❌</td>
+          <td><span class="tag" style="background:var(--bg2);color:#555;border:1px solid var(--border)">Tier 3</span></td>
+          <td>No — Kwality only</td>
+          <td>Very limited availability (30 sessions only). Mon/Thu mornings only.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 6: CLASS FORMATS
+═══════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-classes">
+<div class="content">
+
+  <div class="sec-head">
+    <div class="sec-head-label" style="color:var(--gold)">Section 06 · Class Definitions</div>
+    <h2>Class Format Reference Guide</h2>
+    <p class="sec-sub">Every class format's scheduling rules, location eligibility, intensity profile, and optimisation notes.</p>
+  </div>
+
+  <div class="subsec"><h3>Top Optimisation Opportunities — All Locations</h3></div>
+  <div class="opp-card">
+    <div class="opp-num">1</div>
+    <div class="opp-body">
+      <h4>Expand the 10:00 AM Slot at Kenkere House to Daily</h4>
+      <p>The 10:00 AM slot at Kenkere has a 56.5% fill rate — the highest of any slot at any location in the data set — but runs only 144 sessions total. This is a massively underserved window. Adding it to 5 weekdays with a Tier 1 trainer could immediately improve revenue and fill metrics.</p>
+      <span class="opp-badge ob-now">NOW — 0–30 days</span>
+    </div>
+  </div>
+  <div class="opp-card">
+    <div class="opp-num">2</div>
+    <div class="opp-body">
+      <h4>Expand 09:30 AM Slot at Supreme HQ to 5 Days/Week</h4>
+      <p>The 09:30 AM slot at Supreme HQ has a 46.7% fill rate (highest at Bandra) but only 349 total sessions. It's currently offered sporadically. Making it a daily fixture with Cauveri or Atulan would capture significant unmet morning demand at the studio's strongest efficiency window.</p>
+      <span class="opp-badge ob-now">NOW — 0–30 days</span>
+    </div>
+  </div>
+  <div class="opp-card">
+    <div class="opp-num">3</div>
+    <div class="opp-body">
+      <h4>Increase Anisha Shah's Kwality Slots to Include Occasional Friday Mornings</h4>
+      <p>Anisha Shah has the highest avg check-in of any trainer at any location (7.7). She currently teaches Mon/Tue/Wed only at Kwality. Friday mornings are underperforming. Extending her by even 1 Friday morning slot per fortnight could meaningfully lift Friday's weakest fill day.</p>
+      <span class="opp-badge ob-soon">SOON — 30–60 days</span>
+    </div>
+  </div>
+  <div class="opp-card">
+    <div class="opp-num">4</div>
+    <div class="opp-body">
+      <h4>Reduce Thursday Class Count at Kwality — or Redesign Thursday Trainer Mix</h4>
+      <p>Thursday has the second-highest session count at Kwality House but the lowest fill rate (33.5%). Either reduce Thursday to 8–9 classes (from ~10), or audit which trainer/class combinations are pulling Thursday down and swap in higher-performing profiles from the Mon/Tue data.</p>
+      <span class="opp-badge ob-soon">SOON — 30–60 days</span>
+    </div>
+  </div>
+  <div class="opp-card">
+    <div class="opp-num">5</div>
+    <div class="opp-body">
+      <h4>Add a 4th Saturday Morning Slot at Kenkere</h4>
+      <p>Saturday at Kenkere has a 40.6% fill rate — the studio's best — but only 7–8 classes. The appetite for a 4th morning class (e.g. 08:00 or 08:30) is supported by how quickly 09:00 and 10:15 fill. Kajol or Shruti Kulkarni would be the natural candidates.</p>
+      <span class="opp-badge ob-soon">SOON — 30–60 days</span>
+    </div>
+  </div>
+  <div class="opp-card">
+    <div class="opp-num">6</div>
+    <div class="opp-body">
+      <h4>Investigate Friday Underperformance at Supreme HQ</h4>
+      <p>Friday has the lowest fill rate at Supreme (31.2%) despite good session volume (1,014 sessions). The current Friday trainer mix — Atulan mornings, Karanvir evenings — is not translating into fills. Experiment with Vivaran or Cauveri on Fridays to test if trainer preference is a factor.</p>
+      <span class="opp-badge ob-plan">PLAN — 60–90 days</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="subsec"><h3>Class Format Rules</h3></div>
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Class Format</th>
+          <th>Type</th>
+          <th>Duration</th>
+          <th>Intensity</th>
+          <th>Locations</th>
+          <th>Best Days</th>
+          <th>Best Time Slots</th>
+          <th>Who Can Teach</th>
+          <th>Scheduling Rules</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Studio Barre 57</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>57 min</td>
+          <td>Medium–High</td>
+          <td>All 3</td>
+          <td>All days</td>
+          <td>07:30, 09:00, 11:00, 11:30, 19:00</td>
+          <td>All qualified trainers</td>
+          <td>Core offering. 25–38% of weekly schedule. Min 2/day on weekdays. Always Tier 1 at 11:30 slot.</td>
+        </tr>
+        <tr>
+          <td>Studio Barre 57 Express</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>30–45 min</td>
+          <td>Medium</td>
+          <td>All 3</td>
+          <td>Any weekday</td>
+          <td>07:00–08:30, or evening</td>
+          <td>All Barre-qualified trainers</td>
+          <td>Must pair with full Barre 57 on same day. Max 2/day across schedule.</td>
+        </tr>
+        <tr>
+          <td>Studio Cardio Barre</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>57 min</td>
+          <td>High</td>
+          <td>All 3</td>
+          <td>Mon–Fri preferred</td>
+          <td>17:45, 18:00, 19:15</td>
+          <td>All Barre-qualified trainers</td>
+          <td>1 per day evening. Second most popular class at Kenkere (19.6%).</td>
+        </tr>
+        <tr>
+          <td>Studio Cardio Barre Express</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>30 min</td>
+          <td>High</td>
+          <td>All 3</td>
+          <td>Any day</td>
+          <td>Any slot</td>
+          <td>All Barre-qualified trainers</td>
+          <td>Max 3–4× per week. Must pair with full Cardio Barre. Can substitute for Express slots.</td>
+        </tr>
+        <tr>
+          <td>Studio Cardio Barre Plus</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>60+ min</td>
+          <td>Very High</td>
+          <td>Kwality, Kenkere</td>
+          <td>Sat, Mon</td>
+          <td>10:15, 11:00</td>
+          <td>Reshma Sharma, Vivaran Dhasmana, Kajol Kanchan, Pushyank Nahar</td>
+          <td>Premium weekend class. Max 1× per week. Midday only.</td>
+        </tr>
+        <tr>
+          <td>Studio Mat 57</td>
+          <td><span class="tag t-mat">Mat 57</span></td>
+          <td>57 min</td>
+          <td>Medium</td>
+          <td>All 3</td>
+          <td>Mon, Wed, Sat, Sun</td>
+          <td>11:00, 11:30, 09:00</td>
+          <td>Pranjali Jain, Anisha Shah, Reshma Sharma, Kajol Kanchan, Pushyank Nahar + others</td>
+          <td>Mid-intensity midday class. 3–4× per week minimum.</td>
+        </tr>
+        <tr>
+          <td>Studio Mat 57 Express</td>
+          <td><span class="tag t-mat">Mat 57</span></td>
+          <td>30 min</td>
+          <td>Medium</td>
+          <td>Kwality, Supreme</td>
+          <td>Any</td>
+          <td>Morning or midday</td>
+          <td>Pranjali Jain, Mrigakshi Jaiswal, Karanvir Bhatia, Simonelle De Vitre</td>
+          <td>2–3× per week. Must pair with full Mat 57 on same day.</td>
+        </tr>
+        <tr>
+          <td>Studio FIT</td>
+          <td><span class="tag t-fit">Specialty</span></td>
+          <td>57 min</td>
+          <td>High</td>
+          <td>All 3</td>
+          <td>All days</td>
+          <td>07:30, 08:00, 09:00</td>
+          <td>Anisha Shah, Atulan Purohit, Vivaran Dhasmana, Mrigakshi Jaiswal, Kajol Kanchan, Cauveri Vikrant + others</td>
+          <td>Morning class. 1 daily. High-intensity cardio-strength hybrid.</td>
+        </tr>
+        <tr>
+          <td>Studio Back Body Blaze</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>57 min</td>
+          <td>High</td>
+          <td>All 3</td>
+          <td>Mon–Fri</td>
+          <td>07:30, 09:00</td>
+          <td>Anisha Shah, Mrigakshi Jaiswal, Shruti Kulkarni, Vivaran Dhasmana, Atulan Purohit, Cauveri Vikrant</td>
+          <td>Morning-only class. Max 3× per week. Never in evening slots.</td>
+        </tr>
+        <tr>
+          <td>Studio Back Body Blaze Express</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>30 min</td>
+          <td>High</td>
+          <td>Kwality, Supreme</td>
+          <td>Thu, Fri</td>
+          <td>07:30, 08:00</td>
+          <td>Mrigakshi Jaiswal, Atulan Purohit</td>
+          <td>Max 2× per week. Early morning only. Pair with full BBB.</td>
+        </tr>
+        <tr>
+          <td>Studio PowerCycle</td>
+          <td><span class="tag t-power">PowerCycle</span></td>
+          <td>45 min</td>
+          <td>High</td>
+          <td>Kwality + Supreme ONLY</td>
+          <td>All days (excl. Kenkere)</td>
+          <td>17:30, 18:00, 19:15, 19:30</td>
+          <td>Cauveri Vikrant (primary), Vivaran Dhasmana, Rohan Dahima, Reshma Sharma, Karan Bhatia, Karanvir Bhatia, Richard D'Costa, Mrigakshi Jaiswal, Anmol Sharma, Bret Saldanha, Raunak Khemuka</td>
+          <td>Evening slots primarily. NEVER at Kenkere. At Supreme: equal to Barre (2–3/day). At Kwality: 1/day.</td>
+        </tr>
+        <tr>
+          <td>Studio PowerCycle Express</td>
+          <td><span class="tag t-power">PowerCycle</span></td>
+          <td>30 min</td>
+          <td>High</td>
+          <td>Kwality + Supreme ONLY</td>
+          <td>Any</td>
+          <td>Evening</td>
+          <td>Cauveri Vikrant, Rohan Dahima, Reshma Sharma, Karanvir Bhatia, Mrigakshi Jaiswal, Simonelle De Vitre</td>
+          <td>Pair with full PowerCycle. Max 2–3× per week.</td>
+        </tr>
+        <tr>
+          <td>Studio Foundations</td>
+          <td><span class="tag t-found">Beginner</span></td>
+          <td>60 min</td>
+          <td>Low</td>
+          <td>All 3 (highest at Kenkere)</td>
+          <td>Any (light days)</td>
+          <td>07:15, 09:00, 10:00 — off-peak only</td>
+          <td>Shruti Kulkarni, Poojitha Bhaskar, Siddhartha Kusuma, Shruti Suresh, Pushyank Nahar, Kajol Kanchan, Atulan Purohit, Richard D'Costa, Karan Bhatia, Pranjali Jain</td>
+          <td>Beginner onboarding. Never in 11:30 or 19:15 peak slots. Kenkere: daily. Others: 2–3× per week.</td>
+        </tr>
+        <tr>
+          <td>Studio Recovery</td>
+          <td><span class="tag t-fit">Specialty</span></td>
+          <td>60 min</td>
+          <td>Low</td>
+          <td>All 3</td>
+          <td>Sat, Sun</td>
+          <td>12:30, 16:00</td>
+          <td>Pranjali Jain, Pushyank Nahar, Karan Bhatia, Simonelle De Vitre, Rohan Dahima, Atulan Purohit, Shruti Kulkarni</td>
+          <td>Post-intensity restorative. Weekends only. Never the first class of day. Always follows a high-energy class in the lineup.</td>
+        </tr>
+        <tr>
+          <td>Studio Amped Up!</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>57 min</td>
+          <td>Very High</td>
+          <td>Kwality, Supreme</td>
+          <td>Mon, Tue, Sat</td>
+          <td>08:30, 11:00, 11:30</td>
+          <td>Reshma Sharma, Rohan Dahima</td>
+          <td>High-energy variant. Max 1–2× per week. Reshma is the primary choice.</td>
+        </tr>
+        <tr>
+          <td>Studio SWEAT In 30</td>
+          <td><span class="tag t-fit">Specialty</span></td>
+          <td>30 min</td>
+          <td>High</td>
+          <td>All 3</td>
+          <td>Any</td>
+          <td>Any non-peak</td>
+          <td>Reshma Sharma, Janhavi Jain, Saniya Jaiswal, Pushyank Nahar, Karan Bhatia, Vivaran Dhasmana, Shruti Suresh</td>
+          <td>Express HIIT format. 2–3× per week max. Can replace Express slots.</td>
+        </tr>
+        <tr>
+          <td>Studio HIIT</td>
+          <td><span class="tag t-fit">Specialty</span></td>
+          <td>57 min</td>
+          <td>Very High</td>
+          <td>Kwality primarily</td>
+          <td>Mon–Thu</td>
+          <td>07:30, 09:00</td>
+          <td>Rohan Dahima (primary), Pranjali Jain, Richard D'Costa, Reshma Sharma</td>
+          <td>Very limited offering. Max 1× per week. Morning only. Rohan Dahima preferred.</td>
+        </tr>
+        <tr>
+          <td>Studio Strength Lab (Full/Push/Pull)</td>
+          <td><span class="tag t-strength">Strength Lab</span></td>
+          <td>60 min</td>
+          <td>High–Very High</td>
+          <td>Kwality ONLY</td>
+          <td>Mon, Wed</td>
+          <td>18:00, 19:15</td>
+          <td>Atulan Purohit EXCLUSIVELY</td>
+          <td>Kwality House only. Mon/Wed evenings. Atulan Purohit is the sole qualified trainer. Max 2× per week total.</td>
+        </tr>
+        <tr>
+          <td>Studio Pre/Post Natal</td>
+          <td><span class="tag t-barre">Barre 57</span></td>
+          <td>57 min</td>
+          <td>Low–Medium</td>
+          <td>Kwality ONLY</td>
+          <td>Mon–Fri</td>
+          <td>08:30, 09:00, 11:30 (mornings only)</td>
+          <td>Anisha Shah (Mon–Wed), Mrigakshi Jaiswal (Thu–Fri)</td>
+          <td>Specialist format. Kwality House only. Morning slots exclusively. Specialist trainers only.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<footer style="background:var(--ink);color:rgba(245,242,236,.4);text-align:center;padding:22px 20px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;">
+  Studio Scheduling Rulebook · Single Source of Truth · Derived from 20,786 Sessions · Jan 2024–May 2026
+</footer>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>

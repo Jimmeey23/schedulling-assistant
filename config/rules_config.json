@@ -1,0 +1,8 @@
+{
+  "universal": true,
+  "format_rules": true,
+  "location_kwality": true,
+  "location_supreme": true,
+  "location_kenkere": true,
+  "trainer_specific": false
+}

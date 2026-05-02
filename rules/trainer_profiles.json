@@ -1,0 +1,1349 @@
+[
+  {
+    "name": "Anisha Shah",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"          
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:15"
+        },
+        "avg_classes_per_day": 1.9,
+        "max_classes_per_day": 3,
+        "avg_checkin": 7.7,
+        "session_count": 280,
+        "owned_blocks": [],
+        "notes": "Highest avg attendance. Mon-Wed ONLY. Pre/Post Natal specialist."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Thursday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "12:00"
+        },
+        "avg_classes_per_day": 2.7,
+        "max_classes_per_day": 4,
+        "avg_checkin": 6.1,
+        "session_count": 85,
+        "owned_blocks": [
+          {
+            "day": "Thursday",
+            "times": [
+              "08:00",
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "THURSDAYS ONLY at Bandra. Never any other day."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": true,
+      "foundations": true,
+      "pre_post_natal": true,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Rohan Dahima",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.1,
+        "max_classes_per_day": 4,
+        "avg_checkin": 6.2,
+        "session_count": 320,
+        "owned_blocks": [
+          {
+            "day": "Thursday",
+            "times": [
+              "09:15",
+              "10:15"
+            ]
+          }
+        ],
+        "notes": "Owns Thursday morning block. Amped Up specialist."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": true,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Pranjali Jain",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.8,
+        "session_count": 290,
+        "owned_blocks": [
+          {
+            "day": "Saturday",
+            "times": [
+              "10:15",
+              "11:30",
+              "12:30"
+            ]
+          }
+        ],
+        "notes": "Owns Saturday 10:15-12:30 block."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Reshma Sharma",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.5,
+        "session_count": 180,
+        "owned_blocks": [],
+        "notes": "Amped Up specialist."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 6.2,
+        "session_count": 220,
+        "notes": "PowerCycle specialist at Supreme. Mon/Tue/Wed/Sat."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": true,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Richard D'Costa",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.2,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.4,
+        "session_count": 350,
+        "owned_blocks": [],
+        "notes": "High versatility. PowerCycle certified."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 5.8,
+        "session_count": 91,
+        "notes": "Multi-location trainer. PC qualified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Atulan Purohit",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 2.3,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.9,
+        "session_count": 310,
+        "owned_blocks": [
+          {
+            "day": "Monday",
+            "times": [
+              "18:00"
+            ]
+          },
+          {
+            "day": "Wednesday",
+            "times": [
+              "18:00"
+            ]
+          }
+        ],
+        "notes": "SOLE Strength Lab trainer at Kwality. Mon/Wed evenings for Strength Lab."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 2.5,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.2,
+        "session_count": 120,
+        "owned_blocks": [
+          {
+            "day": "Friday",
+            "times": [
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          },
+          {
+            "day": "Saturday",
+            "times": [
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "Owns Fri/Sat morning block at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": true,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Mrigakshi Jaiswal",
+    "tier": 1,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Thursday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.1,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.6,
+        "session_count": 175,
+        "owned_blocks": [],
+        "notes": "Thu/Fri ONLY at Kwality. Pre/Post Natal specialist."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 3,
+        "avg_checkin": 5.1,
+        "session_count": 95,
+        "owned_blocks": [],
+        "notes": "Mon/Tue/Wed evenings only at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": true,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Vivaran Dhasmana",
+    "tier": 1,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.4,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.7,
+        "session_count": 280,
+        "owned_blocks": [
+          {
+            "day": "Tuesday",
+            "times": [
+              "07:30",
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          },
+          {
+            "day": "Wednesday",
+            "times": [
+              "07:30",
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "Owns Tue/Wed morning blocks at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Cauveri Vikrant",
+    "tier": 1,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Thursday",
+          "Friday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.2,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.3,
+        "session_count": 245,
+        "owned_blocks": [],
+        "notes": "PRIMARY PowerCycle trainer at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Karanvir Bhatia",
+    "tier": 1,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.1,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.4,
+        "session_count": 260,
+        "owned_blocks": [],
+        "notes": "High versatility Tier 1 at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Karan Bhatia",
+    "tier": 1,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 4,
+        "avg_checkin": 5.2,
+        "session_count": 190,
+        "owned_blocks": [
+          {
+            "day": "Sunday",
+            "times": [
+              "10:15",
+              "11:30"
+            ]
+          }
+        ],
+        "notes": "Owns Sunday 10:15 and 11:30 at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Kajol Kanchan",
+    "tier": 1,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.5,
+        "max_classes_per_day": 4,
+        "avg_checkin": 6.1,
+        "session_count": 420,
+        "owned_blocks": [
+          {
+            "day": "Saturday",
+            "times": [
+              "09:00",
+              "10:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "6-day anchor trainer. Sat 09:00 mandatory."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": true
+    }
+  },
+  {
+    "name": "Shruti Kulkarni",
+    "tier": 1,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "19:30"
+        },
+        "avg_classes_per_day": 2.2,
+        "max_classes_per_day": 3,
+        "avg_checkin": 5.8,
+        "session_count": 850,
+        "owned_blocks": [
+          {
+            "day": "Thursday",
+            "times": [
+              "07:15",
+              "09:00"
+            ]
+          },
+          {
+            "day": "Friday",
+            "times": [
+              "07:15",
+              "09:00"
+            ]
+          },
+          {
+            "day": "Sunday",
+            "times": [
+              "10:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "Owns Thu/Fri mornings and Sunday midday (pinned). Also available all other days."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Pushyank Nahar",
+    "tier": 1,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "19:30"
+        },
+        "avg_classes_per_day": 2.5,
+        "max_classes_per_day": 3,
+        "avg_checkin": 5.5,
+        "session_count": 980,
+        "owned_blocks": [
+          {
+            "day": "Monday",
+            "times": [
+              "07:15",
+              "09:00",
+              "11:00"
+            ]
+          },
+          {
+            "day": "Tuesday",
+            "times": [
+              "07:15",
+              "09:00",
+              "11:00"
+            ]
+          },
+          {
+            "day": "Thursday",
+            "times": [
+              "07:15",
+              "09:00",
+              "11:00"
+            ]
+          }
+        ],
+        "notes": "Owns Mon/Tue/Thu morning blocks (pinned). Available all days for other slots."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Bret Saldanha",
+    "tier": 3,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 3.2,
+        "session_count": 85,
+        "owned_blocks": [],
+        "notes": "PowerCycle specialist. Evening only."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Tuesday",
+          "Thursday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 3.0,
+        "session_count": 60,
+        "owned_blocks": [],
+        "notes": "PowerCycle specialist. Evening only."
+      }
+    },
+    "qualifications": {
+      "all_barre": false,
+      "mat_57": false,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Anmol Sharma",
+    "tier": 3,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Tuesday",
+          "Thursday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 3.0,
+        "session_count": 72,
+        "owned_blocks": [],
+        "notes": "PowerCycle specialist. Evening only."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Wednesday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 2.9,
+        "session_count": 55,
+        "owned_blocks": [],
+        "notes": "PowerCycle specialist. Evening only."
+      }
+    },
+    "qualifications": {
+      "all_barre": false,
+      "mat_57": false,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Raunak Khemuka",
+    "tier": 3,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Tuesday",
+          "Wednesday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "17:00",
+          "end": "21:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 2.8,
+        "session_count": 65,
+        "owned_blocks": [],
+        "notes": "PowerCycle specialist. Evening only. Low avg attendance."
+      }
+    },
+    "qualifications": {
+      "all_barre": false,
+      "mat_57": false,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Siddhartha Kusuma",
+    "tier": 2,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.2,
+        "session_count": 110,
+        "owned_blocks": [],
+        "notes": "Foundations certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Shruti Suresh",
+    "tier": 2,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Tuesday",
+          "Thursday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.0,
+        "session_count": 95,
+        "owned_blocks": [],
+        "notes": "Foundations certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Poojitha Bhaskar",
+    "tier": 2,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 3.9,
+        "session_count": 88,
+        "owned_blocks": [],
+        "notes": "Foundations certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Chaitanya Nahar",
+    "tier": 3,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "16:00",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 3.5,
+        "session_count": 72,
+        "owned_blocks": [],
+        "notes": "Afternoons only. Never mornings."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Veena Narasimhan",
+    "tier": 3,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "16:00",
+          "end": "17:15"
+        },
+        "avg_classes_per_day": 1.0,
+        "max_classes_per_day": 1,
+        "avg_checkin": 3.2,
+        "session_count": 55,
+        "owned_blocks": [],
+        "notes": "Weekends only. 16:00-17:15 window only."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Dhruv Mehta",
+    "tier": 2,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.5,
+        "session_count": 120,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kwality."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Priya Nair",
+    "tier": 2,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Tuesday",
+          "Thursday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.3,
+        "session_count": 115,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kwality. Recovery qualified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": true
+    }
+  },
+  {
+    "name": "Naman Sheth",
+    "tier": 2,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Friday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.6,
+        "session_count": 130,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Supreme. PowerCycle certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Ria Kapoor",
+    "tier": 2,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Tuesday",
+          "Thursday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.4,
+        "session_count": 118,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Kavya Reddy",
+    "tier": 2,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.1,
+        "session_count": 98,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kenkere. Foundations certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": true,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Aditya Shetty",
+    "tier": 2,
+    "locations": {
+      "Kenkere House": {
+        "available_days": [
+          "Wednesday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "19:00"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 3.8,
+        "session_count": 82,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kenkere."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Preeti Mohan",
+    "tier": 2,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Thursday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.2,
+        "session_count": 105,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kwality."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Varun Chadha",
+    "tier": 2,
+    "locations": {
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Wednesday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.3,
+        "session_count": 112,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Supreme. PowerCycle certified."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  },
+  {
+    "name": "Pooja Singh",
+    "tier": 2,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Tuesday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 2.0,
+        "max_classes_per_day": 3,
+        "avg_checkin": 4.0,
+        "session_count": 98,
+        "owned_blocks": [],
+        "notes": "Tier 2 at Kwality and Supreme."
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Wednesday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:15",
+          "end": "20:30"
+        },
+        "avg_classes_per_day": 1.5,
+        "max_classes_per_day": 2,
+        "avg_checkin": 3.8,
+        "session_count": 45,
+        "owned_blocks": [],
+        "notes": "Wed/Sun at Supreme."
+      }
+    },
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    }
+  }
+]

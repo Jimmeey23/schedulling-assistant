@@ -1,0 +1,64 @@
+{
+  "_instructions": {
+    "description": "Manual override configuration for trainer scheduling. Edit this file before running the pipeline.",
+    "inactive_trainers": "List trainer names here to exclude them entirely from scheduling.",
+    "tier_overrides": "Override a trainer's tier (1=highest, 3=lowest). Affects prime-slot priority and 15h/week targets.",
+    "leave_periods": "Block a trainer from all slots during a date range. 'location' is optional — omit to block at all locations.",
+    "off_days": "Block a trainer on specific dates. 'location' is optional.",
+    "available_days_overrides": "Override which weekdays a trainer works at a location. Replaces the profile default.",
+    "max_classes_overrides": "Override max classes per day or per week for a trainer at a location.",
+    "location_preferences": "Use 'excluded' to stop scheduling a trainer at a location. 'preferred' boosts their score ranking.",
+    "time_window_overrides": "Override earliest/latest time a trainer can teach at a location."
+  },
+
+  "inactive_trainers": [],
+
+  "tier_overrides": [
+  ],
+
+  "leave_periods": [
+  ],
+
+  "off_days": [
+  ],
+
+  "available_days_overrides": [
+  ],
+
+  "max_classes_overrides": [
+  ],
+
+  "location_preferences": [
+  ],
+
+  "time_window_overrides": [
+  ],
+
+  "_examples": {
+    "inactive_trainers": ["Bret Saldanha"],
+    "tier_overrides": [
+      {"trainer": "Dhruv Mehta", "tier": 1}
+    ],
+    "leave_periods": [
+      {"trainer": "Anisha Shah", "from_date": "2026-05-06", "to_date": "2026-05-10"},
+      {"trainer": "Rohan Dahima", "from_date": "2026-05-08", "to_date": "2026-05-08", "location": "Kwality House, Kemps Corner"}
+    ],
+    "off_days": [
+      {"trainer": "Pranjali Jain", "date": "2026-05-09"},
+      {"trainer": "Kajol Kanchan", "date": "2026-05-10", "location": "Kenkere House"}
+    ],
+    "available_days_overrides": [
+      {"trainer": "Rohan Dahima", "location": "Kwality House, Kemps Corner", "days": ["Monday", "Tuesday", "Wednesday", "Thursday"]}
+    ],
+    "max_classes_overrides": [
+      {"trainer": "Mrigakshi Jaiswal", "location": "Kwality House, Kemps Corner", "max_per_day": 2, "max_per_week": 8}
+    ],
+    "location_preferences": [
+      {"trainer": "Bret Saldanha", "location": "Kwality House, Kemps Corner", "preference": "excluded"},
+      {"trainer": "Cauveri Vikrant", "location": "Supreme HQ, Bandra", "preference": "preferred"}
+    ],
+    "time_window_overrides": [
+      {"trainer": "Veena Narasimhan", "location": "Kenkere House", "start": "16:00", "end": "17:30"}
+    ]
+  }
+}

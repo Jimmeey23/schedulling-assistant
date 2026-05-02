@@ -1,0 +1,23 @@
+{
+  "location": "Kenkere House",
+  "hard_constraints": [
+    {"id": "KE-001", "type": "never_do", "description": "PowerCycle NEVER at Kenkere", "check_fn_name": "check_ke_no_powercycle"},
+    {"id": "KE-002", "type": "always_do", "description": "Kajol Kanchan 6-day anchor - never reduce without confirmed coverage", "check_fn_name": "check_ke_kajol_anchor"},
+    {"id": "KE-003", "type": "always_do", "description": "Pushyank Nahar owns Mon/Tue/Thu morning blocks", "check_fn_name": "check_ke_pushyank_blocks"},
+    {"id": "KE-004", "type": "always_do", "description": "Shruti Kulkarni owns Thu/Fri mornings and Sunday midday", "check_fn_name": "check_ke_shruti_blocks"},
+    {"id": "KE-005", "type": "trainer_availability", "description": "Veena Narasimhan weekends only 16:00-17:15", "check_fn_name": "check_ke_veena_window"},
+    {"id": "KE-006", "type": "trainer_availability", "description": "Chaitanya Nahar Mon/Sat/Sun afternoons only 16:00-18:45", "check_fn_name": "check_ke_chaitanya_window"},
+    {"id": "KE-007", "type": "slot_required", "description": "09:00 AM must be filled with Tier 1 trainer every day", "check_fn_name": "check_ke_0900_tier1"},
+    {"id": "KE-008", "type": "always_do", "description": "Saturday 09:00-11:00: Kajol or Pushyank ONLY", "check_fn_name": "check_ke_sat_morning"},
+    {"id": "KE-009", "type": "class_location", "description": "Foundations certified trainers only at Kenkere", "check_fn_name": "check_ke_foundations_certified"}
+  ],
+  "target_classes_per_day": {
+    "Monday": 7,
+    "Tuesday": 7,
+    "Wednesday": 7,
+    "Thursday": 7,
+    "Friday": 6,
+    "Saturday": 8,
+    "Sunday": 5
+  }
+}

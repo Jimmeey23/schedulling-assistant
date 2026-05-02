@@ -1,0 +1,24 @@
+{
+  "location": "Supreme HQ, Bandra",
+  "hard_constraints": [
+    {"id": "SU-001", "type": "always_do", "description": "PowerCycle minimum 2 per day on weekdays", "check_fn_name": "check_su_powercycle_min"},
+    {"id": "SU-002", "type": "always_do", "description": "Cauveri Vikrant first choice for all PowerCycle at Supreme", "check_fn_name": "check_su_cauveri_powercycle"},
+    {"id": "SU-003", "type": "trainer_availability", "description": "Anisha Shah Thursdays ONLY at Supreme 08:00-11:00", "check_fn_name": "check_su_anisha_thu"},
+    {"id": "SU-004", "type": "always_do", "description": "Vivaran Dhasmana owns Tue/Wed morning blocks 07:30-11:00", "check_fn_name": "check_su_vivaran_blocks"},
+    {"id": "SU-005", "type": "always_do", "description": "Karan Bhatia owns Sunday 10:15 and 11:30 at Supreme", "check_fn_name": "check_su_karan_sun"},
+    {"id": "SU-006", "type": "always_do", "description": "Atulan Purohit owns Fri/Sat morning block 09:00-11:30", "check_fn_name": "check_su_atulan_blocks"},
+    {"id": "SU-007", "type": "trainer_availability", "description": "Mrigakshi Jaiswal Mon/Tue/Wed evenings only at Supreme", "check_fn_name": "check_su_mrigakshi_evenings"},
+    {"id": "SU-008", "type": "slot_required", "description": "18:00 PM slot must always have Tier 1 trainer on weekdays", "check_fn_name": "check_su_1800_tier1"},
+    {"id": "SU-009", "type": "never_do", "description": "No Strength Lab at Supreme HQ", "check_fn_name": "check_su_no_strength_lab"},
+    {"id": "SU-010", "type": "never_do", "description": "No Pre/Post Natal at Supreme HQ", "check_fn_name": "check_su_no_prenatal"}
+  ],
+  "target_classes_per_day": {
+    "Monday": 12,
+    "Tuesday": 11,
+    "Wednesday": 10,
+    "Thursday": 11,
+    "Friday": 9,
+    "Saturday": 11,
+    "Sunday": 8
+  }
+}

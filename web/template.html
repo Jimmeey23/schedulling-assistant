@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Physique 57 — Schedule Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FFFFFF;--surface:#F9FAFB;--surface2:#F3F4F6;
+  --border:#E5E7EB;--border-strong:#D1D5DB;
+  --text:#111827;--text-2:#374151;--text-muted:#6B7280;--text-light:#9CA3AF;
+  --primary:#1E40AF;--primary-600:#2563EB;--primary-light:#EFF6FF;--primary-mid:#DBEAFE;
+  --prime:#D97706;--prime-light:#FFFBEB;
+  --green:#15803D;--green-light:#F0FDF4;
+  --red:#DC2626;--red-light:#FEF2F2;
+  --purple:#7C3AED;--purple-light:#F5F3FF;
+  --r4:4px;--r6:6px;--r8:8px;--r12:12px;--r16:16px;
+  --sh-sm:0 1px 2px rgba(0,0,0,0.05);
+  --sh:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --sh-md:0 4px 6px rgba(0,0,0,0.06),0 2px 4px rgba(0,0,0,0.04);
+  --sh-lg:0 10px 25px rgba(0,0,0,0.1),0 4px 10px rgba(0,0,0,0.05);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+h1,h2,h3,h4,.jakarta{font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+
+/* HEADER */
+.app-header{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:400;box-shadow:var(--sh-sm);
+}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo{
+  width:34px;height:34px;background:var(--primary);border-radius:var(--r8);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;color:#fff;letter-spacing:-0.3px;
+}
+.hdr-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.hdr-sub{font-size:12px;color:var(--text-muted)}
+.week-badge{
+  background:var(--prime-light);color:var(--prime);border:1px solid #FDE68A;
+  border-radius:100px;padding:4px 12px;font-size:12px;font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;
+}
+
+/* LOCATION BAR */
+.loc-bar{
+  background:#fff;border-bottom:1px solid var(--border);padding:0 24px;height:42px;
+  display:flex;align-items:center;gap:2px;position:sticky;top:54px;z-index:390;overflow-x:auto;
+}
+.loc-tab{
+  padding:5px 14px;border-radius:var(--r6);font-size:13px;font-weight:600;
+  font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;
+  background:transparent;color:var(--text-muted);transition:all 0.12s;white-space:nowrap;
+}
+.loc-tab:hover{background:var(--surface2);color:var(--text)}
+.loc-tab.active{background:var(--primary-mid);color:var(--primary)}
+
+/* CONTROL BAR */
+.ctrl-bar{
+  background:#fff;border-bottom:1px solid var(--border);padding:6px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  position:sticky;top:96px;z-index:380;
+}
+.view-group{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.vbtn{
+  display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:var(--r6);
+  font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;border:1px solid var(--border);background:var(--surface);
+  color:var(--text-muted);transition:all 0.1s;white-space:nowrap;
+}
+.vbtn:hover{background:var(--surface2);color:var(--text)}
+.vbtn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.ctrl-right{display:flex;align-items:center;gap:6px}
+.iter-pill{
+  padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border);background:var(--surface2);
+  color:var(--text-muted);transition:all 0.1s;
+}
+.iter-pill.active{background:var(--prime);border-color:var(--prime);color:#fff}
+.filter-toggle-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r6);
+  font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;border:1px solid var(--border);background:var(--surface);
+  color:var(--text-muted);transition:all 0.1s;
+}
+.filter-toggle-btn.active{background:var(--primary-light);border-color:var(--primary-mid);color:var(--primary)}
+
+/* FILTER PANEL */
+.filter-panel{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  overflow:hidden;max-height:0;transition:max-height 0.25s ease;
+  position:sticky;top:138px;z-index:370;
+}
+.filter-panel.open{max-height:300px}
+.fp-inner{padding:14px 24px 16px;display:flex;flex-direction:column;gap:10px}
+.fp-row{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.fp-group{display:flex;flex-direction:column;gap:5px}
+.fp-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--text-muted);font-family:'Plus Jakarta Sans',sans-serif;
+}
+.fp-chips{display:flex;flex-wrap:wrap;gap:3px}
+.fc{
+  padding:3px 9px;border-radius:100px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border);background:#fff;
+  color:var(--text-muted);transition:all 0.1s;user-select:none;
+}
+.fc.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.fp-select{
+  padding:4px 8px;border:1px solid var(--border);border-radius:var(--r6);
+  font-size:12px;font-family:'Inter',sans-serif;background:#fff;
+  color:var(--text);cursor:pointer;outline:none;min-width:140px;
+}
+.fp-bottom{display:flex;align-items:center;gap:12px;padding-top:4px;border-top:1px solid var(--border);flex-wrap:wrap}
+.fp-check{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--text-muted);font-weight:500}
+.fp-check input{accent-color:var(--primary)}
+.fp-score{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
+.fp-score input[type=range]{width:80px;accent-color:var(--primary)}
+.fp-score span{font-weight:600;color:var(--text);min-width:20px}
+.clear-btn{
+  margin-left:auto;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border-strong);background:#fff;
+  color:var(--text-muted);transition:all 0.1s;
+}
+.clear-btn:hover{background:var(--red-light);color:var(--red);border-color:var(--red)}
+
+/* MAIN */
+.main-area{padding:20px 24px 48px;min-height:500px}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r8);
+  padding:12px 16px;min-width:100px;flex:1;box-shadow:var(--sh-sm);
+}
+.sc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.sc-val{font-size:22px;font-weight:800;color:var(--text);line-height:1;font-family:'Plus Jakarta Sans',sans-serif}
+.sc-val.blue{color:var(--primary)}.sc-val.green{color:var(--green)}.sc-val.amber{color:var(--prime)}.sc-val.red{color:var(--red)}
+.sc-sub{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+/* CLASS CARD */
+.cc{
+  border-radius:var(--r8);padding:8px 10px 8px 13px;cursor:pointer;
+  transition:box-shadow 0.15s,transform 0.1s;border:1px solid transparent;
+  position:relative;overflow:hidden;margin-bottom:2px;
+}
+.cc:hover{transform:translateY(-1px);box-shadow:var(--sh-md)}
+.cc-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:var(--r4) 0 0 var(--r4)}
+.cc-barre{background:#F5F3FF;border-color:#E9D5FF}
+.cc-powercycle{background:var(--red-light);border-color:#FECACA}
+.cc-strength_lab{background:var(--primary-light);border-color:#BFDBFE}
+.cc-recovery{background:var(--green-light);border-color:#BBF7D0}
+.cc-foundations{background:var(--prime-light);border-color:#FDE68A}
+.cc-mat_57{background:#F0F9FF;border-color:#BAE6FD}
+.cc-hiit{background:#FDF2F8;border-color:#FBCFE8}
+.cc-default{background:var(--surface);border-color:var(--border)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:2px}
+.cc-name{font-weight:700;font-size:11px;line-height:1.3;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.cc-trainer{font-size:10px;color:var(--text-muted);margin-bottom:3px;font-weight:500}
+.cc-bottom{display:flex;align-items:center;gap:5px}
+.cc-fill-pct{font-size:10px;font-weight:700;min-width:30px}
+.cc-bar-bg{flex:1;background:var(--border);border-radius:2px;height:3px;overflow:hidden}
+.cc-bar-fill{height:100%;border-radius:2px}
+.cc-badge{font-size:8px;font-weight:700;padding:1px 5px;border-radius:100px;text-transform:uppercase;letter-spacing:0.05em;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-hist{font-size:9px;color:var(--text-light);margin-left:auto}
+.cc-viol{position:absolute;bottom:3px;right:5px;width:14px;height:14px;background:var(--red);border-radius:100%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+/* badge colors */
+.bp{background:#D1FAE5;color:#065F46}.bpe{background:var(--purple-light);color:#4C1D95}.bps{background:#DDD6FE;color:#3730A3}.bi{background:var(--primary-mid);color:#1E3A8A}.bc{background:#FEF3C7;color:#78350F}.bd{background:var(--surface2);color:var(--text-muted)}
+
+/* GRID VIEW */
+.sched-grid{display:grid;grid-template-columns:52px repeat(7,1fr);gap:2px;font-size:12px}
+.sg-corner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r6)}
+.sg-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--r6);padding:7px 6px;text-align:center}
+.sg-day-name{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.05em;font-family:'Plus Jakarta Sans',sans-serif}
+.sg-day-date{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sg-time{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r6);
+  padding:6px;text-align:right;font-size:10px;font-weight:600;color:var(--text-muted);
+  display:flex;align-items:flex-start;justify-content:flex-end;padding-top:9px;
+}
+.sg-time.prime{background:var(--prime-light);border-color:#FDE68A;color:var(--prime)}
+.sg-cell{display:flex;flex-direction:column;min-height:34px}
+
+/* TIMELINE VIEW */
+.tl-container{margin-bottom:4px}
+.tl-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.tl-day-lbl{
+  width:32px;font-size:10px;font-weight:700;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:0.05em;text-align:right;flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.tl-track{
+  position:relative;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r6);height:46px;overflow:visible;flex:1;min-width:600px;
+}
+.tl-block{
+  position:absolute;top:3px;bottom:3px;border-radius:var(--r4);
+  cursor:pointer;overflow:hidden;display:flex;flex-direction:column;
+  align-items:flex-start;justify-content:center;padding:0 5px;
+  transition:opacity 0.1s,filter 0.1s;min-width:4px;
+}
+.tl-block:hover{filter:brightness(0.88);z-index:5}
+.tl-b-name{font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3}
+.tl-b-sub{font-size:8px;color:rgba(255,255,255,0.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-axis{display:flex;margin-left:38px;min-width:600px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px}
+.tl-tick{flex:1;font-size:9px;color:var(--text-light);text-align:center}
+.tl-tick.prime-tick{color:var(--prime);font-weight:600}
+
+/* LIST VIEW */
+.list-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.list-tbl thead th{
+  padding:8px 10px;text-align:left;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);
+  background:var(--surface);border-bottom:2px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.list-tbl thead th:hover{color:var(--primary)}
+.list-tbl thead th.sort-asc::after{content:" ▲";color:var(--primary)}
+.list-tbl thead th.sort-desc::after{content:" ▼";color:var(--primary)}
+.list-tbl tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.08s}
+.list-tbl tbody tr:hover{background:var(--primary-light)}
+.list-tbl tbody tr.prime-row{border-left:3px solid var(--prime)}
+.list-tbl td{padding:7px 10px;color:var(--text);vertical-align:middle}
+.td-m{color:var(--text-muted)}.td-c{text-align:center}
+.fill-cell{display:flex;align-items:center;gap:5px}
+.fill-mini{width:36px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.fill-mini-fill{height:100%;border-radius:2px}
+.viol-dot{display:inline-flex;align-items:center;justify-content:center;background:var(--red-light);color:var(--red);border-radius:100%;font-size:10px;font-weight:700;width:18px;height:18px}
+.exp-mark{background:var(--surface2);color:var(--text-muted);border-radius:var(--r4);font-size:9px;font-weight:700;padding:1px 5px;font-family:'Plus Jakarta Sans',sans-serif}
+
+/* TRAINER VIEW */
+.trainer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.tc{background:#fff;border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow 0.15s}
+.tc:hover{box-shadow:var(--sh-md)}
+.tc-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.tc-avatar{
+  width:36px;height:36px;border-radius:100%;background:var(--primary-mid);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--primary);flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.tc-name{font-size:13px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.tc-meta{font-size:11px;color:var(--text-muted);margin-top:1px}
+.tier-badge{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;margin-left:auto}
+.t1{background:#FEF9C3;color:#A16207}.t2{background:var(--surface2);color:var(--text-muted)}.t3{background:#F3F4F6;color:#9CA3AF}
+.tc-stats{padding:10px 16px;display:flex;gap:14px;border-bottom:1px solid var(--border)}
+.tc-s{text-align:center}
+.tc-sv{font-size:16px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.tc-sl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+.tc-sched{padding:10px 16px}
+.tc-st{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif}
+.tc-day{display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;min-height:16px}
+.tc-dl{width:24px;font-size:10px;font-weight:600;color:var(--text-muted);flex-shrink:0;padding-top:2px}
+.tc-chips{display:flex;flex-wrap:wrap;gap:3px}
+.tc-chip{border-radius:var(--r4);padding:2px 6px;font-size:10px;font-weight:600;color:#fff;white-space:nowrap}
+
+/* CROSS-LOCATION VIEW */
+.cross-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cross-tbl{border-collapse:separate;border-spacing:2px;min-width:1500px;font-size:11px}
+.cross-tbl th{padding:5px 4px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.ct-day-hdr{background:var(--surface2);border-radius:var(--r6);color:var(--text);padding:5px 6px;font-size:11px}
+.ct-kw{background:var(--primary-mid);color:var(--primary);border-radius:var(--r4);padding:3px 5px}
+.ct-su{background:#EDE9FE;color:#6D28D9;border-radius:var(--r4);padding:3px 5px}
+.ct-ke{background:var(--green-light);color:var(--green);border-radius:var(--r4);padding:3px 5px}
+.cross-tbl .ct-time{
+  padding:5px 8px;text-align:right;font-size:10px;font-weight:600;color:var(--text-muted);
+  white-space:nowrap;background:var(--surface);border-radius:var(--r4);
+}
+.cross-tbl .ct-time.prime{color:var(--prime);background:var(--prime-light);font-weight:700}
+.cross-tbl td{padding:2px;vertical-align:top;min-width:90px}
+.ct-cell{border-radius:var(--r4);padding:4px 6px;min-height:28px;cursor:pointer;transition:filter 0.1s}
+.ct-cell:hover{filter:brightness(0.88)}
+.ct-empty{background:var(--surface);border-radius:var(--r4);min-height:28px}
+.ct-cn{font-size:10px;font-weight:600;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3}
+.ct-tr{font-size:9px;color:rgba(255,255,255,0.8);margin-top:1px}
+.ct-fp{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);margin-top:1px}
+
+/* ANALYTICS VIEW */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.analytics-grid .span2{grid-column:1/-1}
+.ac{background:#fff;border:1px solid var(--border);border-radius:var(--r12);padding:20px;box-shadow:var(--sh-sm)}
+.ac-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.2px}
+.opp-item{
+  background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);
+  border-radius:var(--r8);padding:10px 14px;margin-bottom:8px;
+}
+.opp-item.warn{border-left-color:var(--prime)}
+.opp-text{font-size:12px;color:var(--text);line-height:1.55}
+.util-row{
+  display:grid;grid-template-columns:130px 40px 40px 50px 1fr;
+  gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);
+}
+.util-bar-bg{background:var(--surface2);border-radius:100px;height:6px;overflow:hidden}
+.util-bar-fill{height:100%;border-radius:100px}
+.mix-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
+.mix-name{flex:1;color:var(--text);font-weight:500;font-size:11px}
+.mix-bar-bg{width:90px;background:var(--border);border-radius:2px;height:5px;overflow:hidden}
+.mix-bar-fill{height:100%;border-radius:2px}
+.mix-pct{width:38px;text-align:right;font-weight:700;color:var(--text);font-size:11px}
+.mix-cnt{width:22px;text-align:right;color:var(--text-muted);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+/* day-of-week bar chart */
+.day-bars{display:flex;gap:4px;align-items:flex-end;height:90px;margin-bottom:6px}
+.day-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.day-bar-fill{width:100%;border-radius:var(--r4) var(--r4) 0 0;min-height:2px;transition:height 0.3s}
+.day-bar-lbl{font-size:9px;color:var(--text-muted);font-weight:600;font-family:'Plus Jakarta Sans',sans-serif}
+.day-bar-val{font-size:9px;color:var(--text-muted)}
+/* score histogram */
+.score-hist{display:flex;gap:3px;align-items:flex-end;height:70px;margin-bottom:6px}
+.sh-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sh-bar{width:100%;border-radius:var(--r4) var(--r4) 0 0}
+.sh-lbl{font-size:8px;color:var(--text-light)}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(17,24,39,0.5);backdrop-filter:blur(4px);
+  z-index:600;display:none;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r16);
+  width:640px;max-width:96vw;max-height:88vh;overflow-y:auto;
+  box-shadow:var(--sh-lg);animation:mIn 0.2s ease;
+}
+@keyframes mIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hdr{
+  padding:20px 24px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  position:sticky;top:0;background:#fff;z-index:5;
+}
+.modal-class-name{font-size:17px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;line-height:1.25;letter-spacing:-0.3px}
+.modal-meta{font-size:12px;color:var(--text-muted);margin-top:3px}
+.modal-close{
+  width:30px;height:30px;border-radius:var(--r6);border:1px solid var(--border);
+  background:var(--surface);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:16px;color:var(--text-muted);flex-shrink:0;transition:all 0.1s;
+}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:20px 24px}
+.modal-section{margin-bottom:20px}
+.ms-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--text-muted);margin-bottom:10px;border-bottom:1px solid var(--border);
+  padding-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.modal-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mm{background:var(--surface);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px}
+.mm-l{font-size:10px;color:var(--text-muted);margin-bottom:3px;font-weight:500}
+.mm-v{font-size:17px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.mm-s{font-size:10px;color:var(--text-light);margin-top:1px}
+.modal-reason{
+  background:var(--primary-light);border-left:3px solid var(--primary);
+  border-radius:0 var(--r8) var(--r8) 0;padding:12px 14px;
+  font-size:12px;line-height:1.65;color:var(--text-2);
+}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{
+  padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;
+  border:1px solid;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.chip-prime{background:var(--prime-light);border-color:#FDE68A;color:var(--prime)}
+.chip-room{background:var(--primary-light);border-color:var(--primary-mid);color:var(--primary)}
+.chip-exp{background:var(--surface2);border-color:var(--border-strong);color:var(--text-muted)}
+.chip-dur{background:var(--surface);border-color:var(--border);color:var(--text-muted)}
+.viol-item{background:var(--red-light);border:1px solid #FECACA;border-radius:var(--r6);padding:5px 10px;font-size:11px;color:var(--red);font-weight:500;margin-bottom:4px}
+.trainer-hist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.th-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px}
+.th-lbl{font-size:10px;color:var(--text-muted);margin-bottom:4px;font-weight:500}
+.th-val{font-size:15px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.score-ring-lg svg text{font-family:'Inter',sans-serif}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="hdr-left">
+    <div class="logo">P57</div>
+    <div>
+      <div class="hdr-title jakarta">Schedule Intelligence</div>
+      <div class="hdr-sub">Physique 57 India</div>
+    </div>
+  </div>
+  <div class="week-badge" id="week-badge">Week of —</div>
+</header>
+
+<div class="loc-bar" id="loc-bar"></div>
+
+<div class="ctrl-bar">
+  <div class="view-group" id="view-group">
+    <button class="vbtn active" id="vbtn-grid" onclick="setView('grid')">⊞ Grid</button>
+    <button class="vbtn" id="vbtn-timeline" onclick="setView('timeline')">⟼ Timeline</button>
+    <button class="vbtn" id="vbtn-list" onclick="setView('list')">≡ List</button>
+    <button class="vbtn" id="vbtn-trainer" onclick="setView('trainer')">◉ Trainer</button>
+    <button class="vbtn" id="vbtn-cross" onclick="setView('cross')">⊕ Cross-Location</button>
+    <button class="vbtn" id="vbtn-analytics" onclick="setView('analytics')">▦ Analytics</button>
+  </div>
+  <div class="ctrl-right">
+    <div id="iter-row" style="display:flex;gap:3px"></div>
+    <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleFilters()">⊟ Filters</button>
+  </div>
+</div>
+
+<div class="filter-panel" id="filter-panel">
+  <div class="fp-inner">
+    <div class="fp-row">
+      <div class="fp-group">
+        <div class="fp-label">Days</div>
+        <div class="fp-chips" id="fp-days"></div>
+      </div>
+      <div class="fp-group">
+        <div class="fp-label">Time Band</div>
+        <div class="fp-chips">
+          <span class="fc on" data-band="morning" onclick="toggleBand(this)">Morning</span>
+          <span class="fc on" data-band="midday" onclick="toggleBand(this)">Midday</span>
+          <span class="fc on" data-band="evening" onclick="toggleBand(this)">Evening</span>
+        </div>
+      </div>
+      <div class="fp-group">
+        <div class="fp-label">Class</div>
+        <select class="fp-select" id="fp-class" onchange="applyFilters()"><option value="">All Classes</option></select>
+      </div>
+      <div class="fp-group">
+        <div class="fp-label">Trainer</div>
+        <select class="fp-select" id="fp-trainer" onchange="applyFilters()"><option value="">All Trainers</option></select>
+      </div>
+      <div class="fp-group">
+        <div class="fp-label">Room</div>
+        <select class="fp-select" id="fp-room" onchange="applyFilters()"><option value="">All Rooms</option></select>
+      </div>
+    </div>
+    <div class="fp-row">
+      <div class="fp-group">
+        <div class="fp-label">Recommendation</div>
+        <div class="fp-chips" id="fp-recs"></div>
+      </div>
+    </div>
+    <div class="fp-bottom">
+      <label class="fp-check"><input type="checkbox" id="fp-violations" onchange="applyFilters()"><span>Violations only</span></label>
+      <label class="fp-check"><input type="checkbox" id="fp-experimental" onchange="applyFilters()"><span>Experimental only</span></label>
+      <div class="fp-score">
+        <span>Score ≥</span>
+        <input type="range" min="0" max="100" value="0" id="fp-score-min" oninput="document.getElementById('fp-score-val').textContent=this.value;applyFilters()">
+        <span id="fp-score-val">0</span>
+      </div>
+      <button class="clear-btn" onclick="clearFilters()">✕ Clear All</button>
+    </div>
+  </div>
+</div>
+
+<div class="main-area" id="main-area"></div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA — injected by reporter.py
+// ============================================================
+const SCHEDULE_DATA = /*INJECT_SCHEDULE_DATA*/;
+const SCORECARD    = /*INJECT_SCORECARD*/;
+const WEEK_LABEL   = /*INJECT_WEEK_LABEL*/;
+const OPPORTUNITIES = /*INJECT_OPPORTUNITIES*/;
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+const DAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const DAY_SHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const LOC_SHORT = {
+  "Kwality House, Kemps Corner":"Kwality",
+  "Supreme HQ, Bandra":"Supreme",
+  "Kenkere House":"Kenkere"
+};
+const LOC_ABBR = {
+  "Kwality House, Kemps Corner":"KW",
+  "Supreme HQ, Bandra":"SU",
+  "Kenkere House":"KE"
+};
+const LOC_COLOR = {
+  "Kwality House, Kemps Corner":"#1E40AF",
+  "Supreme HQ, Bandra":"#7C3AED",
+  "Kenkere House":"#15803D"
+};
+const LOC_LIGHT = {
+  "Kwality House, Kemps Corner":"#EFF6FF",
+  "Supreme HQ, Bandra":"#F5F3FF",
+  "Kenkere House":"#F0FDF4"
+};
+const FAM_COLOR = {
+  barre:"#7C3AED",powercycle:"#DC2626",strength_lab:"#1D4ED8",
+  recovery:"#059669",foundations:"#D97706",mat_57:"#0284C7",
+  hiit:"#DB2777",default:"#6B7280"
+};
+const FAM_BG = {
+  barre:"#F5F3FF",powercycle:"#FEF2F2",strength_lab:"#EFF6FF",
+  recovery:"#F0FDF4",foundations:"#FFFBEB",mat_57:"#F0F9FF",
+  hiit:"#FDF2F8",default:"#F9FAFB"
+};
+const PRIME_TIMES = new Set(["08:00","08:30","09:00","09:30","10:00","10:15","11:00","11:30","17:30","17:45","18:00","18:15","19:00","19:15","19:30"]);
+const REC_LIST = ["PINNED","PROTECT_EXACT","PROTECT_SLOT","INCLUDE","CONSIDER","DROP"];
+const REC_LABEL = {PINNED:"Pinned",PROTECT_EXACT:"Protect",PROTECT_SLOT:"Protect",INCLUDE:"Include",CONSIDER:"Consider",DROP:"Drop"};
+
+// ============================================================
+// STATE
+// ============================================================
+let _loc = null;
+let _view = "grid";
+let _iter = "Main";
+let _filtersOpen = false;
+let _activeDays   = new Set(DAY_ORDER);
+let _activeBands  = new Set(["morning","midday","evening"]);
+let _activeRecs   = new Set(REC_LIST);
+let _classFilter  = "";
+let _trainerFilter= "";
+let _roomFilter   = "";
+let _minScore     = 0;
+let _violOnly     = false;
+let _expOnly      = false;
+let _sortCol      = null;
+let _sortDir      = 1;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getFamily(cn) {
+  if (!cn) return "default";
+  const l = cn.toLowerCase();
+  if (l.includes("powercycle")||l.includes("power cycle")) return "powercycle";
+  if (l.includes("strength lab")) return "strength_lab";
+  if (l.includes("recovery")||l.includes("flex & flow")) return "recovery";
+  if (l.includes("foundation")) return "foundations";
+  if (l.includes("mat 57")) return "mat_57";
+  if (l.includes("hiit")||l.includes("dance cardio")) return "hiit";
+  if (l.includes("barre")||l.includes("fit")||l.includes("amped")||l.includes("back body")||l.includes("power barre")) return "barre";
+  return "default";
+}
+function tmins(t){if(!t)return 0;const[h,m]=t.split(":").map(Number);return h*60+m}
+function isPrime(t){return PRIME_TIMES.has(t)}
+function pct(v,d=0){if(v==null||isNaN(v))return"—";return(v*100).toFixed(d)+"%"}
+function round1(v){return v==null?"—":v.toFixed(1)}
+function fillColor(v){if(v==null)return"#9CA3AF";if(v>=0.6)return"#15803D";if(v>=0.4)return"#D97706";return"#DC2626"}
+function timeBand(t){const m=tmins(t);if(m>=7*60&&m<10*60)return"morning";if(m>=10*60&&m<13*60)return"midday";return"evening"}
+function displayClass(cn){return(cn||"").replace(/^Studio /,"")}
+function trainerInitials(name){return(name||"?").split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase()}
+function recGroup(r){
+  if(r==="PINNED")return"PINNED";
+  if(r==="PROTECT_EXACT"||r==="PROTECT")return"PROTECT_EXACT";
+  if(r==="PROTECT_SLOT")return"PROTECT_SLOT";
+  return r||"INCLUDE";
+}
+function recBadgeCls(r){
+  const g=recGroup(r);
+  return{PINNED:"bp",PROTECT_EXACT:"bpe",PROTECT_SLOT:"bps",INCLUDE:"bi",CONSIDER:"bc",DROP:"bd"}[g]||"bd";
+}
+function recLabel(r){return REC_LABEL[recGroup(r)]||r||"Include"}
+
+function scoreRing(score,size=22){
+  const s=score||0;
+  const r=(size/2)-2;const cx=size/2;const cy=size/2;
+  const circ=2*Math.PI*r;
+  const fill=(s/100)*circ;
+  const color=s>=70?"#15803D":s>=45?"#1D4ED8":s>=25?"#D97706":"#DC2626";
+  return`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="display:block;flex-shrink:0">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E5E7EB" stroke-width="2"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="2"
+      stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}"
+      stroke-linecap="round"
+      transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy+3.5}" text-anchor="middle" font-size="${size<28?6:8}" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${Math.round(s)}</text>
+  </svg>`;
+}
+
+// ============================================================
+// DATA ACCESSORS
+// ============================================================
+function getSlots(loc,iter){
+  loc=loc||_loc; iter=iter||_iter;
+  if(iter!=="Main"&&SCHEDULE_DATA.iterations&&SCHEDULE_DATA.iterations[iter]&&SCHEDULE_DATA.iterations[iter][loc])
+    return SCHEDULE_DATA.iterations[iter][loc]||[];
+  return(SCHEDULE_DATA.locations&&SCHEDULE_DATA.locations[loc])||[];
+}
+function filterSlots(slots){
+  return slots.filter(s=>{
+    if(!_activeDays.has(s.day_of_week))return false;
+    if(!_activeBands.has(timeBand(s.time)))return false;
+    const rg=recGroup(s.recommendation);
+    if(!_activeRecs.has(rg))return false;
+    if(_classFilter&&!s.class_name.toLowerCase().includes(_classFilter.toLowerCase()))return false;
+    if(_trainerFilter&&(s.trainer_1||"").toLowerCase()!==_trainerFilter.toLowerCase())return false;
+    if(_roomFilter&&(s.room||"").toLowerCase()!==_roomFilter.toLowerCase())return false;
+    if(_minScore>0&&(s.score||0)<_minScore)return false;
+    if(_violOnly&&(!s.constraint_violations||s.constraint_violations.length===0))return false;
+    if(_expOnly&&!s.is_experimental)return false;
+    return true;
+  });
+}
+function getAllLocSlots(){
+  const locs=Object.keys(SCHEDULE_DATA.locations||{});
+  return locs.flatMap(l=>getSlots(l));
+}
+
+// ============================================================
+// UI BUILDERS
+// ============================================================
+function buildLocTabs(){
+  const bar=document.getElementById("loc-bar");
+  bar.innerHTML="";
+  const locs=Object.keys(SCHEDULE_DATA.locations||{});
+  locs.forEach((loc,i)=>{
+    const btn=document.createElement("button");
+    btn.className="loc-tab"+(i===0?" active":"");
+    btn.textContent=LOC_SHORT[loc]||loc.split(",")[0];
+    btn.title=loc;
+    btn.onclick=()=>{
+      document.querySelectorAll(".loc-tab").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      _loc=loc;
+      _view!=="cross"&&_view!=="analytics"&&populateDropdowns(getSlots(loc));
+      renderView();
+    };
+    bar.appendChild(btn);
+    if(i===0)_loc=loc;
+  });
+}
+
+function buildIterPills(){
+  const row=document.getElementById("iter-row");
+  row.innerHTML="";
+  const iters=["Main"];
+  if(SCHEDULE_DATA.iterations)Object.keys(SCHEDULE_DATA.iterations).forEach(k=>{if(k!=="Main")iters.push(k)});
+  if(iters.length<=1)return;
+  iters.forEach(iter=>{
+    const btn=document.createElement("button");
+    btn.className="iter-pill"+(iter==="Main"?" active":"");
+    btn.textContent=iter;
+    btn.onclick=()=>{
+      document.querySelectorAll(".iter-pill").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      _iter=iter;renderView();
+    };
+    row.appendChild(btn);
+  });
+}
+
+function buildDayChips(){
+  const el=document.getElementById("fp-days");
+  el.innerHTML="";
+  DAY_ORDER.forEach((day,i)=>{
+    const c=document.createElement("span");
+    c.className="fc on";c.dataset.day=day;
+    c.textContent=DAY_SHORT[i];
+    c.onclick=()=>{c.classList.toggle("on");_activeDays.has(day)?_activeDays.delete(day):_activeDays.add(day);renderView()};
+    el.appendChild(c);
+  });
+}
+
+function buildRecChips(){
+  const el=document.getElementById("fp-recs");
+  el.innerHTML="";
+  REC_LIST.forEach(r=>{
+    const c=document.createElement("span");
+    c.className="fc on";c.dataset.rec=r;
+    c.textContent=recLabel(r);
+    c.onclick=()=>{c.classList.toggle("on");_activeRecs.has(r)?_activeRecs.delete(r):_activeRecs.add(r);renderView()};
+    el.appendChild(c);
+  });
+}
+
+function populateDropdowns(slots){
+  const classes=[...new Set(slots.map(s=>s.class_name).filter(Boolean))].sort();
+  const trainers=[...new Set(slots.map(s=>s.trainer_1).filter(Boolean))].sort();
+  const rooms=[...new Set(slots.map(s=>s.room).filter(Boolean))].sort();
+  const cf=document.getElementById("fp-class");
+  const tf=document.getElementById("fp-trainer");
+  const rf=document.getElementById("fp-room");
+  cf.innerHTML='<option value="">All Classes</option>'+classes.map(c=>`<option value="${c}">${displayClass(c)}</option>`).join("");
+  tf.innerHTML='<option value="">All Trainers</option>'+trainers.map(t=>`<option value="${t}">${t}</option>`).join("");
+  rf.innerHTML='<option value="">All Rooms</option>'+rooms.map(r=>`<option value="${r}">${r}</option>`).join("");
+}
+
+// ============================================================
+// FILTER HANDLERS
+// ============================================================
+function toggleFilters(){
+  _filtersOpen=!_filtersOpen;
+  document.getElementById("filter-panel").classList.toggle("open",_filtersOpen);
+  document.getElementById("filter-toggle-btn").classList.toggle("active",_filtersOpen);
+}
+function toggleBand(el){el.classList.toggle("on");const b=el.dataset.band;_activeBands.has(b)?_activeBands.delete(b):_activeBands.add(b);renderView()}
+function applyFilters(){
+  _classFilter=document.getElementById("fp-class").value;
+  _trainerFilter=document.getElementById("fp-trainer").value;
+  _roomFilter=document.getElementById("fp-room").value;
+  _minScore=parseInt(document.getElementById("fp-score-min").value)||0;
+  _violOnly=document.getElementById("fp-violations").checked;
+  _expOnly=document.getElementById("fp-experimental").checked;
+  renderView();
+}
+function clearFilters(){
+  _activeDays=new Set(DAY_ORDER);_activeBands=new Set(["morning","midday","evening"]);
+  _activeRecs=new Set(REC_LIST);_classFilter="";_trainerFilter="";_roomFilter="";
+  _minScore=0;_violOnly=false;_expOnly=false;
+  document.querySelectorAll(".fc").forEach(c=>c.classList.add("on"));
+  document.getElementById("fp-class").value="";
+  document.getElementById("fp-trainer").value="";
+  document.getElementById("fp-room").value="";
+  document.getElementById("fp-score-min").value=0;
+  document.getElementById("fp-score-val").textContent=0;
+  document.getElementById("fp-violations").checked=false;
+  document.getElementById("fp-experimental").checked=false;
+  renderView();
+}
+
+// ============================================================
+// STATS ROW
+// ============================================================
+function renderStatsRow(area,slots){
+  const total=slots.length;
+  const avgFill=total?slots.reduce((s,x)=>s+(x.predicted_fill_rate||0),0)/total:0;
+  const avgScore=total?slots.reduce((s,x)=>s+(x.score||0),0)/total:0;
+  const violations=slots.filter(s=>s.constraint_violations&&s.constraint_violations.length>0).length;
+  const protected_=slots.filter(s=>s.recommendation==="PINNED"||s.recommendation==="PROTECT_EXACT"||s.recommendation==="PROTECT").length;
+  const experimental=slots.filter(s=>s.is_experimental).length;
+  const trainers=new Set(slots.map(s=>s.trainer_1).filter(Boolean)).size;
+  area.insertAdjacentHTML("beforeend",`<div class="stats-row">
+    ${sc("Classes",total,"blue")}
+    ${sc("Avg Fill",pct(avgFill,1),avgFill>=0.5?"green":avgFill>=0.35?"amber":"red")}
+    ${sc("Avg Score",Math.round(avgScore)+"/100","blue")}
+    ${sc("Trainers",trainers,"")}
+    ${sc("Protected",protected_,"green")}
+    ${sc("Violations",violations,violations>0?"red":"")}
+    ${sc("Experimental",experimental,"amber")}
+  </div>`);
+}
+function sc(label,value,cls){
+  return`<div class="stat-card"><div class="sc-lbl">${label}</div><div class="sc-val${cls?" "+cls:""}">${value}</div></div>`;
+}
+
+// ============================================================
+// VIEW ROUTER
+// ============================================================
+function setView(v){
+  _view=v;
+  document.querySelectorAll(".vbtn").forEach(b=>b.classList.remove("active"));
+  const el=document.getElementById("vbtn-"+v);
+  if(el)el.classList.add("active");
+  renderView();
+}
+
+function renderView(){
+  const area=document.getElementById("main-area");
+  area.innerHTML="";
+  const slots=_loc?getSlots(_loc):[];
+  const filtered=filterSlots(slots);
+  if(_view==="grid")     renderGrid(area,filtered,slots);
+  else if(_view==="timeline") renderTimeline(area,filtered);
+  else if(_view==="list")     renderList(area,filtered);
+  else if(_view==="trainer")  renderTrainer(area,filtered);
+  else if(_view==="cross")    renderCrossLocation(area);
+  else if(_view==="analytics")renderAnalytics(area,slots);
+}
+
+// ============================================================
+// GRID VIEW
+// ============================================================
+function renderGrid(area,filtered,allSlots){
+  renderStatsRow(area,allSlots);
+  // Build lookup: day → time → [slots]
+  const byDayTime={};
+  DAY_ORDER.forEach(d=>{byDayTime[d]={}});
+  filtered.forEach(s=>{
+    const t=s.time||"00:00";
+    if(!byDayTime[s.day_of_week])byDayTime[s.day_of_week]={};
+    if(!byDayTime[s.day_of_week][t])byDayTime[s.day_of_week][t]=[];
+    byDayTime[s.day_of_week][t].push(s);
+  });
+  const times=[...new Set(filtered.map(s=>s.time||"00:00"))].sort();
+  const dayDates=SCHEDULE_DATA.day_dates||{};
+
+  const grid=document.createElement("div");
+  grid.className="sched-grid";
+
+  // Count classes per day (from filtered)
+  const dayCount={};DAY_ORDER.forEach(d=>dayCount[d]=0);
+  filtered.forEach(s=>dayCount[s.day_of_week]=(dayCount[s.day_of_week]||0)+1);
+
+  // header row
+  grid.insertAdjacentHTML("beforeend",`<div class="sg-corner"></div>`);
+  DAY_ORDER.forEach(d=>{
+    const dt=dayDates[d]?new Date(dayDates[d]).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"";
+    const cnt=dayCount[d]||0;
+    const cntColor=cnt>=10?"var(--green)":cnt>=7?"var(--primary)":"var(--text-muted)";
+    grid.insertAdjacentHTML("beforeend",`<div class="sg-day">
+      <div class="sg-day-name">${d.slice(0,3)}</div>
+      <div class="sg-day-date">${dt}</div>
+      <div style="font-size:10px;font-weight:700;color:${cntColor};margin-top:2px;font-family:'Plus Jakarta Sans',sans-serif">${cnt} classes</div>
+    </div>`);
+  });
+
+  // body rows
+  times.forEach(t=>{
+    const primeCls=isPrime(t)?" prime":"";
+    grid.insertAdjacentHTML("beforeend",`<div class="sg-time${primeCls}">${t}</div>`);
+    DAY_ORDER.forEach(d=>{
+      const cell=document.createElement("div");
+      cell.className="sg-cell";
+      const slotsHere=(byDayTime[d]||{})[t]||[];
+      slotsHere.sort((a,b)=>(b.score||0)-(a.score||0)).forEach(s=>cell.appendChild(makeClassCard(s)));
+      grid.appendChild(cell);
+    });
+  });
+
+  area.appendChild(grid);
+}
+
+function makeClassCard(s){
+  const fam=getFamily(s.class_name);
+  const div=document.createElement("div");
+  div.className=`cc cc-${fam}`;
+  const fill=s.predicted_fill_rate||0;
+  const fc=fillColor(fill);
+  const viols=s.constraint_violations&&s.constraint_violations.length?`<div class="cc-viol">${s.constraint_violations.length}</div>`:"";
+  const exp=s.is_experimental?`<span class="cc-exp-mark">EXP</span>`:"";
+  const rg=recGroup(s.recommendation);
+  const badgeCls=recBadgeCls(s.recommendation);
+  div.innerHTML=`
+    <div class="cc-accent" style="background:${FAM_COLOR[fam]||FAM_COLOR.default}"></div>
+    ${exp}${viols}
+    <div class="cc-top">
+      <div class="cc-name">${displayClass(s.class_name)}</div>
+      <div class="cc-score-ring">${scoreRing(s.score,22)}</div>
+    </div>
+    <div class="cc-trainer">${s.trainer_1||"—"}</div>
+    <div class="cc-bottom">
+      <span class="cc-fill-pct" style="color:${fc}">${pct(fill)}</span>
+      <div class="cc-bar-bg"><div class="cc-bar-fill" style="width:${Math.round(fill*100)}%;background:${fc}"></div></div>
+      <span class="cc-badge ${badgeCls}">${recLabel(s.recommendation)}</span>
+      <span class="cc-hist">${s.historical_session_count||0}×</span>
+    </div>`;
+  div.onclick=()=>openModal(s);
+  return div;
+}
+
+// ============================================================
+// TIMELINE VIEW
+// ============================================================
+function renderTimeline(area,filtered){
+  const TL_START=7*60, TL_END=21*60, TL_SPAN=TL_END-TL_START;
+  renderStatsRow(area,filtered);
+
+  const wrap=document.createElement("div");
+  wrap.className="tl-container";
+  wrap.style.overflowX="auto";
+
+  // build by day
+  const byDay={};
+  DAY_ORDER.forEach(d=>byDay[d]=[]);
+  filtered.forEach(s=>{if(byDay[s.day_of_week])byDay[s.day_of_week].push(s)});
+
+  DAY_ORDER.forEach((day,di)=>{
+    const daySlots=byDay[day];
+    const row=document.createElement("div");
+    row.className="tl-row";
+    row.innerHTML=`<div class="tl-day-lbl">${DAY_SHORT[di]}</div>`;
+    const track=document.createElement("div");
+    track.className="tl-track";
+    daySlots.forEach(s=>{
+      const start=tmins(s.time||"00:00");
+      const dur=s.duration_min||57;
+      const left=Math.max(0,(start-TL_START)/TL_SPAN*100);
+      const width=Math.max(0.5,dur/TL_SPAN*100);
+      const fam=getFamily(s.class_name);
+      const col=FAM_COLOR[fam]||FAM_COLOR.default;
+      const block=document.createElement("div");
+      block.className="tl-block";
+      block.style.cssText=`left:${left.toFixed(2)}%;width:${width.toFixed(2)}%;background:${col};opacity:${s.is_experimental?0.6:1}`;
+      block.title=`${s.time} ${displayClass(s.class_name)} — ${s.trainer_1} (${pct(s.predicted_fill_rate)})`;
+      if(width>4){
+        block.innerHTML=`<div class="tl-b-name">${displayClass(s.class_name)}</div>${width>8?`<div class="tl-b-sub">${s.trainer_1||""}</div>`:""}`;
+      }
+      block.onclick=()=>openModal(s);
+      track.appendChild(block);
+    });
+    row.appendChild(track);
+    wrap.appendChild(row);
+  });
+
+  // time axis
+  const axisTimes=[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+  const axisHTML=`<div class="tl-axis" style="display:flex;margin-left:38px;min-width:600px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px">
+    ${axisTimes.map(h=>{
+      const pos=((h*60-TL_START)/TL_SPAN*100).toFixed(1);
+      const isPr=[8,9,10,11,17,18,19].includes(h);
+      return`<div style="position:absolute;left:${pos}%;font-size:9px;color:${isPr?"var(--prime)":"var(--text-light)"};font-weight:${isPr?700:400}">${h}:00</div>`;
+    }).join("")}
+  </div>`;
+  wrap.insertAdjacentHTML("beforeend",`<div style="position:relative;height:16px;margin-left:38px;min-width:600px;border-top:1px solid var(--border);margin-top:4px">${axisTimes.map(h=>{const pos=((h*60-TL_START)/TL_SPAN*100).toFixed(1);return`<span style="position:absolute;left:${pos}%;font-size:9px;color:var(--text-light);transform:translateX(-50%)">${h}:00</span>`}).join("")}</div>`);
+
+  // legend
+  const legendEl=document.createElement("div");
+  legendEl.className="legend";legendEl.style.marginTop="14px";
+  Object.entries(FAM_COLOR).forEach(([fam,col])=>{
+    legendEl.insertAdjacentHTML("beforeend",`<div class="li"><div class="ld" style="background:${col}"></div>${fam.replace("_"," ")}</div>`);
+  });
+  wrap.appendChild(legendEl);
+  area.appendChild(wrap);
+}
+
+// ============================================================
+// LIST VIEW
+// ============================================================
+function renderList(area,filtered){
+  renderStatsRow(area,filtered);
+  const cols=[
+    {k:"day_of_week",l:"Day",sort:s=>DAY_ORDER.indexOf(s.day_of_week)},
+    {k:"time",l:"Time",sort:s=>tmins(s.time)},
+    {k:"class_name",l:"Class",sort:s=>s.class_name||""},
+    {k:"trainer_1",l:"Trainer",sort:s=>s.trainer_1||""},
+    {k:"room",l:"Room",sort:s=>s.room||""},
+    {k:"score",l:"Score",sort:s=>s.score||0},
+    {k:"predicted_fill_rate",l:"Fill %",sort:s=>s.predicted_fill_rate||0},
+    {k:"historical_avg_checkin",l:"Avg CheckIn",sort:s=>s.historical_avg_checkin||0},
+    {k:"historical_session_count",l:"Sessions",sort:s=>s.historical_session_count||0},
+    {k:"historical_late_cancel_rate",l:"Late Cancel",sort:s=>s.historical_late_cancel_rate||0},
+    {k:"historical_no_show_rate",l:"No Show",sort:s=>s.historical_no_show_rate||0},
+    {k:"trainer_overall_fill",l:"Trainer Fill",sort:s=>s.trainer_overall_fill||0},
+    {k:"recommendation",l:"Rec",sort:s=>s.recommendation||""},
+    {k:"constraint_violations",l:"Violations",sort:s=>(s.constraint_violations||[]).length},
+  ];
+
+  let data=[...filtered];
+  if(_sortCol!==null){
+    const col=cols[_sortCol];
+    data.sort((a,b)=>{const va=col.sort(a),vb=col.sort(b);return typeof va==="string"?va.localeCompare(vb)*_sortDir:(va-vb)*_sortDir});
+  }
+
+  const wrap=document.createElement("div");wrap.style.overflowX="auto";
+  const tbl=document.createElement("table");tbl.className="list-tbl";
+
+  const thead=document.createElement("thead");
+  thead.innerHTML=`<tr>${cols.map((c,i)=>`<th onclick="sortList(${i})">${c.l}</th>`).join("")}</tr>`;
+  tbl.appendChild(thead);
+
+  const tbody=document.createElement("tbody");
+  data.forEach(s=>{
+    const tr=document.createElement("tr");
+    if(isPrime(s.time))tr.classList.add("prime-row");
+    tr.onclick=()=>openModal(s);
+    const fill=s.predicted_fill_rate||0;
+    const fc=fillColor(fill);
+    const viols=s.constraint_violations||[];
+    const fam=getFamily(s.class_name);
+    tr.innerHTML=`
+      <td class="td-m">${s.day_of_week||""}</td>
+      <td><span style="font-weight:700;color:${isPrime(s.time)?"var(--prime)":"var(--text)"}">${s.time||""}</span></td>
+      <td><span style="color:${FAM_COLOR[fam]||FAM_COLOR.default};font-weight:600">${displayClass(s.class_name)}</span></td>
+      <td>${s.trainer_1||"—"}</td>
+      <td class="td-m">${s.room||"—"}</td>
+      <td class="td-c">${scoreRing(s.score,22)}</td>
+      <td><div class="fill-cell"><div class="fill-mini"><div class="fill-mini-fill" style="width:${Math.round(fill*100)}%;background:${fc}"></div></div><span style="font-weight:700;color:${fc}">${pct(fill)}</span></div></td>
+      <td class="td-c">${round1(s.historical_avg_checkin)}</td>
+      <td class="td-c">${s.historical_session_count||0}</td>
+      <td class="td-c" style="color:${(s.historical_late_cancel_rate||0)>0.15?"var(--red)":"var(--text-muted)"}">${pct(s.historical_late_cancel_rate)}</td>
+      <td class="td-c" style="color:${(s.historical_no_show_rate||0)>0.2?"var(--red)":"var(--text-muted)"}">${pct(s.historical_no_show_rate)}</td>
+      <td class="td-c" style="color:${fillColor(s.trainer_overall_fill)}">${pct(s.trainer_overall_fill)}</td>
+      <td><span class="cc-badge ${recBadgeCls(s.recommendation)}">${recLabel(s.recommendation)}</span>${s.is_experimental?`<span class="exp-mark" style="margin-left:3px">EXP</span>`:""}</td>
+      <td class="td-c">${viols.length?`<span class="viol-dot">${viols.length}</span>`:""}</td>`;
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  wrap.appendChild(tbl);
+  area.appendChild(wrap);
+}
+function sortList(i){
+  if(_sortCol===i)_sortDir*=-1;else{_sortCol=i;_sortDir=-1}
+  document.querySelectorAll(".list-tbl thead th").forEach((th,j)=>{th.classList.remove("sort-asc","sort-desc");if(j===i)th.classList.add(_sortDir===1?"sort-asc":"sort-desc")});
+  renderList(document.getElementById("main-area"),filterSlots(getSlots(_loc)));
+  document.getElementById("main-area").scrollTop=0;
+}
+
+// ============================================================
+// TRAINER VIEW
+// ============================================================
+function renderTrainer(area,filtered){
+  renderStatsRow(area,filtered);
+  // Group by trainer
+  const byTrainer={};
+  filtered.forEach(s=>{
+    const t=s.trainer_1||"Unknown";
+    if(!byTrainer[t])byTrainer[t]={slots:[],fill:0,checkin:0,sessions:0,overallFill:s.trainer_overall_fill||0,overallCheckin:s.trainer_overall_checkin||0,totalSessions:s.trainer_total_sessions||0};
+    byTrainer[t].slots.push(s);
+  });
+  // Compute per-trainer stats
+  Object.entries(byTrainer).forEach(([t,d])=>{
+    d.fill=d.slots.reduce((s,x)=>s+(x.predicted_fill_rate||0),0)/d.slots.length;
+    d.checkin=d.slots.reduce((s,x)=>s+(x.historical_avg_checkin||0),0)/d.slots.length;
+    d.sessions=d.slots.reduce((s,x)=>s+(x.historical_session_count||0),0);
+  });
+  const sorted=Object.entries(byTrainer).sort((a,b)=>b[1].overallFill-a[1].overallFill);
+
+  const grid=document.createElement("div");
+  grid.className="trainer-grid";
+
+  sorted.forEach(([trainer,d])=>{
+    const overallFill=d.overallFill||0;
+    const fc=fillColor(overallFill);
+    const initials=trainerInitials(trainer);
+    // Determine tier from slot recommendations
+    const hasPinned=d.slots.some(s=>s.recommendation==="PINNED"||s.recommendation==="PROTECT_EXACT");
+    const tierNum=hasPinned?1:d.overallFill>=0.4?2:3;
+    const tierCls=`t${tierNum}`;
+    const tierLbl=`Tier ${tierNum}`;
+
+    // Build schedule by day
+    const byDay={};DAY_ORDER.forEach(day=>byDay[day]=[]);
+    d.slots.forEach(s=>{if(byDay[s.day_of_week])byDay[s.day_of_week].push(s)});
+
+    const schedRows=DAY_ORDER.filter(day=>byDay[day].length>0).map(day=>{
+      const chips=byDay[day].sort((a,b)=>tmins(a.time)-tmins(b.time)).map(s=>{
+        const fam=getFamily(s.class_name);
+        const col=FAM_COLOR[fam]||FAM_COLOR.default;
+        return`<span class="tc-chip" style="background:${col}" title="${displayClass(s.class_name)} — ${pct(s.predicted_fill_rate)}" onclick="event.stopPropagation();openModal(${JSON.stringify(s).replace(/"/g,"&quot;")})">${s.time}<span class="trainer-cls-time">${displayClass(s.class_name).slice(0,8)}</span></span>`;
+      }).join("");
+      return`<div class="tc-day"><div class="tc-dl">${day.slice(0,3)}</div><div class="tc-chips">${chips}</div></div>`;
+    }).join("");
+
+    const weekClasses=d.slots.length;
+    const weekHours=(d.slots.reduce((s,x)=>s+(x.duration_min||57),0)/60).toFixed(1);
+
+    const card=document.createElement("div");
+    card.className="tc";
+    card.innerHTML=`
+      <div class="tc-hdr">
+        <div class="tc-avatar">${initials}</div>
+        <div>
+          <div class="tc-name">${trainer}</div>
+          <div class="tc-meta">Overall fill: <strong style="color:${fc}">${pct(overallFill)}</strong> · ${d.totalSessions} total sessions</div>
+        </div>
+        <span class="tier-badge ${tierCls}">${tierLbl}</span>
+      </div>
+      <div class="tc-stats">
+        <div class="tc-s"><div class="tc-sv" style="color:${fc}">${pct(overallFill)}</div><div class="tc-sl">Avg Fill</div></div>
+        <div class="tc-s"><div class="tc-sv">${weekClasses}</div><div class="tc-sl">This Week</div></div>
+        <div class="tc-s"><div class="tc-sv">${weekHours}h</div><div class="tc-sl">Hours</div></div>
+        <div class="tc-s"><div class="tc-sv">${round1(d.overallCheckin)}</div><div class="tc-sl">Avg CheckIn</div></div>
+        <div class="tc-s"><div class="tc-sv">${d.totalSessions}</div><div class="tc-sl">All Time</div></div>
+      </div>
+      <div class="tc-sched">
+        <div class="tc-st">This Week Schedule</div>
+        ${schedRows||"<div style='font-size:11px;color:var(--text-muted)'>No classes match current filters</div>"}
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  area.appendChild(grid);
+}
+
+// ============================================================
+// CROSS-LOCATION VIEW
+// ============================================================
+function renderCrossLocation(area){
+  const locs=Object.keys(SCHEDULE_DATA.locations||{});
+  if(locs.length===0){area.textContent="No location data.";return}
+
+  // Apply active filters to each location's slots
+  const filteredByLoc={};
+  locs.forEach(loc=>{ filteredByLoc[loc]=filterSlots(getSlots(loc)); });
+  const allFiltered=locs.flatMap(loc=>filteredByLoc[loc]);
+  renderStatsRow(area,allFiltered);
+
+  // Build lookup: loc → day → time → [slots] (filtered)
+  const lookup={};
+  locs.forEach(loc=>{
+    lookup[loc]={};
+    DAY_ORDER.forEach(day=>lookup[loc][day]={});
+    filteredByLoc[loc].forEach(s=>{
+      const t=s.time||"00:00";
+      if(!lookup[loc][s.day_of_week][t])lookup[loc][s.day_of_week][t]=[];
+      lookup[loc][s.day_of_week][t].push(s);
+    });
+  });
+
+  // Day class counts per location (for column header badges)
+  const dayCntByLoc={};
+  locs.forEach(loc=>{dayCntByLoc[loc]={};DAY_ORDER.forEach(d=>dayCntByLoc[loc][d]=0)});
+  allFiltered.forEach(s=>{if(dayCntByLoc[s.location])dayCntByLoc[s.location][s.day_of_week]=(dayCntByLoc[s.location][s.day_of_week]||0)+1});
+
+  const allTimes=[...new Set(allFiltered.map(s=>s.time||"00:00"))].sort();
+
+  const locLabels={"Kwality House, Kemps Corner":"ct-kw","Supreme HQ, Bandra":"ct-su","Kenkere House":"ct-ke"};
+
+  const wrap=document.createElement("div");wrap.className="cross-wrap";
+  const tbl=document.createElement("table");tbl.className="cross-tbl";
+
+  // Header rows: Day row + Location row
+  let th1=`<tr><th></th>`;// time column
+  let th2=`<tr><th></th>`;
+  DAY_ORDER.forEach(day=>{
+    const totalDay=locs.reduce((s,loc)=>s+(dayCntByLoc[loc][day]||0),0);
+    th1+=`<th colspan="${locs.length}" class="ct-day-hdr">${day}<br><span style="font-weight:400;font-size:9px;opacity:0.7">${totalDay} classes</span></th>`;
+    locs.forEach(loc=>{
+      const abbr=LOC_ABBR[loc]||loc.slice(0,2);
+      const cls=locLabels[loc]||"";
+      const cnt=dayCntByLoc[loc][day]||0;
+      th2+=`<th class="${cls}">${abbr}<br><span style="font-weight:400;opacity:0.8">${cnt}</span></th>`;
+    });
+  });
+  th1+=`</tr>`;th2+=`</tr>`;
+
+  const thead=document.createElement("thead");
+  thead.innerHTML=th1+th2;
+  tbl.appendChild(thead);
+
+  const tbody=document.createElement("tbody");
+  allTimes.forEach(t=>{
+    const tr=document.createElement("tr");
+    tr.insertAdjacentHTML("beforeend",`<td class="ct-time${isPrime(t)?" prime":""}">${t}</td>`);
+    DAY_ORDER.forEach(day=>{
+      locs.forEach(loc=>{
+        const slotsHere=(lookup[loc][day]||{})[t]||[];
+        const td=document.createElement("td");
+        if(slotsHere.length===0){
+          td.innerHTML=`<div class="ct-empty"></div>`;
+        } else {
+          slotsHere.forEach(s=>{
+            const fam=getFamily(s.class_name);
+            const col=FAM_COLOR[fam]||FAM_COLOR.default;
+            const div=document.createElement("div");
+            div.className="ct-cell";
+            div.style.background=col;
+            div.title=`${loc}: ${displayClass(s.class_name)} — ${s.trainer_1} (${pct(s.predicted_fill_rate)})`;
+            div.innerHTML=`<div class="ct-cn">${displayClass(s.class_name)}</div><div class="ct-tr">${s.trainer_1||""}</div><div class="ct-fp">${pct(s.predicted_fill_rate)}</div>`;
+            div.onclick=()=>openModal(s);
+            td.appendChild(div);
+          });
+        }
+        tr.appendChild(td);
+      });
+    });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  wrap.appendChild(tbl);
+
+  // Legend
+  wrap.insertAdjacentHTML("beforeend",`<div class="legend" style="margin-top:12px">
+    ${locs.map(loc=>`<div class="li"><div class="ld" style="background:${LOC_COLOR[loc]||'#6B7280'}"></div>${LOC_SHORT[loc]||loc}</div>`).join("")}
+    ${Object.entries(FAM_COLOR).slice(0,6).map(([f,c])=>`<div class="li"><div class="ld" style="background:${c}"></div>${f.replace("_"," ")}</div>`).join("")}
+  </div>`);
+
+  area.appendChild(wrap);
+}
+
+// ============================================================
+// ANALYTICS VIEW
+// ============================================================
+function renderAnalytics(area,allLocSlots){
+  const slots=getAllLocSlots();
+  renderStatsRow(area,slots);
+
+  const grid=document.createElement("div");
+  grid.className="analytics-grid";
+
+  // Opportunities card (full width)
+  const opp=document.createElement("div");
+  opp.className="ac span2";
+  const oppData=OPPORTUNITIES||[];
+  opp.innerHTML=`<div class="ac-title">⚡ Optimisation Opportunities</div>`+
+    oppData.map((o,i)=>`<div class="opp-item${i%2===1?" warn":""}"><div class="opp-text">${o}</div></div>`).join("")+
+    (oppData.length===0?"<div style='font-size:12px;color:var(--text-muted)'>No opportunities data.</div>":"");
+  grid.appendChild(opp);
+
+  // Class mix per location
+  const locs=Object.keys(SCHEDULE_DATA.locations||{});
+  locs.forEach(loc=>{
+    const locSlots=getSlots(loc);
+    const mixCounts={};
+    locSlots.forEach(s=>{const cn=s.class_name||"Unknown";mixCounts[cn]=(mixCounts[cn]||0)+1});
+    const total=locSlots.length;
+    const sorted=Object.entries(mixCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+    const card=document.createElement("div");
+    card.className="ac";
+    card.innerHTML=`<div class="ac-title">📊 ${LOC_SHORT[loc]||loc} — Class Mix</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">${total} classes · Week of ${WEEK_LABEL||""}</div>
+      ${sorted.map(([cn,cnt])=>{
+        const pctV=(cnt/total);
+        const fam=getFamily(cn);
+        const col=FAM_COLOR[fam]||FAM_COLOR.default;
+        return`<div class="mix-row">
+          <div class="mix-name">${displayClass(cn)}</div>
+          <div class="mix-bar-bg"><div class="mix-bar-fill" style="width:${Math.round(pctV*100)}%;background:${col}"></div></div>
+          <div class="mix-pct">${Math.round(pctV*100)}%</div>
+          <div class="mix-cnt">${cnt}</div>
+        </div>`;
+      }).join("")}`;
+    grid.appendChild(card);
+  });
+
+  // Day-of-week fill rate chart (full width)
+  const dayCard=document.createElement("div");
+  dayCard.className="ac span2";
+  const dayFills={};const dayCounts={};
+  DAY_ORDER.forEach(d=>{dayFills[d]=0;dayCounts[d]=0});
+  getAllLocSlots().forEach(s=>{if(s.day_of_week){dayFills[s.day_of_week]+=(s.predicted_fill_rate||0);dayCounts[s.day_of_week]++}});
+  const maxFill=Math.max(...DAY_ORDER.map(d=>dayCounts[d]?dayFills[d]/dayCounts[d]:0));
+  dayCard.innerHTML=`<div class="ac-title">📅 Fill Rate by Day of Week (All Locations)</div>
+    <div class="day-bars">
+      ${DAY_ORDER.map((d,i)=>{
+        const avg=dayCounts[d]?dayFills[d]/dayCounts[d]:0;
+        const h=maxFill>0?Math.round(avg/maxFill*80):0;
+        const col=fillColor(avg);
+        return`<div class="day-bar-col">
+          <div class="day-bar-val" style="font-size:9px;color:${col};font-weight:700">${pct(avg)}</div>
+          <div class="day-bar-fill" style="height:${h}px;background:${col};border-radius:var(--r4) var(--r4) 0 0;width:100%"></div>
+          <div class="day-bar-lbl">${DAY_SHORT[i]}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  grid.appendChild(dayCard);
+
+  // Trainer utilization card
+  const trainersMap={};
+  getAllLocSlots().forEach(s=>{
+    const t=s.trainer_1;if(!t)return;
+    if(!trainersMap[t])trainersMap[t]={classes:0,fill:0,checkin:0,sessions:s.trainer_overall_fill||0,overallFill:s.trainer_overall_fill||0};
+    trainersMap[t].classes++;trainersMap[t].fill+=(s.predicted_fill_rate||0);
+  });
+  const trainerList=Object.entries(trainersMap).sort((a,b)=>b[1].overallFill-a[1].overallFill).slice(0,15);
+  const maxTrainerFill=Math.max(...trainerList.map(([,d])=>d.overallFill));
+
+  const utilCard=document.createElement("div");
+  utilCard.className="ac span2";
+  utilCard.innerHTML=`<div class="ac-title">👤 Trainer Performance Overview (Top 15)</div>
+    <div style="display:grid;grid-template-columns:130px 40px 40px 50px 1fr;gap:8px;padding:6px 0;border-bottom:2px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em">
+      <span>Trainer</span><span style="text-align:center">Classes</span><span style="text-align:center">Avg Fill</span><span></span><span>Utilization</span>
+    </div>
+    ${trainerList.map(([name,d])=>{
+      const avgF=d.classes?d.fill/d.classes:0;
+      const fc=fillColor(d.overallFill);
+      const barW=maxTrainerFill>0?Math.round(d.overallFill/maxTrainerFill*100):0;
+      return`<div class="util-row">
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${name}</span>
+        <span style="text-align:center;font-size:12px;font-weight:600">${d.classes}</span>
+        <span style="text-align:center;font-size:12px;font-weight:700;color:${fc}">${pct(d.overallFill)}</span>
+        <span></span>
+        <div class="util-bar-bg"><div class="util-bar-fill" style="width:${barW}%;background:${fc}"></div></div>
+      </div>`;
+    }).join("")}`;
+  grid.appendChild(utilCard);
+
+  // Score distribution histogram
+  const scoreCard=document.createElement("div");
+  scoreCard.className="ac";
+  const buckets=new Array(10).fill(0);
+  const allScores=getAllLocSlots().map(s=>s.score||0);
+  allScores.forEach(sc=>{const b=Math.min(9,Math.floor(sc/10));buckets[b]++});
+  const maxBucket=Math.max(...buckets);
+  const bucketColors=["#DC2626","#DC2626","#D97706","#D97706","#D97706","#1D4ED8","#1D4ED8","#15803D","#15803D","#15803D"];
+  scoreCard.innerHTML=`<div class="ac-title">📈 Score Distribution</div>
+    <div class="score-hist">
+      ${buckets.map((cnt,i)=>{
+        const h=maxBucket>0?Math.round(cnt/maxBucket*60):0;
+        return`<div class="sh-col">
+          <span style="font-size:9px;color:var(--text-muted)">${cnt}</span>
+          <div class="sh-bar" style="height:${h}px;background:${bucketColors[i]};border-radius:var(--r4) var(--r4) 0 0;width:100%;min-height:2px"></div>
+          <span class="sh-lbl">${i*10}–${i*10+9}</span>
+        </div>`;
+      }).join("")}
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px">
+      Median: <strong>${allScores.length?Math.round(allScores.sort((a,b)=>a-b)[Math.floor(allScores.length/2)]):0}</strong> ·
+      Mean: <strong>${allScores.length?Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length):0}</strong> ·
+      Protected: <strong>${getAllLocSlots().filter(s=>s.recommendation==="PROTECT_EXACT"||s.recommendation==="PINNED").length}</strong>
+    </div>`;
+  grid.appendChild(scoreCard);
+
+  // Constraint violations card
+  const violSlots=getAllLocSlots().filter(s=>s.constraint_violations&&s.constraint_violations.length>0);
+  const violCard=document.createElement("div");
+  violCard.className="ac";
+  if(violSlots.length===0){
+    violCard.innerHTML=`<div class="ac-title">✅ Constraint Violations</div><div style="color:var(--green);font-size:13px;font-weight:600;padding:10px 0">No violations detected</div>`;
+  } else {
+    const violMap={};
+    violSlots.forEach(s=>(s.constraint_violations||[]).forEach(v=>{violMap[v]=(violMap[v]||0)+1}));
+    violCard.innerHTML=`<div class="ac-title">⚠️ Constraint Violations (${violSlots.length} slots)</div>`+
+      Object.entries(violMap).sort((a,b)=>b[1]-a[1]).map(([v,cnt])=>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+           <span style="color:var(--red)">${v}</span><strong style="color:var(--red)">${cnt}×</strong>
+         </div>`).join("");
+  }
+  grid.appendChild(violCard);
+
+  area.appendChild(grid);
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(s){
+  const fam=getFamily(s.class_name);
+  const fill=s.predicted_fill_rate||0;
+  const fc=fillColor(fill);
+  const viols=s.constraint_violations||[];
+  const dayDates=SCHEDULE_DATA.day_dates||{};
+  const dateStr=dayDates[s.day_of_week]?new Date(dayDates[s.day_of_week]).toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"}):s.day_of_week;
+
+  const box=document.getElementById("modal-box");
+  box.innerHTML=`
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-class-name">${displayClass(s.class_name)}</div>
+        <div class="modal-meta">${dateStr} · ${s.time} · ${s.room||"—"} · ${s.location||""}</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="ms-title">Performance Metrics</div>
+        <div class="modal-metrics">
+          <div class="mm"><div class="mm-l">Predicted Fill</div><div class="mm-v" style="color:${fc}">${pct(fill,1)}</div><div class="mm-s">of ${s.capacity||"—"} capacity</div></div>
+          <div class="mm"><div class="mm-l">Composite Score</div><div class="mm-v">${scoreRing(s.score,32)}</div><div class="mm-s">${s.recommendation||"—"}</div></div>
+          <div class="mm"><div class="mm-l">Historical Fill</div><div class="mm-v" style="color:${fillColor(s.historical_avg_fill||0)}">${pct(s.historical_avg_fill)}</div><div class="mm-s">${s.historical_session_count||0} sessions</div></div>
+          <div class="mm"><div class="mm-l">Avg Check-In</div><div class="mm-v">${round1(s.historical_avg_checkin)}</div><div class="mm-s">per session</div></div>
+          <div class="mm"><div class="mm-l">Late Cancel</div><div class="mm-v" style="color:${(s.historical_late_cancel_rate||0)>0.15?"var(--red)":"var(--text)"}">${pct(s.historical_late_cancel_rate)}</div><div class="mm-s">rate</div></div>
+          <div class="mm"><div class="mm-l">No Show</div><div class="mm-v" style="color:${(s.historical_no_show_rate||0)>0.2?"var(--red)":"var(--text)"}">${pct(s.historical_no_show_rate)}</div><div class="mm-s">rate</div></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="ms-title">Trainer — ${s.trainer_1||"—"}</div>
+        <div class="trainer-hist">
+          <div class="th-card"><div class="th-lbl">Overall Fill Rate</div><div class="th-val" style="color:${fillColor(s.trainer_overall_fill||0)}">${pct(s.trainer_overall_fill)}</div></div>
+          <div class="th-card"><div class="th-lbl">Avg Check-In (all)</div><div class="th-val">${round1(s.trainer_overall_checkin)}</div></div>
+          <div class="th-card"><div class="th-lbl">Total Sessions</div><div class="th-val">${s.trainer_total_sessions||0}</div></div>
+          <div class="th-card"><div class="th-lbl">Duration</div><div class="th-val">${s.duration_min||57} min</div></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="ms-title">Scheduling Rationale</div>
+        <div class="modal-reason">${s.scheduling_reason||"No reason available."}</div>
+        <div class="chip-row">
+          ${isPrime(s.time)?`<span class="chip chip-prime">★ Prime Slot</span>`:""}
+          ${s.is_experimental?`<span class="chip chip-exp">Experimental</span>`:""}
+          <span class="chip chip-room">${s.room||"—"}</span>
+          <span class="chip chip-dur">${s.duration_min||57} min</span>
+          ${s.trainer_2?`<span class="chip chip-room">Co: ${s.trainer_2}</span>`:""}
+          ${s.cover?`<span class="chip">Cover: ${s.cover}</span>`:""}
+        </div>
+      </div>
+
+      ${viols.length?`<div class="modal-section">
+        <div class="ms-title">⚠️ Constraint Violations (${viols.length})</div>
+        ${viols.map(v=>`<div class="viol-item">${v}</div>`).join("")}
+      </div>`:""}
+
+    </div>`;
+
+  document.getElementById("modal-overlay").classList.add("open");
+}
+function closeModal(){document.getElementById("modal-overlay").classList.remove("open")}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  document.getElementById("week-badge").textContent=`Week of ${WEEK_LABEL||"—"}`;
+  buildLocTabs();
+  buildIterPills();
+  buildDayChips();
+  buildRecChips();
+  if(_loc){
+    populateDropdowns(getSlots(_loc));
+    renderView();
+  }
+}
+
+document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+window.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>

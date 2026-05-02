@@ -1,0 +1,210 @@
+{
+  "hard_constraints": [
+    {
+      "constraint_id": "UNIV-001",
+      "type": "always_do",
+      "location": null,
+      "description": "Barre 57 family must be >= 25% of total weekly classes at any location"
+    },
+    {
+      "constraint_id": "UNIV-002",
+      "type": "always_do",
+      "location": null,
+      "description": "All 3 time bands must have >= 1 class every weekday"
+    },
+    {
+      "constraint_id": "UNIV-003",
+      "type": "always_do",
+      "location": null,
+      "description": "Saturday must be max-load day"
+    },
+    {
+      "constraint_id": "UNIV-004",
+      "type": "never_do",
+      "location": null,
+      "description": "Sunday max 5-6 classes, no class before 10:00"
+    },
+    {
+      "constraint_id": "UNIV-005",
+      "type": "class_location",
+      "location": null,
+      "description": "Specialist classes only certified trainers"
+    },
+    {
+      "constraint_id": "UNIV-006",
+      "type": "always_do",
+      "location": null,
+      "description": "Express class must be paired with full-length equivalent on same day"
+    },
+    {
+      "constraint_id": "UNIV-007",
+      "type": "never_do",
+      "location": null,
+      "description": "Studio Recovery must never be first class of day"
+    },
+    {
+      "constraint_id": "UNIV-008",
+      "type": "never_do",
+      "location": null,
+      "description": "Foundations never at 11:30 or 19:15"
+    },
+    {
+      "constraint_id": "UNIV-011",
+      "type": "class_location",
+      "location": null,
+      "description": "PowerCycle NEVER at Kenkere House"
+    },
+    {
+      "constraint_id": "UNIV-012",
+      "type": "class_location",
+      "location": null,
+      "description": "Strength Lab ONLY at Kwality House"
+    },
+    {
+      "constraint_id": "UNIV-013",
+      "type": "class_location",
+      "location": null,
+      "description": "Pre/Post Natal NEVER at ANY LOCATION"
+    },
+    {
+      "constraint_id": "UNIV-014",
+      "type": "slot_required",
+      "location": null,
+      "description": "Peak midday slot must never be empty"
+    },
+    {
+      "constraint_id": "UNIV-015",
+      "type": "always_do",
+      "location": null,
+      "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day"
+    },
+    {
+      "constraint_id": "UNIV-016",
+      "type": "always_do",
+      "location": null,
+      "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays"
+    },
+    {
+      "constraint_id": "UNIV-017",
+      "type": "always_do",
+      "location": null,
+      "description": "Always assign Tier 1 trainer to primary peak slot"
+    },
+    {
+      "constraint_id": "UNIV-019",
+      "type": "never_do",
+      "location": null,
+      "description": "Specialist classes no substitution with non-certified"
+    },
+    {
+      "constraint_id": "UNIV-021",
+      "type": "never_do",
+      "location": null,
+      "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations"
+    },
+    {
+      "constraint_id": "UNIV-023",
+      "type": "never_do",
+      "location": null,
+      "description": "Same class formats must not be scheduled consecutively"
+    },
+    {
+      "constraint_id": "UNIV-024",
+      "type": "slot_required",
+      "location": null,
+      "description": "No classes before 07:00, between 13:00-15:00, or after 20:30"
+    },
+    {
+      "constraint_id": "UNIV-026",
+      "type": "never_do",
+      "location": null,
+      "description": "Recovery sessions must be the last class in their shift at that location"
+    }
+  ],
+  "soft_constraints": [
+    {
+      "constraint_id": "MIX-001",
+      "priority": 1,
+      "description": "Barre 57 family 45-55% of weekly classes",
+      "penalty": 10.0
+    },
+    {
+      "constraint_id": "MIX-002",
+      "priority": 1,
+      "description": "PowerCycle 8-10% Kwality, 25-28% Supreme, 0% Kenkere",
+      "penalty": 8.0
+    },
+    {
+      "constraint_id": "MIX-003",
+      "priority": 2,
+      "description": "Mat 57 minimum 3-4x per week per location",
+      "penalty": 5.0
+    },
+    {
+      "constraint_id": "MIX-004",
+      "priority": 2,
+      "description": "FIT 1x daily morning slots",
+      "penalty": 5.0
+    },
+    {
+      "constraint_id": "MIX-005",
+      "priority": 2,
+      "description": "Foundations at Kenkere 1x daily; Kwality/Supreme 2-3x/week",
+      "penalty": 5.0
+    },
+    {
+      "constraint_id": "MIX-006",
+      "priority": 3,
+      "description": "Recovery weekends only afternoon slots 12:30-16:00",
+      "penalty": 4.0
+    },
+    {
+      "constraint_id": "MIX-007",
+      "priority": 3,
+      "description": "Back Body Blaze morning only 07:30-09:00 max 3x/week",
+      "penalty": 4.0
+    },
+    {
+      "constraint_id": "MIX-008",
+      "priority": 3,
+      "description": "Studio Amped Up max 1-2x/week Reshma or Rohan only",
+      "penalty": 4.0
+    },
+    {
+      "constraint_id": "MIX-009",
+      "priority": 4,
+      "description": "Cardio Barre 1x/day evenings preferred",
+      "penalty": 3.0
+    },
+    {
+      "constraint_id": "MIX-010",
+      "priority": 4,
+      "description": "Strength Lab max 2x/week Kwality Mon/Wed evenings only",
+      "penalty": 3.0
+    },
+    {
+      "constraint_id": "SLOT-001",
+      "priority": 1,
+      "description": "Always fill peak midday 11:00-11:30 and prime evening 19:00-19:30",
+      "penalty": 8.0
+    },
+    {
+      "constraint_id": "SLOT-002",
+      "priority": 2,
+      "description": "Fill morning block 08:00-09:30 and early evening 17:45-18:15",
+      "penalty": 5.0
+    },
+    {
+      "constraint_id": "SLOT-003",
+      "priority": 3,
+      "description": "Fill early morning 07:00-07:30 and late evening 20:00",
+      "penalty": 3.0
+    },
+    {
+      "constraint_id": "SLOT-004",
+      "priority": 4,
+      "description": "Mid-afternoon 13:00-16:00 optional",
+      "penalty": 2.0
+    }
+  ]
+}
