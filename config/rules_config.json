@@ -33,27 +33,27 @@
   },
   "rules": {
     "UNIV-001": {
-      "enabled": true,
+      "enabled": false,
       "description": "Barre 57 family must be >= 25% of total weekly classes at any location",
       "title": "UNIV-001"
     },
     "UNIV-002": {
-      "enabled": true,
+      "enabled": false,
       "description": "All 3 time bands must have >= 1 class every weekday",
       "title": "UNIV-002"
     },
     "UNIV-003": {
-      "enabled": true,
+      "enabled": false,
       "description": "Saturday must be max-load day",
       "title": "UNIV-003"
     },
     "UNIV-004": {
-      "enabled": true,
+      "enabled": false,
       "description": "Sunday max 5-6 classes",
       "title": "UNIV-004"
     },
     "UNIV-005": {
-      "enabled": true,
+      "enabled": false,
       "description": "Specialist classes only certified trainers",
       "title": "UNIV-005"
     },
@@ -63,37 +63,37 @@
       "title": "UNIV-006"
     },
     "UNIV-007": {
-      "enabled": true,
+      "enabled": false,
       "description": "Studio Recovery must never be first class of day",
       "title": "UNIV-007"
     },
     "UNIV-008": {
-      "enabled": true,
+      "enabled": false,
       "description": "Foundations never at 11:30 or 19:15",
       "title": "UNIV-008"
     },
     "UNIV-009": {
-      "enabled": true,
+      "enabled": false,
       "description": "No trainer > 3 consecutive classes without 5 min gap",
       "title": "UNIV-009"
     },
     "UNIV-010": {
-      "enabled": true,
+      "enabled": false,
       "description": "No trainer > 4 classes in one day",
       "title": "UNIV-010"
     },
     "UNIV-011": {
-      "enabled": true,
+      "enabled": false,
       "description": "PowerCycle NEVER at Kenkere House",
       "title": "UNIV-011"
     },
     "UNIV-012": {
-      "enabled": true,
+      "enabled": false,
       "description": "Strength Lab ONLY at Kwality House",
       "title": "UNIV-012"
     },
     "UNIV-013": {
-      "enabled": true,
+      "enabled": false,
       "description": "Pre/Post Natal NEVER at ANY LOCATION",
       "title": "UNIV-013"
     },
@@ -103,7 +103,7 @@
       "title": "UNIV-014"
     },
     "UNIV-015": {
-      "enabled": true,
+      "enabled": false,
       "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day",
       "title": "UNIV-015"
     },
@@ -113,7 +113,7 @@
       "title": "UNIV-016"
     },
     "UNIV-017": {
-      "enabled": true,
+      "enabled": false,
       "description": "Always assign Tier 1 trainer to primary peak slot",
       "title": "UNIV-017"
     },
@@ -133,157 +133,157 @@
       "title": "UNIV-020"
     },
     "UNIV-021": {
-      "enabled": true,
+      "enabled": false,
       "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations",
       "title": "UNIV-021"
     },
     "UNIV-022": {
-      "enabled": true,
+      "enabled": false,
       "description": "A trainer cannot be scheduled across 2 locations in the same shift",
       "title": "UNIV-022"
     },
     "UNIV-023": {
-      "enabled": true,
+      "enabled": false,
       "description": "Same class formats must not be scheduled consecutively",
       "title": "UNIV-023"
     },
     "UNIV-024": {
-      "enabled": true,
+      "enabled": false,
       "description": "No classes before 07:00, between 13:00-15:00, or after 20:30",
       "title": "UNIV-024"
     },
     "UNIV-025": {
-      "enabled": true,
+      "enabled": false,
       "description": "Every trainer must get at least 1 full day off each week; 2 is preferred",
       "title": "UNIV-025"
     },
     "UNIV-026": {
-      "enabled": true,
+      "enabled": false,
       "description": "Recovery sessions must be the last class in their shift at that location",
       "title": "UNIV-026"
     },
     "FMT-STUDIO-BARRE-57": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; preferred slots: 07:30, 09:00, 11:00, 11:30, 19:00; min/week=14; target mix=30%; rules: min_2_per_weekday, min_1_per_sunday, always_tier1_at_1130",
       "title": "Studio Barre 57"
     },
     "FMT-STUDIO-CARDIO-BARRE": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; preferred slots: 19:00, 19:15, 19:30; min/week=7; target mix=10%; rules: prefer_evenings",
       "title": "Studio Cardio Barre"
     },
     "FMT-STUDIO-CARDIO-BARRE-EXPRESS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=30m; preferred slots: 07:00, 07:15, 07:30; min/week=4; target mix=3%; rules: pair_with_full_same_day",
       "title": "Studio Cardio Barre Express"
     },
     "FMT-STUDIO-CARDIO-BARRE-PLUS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=75m; preferred slots: 09:00, 10:00, 11:00; min/week=1; target mix=3%",
       "title": "Studio Cardio Barre Plus"
     },
     "FMT-STUDIO-MAT-57": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; preferred slots: 09:00, 10:00, 11:00; min/week=9; target mix=8%; rules: min_9_per_week",
       "title": "Studio Mat 57"
     },
     "FMT-STUDIO-MAT-57-EXPRESS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=30m; preferred slots: 07:00, 07:15, 07:30; min/week=1; target mix=3%; rules: pair_with_full_same_day, morning_only",
       "title": "Studio Mat 57 Express"
     },
     "FMT-STUDIO-BACK-BODY-BLAZE": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; preferred slots: 07:30, 08:00, 09:00; min/week=2; max/week=3; target mix=6%; rules: morning_only, max_3_per_week",
       "title": "Studio Back Body Blaze"
     },
     "FMT-STUDIO-BACK-BODY-BLAZE-EXPRESS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=30m; preferred slots: 07:00, 07:15, 07:30; target mix=2%; rules: pair_with_full_same_day, morning_only",
       "title": "Studio Back Body Blaze Express"
     },
     "FMT-STUDIO-FIT": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; preferred slots: 08:00, 09:00, 10:00; min/week=8; target mix=7%; rules: min_1_per_day, morning_preferred",
       "title": "Studio FIT"
     },
     "FMT-STUDIO-SWEAT-IN-30": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=30m; preferred slots: 07:00, 08:00, 09:00; target mix=3%; rules: morning_only, pair_with_full_same_day",
       "title": "Studio SWEAT In 30"
     },
     "FMT-STUDIO-POWERCYCLE": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=powercycle; duration=45m; never at Kenkere House; preferred slots: 17:30, 18:00, 19:15, 19:30; min/week=14; target mix=9%; rules: evening_only, never_kenkere, cauveri_first_choice_at_supreme, pair_express_with_full_same_day",
       "title": "Studio PowerCycle"
     },
     "FMT-STUDIO-POWERCYCLE-EXPRESS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=powercycle; duration=30m; never at Kenkere House; preferred slots: 17:30, 18:00; min/week=8; target mix=3%; rules: never_kenkere, pair_with_full_same_day",
       "title": "Studio PowerCycle Express"
     },
     "FMT-STUDIO-STRENGTH-LAB": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=strength_lab; duration=57m; never at Supreme HQ, Bandra, Kenkere House; preferred days: all; preferred slots: 07:15, 09:00, 11:00, 11:30, 10:00, 18:00; min/week=1; max/week=2; target mix=2%; rules: kwality_only, atulan_exclusively; certified only: Atulan Purohit, Anisha Shah, Mrigakshi Jaiswal, Richard D'Costa, Vivaran Dhasmana, Cauveri Vikrant, Karanvir Bhatia",
       "title": "Studio Strength Lab"
     },
     "FMT-STUDIO-STRENGTH-LAB-FULL-BODY": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=strength_lab; duration=57m; never at Supreme HQ, Bandra, Kenkere House; preferred days: all; preferred slots: 07:15, 09:00, 11:00, 11:30, 10:00, 18:00; min/week=8; max/week=10; target mix=1%; rules: kwality_only, counts_toward_strength_lab_weekly_cap; certified only: Atulan Purohit, Anisha Shah, Mrigakshi Jaiswal, Richard D'Costa, Vivaran Dhasmana, Cauveri Vikrant, Karanvir Bhatia",
       "title": "Studio Strength Lab (Full Body)"
     },
     "FMT-STUDIO-STRENGTH-LAB-PUSH": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=strength_lab; duration=57m; never at Supreme HQ, Bandra, Kenkere House; preferred days: all; preferred slots: 07:15, 09:00, 11:00, 11:30, 10:00, 18:00; min/week=5; max/week=10; target mix=1%; rules: kwality_only, counts_toward_strength_lab_weekly_cap; certified only: Atulan Purohit, Anisha Shah, Mrigakshi Jaiswal, Richard D'Costa, Vivaran Dhasmana, Cauveri Vikrant, Karanvir Bhatia",
       "title": "Studio Strength Lab (Push)"
     },
     "FMT-STUDIO-STRENGTH-LAB-PULL": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=strength_lab; duration=57m; never at Supreme HQ, Bandra, Kenkere House; preferred days: all; preferred slots: 07:15, 09:00, 11:00, 11:30, 10:00, 18:00; min/week=5; max/week=10; target mix=1%; rules: kwality_only, counts_toward_strength_lab_weekly_cap; certified only: Atulan Purohit, Anisha Shah, Mrigakshi Jaiswal, Richard D'Costa, Vivaran Dhasmana, Cauveri Vikrant, Karanvir Bhatia",
       "title": "Studio Strength Lab (Pull)"
     },
     "FMT-STUDIO-RECOVERY": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=recovery; duration=57m; preferred days: Saturday, Sunday; preferred slots: 12:30, 13:00, 14:00, 15:00; min/week=1; max/week=2; target mix=3%; rules: never_first_class_of_day, weekends_preferred, afternoon_only",
       "title": "Studio Recovery"
     },
     "FMT-STUDIO-FOUNDATIONS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=foundations; duration=57m; preferred slots: 09:00, 10:00, 11:00; target mix=5%; rules: certified_only, never_1130, never_1915; certified only: Shruti Kulkarni, Poojitha Bhaskar, Siddhartha Kusuma, Shruti Suresh, Pushyank Nahar, Kajol Kanchan, Rohan Dahima, Pranjali Jain, Atulan Purohit, Mrigakshi Jaiswal, Richard D'Costa, Vivaran Dhasmana, Cauveri Vikrant, Karanvir Bhatia, Anisha Shah",
       "title": "Studio Foundations"
     },
     "FMT-STUDIO-AMPED-UP": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=57m; eligible at Kwality House, Kemps Corner, Supreme HQ, Bandra; preferred slots: 19:00, 19:15; min/week=1; max/week=2; target mix=2%; rules: max_2_per_week, reshma_or_rohan",
       "title": "Studio Amped Up!"
     },
     "FMT-STUDIO-BARRE-57-EXPRESS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=barre_57; duration=30m; preferred slots: 07:00, 07:15, 07:30; min/week=2; target mix=5%; rules: pair_with_full_same_day, morning_only",
       "title": "Studio Barre 57 Express"
     },
     "FMT-STUDIO-HIIT": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=hiit; duration=45m; eligible at Kwality House, Kemps Corner, Supreme HQ, Bandra; preferred slots: 07:00, 07:30, 18:00; min/week=1; max/week=2; target mix=3%; rules: max_2_per_week",
       "title": "Studio HIIT"
     },
     "FMT-STUDIO-PRE-POST-NATAL": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=prenatal; duration=57m; never at Supreme HQ, Bandra, Kenkere House; preferred days: Monday, Tuesday, Wednesday, Thursday, Friday; preferred slots: 08:30, 09:00, 10:00, 11:00, 11:30; target mix=3%; rules: kwality_only, mornings_only, anisha_mon_wed, mrigakshi_thu_fri; certified only: Anisha Shah, Mrigakshi Jaiswal",
       "title": "Studio Pre/Post Natal"
     },
     "FMT-STUDIO-TRAINER-S-CHOICE": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=special; duration=57m; min/week=1; target mix=1%; rules: schedule_as_needed, tier1_trainer_only",
       "title": "Studio Trainer's Choice"
     },
     "FMT-STUDIO-HOSTED-CLASS": {
-      "enabled": true,
+      "enabled": false,
       "description": "family=special; duration=60m; target mix=1%; rules: schedule_as_needed",
       "title": "Studio Hosted Class"
     },
     "KW-001": {
-      "enabled": true,
+      "enabled": false,
       "description": "11:30 AM slot must always be filled with a Tier 1 trainer",
       "title": "KW-001"
     },
@@ -298,12 +298,12 @@
       "title": "KW-003"
     },
     "KW-004": {
-      "enabled": true,
+      "enabled": false,
       "description": "Pranjali Jain owns Saturday 10:15-12:30 block",
       "title": "KW-004"
     },
     "KW-005": {
-      "enabled": true,
+      "enabled": false,
       "description": "Rohan Dahima owns Thursday morning 09:15/10:15",
       "title": "KW-005"
     },
@@ -323,97 +323,97 @@
       "title": "KW-008"
     },
     "SU-001": {
-      "enabled": true,
+      "enabled": false,
       "description": "PowerCycle minimum 2 per day on weekdays",
       "title": "SU-001"
     },
     "SU-002": {
-      "enabled": true,
+      "enabled": false,
       "description": "Cauveri Vikrant first choice for all PowerCycle at Supreme",
       "title": "SU-002"
     },
     "SU-003": {
-      "enabled": true,
+      "enabled": false,
       "description": "Anisha Shah Thursdays ONLY at Supreme 08:00-11:00",
       "title": "SU-003"
     },
     "SU-004": {
-      "enabled": true,
+      "enabled": false,
       "description": "Vivaran Dhasmana owns Tue/Wed morning blocks 07:30-11:00",
       "title": "SU-004"
     },
     "SU-005": {
-      "enabled": true,
+      "enabled": false,
       "description": "Karan Bhatia owns Sunday 10:15 and 11:30 at Supreme",
       "title": "SU-005"
     },
     "SU-006": {
-      "enabled": true,
+      "enabled": false,
       "description": "Atulan Purohit owns Fri/Sat morning block 09:00-11:30",
       "title": "SU-006"
     },
     "SU-007": {
-      "enabled": true,
+      "enabled": false,
       "description": "Mrigakshi Jaiswal Mon/Tue/Wed evenings only at Supreme",
       "title": "SU-007"
     },
     "SU-008": {
-      "enabled": true,
+      "enabled": false,
       "description": "18:00 PM slot must always have Tier 1 trainer on weekdays",
       "title": "SU-008"
     },
     "SU-009": {
-      "enabled": true,
+      "enabled": false,
       "description": "No Strength Lab at Supreme HQ",
       "title": "SU-009"
     },
     "SU-010": {
-      "enabled": true,
+      "enabled": false,
       "description": "No Pre/Post Natal at Supreme HQ",
       "title": "SU-010"
     },
     "KE-001": {
-      "enabled": true,
+      "enabled": false,
       "description": "PowerCycle NEVER at Kenkere",
       "title": "KE-001"
     },
     "KE-002": {
-      "enabled": true,
+      "enabled": false,
       "description": "Kajol Kanchan 6-day anchor - never reduce without confirmed coverage",
       "title": "KE-002"
     },
     "KE-003": {
-      "enabled": true,
+      "enabled": false,
       "description": "Pushyank Nahar owns Mon/Tue/Thu morning blocks",
       "title": "KE-003"
     },
     "KE-004": {
-      "enabled": true,
+      "enabled": false,
       "description": "Shruti Kulkarni owns Thu/Fri mornings and Sunday midday",
       "title": "KE-004"
     },
     "KE-005": {
-      "enabled": true,
+      "enabled": false,
       "description": "Veena Narasimhan weekends only 16:00-17:15",
       "title": "KE-005"
     },
     "KE-006": {
-      "enabled": true,
+      "enabled": false,
       "description": "Chaitanya Nahar Mon/Sat/Sun afternoons only 16:00-18:45",
       "title": "KE-006"
     },
     "KE-007": {
-      "enabled": true,
+      "enabled": false,
       "description": "09:00 AM must be filled with Tier 1 trainer every day",
       "title": "KE-007"
     },
     "KE-008": {
-      "enabled": true,
+      "enabled": false,
       "description": "Saturday 09:00-11:00: Kajol or Pushyank ONLY",
       "title": "KE-008"
     },
     "KE-009": {
-      "enabled": true,
+      "enabled": false,
       "description": "Foundations certified trainers only at Kenkere",
       "title": "KE-009"
     }

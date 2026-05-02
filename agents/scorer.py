@@ -254,11 +254,16 @@ class ClassScorer:
 
         # -----------------------------------------------------------------
         # 6. Composite score (0–100)
+        #    blended_fill used DIRECTLY (0–1 → 0–40 pts) so a 55% fill slot
+        #    actually earns ~22 pts from fill alone — not crushed by within-
+        #    location min-max that made 50% fill look like 5 pts.
+        #    checkin / rev still normalised within-location (absolute values
+        #    are not comparable across class types).
         # -----------------------------------------------------------------
         w = self.weights
         for r in records:
             base_score = (
-                r.get("blended_fill_norm", 0.0) * w["blended_fill"] * 100
+                r.get("blended_fill", 0.0) * w["blended_fill"] * 100
                 + r.get("blended_checkin_norm", 0.0) * w["blended_checkin"] * 100
                 + r.get("longevity", 0.0) * w["longevity"] * 100
                 + r.get("blended_rev_norm", 0.0) * w["rev_per_session"] * 100

@@ -193,7 +193,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* TIMELINE VIEW */
 .tl-container{margin-bottom:4px}
-.tl-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.tl-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .tl-day-lbl{
   width:32px;font-size:10px;font-weight:700;color:var(--text-muted);
   text-transform:uppercase;letter-spacing:0.05em;text-align:right;flex-shrink:0;
@@ -201,17 +201,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .tl-track{
   position:relative;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r6);height:46px;overflow:visible;flex:1;min-width:600px;
+  border-radius:var(--r6);height:58px;overflow:visible;flex:1;min-width:600px;
 }
 .tl-block{
-  position:absolute;top:3px;bottom:3px;border-radius:var(--r4);
+  position:absolute;top:4px;bottom:4px;border-radius:6px;
   cursor:pointer;overflow:hidden;display:flex;flex-direction:column;
-  align-items:flex-start;justify-content:center;padding:0 5px;
-  transition:opacity 0.1s,filter 0.1s;min-width:4px;
+  align-items:flex-start;justify-content:center;padding:0 6px;
+  transition:transform 0.1s,filter 0.1s,box-shadow 0.1s;min-width:5px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.18);
 }
-.tl-block:hover{filter:brightness(0.88);z-index:5}
-.tl-b-name{font-size:9px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3}
-.tl-b-sub{font-size:8px;color:rgba(255,255,255,0.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-block:hover{filter:brightness(0.9);z-index:10;box-shadow:0 3px 8px rgba(0,0,0,0.25);transform:scaleY(1.06)}
+.tl-b-top{height:3px;position:absolute;top:0;left:0;right:0;border-radius:6px 6px 0 0;opacity:0.6}
+.tl-b-name{font-size:10px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2;letter-spacing:0.02em}
+.tl-b-fill{font-size:9px;font-weight:600;color:rgba(255,255,255,0.9);line-height:1.2;margin-top:1px}
+.tl-b-sub{font-size:8px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-axis{display:flex;margin-left:38px;min-width:600px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px}
 .tl-tick{flex:1;font-size:9px;color:var(--text-light);text-align:center}
 .tl-tick.prime-tick{color:var(--prime);font-weight:600}
@@ -240,14 +243,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .exp-mark{background:var(--surface2);color:var(--text-muted);border-radius:var(--r4);font-size:9px;font-weight:700;padding:1px 5px;font-family:'Plus Jakarta Sans',sans-serif}
 
 /* TRAINER VIEW */
-.trainer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.trainer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
 .tc{background:#fff;border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;box-shadow:var(--sh-sm);transition:box-shadow 0.15s}
 .tc:hover{box-shadow:var(--sh-md)}
 .tc-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .tc-avatar{
-  width:36px;height:36px;border-radius:100%;background:var(--primary-mid);
+  width:38px;height:38px;border-radius:100%;background:var(--primary-mid);
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:var(--primary);flex-shrink:0;
+  font-size:14px;font-weight:700;color:var(--primary);flex-shrink:0;
   font-family:'Plus Jakarta Sans',sans-serif;
 }
 .tc-name{font-size:13px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
@@ -255,36 +258,44 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .tier-badge{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;margin-left:auto}
 .t1{background:#FEF9C3;color:#A16207}.t2{background:var(--surface2);color:var(--text-muted)}.t3{background:#F3F4F6;color:#9CA3AF}
 .tc-stats{padding:10px 16px;display:flex;gap:14px;border-bottom:1px solid var(--border)}
-.tc-s{text-align:center}
-.tc-sv{font-size:16px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.tc-s{text-align:center;flex:1}
+.tc-sv{font-size:15px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
 .tc-sl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+.tc-loc-stats{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+.tc-loc-pill{border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600;display:flex;align-items:center;gap:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.tc-loc-fill{font-weight:700;margin-left:2px}
 .tc-sched{padding:10px 16px}
+.tc-sched-loc{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin:6px 0 3px;font-family:'Plus Jakarta Sans',sans-serif}
 .tc-st{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif}
 .tc-day{display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;min-height:16px}
 .tc-dl{width:24px;font-size:10px;font-weight:600;color:var(--text-muted);flex-shrink:0;padding-top:2px}
 .tc-chips{display:flex;flex-wrap:wrap;gap:3px}
-.tc-chip{border-radius:var(--r4);padding:2px 6px;font-size:10px;font-weight:600;color:#fff;white-space:nowrap}
+.tc-chip{border-radius:var(--r4);padding:2px 7px;font-size:10px;font-weight:600;color:#fff;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+.tc-chip-cls{font-size:9px;opacity:0.9}
 
 /* CROSS-LOCATION VIEW */
 .cross-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.cross-tbl{border-collapse:separate;border-spacing:2px;min-width:1500px;font-size:11px}
-.cross-tbl th{padding:5px 4px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
-.ct-day-hdr{background:var(--surface2);border-radius:var(--r6);color:var(--text);padding:5px 6px;font-size:11px}
-.ct-kw{background:var(--primary-mid);color:var(--primary);border-radius:var(--r4);padding:3px 5px}
-.ct-su{background:#EDE9FE;color:#6D28D9;border-radius:var(--r4);padding:3px 5px}
-.ct-ke{background:var(--green-light);color:var(--green);border-radius:var(--r4);padding:3px 5px}
+.cross-tbl{border-collapse:separate;border-spacing:3px;min-width:1500px;font-size:11px}
+.cross-tbl th{padding:6px 4px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.ct-day-hdr{background:var(--surface2);border-radius:var(--r6);color:var(--text);padding:6px 8px;font-size:11px}
+.ct-kw{background:var(--primary-mid);color:var(--primary);border-radius:var(--r4);padding:4px 6px}
+.ct-su{background:#EDE9FE;color:#6D28D9;border-radius:var(--r4);padding:4px 6px}
+.ct-ke{background:var(--green-light);color:var(--green);border-radius:var(--r4);padding:4px 6px}
 .cross-tbl .ct-time{
-  padding:5px 8px;text-align:right;font-size:10px;font-weight:600;color:var(--text-muted);
+  padding:5px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--text-muted);
   white-space:nowrap;background:var(--surface);border-radius:var(--r4);
 }
 .cross-tbl .ct-time.prime{color:var(--prime);background:var(--prime-light);font-weight:700}
-.cross-tbl td{padding:2px;vertical-align:top;min-width:90px}
-.ct-cell{border-radius:var(--r4);padding:4px 6px;min-height:28px;cursor:pointer;transition:filter 0.1s}
-.ct-cell:hover{filter:brightness(0.88)}
-.ct-empty{background:var(--surface);border-radius:var(--r4);min-height:28px}
-.ct-cn{font-size:10px;font-weight:600;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3}
-.ct-tr{font-size:9px;color:rgba(255,255,255,0.8);margin-top:1px}
-.ct-fp{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);margin-top:1px}
+.cross-tbl td{padding:2px;vertical-align:top;min-width:100px}
+.ct-cell{border-radius:6px;padding:5px 7px;min-height:52px;cursor:pointer;transition:filter 0.12s,box-shadow 0.12s;position:relative;overflow:hidden}
+.ct-cell:hover{filter:brightness(0.9);box-shadow:0 2px 6px rgba(0,0,0,0.18);z-index:2}
+.ct-cell-bar{position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 6px 6px;opacity:0.9}
+.ct-empty{background:var(--surface);border-radius:6px;min-height:52px;border:1px dashed var(--border)}
+.ct-short{font-size:12px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2;letter-spacing:0.02em}
+.ct-cn{font-size:9px;font-weight:500;color:rgba(255,255,255,0.85);font-family:'Plus Jakarta Sans',sans-serif;line-height:1.3;margin-top:1px}
+.ct-tr{font-size:9px;color:rgba(255,255,255,0.75);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct-fp{font-size:11px;font-weight:700;color:rgba(255,255,255,0.95);margin-top:3px;display:flex;align-items:center;gap:3px}
+.ct-rec-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.8);display:inline-block}
 
 /* ANALYTICS VIEW */
 .analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -760,6 +771,28 @@ function round1(v){return v==null?"—":v.toFixed(1)}
 function fillColor(v){if(v==null)return"#9CA3AF";if(v>=0.6)return"#15803D";if(v>=0.4)return"#D97706";return"#DC2626"}
 function timeBand(t){const m=tmins(t);if(m>=7*60&&m<10*60)return"morning";if(m>=10*60&&m<13*60)return"midday";return"evening"}
 function displayClass(cn){return(cn||"").replace(/^Studio /,"")}
+const CLASS_SHORT={
+  "Barre 57":"B57","Barre 57 Express":"B57E",
+  "Cardio Barre":"CB","Cardio Barre Express":"CBE","Cardio Barre Plus":"CB+",
+  "PowerCycle":"PCYC",
+  "Strength Lab (Push)":"SL·P","Strength Lab (Pull)":"SL·L","Strength Lab (Full Body)":"SL·F",
+  "Mat 57":"M57","Mat 57 Express":"M57E",
+  "FIT":"FIT","SWEAT In 30":"SW30","Foundations":"FOUN",
+  "Back Body Blaze":"BBB","Amped Up!":"AMP","Hosted Class":"HOST"
+};
+function shortClass(cn){
+  const s=(cn||"").replace(/^Studio /,"");
+  return CLASS_SHORT[s]||(s.split(" ").map(w=>w[0]).join("").slice(0,4).toUpperCase());
+}
+const REC_BLOCK={
+  "PINNED":     {bg:"#15803D",stripe:"#bbf7d0"},
+  "PROTECT_EXACT":{bg:"#16A34A",stripe:"#bbf7d0"},
+  "PROTECT":    {bg:"#16A34A",stripe:"#bbf7d0"},
+  "INCLUDE":    {bg:"#1D4ED8",stripe:"#bfdbfe"},
+  "CONSIDER":   {bg:"#D97706",stripe:"#fde68a"},
+  "DROP":       {bg:"#9CA3AF",stripe:"#e5e7eb"},
+};
+function recBlockColor(rec){return(REC_BLOCK[rec]||REC_BLOCK["CONSIDER"]).bg}
 function trainerInitials(name){return(name||"?").split(" ").map(p=>p[0]).join("").slice(0,2).toUpperCase()}
 function recGroup(r){
   if(r==="PINNED")return"PINNED";
@@ -1071,14 +1104,29 @@ function makeClassCard(s){
 // TIMELINE VIEW
 // ============================================================
 function renderTimeline(area,filtered){
-  const TL_START=7*60, TL_END=21*60, TL_SPAN=TL_END-TL_START;
+  const TL_START=7*60, TL_END=21.5*60, TL_SPAN=TL_END-TL_START;
   renderStatsRow(area,filtered);
 
   const wrap=document.createElement("div");
   wrap.className="tl-container";
   wrap.style.overflowX="auto";
 
-  // build by day
+  const REC_LEG=[
+    {key:"PROTECT",  label:"Protected", col:"#16A34A"},
+    {key:"INCLUDE",  label:"Include",   col:"#1D4ED8"},
+    {key:"CONSIDER", label:"Consider",  col:"#D97706"},
+    {key:"DROP",     label:"Drop",      col:"#9CA3AF"},
+  ];
+  const legEl=document.createElement("div");
+  legEl.className="legend";legEl.style.marginBottom="10px";
+  REC_LEG.forEach(({label,col})=>{
+    legEl.insertAdjacentHTML("beforeend",`<div class="li"><div class="ld" style="background:${col}"></div>${label}</div>`);
+  });
+  Object.entries(FAM_COLOR).filter(([k])=>k!=="default").forEach(([fam,col])=>{
+    legEl.insertAdjacentHTML("beforeend",`<div class="li" style="opacity:0.6"><div class="ld" style="background:${col};height:4px;border-radius:2px;margin-top:3px"></div><span style="font-size:9px">${fam.replace(/_/g," ")}</span></div>`);
+  });
+  wrap.appendChild(legEl);
+
   const byDay={};
   DAY_ORDER.forEach(d=>byDay[d]=[]);
   filtered.forEach(s=>{if(byDay[s.day_of_week])byDay[s.day_of_week].push(s)});
@@ -1087,23 +1135,43 @@ function renderTimeline(area,filtered){
     const daySlots=byDay[day];
     const row=document.createElement("div");
     row.className="tl-row";
-    row.innerHTML=`<div class="tl-day-lbl">${DAY_SHORT[di]}</div>`;
+    const dayLbl=document.createElement("div");
+    dayLbl.className="tl-day-lbl";
+    const cnt=daySlots.length;
+    dayLbl.innerHTML=`${DAY_SHORT[di]}<span style="display:block;font-size:8px;opacity:0.6;font-weight:400">${cnt}</span>`;
+    row.appendChild(dayLbl);
+
     const track=document.createElement("div");
     track.className="tl-track";
+
     daySlots.forEach(s=>{
       const start=tmins(s.time||"00:00");
       const dur=s.duration_min||57;
       const left=Math.max(0,(start-TL_START)/TL_SPAN*100);
-      const width=Math.max(0.5,dur/TL_SPAN*100);
+      const width=Math.max(0.6,dur/TL_SPAN*100);
+
+      const rec=s.recommendation||"CONSIDER";
+      const recNorm=rec.replace("PROTECT_EXACT","PROTECT").replace("PROTECT_SLOT","PROTECT").replace("PINNED","PROTECT");
+      const bg=recBlockColor(recNorm);
       const fam=getFamily(s.class_name);
-      const col=FAM_COLOR[fam]||FAM_COLOR.default;
+      const famCol=FAM_COLOR[fam]||FAM_COLOR.default;
+      const fill=s.predicted_fill_rate||0;
+
       const block=document.createElement("div");
       block.className="tl-block";
-      block.style.cssText=`left:${left.toFixed(2)}%;width:${width.toFixed(2)}%;background:${col};opacity:${s.is_experimental?0.6:1}`;
-      block.title=`${s.time} ${displayClass(s.class_name)} — ${s.trainer_1} (${pct(s.predicted_fill_rate)})`;
-      if(width>4){
-        block.innerHTML=`<div class="tl-b-name">${displayClass(s.class_name)}</div>${width>8?`<div class="tl-b-sub">${s.trainer_1||""}</div>`:""}`;
+      block.style.cssText=`left:${left.toFixed(2)}%;width:${width.toFixed(2)}%;background:${bg};opacity:${s.is_experimental?0.65:1}`;
+      block.title=`${s.time} ${displayClass(s.class_name)} — ${s.trainer_1} · Fill: ${pct(fill)} · ${rec}`;
+
+      let inner=`<div class="tl-b-top" style="background:${famCol}"></div>`;
+      if(width>3.5){
+        inner+=`<div class="tl-b-name">${shortClass(s.class_name)}</div>`;
+        if(width>5){inner+=`<div class="tl-b-fill">${pct(fill)}</div>`;}
+        if(width>9){
+          const lastName=(s.trainer_1||"").split(" ").pop();
+          inner+=`<div class="tl-b-sub">${lastName}</div>`;
+        }
       }
+      block.innerHTML=inner;
       block.onclick=()=>openModal(s);
       track.appendChild(block);
     });
@@ -1111,24 +1179,13 @@ function renderTimeline(area,filtered){
     wrap.appendChild(row);
   });
 
-  // time axis
   const axisTimes=[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
-  const axisHTML=`<div class="tl-axis" style="display:flex;margin-left:38px;min-width:600px;border-top:1px solid var(--border);padding-top:4px;margin-top:2px">
-    ${axisTimes.map(h=>{
-      const pos=((h*60-TL_START)/TL_SPAN*100).toFixed(1);
-      const isPr=[8,9,10,11,17,18,19].includes(h);
-      return`<div style="position:absolute;left:${pos}%;font-size:9px;color:${isPr?"var(--prime)":"var(--text-light)"};font-weight:${isPr?700:400}">${h}:00</div>`;
-    }).join("")}
-  </div>`;
-  wrap.insertAdjacentHTML("beforeend",`<div style="position:relative;height:16px;margin-left:38px;min-width:600px;border-top:1px solid var(--border);margin-top:4px">${axisTimes.map(h=>{const pos=((h*60-TL_START)/TL_SPAN*100).toFixed(1);return`<span style="position:absolute;left:${pos}%;font-size:9px;color:var(--text-light);transform:translateX(-50%)">${h}:00</span>`}).join("")}</div>`);
+  wrap.insertAdjacentHTML("beforeend",`<div style="position:relative;height:18px;margin-left:38px;min-width:600px;border-top:1px solid var(--border);margin-top:4px">${axisTimes.map(h=>{
+    const pos=((h*60-TL_START)/TL_SPAN*100).toFixed(1);
+    const isPr=[8,9,10,11,17,18,19].includes(h);
+    return`<span style="position:absolute;left:${pos}%;font-size:9px;color:${isPr?"var(--prime)":"var(--text-light)"};font-weight:${isPr?700:400};transform:translateX(-50%)">${h}:00</span>`;
+  }).join("")}</div>`);
 
-  // legend
-  const legendEl=document.createElement("div");
-  legendEl.className="legend";legendEl.style.marginTop="14px";
-  Object.entries(FAM_COLOR).forEach(([fam,col])=>{
-    legendEl.insertAdjacentHTML("beforeend",`<div class="li"><div class="ld" style="background:${col}"></div>${fam.replace("_"," ")}</div>`);
-  });
-  wrap.appendChild(legendEl);
   area.appendChild(wrap);
 }
 
@@ -1205,25 +1262,27 @@ function sortList(i){
 }
 
 // ============================================================
-// TRAINER VIEW
+// TRAINER VIEW — all locations side by side
 // ============================================================
 function renderTrainer(area,filtered){
   renderStatsRow(area,filtered);
-  // Group by trainer
-  const byTrainer={};
-  filtered.forEach(s=>{
-    const t=s.trainer_1||"Unknown";
-    if(!byTrainer[t])byTrainer[t]={slots:[],fill:0,checkin:0,sessions:0,overallFill:s.trainer_overall_fill||0,overallCheckin:s.trainer_overall_checkin||0,totalSessions:s.trainer_total_sessions||0};
-    byTrainer[t].slots.push(s);
-  });
-  // Compute per-trainer stats
-  Object.entries(byTrainer).forEach(([t,d])=>{
-    d.fill=d.slots.reduce((s,x)=>s+(x.predicted_fill_rate||0),0)/d.slots.length;
-    d.checkin=d.slots.reduce((s,x)=>s+(x.historical_avg_checkin||0),0)/d.slots.length;
-    d.sessions=d.slots.reduce((s,x)=>s+(x.historical_session_count||0),0);
-  });
-  const sorted=Object.entries(byTrainer).sort((a,b)=>b[1].overallFill-a[1].overallFill);
 
+  const allSlots=getAllLocSlots();
+  const locs=Object.keys(SCHEDULE_DATA.locations||{});
+
+  const LOC_PILL_BG={"Kwality House, Kemps Corner":"#EFF6FF","Supreme HQ, Bandra":"#EDE9FE","Kenkere House":"#F0FDF4"};
+  const LOC_PILL_FG={"Kwality House, Kemps Corner":"#1D4ED8","Supreme HQ, Bandra":"#6D28D9","Kenkere House":"#15803D"};
+
+  const byTrainer={};
+  allSlots.forEach(s=>{
+    const t=s.trainer_1||"Unknown";
+    if(!byTrainer[t])byTrainer[t]={byLoc:{},overallFill:s.trainer_overall_fill||0,overallCheckin:s.trainer_overall_checkin||0,totalSessions:s.trainer_total_sessions||0};
+    const loc=s.location||locs[0]||"";
+    if(!byTrainer[t].byLoc[loc])byTrainer[t].byLoc[loc]=[];
+    byTrainer[t].byLoc[loc].push(s);
+  });
+
+  const sorted=Object.entries(byTrainer).sort((a,b)=>b[1].overallFill-a[1].overallFill);
   const grid=document.createElement("div");
   grid.className="trainer-grid";
 
@@ -1231,49 +1290,63 @@ function renderTrainer(area,filtered){
     const overallFill=d.overallFill||0;
     const fc=fillColor(overallFill);
     const initials=trainerInitials(trainer);
-    // Determine tier from slot recommendations
-    const hasPinned=d.slots.some(s=>s.recommendation==="PINNED"||s.recommendation==="PROTECT_EXACT");
-    const tierNum=hasPinned?1:d.overallFill>=0.4?2:3;
+    const allSlotsFT=Object.values(d.byLoc).flat();
+    const hasPinned=allSlotsFT.some(s=>["PINNED","PROTECT_EXACT","PROTECT"].includes(s.recommendation));
+    const tierNum=hasPinned?1:overallFill>=0.4?2:3;
     const tierCls=`t${tierNum}`;
-    const tierLbl=`Tier ${tierNum}`;
 
-    // Build schedule by day
-    const byDay={};DAY_ORDER.forEach(day=>byDay[day]=[]);
-    d.slots.forEach(s=>{if(byDay[s.day_of_week])byDay[s.day_of_week].push(s)});
+    const weekClasses=allSlotsFT.length;
+    const weekHours=(allSlotsFT.reduce((s,x)=>s+(x.duration_min||57),0)/60).toFixed(1);
 
-    const schedRows=DAY_ORDER.filter(day=>byDay[day].length>0).map(day=>{
-      const chips=byDay[day].sort((a,b)=>tmins(a.time)-tmins(b.time)).map(s=>{
-        const fam=getFamily(s.class_name);
-        const col=FAM_COLOR[fam]||FAM_COLOR.default;
-        return`<span class="tc-chip" style="background:${col}" title="${displayClass(s.class_name)} — ${pct(s.predicted_fill_rate)}" onclick="event.stopPropagation();openModal(${JSON.stringify(s).replace(/"/g,"&quot;")})">${s.time}<span class="trainer-cls-time">${displayClass(s.class_name).slice(0,8)}</span></span>`;
-      }).join("");
-      return`<div class="tc-day"><div class="tc-dl">${day.slice(0,3)}</div><div class="tc-chips">${chips}</div></div>`;
+    const locPills=locs.filter(loc=>d.byLoc[loc]?.length).map(loc=>{
+      const locSlots=d.byLoc[loc];
+      const avgFill=locSlots.reduce((s,x)=>s+(x.predicted_fill_rate||0),0)/locSlots.length;
+      const bg=LOC_PILL_BG[loc]||"#F3F4F6";
+      const fg=LOC_PILL_FG[loc]||"#374151";
+      const abbr=LOC_ABBR[loc]||loc.slice(0,2);
+      return`<div class="tc-loc-pill" style="background:${bg};color:${fg}">${abbr}<span class="tc-loc-fill" style="color:${fillColor(avgFill)}">${pct(avgFill)}</span> <span style="opacity:0.65;font-size:9px">${locSlots.length}cl</span></div>`;
     }).join("");
 
-    const weekClasses=d.slots.length;
-    const weekHours=(d.slots.reduce((s,x)=>s+(x.duration_min||57),0)/60).toFixed(1);
+    const schedSections=locs.filter(loc=>d.byLoc[loc]?.length).map(loc=>{
+      const locSlots=d.byLoc[loc];
+      const abbr=LOC_ABBR[loc]||loc.slice(0,2);
+      const fg=LOC_PILL_FG[loc]||"#374151";
+      const byDay2={};DAY_ORDER.forEach(day=>byDay2[day]=[]);
+      locSlots.forEach(s=>{if(byDay2[s.day_of_week])byDay2[s.day_of_week].push(s)});
+      const rows=DAY_ORDER.filter(day=>byDay2[day].length>0).map(day=>{
+        const chips=byDay2[day].sort((a,b)=>tmins(a.time)-tmins(b.time)).map(s=>{
+          const rec=s.recommendation||"CONSIDER";
+          const recN=rec.replace("PROTECT_EXACT","PROTECT").replace("PROTECT_SLOT","PROTECT").replace("PINNED","PROTECT");
+          const bg2=recBlockColor(recN);
+          const sq=JSON.stringify(s).replace(/"/g,"&quot;");
+          return`<span class="tc-chip" style="background:${bg2}" title="${displayClass(s.class_name)} · ${pct(s.predicted_fill_rate)} · ${rec}" onclick="event.stopPropagation();openModal(${sq})">${s.time} <span class="tc-chip-cls">${shortClass(s.class_name)}</span></span>`;
+        }).join("");
+        return`<div class="tc-day"><div class="tc-dl">${day.slice(0,3)}</div><div class="tc-chips">${chips}</div></div>`;
+      }).join("");
+      return`<div class="tc-sched-loc" style="color:${fg}">${abbr}</div>${rows}`;
+    }).join("");
 
     const card=document.createElement("div");
     card.className="tc";
     card.innerHTML=`
       <div class="tc-hdr">
         <div class="tc-avatar">${initials}</div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="tc-name">${trainer}</div>
-          <div class="tc-meta">Overall fill: <strong style="color:${fc}">${pct(overallFill)}</strong> · ${d.totalSessions} total sessions</div>
+          <div class="tc-meta">${d.totalSessions} sessions all-time</div>
         </div>
-        <span class="tier-badge ${tierCls}">${tierLbl}</span>
+        <span class="tier-badge ${tierCls}">Tier ${tierNum}</span>
       </div>
       <div class="tc-stats">
-        <div class="tc-s"><div class="tc-sv" style="color:${fc}">${pct(overallFill)}</div><div class="tc-sl">Avg Fill</div></div>
+        <div class="tc-s"><div class="tc-sv" style="color:${fc}">${pct(overallFill)}</div><div class="tc-sl">Overall Fill</div></div>
         <div class="tc-s"><div class="tc-sv">${weekClasses}</div><div class="tc-sl">This Week</div></div>
         <div class="tc-s"><div class="tc-sv">${weekHours}h</div><div class="tc-sl">Hours</div></div>
         <div class="tc-s"><div class="tc-sv">${round1(d.overallCheckin)}</div><div class="tc-sl">Avg CheckIn</div></div>
-        <div class="tc-s"><div class="tc-sv">${d.totalSessions}</div><div class="tc-sl">All Time</div></div>
       </div>
+      <div class="tc-loc-stats">${locPills||"<span style='font-size:11px;color:var(--text-muted)'>No data</span>"}</div>
       <div class="tc-sched">
-        <div class="tc-st">This Week Schedule</div>
-        ${schedRows||"<div style='font-size:11px;color:var(--text-muted)'>No classes match current filters</div>"}
+        <div class="tc-st">This Week · All Locations</div>
+        ${schedSections||"<div style='font-size:11px;color:var(--text-muted)'>No classes this week</div>"}
       </div>`;
     grid.appendChild(card);
   });
@@ -1288,13 +1361,11 @@ function renderCrossLocation(area){
   const locs=Object.keys(SCHEDULE_DATA.locations||{});
   if(locs.length===0){area.textContent="No location data.";return}
 
-  // Apply active filters to each location's slots
   const filteredByLoc={};
   locs.forEach(loc=>{ filteredByLoc[loc]=filterSlots(getSlots(loc)); });
   const allFiltered=locs.flatMap(loc=>filteredByLoc[loc]);
   renderStatsRow(area,allFiltered);
 
-  // Build lookup: loc → day → time → [slots] (filtered)
   const lookup={};
   locs.forEach(loc=>{
     lookup[loc]={};
@@ -1306,29 +1377,26 @@ function renderCrossLocation(area){
     });
   });
 
-  // Day class counts per location (for column header badges)
   const dayCntByLoc={};
   locs.forEach(loc=>{dayCntByLoc[loc]={};DAY_ORDER.forEach(d=>dayCntByLoc[loc][d]=0)});
   allFiltered.forEach(s=>{if(dayCntByLoc[s.location])dayCntByLoc[s.location][s.day_of_week]=(dayCntByLoc[s.location][s.day_of_week]||0)+1});
 
   const allTimes=[...new Set(allFiltered.map(s=>s.time||"00:00"))].sort();
-
   const locLabels={"Kwality House, Kemps Corner":"ct-kw","Supreme HQ, Bandra":"ct-su","Kenkere House":"ct-ke"};
 
   const wrap=document.createElement("div");wrap.className="cross-wrap";
   const tbl=document.createElement("table");tbl.className="cross-tbl";
 
-  // Header rows: Day row + Location row
-  let th1=`<tr><th></th>`;// time column
+  let th1=`<tr><th style="min-width:52px"></th>`;
   let th2=`<tr><th></th>`;
   DAY_ORDER.forEach(day=>{
     const totalDay=locs.reduce((s,loc)=>s+(dayCntByLoc[loc][day]||0),0);
-    th1+=`<th colspan="${locs.length}" class="ct-day-hdr">${day}<br><span style="font-weight:400;font-size:9px;opacity:0.7">${totalDay} classes</span></th>`;
+    th1+=`<th colspan="${locs.length}" class="ct-day-hdr">${day.slice(0,3)}<br><span style="font-weight:400;font-size:9px;opacity:0.7">${totalDay}</span></th>`;
     locs.forEach(loc=>{
       const abbr=LOC_ABBR[loc]||loc.slice(0,2);
       const cls=locLabels[loc]||"";
       const cnt=dayCntByLoc[loc][day]||0;
-      th2+=`<th class="${cls}">${abbr}<br><span style="font-weight:400;opacity:0.8">${cnt}</span></th>`;
+      th2+=`<th class="${cls}">${abbr}<br><span style="font-weight:400;opacity:0.75;font-size:9px">${cnt}</span></th>`;
     });
   });
   th1+=`</tr>`;th2+=`</tr>`;
@@ -1340,22 +1408,34 @@ function renderCrossLocation(area){
   const tbody=document.createElement("tbody");
   allTimes.forEach(t=>{
     const tr=document.createElement("tr");
-    tr.insertAdjacentHTML("beforeend",`<td class="ct-time${isPrime(t)?" prime":""}">${t}</td>`);
+    const isPr=isPrime(t);
+    tr.insertAdjacentHTML("beforeend",`<td class="ct-time${isPr?" prime":""}">${t}</td>`);
     DAY_ORDER.forEach(day=>{
       locs.forEach(loc=>{
         const slotsHere=(lookup[loc][day]||{})[t]||[];
         const td=document.createElement("td");
+        td.style.padding="2px";
         if(slotsHere.length===0){
           td.innerHTML=`<div class="ct-empty"></div>`;
         } else {
           slotsHere.forEach(s=>{
             const fam=getFamily(s.class_name);
-            const col=FAM_COLOR[fam]||FAM_COLOR.default;
+            const famCol=FAM_COLOR[fam]||FAM_COLOR.default;
+            const fill=s.predicted_fill_rate||0;
+            const fillC=fillColor(fill);
+            const trName=(s.trainer_1||"").split(" ").pop();
+            const recDot=`<span class="ct-rec-dot" style="background:${fillC}"></span>`;
+
             const div=document.createElement("div");
             div.className="ct-cell";
-            div.style.background=col;
-            div.title=`${loc}: ${displayClass(s.class_name)} — ${s.trainer_1} (${pct(s.predicted_fill_rate)})`;
-            div.innerHTML=`<div class="ct-cn">${displayClass(s.class_name)}</div><div class="ct-tr">${s.trainer_1||""}</div><div class="ct-fp">${pct(s.predicted_fill_rate)}</div>`;
+            div.style.background=famCol;
+            div.title=`${LOC_SHORT[loc]||loc}: ${displayClass(s.class_name)} — ${s.trainer_1} · Fill: ${pct(fill)} · ${s.recommendation||""}`;
+            div.innerHTML=`
+              <div class="ct-short">${shortClass(s.class_name)}</div>
+              <div class="ct-cn">${displayClass(s.class_name)}</div>
+              <div class="ct-tr">${trName}</div>
+              <div class="ct-fp">${recDot}${pct(fill)}</div>
+              <div class="ct-cell-bar" style="width:${Math.round(fill*100)}%;background:${fillC}"></div>`;
             div.onclick=()=>openModal(s);
             td.appendChild(div);
           });
@@ -1368,10 +1448,12 @@ function renderCrossLocation(area){
   tbl.appendChild(tbody);
   wrap.appendChild(tbl);
 
-  // Legend
-  wrap.insertAdjacentHTML("beforeend",`<div class="legend" style="margin-top:12px">
+  wrap.insertAdjacentHTML("beforeend",`<div class="legend" style="margin-top:14px">
     ${locs.map(loc=>`<div class="li"><div class="ld" style="background:${LOC_COLOR[loc]||'#6B7280'}"></div>${LOC_SHORT[loc]||loc}</div>`).join("")}
-    ${Object.entries(FAM_COLOR).slice(0,6).map(([f,c])=>`<div class="li"><div class="ld" style="background:${c}"></div>${f.replace("_"," ")}</div>`).join("")}
+    ${Object.entries(FAM_COLOR).filter(([k])=>k!=="default").map(([f,c])=>`<div class="li"><div class="ld" style="background:${c}"></div>${f.replace(/_/g," ")}</div>`).join("")}
+    <div class="li"><div style="display:flex;gap:3px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#15803D;display:inline-block"></span></div>≥60% fill</div>
+    <div class="li"><div style="display:flex;gap:3px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#D97706;display:inline-block"></span></div>40–60%</div>
+    <div class="li"><div style="display:flex;gap:3px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#DC2626;display:inline-block"></span></div>&lt;40%</div>
   </div>`);
 
   area.appendChild(wrap);
@@ -2133,8 +2215,14 @@ function settSetTab(tab){
 }
 
 function settLoadData(){
-  const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{_settTrainerProfiles=d;return d;});
-  const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):fetch("/api/schedule-config").then(r=>r.json()).then(d=>{_settSchedConfig=d;return d;});
+  const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
+    _settTrainerProfiles=Array.isArray(d)?d:(Array.isArray(d?.data)?d.data:[]);
+    return _settTrainerProfiles;
+  }).catch(()=>{_settTrainerProfiles=[];return[];});
+  const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):fetch("/api/schedule-config").then(r=>r.json()).then(d=>{
+    _settSchedConfig=(d&&!d.error)?d:{targets:{},manual_protected:[],manual_excluded:[]};
+    return _settSchedConfig;
+  }).catch(()=>{_settSchedConfig={targets:{},manual_protected:[],manual_excluded:[]};return _settSchedConfig;});
   Promise.all([p1,p2]).then(()=>{settRenderQualifications();settRenderAvailability();settRenderTargets();}).catch(e=>console.error("Settings load error",e));
 }
 

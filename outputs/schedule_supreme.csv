@@ -1,64 +1,68 @@
 ,4-May,,,,,,,,,,5-May,,,,,,,,,,6-May,,,,,,,,,,7-May,,,,,,,,,,8-May,,,,,,,,,,9-May,,,,,,,,,,10-May,,,,,,,,,
 ,Monday,,,,,,,,,,Tuesday,,,,,,,,,,Wednesday,,,,,,,,,,Thursday,,,,,,,,,,Friday,,,,,,,,,,Saturday,,,,,,,,,,Sunday,,,,,,,,,
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
-07:30,Studio Barre 57,Cauveri Vikrant,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,30%,46,30%,4.1,Pinned block — rule ownership ,,,,,,,,,,,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,
-09:00,Studio Mat 57,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,46%,66,46%,6.0,Pinned block — rule ownership ,,Studio Mat 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Atulan Purohit,Studio 1,14,71%,31,71%,9.9,Pinned block — rule ownership ,,,,,,,,,,,
-09:30,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,Studio Back Body Blaze Express,Atulan Purohit,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Back Body Blaze Express,Cauveri Vikrant,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,
+07:30,Studio Cardio Barre,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Score 16.2/100 (PROTECT),,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,30%,46,30%,4.1,Pinned block — rule ownership ,,,,,,,,,,,,Studio Barre 57,Cauveri Vikrant,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,
+09:00,Studio Mat 57 Express,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,46%,66,46%,6.0,Pinned block — rule ownership ,,Studio Mat 57,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Atulan Purohit,Studio 1,14,71%,31,71%,9.9,Pinned block — rule ownership ,,,,,,,,,,,
+09:30,Studio Back Body Blaze,Vivaran Dhasmana,Studio 2,14,38%,0,0%,0.0,Score 19.7/100 (PROTECT),,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Score 6.2/100 (PROTECT),,,,,,,,,,,,Studio Back Body Blaze Express,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Back Body Blaze Express,Cauveri Vikrant,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
 09:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Richard D'Costa,Studio 2,14,35%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,,,,,,,,,,,
 10:00,,,,,,,,,,,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Barre 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,,,,,,,,,,,,,,,,,,,,,Studio Back Body Blaze,Atulan Purohit,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio FIT,Cauveri Vikrant,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,
-10:15,,,,,,,,,,,Studio Back Body Blaze Express,Reshma Sharma,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,Studio HIIT,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Karan Bhatia,Studio 1,14,47%,89,47%,6.6,Pinned block — rule ownership ,
-11:00,Studio Recovery,Vivaran Dhasmana,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Mat 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Mat 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Recovery,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Recovery,Cauveri Vikrant,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Atulan Purohit,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,38%,0,0%,0.0,Experimental: no historical da,
-11:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Recovery,Karan Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Mat 57,Karan Bhatia,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,
+10:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio HIIT,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Karan Bhatia,Studio 1,14,47%,89,47%,6.6,Pinned block — rule ownership ,
+11:00,Studio Recovery,Vivaran Dhasmana,Studio 1,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Mat 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Mat 57,Vivaran Dhasmana,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio Recovery,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Score 8.8/100 (PROTECT),,Studio Recovery,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Score 8.8/100 (PROTECT),,Studio Barre 57,Atulan Purohit,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,38%,0,0%,0.0,Score 18.6/100 (PROTECT),
+11:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Karan Bhatia,Studio 1,14,52%,0,0%,0.0,Pinned block — rule ownership ,
 12:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Cauveri Vikrant,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,
 12:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Recovery,Karan Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,
-17:45,Studio Barre 57,Karan Bhatia,Studio 1,14,15%,28,15%,2.1,"Experimental: 28 sessions, fil",,Studio Barre 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Back Body Blaze Express,Reshma Sharma,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,50%,1,50%,7.0,"Experimental: 1 sessions, fill",,Studio Barre 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio FIT,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
-18:00,Studio FIT,Mrigakshi Jaiswal,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio FIT,Mrigakshi Jaiswal,Studio 2,14,40%,1,40%,4.0,"Experimental: 1 sessions, fill",,Studio Cardio Barre Express,Mrigakshi Jaiswal,Studio 2,14,28%,20,28%,3.9,"Experimental: 20 sessions, fil",,Studio Mat 57 Express,Atulan Purohit,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio FIT,Cauveri Vikrant,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Cardio Barre,Karan Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
-19:00,Studio PowerCycle,Vivaran Dhasmana,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,Studio PowerCycle,Mrigakshi Jaiswal,PowerCycle Studio,14,88%,2,88%,11.5,[DIVERSITY-FLAG: Studio PowerC,,Studio PowerCycle,Reshma Sharma,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,49%,51,49%,6.4,Enforced class slot: Studio Po,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,45%,0,0%,0.0,[DIVERSITY-FLAG: Studio PowerC,,Studio PowerCycle,Vivaran Dhasmana,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,,,,,,,,,,
-19:15,Studio Barre 57,Karan Bhatia,Studio 2,14,28%,5,28%,3.6,"Experimental: 5 sessions, fill",,Studio Mat 57 Express,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Mrigakshi Jaiswal,Studio 1,14,45%,20,45%,6.2,"Experimental: 20 sessions, fil",,Studio Barre 57,Karanvir Bhatia,Studio 2,14,27%,29,27%,3.7,"Experimental: 29 sessions, fil",,Studio Mat 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Cardio Barre,Karan Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
-19:30,Studio Mat 57 Express,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Cardio Barre,Richard D'Costa,Studio 2,14,35%,0,0%,0.0,Coverage: best available train,,Studio Recovery,Karan Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio FIT,Atulan Purohit,Studio 1,14,100%,1,100%,10.0,"Experimental: 1 sessions, fill",,Studio Back Body Blaze,Richard D'Costa,Studio 2,14,35%,0,0%,0.0,Coverage: best available train,,Studio Mat 57,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
+16:30,,,,,,,,,,,Studio Barre 57 Express,Pranjali Jain,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Vivaran Dhasmana,Studio 1,14,38%,0,0%,0.0,Score 10.0/100 (PROTECT),,,,,,,,,,,
+17:45,Studio Barre 57,Karan Bhatia,Studio 1,14,15%,28,15%,2.1,"Experimental: 28 sessions, fil",,Studio FIT,Mrigakshi Jaiswal,Studio 1,14,40%,1,40%,4.0,Score 13.8/100 (PROTECT) — 1 s,,Studio Back Body Blaze Express,Reshma Sharma,Studio 1,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Barre 57,Karanvir Bhatia,Studio 1,14,50%,1,50%,7.0,"Experimental: 1 sessions, fill",,Studio Barre 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Experimental: no historical da,,Studio FIT,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Score 21.2/100 (PROTECT),,,,,,,,,,,
+18:00,Studio Mat 57,Vivaran Dhasmana,Studio 2,14,38%,0,0%,0.0,Score 10.0/100 (PROTECT),,Studio Barre 57,Karanvir Bhatia,Studio 2,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Cardio Barre Express,Mrigakshi Jaiswal,Studio 2,14,28%,20,28%,3.9,"Experimental: 20 sessions, fil",,Studio FIT,Atulan Purohit,Studio 2,14,38%,0,0%,0.0,Score 14.4/100 (PROTECT),,Studio FIT,Cauveri Vikrant,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Cardio Barre,Karan Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
+19:00,Studio PowerCycle,Vivaran Dhasmana,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,Studio PowerCycle,Mrigakshi Jaiswal,PowerCycle Studio,14,88%,2,88%,11.5,[DIVERSITY-FLAG: Studio PowerC,,Studio PowerCycle,Reshma Sharma,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,49%,51,49%,6.4,Enforced class slot: Studio Po,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,45%,0,0%,0.0,Enforced class slot: Studio Po,,Studio PowerCycle,Karan Bhatia,PowerCycle Studio,14,45%,0,0%,0.0,[DIVERSITY-FLAG: Studio PowerC,,,,,,,,,,,
+19:15,Studio Barre 57,Karan Bhatia,Studio 2,14,28%,5,28%,3.6,"Experimental: 5 sessions, fill",,Studio Recovery,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Score 8.8/100 (PROTECT),,Studio Barre 57,Mrigakshi Jaiswal,Studio 1,14,45%,20,45%,6.2,Score 20.0/100 (PROTECT) — 20 ,,Studio Barre 57,Karanvir Bhatia,Studio 2,14,27%,29,27%,3.7,"Experimental: 29 sessions, fil",,Studio Mat 57,Karanvir Bhatia,Studio 1,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Recovery,Vivaran Dhasmana,Studio 1,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,,,,,,,,,,
+19:30,Studio FIT,Mrigakshi Jaiswal,Studio 1,14,69%,72,69%,6.9,Score 20.0/100 (PROTECT) — 72 ,,,,,,,,,,,,Studio Recovery,Karan Bhatia,Studio 2,14,38%,0,0%,0.0,Experimental: no historical da,,Studio Mat 57 Express,Atulan Purohit,Studio 1,14,38%,0,0%,0.0,Score 20.0/100 (PROTECT),,Studio Back Body Blaze,Richard D'Costa,Studio 2,14,35%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,,,,,,,,,,,
 
 
 === WEEKLY BREAKDOWN ===
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Atulan Purohit,8,7.0,53%,Studio FIT
-Cauveri Vikrant,9,7.3,40%,Studio PowerCycle
-Karan Bhatia,9,7.2,37%,Studio Barre 57
-Karanvir Bhatia,13,11.3,38%,Studio Barre 57
-Mrigakshi Jaiswal,5,4.3,48%,Studio FIT
-Reshma Sharma,3,2.2,40%,Studio Back Body Blaze Express
-Richard D'Costa,3,2.8,35%,Studio Cardio Barre
-Vivaran Dhasmana,12,10.6,46%,Studio Barre 57
+Atulan Purohit,8,7.0,46%,Studio FIT
+Cauveri Vikrant,8,6.8,40%,Studio PowerCycle
+Karan Bhatia,8,6.5,38%,Studio Barre 57
+Karanvir Bhatia,14,11.1,38%,Studio Mat 57 Express
+Mrigakshi Jaiswal,5,4.3,54%,Studio FIT
+Pranjali Jain,1,0.8,38%,Studio Barre 57 Express
+Reshma Sharma,2,1.5,42%,Studio PowerCycle
+Richard D'Costa,2,1.9,35%,Studio Back Body Blaze
+Vivaran Dhasmana,14,12.2,44%,Studio Mat 57
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
 Studio Back Body Blaze,5,45%,5
-Studio Back Body Blaze Express,4,38%,4
-Studio Barre 57,17,42%,7
-Studio Cardio Barre,4,36%,3
+Studio Back Body Blaze Express,3,38%,3
+Studio Barre 57,16,42%,7
+Studio Barre 57 Express,1,38%,1
+Studio Cardio Barre,3,37%,3
 Studio Cardio Barre Express,1,28%,1
-Studio FIT,6,49%,6
+Studio FIT,6,44%,6
 Studio HIIT,1,38%,1
 Studio Mat 57,7,44%,7
-Studio Mat 57 Express,4,38%,4
+Studio Mat 57 Express,5,38%,5
 Studio PowerCycle,7,51%,7
-Studio Recovery,6,38%,6
+Studio Recovery,7,38%,7
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
-07:30,Studio Barre 57,Studio Barre 57,Studio Barre 57,-,Studio Barre 57,-,-,4
-09:00,Studio Mat 57,Studio Back Body Blaze,Studio Back Body Blaze,Studio Mat 57,Studio Mat 57 Express,Studio Barre 57,-,6
-09:30,Studio Back Body Blaze,-,-,Studio Back Body Blaze Express,Studio Back Body Blaze Express,-,-,3
+07:30,Studio Cardio Barre,Studio Barre 57,Studio Barre 57,-,Studio Barre 57,-,-,4
+09:00,Studio Mat 57 Express,Studio Back Body Blaze,Studio Back Body Blaze,Studio Mat 57,Studio Mat 57 Express,Studio Barre 57,-,6
+09:30,Studio Back Body Blaze,Studio Mat 57 Express,-,Studio Back Body Blaze Express,Studio Back Body Blaze Express,Studio Mat 57 Express,-,5
 09:45,-,-,-,-,Studio Cardio Barre,-,-,1
 10:00,-,Studio Barre 57,Studio Barre 57,-,-,Studio Back Body Blaze,Studio FIT,4
-10:15,-,Studio Back Body Blaze Express,-,Studio HIIT,-,-,Studio Barre 57,3
+10:15,-,-,-,Studio HIIT,-,-,Studio Barre 57,2
 11:00,Studio Recovery,Studio Mat 57,Studio Mat 57,Studio Recovery,Studio Recovery,Studio Barre 57,Studio PowerCycle,7
-11:30,-,-,-,-,-,Studio Recovery,Studio Mat 57,2
+11:30,-,-,-,-,-,-,Studio Mat 57,1
 12:00,-,-,-,-,-,-,Studio Barre 57,1
 12:30,-,-,-,-,-,-,Studio Recovery,1
-17:45,Studio Barre 57,Studio Barre 57,Studio Back Body Blaze Express,Studio Barre 57,Studio Barre 57,Studio FIT,-,6
-18:00,Studio FIT,Studio FIT,Studio Cardio Barre Express,Studio Mat 57 Express,Studio FIT,Studio Cardio Barre,-,6
+16:30,-,Studio Barre 57 Express,-,-,-,Studio Mat 57,-,2
+17:45,Studio Barre 57,Studio FIT,Studio Back Body Blaze Express,Studio Barre 57,Studio Barre 57,Studio FIT,-,6
+18:00,Studio Mat 57,Studio Barre 57,Studio Cardio Barre Express,Studio FIT,Studio FIT,Studio Cardio Barre,-,6
 19:00,Studio PowerCycle,Studio PowerCycle,Studio PowerCycle,Studio PowerCycle,Studio PowerCycle,Studio PowerCycle,-,6
-19:15,Studio Barre 57,Studio Mat 57 Express,Studio Barre 57,Studio Barre 57,Studio Mat 57,Studio Cardio Barre,-,6
-19:30,Studio Mat 57 Express,Studio Cardio Barre,Studio Recovery,Studio FIT,Studio Back Body Blaze,Studio Mat 57,-,6
+19:15,Studio Barre 57,Studio Recovery,Studio Barre 57,Studio Barre 57,Studio Mat 57,Studio Recovery,-,6
+19:30,Studio FIT,-,Studio Recovery,Studio Mat 57 Express,Studio Back Body Blaze,-,-,4
