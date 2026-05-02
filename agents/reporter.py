@@ -228,7 +228,7 @@ function escapeHtml(value){
     .replace(/'/g, "&#39;");
 }
 
-function escapeAttr(value){ return escapeHtml(value).replace(/\n/g, '&#10;'); }
+function escapeAttr(value){ return escapeHtml(value).replace(/\\n/g, '&#10;'); }
 function escapeTextarea(value){ return String(value || ""); }
 
 function applyCatalogResponse(res, rerender){

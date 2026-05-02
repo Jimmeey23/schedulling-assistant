@@ -381,88 +381,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .th-lbl{font-size:10px;color:var(--text-muted);margin-bottom:4px;font-weight:500}
 .th-val{font-size:15px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
 .score-ring-lg svg text{font-family:'Inter',sans-serif}
-
-/* GENERATE BUTTON */
-.gen-btn{
-  display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r8);
-  font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer;border:1.5px solid var(--green);background:var(--green-light);
-  color:var(--green);transition:all 0.15s;white-space:nowrap;
-}
-.gen-btn:hover{background:var(--green);color:#fff}
-.gen-btn:disabled{background:var(--surface2);border-color:var(--border);color:var(--text-muted);cursor:not-allowed}
-.gen-btn .gen-spinner{display:none;width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite}
-.gen-btn.running .gen-spinner{display:block}
-.gen-btn.running .gen-icon{display:none}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* PIPELINE STATUS BAR */
-#pipeline-bar{
-  display:none;position:sticky;top:54px;z-index:395;
-  background:linear-gradient(90deg,#1E3A8A 0%,#1D4ED8 100%);
-  color:#EFF6FF;font-size:11px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
-  padding:6px 24px;display:flex;align-items:center;gap:10px;
-}
-#pipeline-bar.visible{display:flex}
-.pb-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
-.pb-reload{margin-left:auto;padding:2px 10px;border-radius:100px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
-.pb-reload:hover{background:rgba(255,255,255,0.35)}
-
-/* TOAST */
-.toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:#111827;color:#F9FAFB;border-radius:100px;padding:10px 20px;
-  font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:999;opacity:0;
-  transition:opacity 0.25s,transform 0.25s;pointer-events:none;white-space:nowrap;
-}
-.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:#065F46;color:#D1FAE5}
-.toast.error{background:#991B1B;color:#FEE2E2}
-.toast.warn{background:#92400E;color:#FEF3C7}
-
-/* RULES VIEW */
-.rules-view{max-width:900px;margin:0 auto}
-.rv-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-.rv-title{font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.4px}
-.rv-sub{font-size:13px;color:var(--text-muted);margin-top:4px;line-height:1.5}
-.rv-actions{display:flex;gap:8px;align-items:center}
-.rv-run-btn{
-  display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r8);
-  font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer;border:none;background:var(--green);color:#fff;transition:all 0.15s;
-}
-.rv-run-btn:hover{background:#166534}
-.rv-run-btn:disabled{background:var(--text-muted);cursor:not-allowed}
-.rv-status{font-size:12px;font-weight:600;color:var(--green);min-height:16px}
-.rv-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:700px){.rv-grid{grid-template-columns:1fr}}
-.rv-group{background:#fff;border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;box-shadow:var(--sh-sm)}
-.rv-group-hdr{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-  padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface);
-}
-.rv-group-label{font-size:13px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
-.rv-group-desc{font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.45}
-.rv-group-count{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);color:var(--text-muted);border-radius:999px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px}
-.rv-rules-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
-.rv-rule{border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;background:var(--surface);transition:border-color 0.1s}
-.rv-rule.off{opacity:0.65}
-.rv-rule:hover{border-color:var(--border-strong)}
-.rv-rule-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.rv-rule-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.35}
-.rv-rule-id{font-size:10px;color:var(--text-muted);margin-top:2px;font-family:monospace}
-.rv-rule-textarea{
-  width:100%;min-height:68px;border-radius:var(--r6);border:1px solid var(--border);
-  background:#fff;color:var(--text);padding:8px 10px;font-size:11px;line-height:1.5;
-  resize:vertical;font-family:'Inter',sans-serif;transition:border-color 0.1s;
-}
-.rv-rule-textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-mid)}
-.rv-rule-btns{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:6px}
-.rv-btn{border:1px solid var(--border);background:#fff;color:var(--text-muted);border-radius:var(--r6);padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.1s}
-.rv-btn:hover{background:var(--surface2);color:var(--text)}
-.rv-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.rv-btn.primary:hover{background:#1E3A8A}
 </style>
 </head>
 <body>
@@ -475,21 +393,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="hdr-sub">Physique 57 India</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="week-badge" id="week-badge">Week of —</div>
-    <button class="gen-btn" id="gen-btn" onclick="runPipelineFromHeader()">
-      <span class="gen-icon">&#9654;</span>
-      <span class="gen-spinner"></span>
-      <span id="gen-btn-label">Generate</span>
-    </button>
-  </div>
+  <div class="week-badge" id="week-badge">Week of —</div>
 </header>
-<div id="pipeline-bar">
-  <div class="pb-spinner"></div>
-  <span id="pb-msg">Pipeline running…</span>
-  <button class="pb-reload" onclick="location.reload()">Reload</button>
-</div>
-<div id="toast-el" class="toast"></div>
 
 <div class="loc-bar" id="loc-bar"></div>
 
@@ -501,7 +406,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <button class="vbtn" id="vbtn-trainer" onclick="setView('trainer')">◉ Trainer</button>
     <button class="vbtn" id="vbtn-cross" onclick="setView('cross')">⊕ Cross-Location</button>
     <button class="vbtn" id="vbtn-analytics" onclick="setView('analytics')">▦ Analytics</button>
-    <button class="vbtn" id="vbtn-rules" onclick="setView('rules')">&#9881; Rules</button>
   </div>
   <div class="ctrl-right">
     <div id="iter-row" style="display:flex;gap:3px"></div>
@@ -639,26 +543,26 @@ const SCHEDULE_DATA = {
         "day_of_week": "Monday",
         "time": "18:15",
         "class_name": "Studio Mat 57",
-        "trainer_1": "Anisha Shah",
+        "trainer_1": "Reshma Sharma",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 20.22,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Anisha Shah \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Reshma Sharma \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
         "historical_late_cancel_rate": 0.0,
         "historical_no_show_rate": 0.0,
         "constraint_violations": [],
-        "trainer_overall_fill": 0.49309987160420715,
-        "trainer_overall_checkin": 7.673139158576052,
-        "trainer_total_sessions": 618
+        "trainer_overall_fill": 0.4011980713272727,
+        "trainer_overall_checkin": 6.214196762141968,
+        "trainer_total_sessions": 803
       },
       {
         "location": "Kwality House, Kemps Corner",
@@ -673,7 +577,7 @@ const SCHEDULE_DATA = {
         "capacity": 22,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.48,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio FIT with Atulan Purohit \u2014 included for class variety",
@@ -727,7 +631,7 @@ const SCHEDULE_DATA = {
         "capacity": 10,
         "duration_min": 45,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 20.31,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Rohan Dahima \u2014 included for class variety",
@@ -882,49 +786,22 @@ const SCHEDULE_DATA = {
         "day_of_week": "Tuesday",
         "time": "17:45",
         "class_name": "Studio Barre 57",
-        "trainer_1": "Rohan Dahima",
+        "trainer_1": "Anisha Shah",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 1",
         "capacity": 22,
         "duration_min": 57,
-        "predicted_fill_rate": 0.39772727271785707,
+        "predicted_fill_rate": 0.38441558441249996,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: 28 sessions, fill 40% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.39772727271785707,
-        "historical_avg_checkin": 8.75,
-        "historical_session_count": 28,
-        "historical_late_cancel_rate": 0.07086663336428571,
-        "historical_no_show_rate": 0.10896187146071426,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4257609553470021,
-        "trainer_overall_checkin": 6.8211991434689505,
-        "trainer_total_sessions": 934
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-05",
-        "day_of_week": "Tuesday",
-        "time": "18:00",
-        "class_name": "Studio FIT",
-        "trainer_1": "Anisha Shah",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Anisha Shah \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
+        "scheduling_reason": "Experimental: 56 sessions, fill 38% \u2014 included to diversify schedule",
+        "historical_avg_fill": 0.38441558441249996,
+        "historical_avg_checkin": 8.0,
+        "historical_session_count": 56,
+        "historical_late_cancel_rate": 0.11795681996428573,
+        "historical_no_show_rate": 0.11795681996428573,
         "constraint_violations": [],
         "trainer_overall_fill": 0.49309987160420715,
         "trainer_overall_checkin": 7.673139158576052,
@@ -934,70 +811,16 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
-        "time": "18:15",
-        "class_name": "Studio PowerCycle",
-        "trainer_1": "Anmol Sharma",
-        "trainer_2": "",
-        "cover": "",
-        "room": "PowerCycle Studio",
-        "capacity": 10,
-        "duration_min": 45,
-        "predicted_fill_rate": 0.2642857142857143,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: 14 sessions, fill 26% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.2642857142857143,
-        "historical_avg_checkin": 2.642857142857143,
-        "historical_session_count": 14,
-        "historical_late_cancel_rate": 0.23095238095,
-        "historical_no_show_rate": 0.23095238095,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.3517651888336207,
-        "trainer_overall_checkin": 3.5,
-        "trainer_total_sessions": 116
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-05",
-        "day_of_week": "Tuesday",
-        "time": "19:00",
-        "class_name": "Studio Barre 57",
-        "trainer_1": "Rohan Dahima",
+        "time": "18:00",
+        "class_name": "Studio Mat 57",
+        "trainer_1": "Reshma Sharma",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 13,
         "duration_min": 57,
-        "predicted_fill_rate": 0.6309523809428571,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: 14 sessions, fill 63% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.6309523809428571,
-        "historical_avg_checkin": 7.571428571428571,
-        "historical_session_count": 14,
-        "historical_late_cancel_rate": 0.2103574996428572,
-        "historical_no_show_rate": 0.2103574996428572,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4257609553470021,
-        "trainer_overall_checkin": 6.8211991434689505,
-        "trainer_total_sessions": 934
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-05",
-        "day_of_week": "Tuesday",
-        "time": "19:15",
-        "class_name": "Studio Mat 57",
-        "trainer_1": "Reshma Sharma",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
-        "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 20.22,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Reshma Sharma \u2014 included for class variety",
@@ -1015,7 +838,61 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
-        "time": "08:30",
+        "time": "18:15",
+        "class_name": "Studio PowerCycle",
+        "trainer_1": "Rohan Dahima",
+        "trainer_2": "",
+        "cover": "",
+        "room": "PowerCycle Studio",
+        "capacity": 10,
+        "duration_min": 45,
+        "predicted_fill_rate": 0.38,
+        "score": 20.31,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Rohan Dahima \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4257609553470021,
+        "trainer_overall_checkin": 6.8211991434689505,
+        "trainer_total_sessions": 934
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-05",
+        "day_of_week": "Tuesday",
+        "time": "19:00",
+        "class_name": "Studio Barre 57",
+        "trainer_1": "Anisha Shah",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 20.0,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Anisha Shah \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.49309987160420715,
+        "trainer_overall_checkin": 7.673139158576052,
+        "trainer_total_sessions": 618
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-05",
+        "day_of_week": "Tuesday",
+        "time": "19:15",
         "class_name": "Studio Amped Up!",
         "trainer_1": "Reshma Sharma",
         "trainer_2": "",
@@ -1023,16 +900,16 @@ const SCHEDULE_DATA = {
         "room": "Studio 1",
         "capacity": 22,
         "duration_min": 57,
-        "predicted_fill_rate": 0.47549783549714275,
-        "score": 20.0,
+        "predicted_fill_rate": 0.38,
+        "score": 21.25,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: 105 sessions, fill 48% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.47549783549714275,
-        "historical_avg_checkin": 9.666666666666666,
-        "historical_session_count": 105,
-        "historical_late_cancel_rate": 0.10309244443142859,
-        "historical_no_show_rate": 0.11261625395523812,
+        "scheduling_reason": "Experimental: no historical data for Studio Amped Up! with Reshma Sharma \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
         "constraint_violations": [],
         "trainer_overall_fill": 0.4011980713272727,
         "trainer_overall_checkin": 6.214196762141968,
@@ -1042,19 +919,19 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
-        "time": "09:00",
-        "class_name": "Studio Strength Lab (Pull)",
+        "time": "08:30",
+        "class_name": "Studio FIT",
         "trainer_1": "Atulan Purohit",
         "trainer_2": "",
         "cover": "",
-        "room": "Strength Lab",
-        "capacity": 7,
+        "room": "Studio 1",
+        "capacity": 22,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.48,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Strength Lab (Pull) with Atulan Purohit \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio FIT with Atulan Purohit \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -1069,13 +946,13 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
-        "time": "09:30",
+        "time": "09:00",
         "class_name": "Studio Back Body Blaze",
         "trainer_1": "Anisha Shah",
         "trainer_2": "",
         "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
+        "room": "Studio 2",
+        "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
         "score": 20.0,
@@ -1096,13 +973,40 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
+        "time": "09:30",
+        "class_name": "Studio Strength Lab (Pull)",
+        "trainer_1": "Atulan Purohit",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Strength Lab",
+        "capacity": 7,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 22.92,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Strength Lab (Pull) with Atulan Purohit \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.387638147461744,
+        "trainer_overall_checkin": 5.255977496483825,
+        "trainer_total_sessions": 711
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-05",
+        "day_of_week": "Tuesday",
         "time": "10:15",
         "class_name": "Studio Mat 57 Express",
         "trainer_1": "Pranjali Jain",
         "trainer_2": "",
         "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
+        "room": "Studio 1",
+        "capacity": 22,
         "duration_min": 45,
         "predicted_fill_rate": 0.38,
         "score": 20.0,
@@ -1151,42 +1055,15 @@ const SCHEDULE_DATA = {
         "date": "2026-05-06",
         "day_of_week": "Wednesday",
         "time": "17:45",
-        "class_name": "Studio Mat 57",
-        "trainer_1": "Pranjali Jain",
+        "class_name": "Studio Barre 57",
+        "trainer_1": "Rohan Dahima",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 1",
         "capacity": 22,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Pranjali Jain \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4308928039808676,
-        "trainer_overall_checkin": 6.7208008898776415,
-        "trainer_total_sessions": 899
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-06",
-        "day_of_week": "Wednesday",
-        "time": "18:15",
-        "class_name": "Studio Barre 57",
-        "trainer_1": "Rohan Dahima",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 22.12,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Rohan Dahima \u2014 included for class variety",
@@ -1204,7 +1081,88 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-06",
         "day_of_week": "Wednesday",
+        "time": "18:15",
+        "class_name": "Studio Mat 57",
+        "trainer_1": "Pranjali Jain",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 20.06,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Pranjali Jain \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4308928039808676,
+        "trainer_overall_checkin": 6.7208008898776415,
+        "trainer_total_sessions": 899
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-06",
+        "day_of_week": "Wednesday",
         "time": "19:00",
+        "class_name": "Studio PowerCycle",
+        "trainer_1": "Rohan Dahima",
+        "trainer_2": "",
+        "cover": "",
+        "room": "PowerCycle Studio",
+        "capacity": 10,
+        "duration_min": 45,
+        "predicted_fill_rate": 0.38,
+        "score": 20.31,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Rohan Dahima \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4257609553470021,
+        "trainer_overall_checkin": 6.8211991434689505,
+        "trainer_total_sessions": 934
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-06",
+        "day_of_week": "Wednesday",
+        "time": "19:15",
+        "class_name": "Studio Barre 57",
+        "trainer_1": "Atulan Purohit",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 20.0,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Atulan Purohit \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.387638147461744,
+        "trainer_overall_checkin": 5.255977496483825,
+        "trainer_total_sessions": 711
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-06",
+        "day_of_week": "Wednesday",
+        "time": "08:30",
         "class_name": "Studio Back Body Blaze",
         "trainer_1": "Anisha Shah",
         "trainer_2": "",
@@ -1231,22 +1189,22 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-06",
         "day_of_week": "Wednesday",
-        "time": "19:15",
-        "class_name": "Studio PowerCycle",
+        "time": "09:00",
+        "class_name": "Studio FIT",
         "trainer_1": "Rohan Dahima",
         "trainer_2": "",
         "cover": "",
-        "room": "PowerCycle Studio",
-        "capacity": 10,
-        "duration_min": 45,
-        "predicted_fill_rate": 0.2,
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: 1 sessions, fill 20% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.2,
-        "historical_avg_checkin": 2.0,
-        "historical_session_count": 1,
+        "scheduling_reason": "Experimental: no historical data for Studio FIT with Rohan Dahima \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
         "historical_late_cancel_rate": 0.0,
         "historical_no_show_rate": 0.0,
         "constraint_violations": [],
@@ -1258,46 +1216,19 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-06",
         "day_of_week": "Wednesday",
-        "time": "08:30",
-        "class_name": "Studio Cardio Barre",
-        "trainer_1": "Anisha Shah",
+        "time": "09:30",
+        "class_name": "Studio Mat 57 Express",
+        "trainer_1": "Pranjali Jain",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 1",
         "capacity": 22,
-        "duration_min": 57,
+        "duration_min": 45,
         "predicted_fill_rate": 0.38,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Cardio Barre with Anisha Shah \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.49309987160420715,
-        "trainer_overall_checkin": 7.673139158576052,
-        "trainer_total_sessions": 618
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-06",
-        "day_of_week": "Wednesday",
-        "time": "09:00",
-        "class_name": "Studio FIT",
-        "trainer_1": "Pranjali Jain",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Pranjali Jain \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 Express with Pranjali Jain \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -1312,7 +1243,7 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-06",
         "day_of_week": "Wednesday",
-        "time": "09:30",
+        "time": "10:15",
         "class_name": "Studio HIIT",
         "trainer_1": "Rohan Dahima",
         "trainer_2": "",
@@ -1330,33 +1261,6 @@ const SCHEDULE_DATA = {
         "historical_session_count": 0,
         "historical_late_cancel_rate": 0.0,
         "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4257609553470021,
-        "trainer_overall_checkin": 6.8211991434689505,
-        "trainer_total_sessions": 934
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-06",
-        "day_of_week": "Wednesday",
-        "time": "10:15",
-        "class_name": "Studio Barre 57",
-        "trainer_1": "Rohan Dahima",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.4166666667,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: 1 sessions, fill 42% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.4166666667,
-        "historical_avg_checkin": 5.0,
-        "historical_session_count": 1,
-        "historical_late_cancel_rate": 0.1666666667,
-        "historical_no_show_rate": 0.1666666667,
         "constraint_violations": [],
         "trainer_overall_fill": 0.4257609553470021,
         "trainer_overall_checkin": 6.8211991434689505,
@@ -1483,7 +1387,7 @@ const SCHEDULE_DATA = {
         "capacity": 10,
         "duration_min": 45,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 22.45,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Anmol Sharma \u2014 included for class variety",
@@ -1591,8 +1495,8 @@ const SCHEDULE_DATA = {
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
+        "score": 19.99,
+        "recommendation": "DROP",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Anisha Shah \u2014 included for class variety",
         "historical_avg_fill": 0.0,
@@ -1664,33 +1568,6 @@ const SCHEDULE_DATA = {
         "date": "2026-05-08",
         "day_of_week": "Friday",
         "time": "18:00",
-        "class_name": "Studio FIT",
-        "trainer_1": "Mrigakshi Jaiswal",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Mrigakshi Jaiswal \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4205615392844409,
-        "trainer_overall_checkin": 5.905996758508914,
-        "trainer_total_sessions": 617
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-08",
-        "day_of_week": "Friday",
-        "time": "18:15",
         "class_name": "Studio PowerCycle",
         "trainer_1": "Bret Saldanha",
         "trainer_2": "",
@@ -1699,7 +1576,7 @@ const SCHEDULE_DATA = {
         "capacity": 10,
         "duration_min": 45,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 20.55,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Bret Saldanha \u2014 included for class variety",
@@ -1712,6 +1589,33 @@ const SCHEDULE_DATA = {
         "trainer_overall_fill": 0.3188816660633803,
         "trainer_overall_checkin": 3.1971830985915495,
         "trainer_total_sessions": 142
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-08",
+        "day_of_week": "Friday",
+        "time": "18:15",
+        "class_name": "Studio Mat 57 Express",
+        "trainer_1": "Mrigakshi Jaiswal",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 45,
+        "predicted_fill_rate": 0.38,
+        "score": 20.0,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 Express with Mrigakshi Jaiswal \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4205615392844409,
+        "trainer_overall_checkin": 5.905996758508914,
+        "trainer_total_sessions": 617
       },
       {
         "location": "Kwality House, Kemps Corner",
@@ -1745,16 +1649,43 @@ const SCHEDULE_DATA = {
         "date": "2026-05-08",
         "day_of_week": "Friday",
         "time": "08:30",
-        "class_name": "Studio Mat 57",
-        "trainer_1": "Anisha Shah",
+        "class_name": "Studio FIT",
+        "trainer_1": "Atulan Purohit",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 1",
         "capacity": 22,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.48,
         "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio FIT with Atulan Purohit \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.387638147461744,
+        "trainer_overall_checkin": 5.255977496483825,
+        "trainer_total_sessions": 711
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-08",
+        "day_of_week": "Friday",
+        "time": "09:00",
+        "class_name": "Studio Mat 57",
+        "trainer_1": "Anisha Shah",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 19.99,
+        "recommendation": "DROP",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Anisha Shah \u2014 included for class variety",
         "historical_avg_fill": 0.0,
@@ -1793,33 +1724,6 @@ const SCHEDULE_DATA = {
         "trainer_overall_fill": 0.387638147461744,
         "trainer_overall_checkin": 5.255977496483825,
         "trainer_total_sessions": 711
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-08",
-        "day_of_week": "Friday",
-        "time": "19:00",
-        "class_name": "Studio Mat 57 Express",
-        "trainer_1": "Mrigakshi Jaiswal",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
-        "duration_min": 45,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 Express with Mrigakshi Jaiswal \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4205615392844409,
-        "trainer_overall_checkin": 5.905996758508914,
-        "trainer_total_sessions": 617
       },
       {
         "location": "Kwality House, Kemps Corner",
@@ -1907,18 +1811,18 @@ const SCHEDULE_DATA = {
         "date": "2026-05-09",
         "day_of_week": "Saturday",
         "time": "18:00",
-        "class_name": "Studio Recovery",
+        "class_name": "Studio Mat 57 Express",
         "trainer_1": "Pranjali Jain",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 13,
-        "duration_min": 30,
+        "duration_min": 45,
         "predicted_fill_rate": 0.38,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Recovery with Pranjali Jain \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 Express with Pranjali Jain \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -1928,78 +1832,78 @@ const SCHEDULE_DATA = {
         "trainer_overall_fill": 0.4308928039808676,
         "trainer_overall_checkin": 6.7208008898776415,
         "trainer_total_sessions": 899
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-09",
+        "day_of_week": "Saturday",
+        "time": "19:00",
+        "class_name": "Studio Barre 57",
+        "trainer_1": "Pranjali Jain",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 2",
+        "capacity": 13,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 23.55,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Pranjali Jain \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4308928039808676,
+        "trainer_overall_checkin": 6.7208008898776415,
+        "trainer_total_sessions": 899
+      },
+      {
+        "location": "Kwality House, Kemps Corner",
+        "date": "2026-05-09",
+        "day_of_week": "Saturday",
+        "time": "19:15",
+        "class_name": "Studio FIT",
+        "trainer_1": "Reshma Sharma",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 1",
+        "capacity": 22,
+        "duration_min": 57,
+        "predicted_fill_rate": 0.38,
+        "score": 16.54,
+        "recommendation": "DROP",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: no historical data for Studio FIT with Reshma Sharma \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.4011980713272727,
+        "trainer_overall_checkin": 6.214196762141968,
+        "trainer_total_sessions": 803
       },
       {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-09",
         "day_of_week": "Saturday",
         "time": "17:00",
-        "class_name": "Studio FIT",
-        "trainer_1": "Pranjali Jain",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 13,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Pranjali Jain \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4308928039808676,
-        "trainer_overall_checkin": 6.7208008898776415,
-        "trainer_total_sessions": 899
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-09",
-        "day_of_week": "Saturday",
-        "time": "17:15",
-        "class_name": "Studio PowerCycle Express",
+        "class_name": "Studio PowerCycle",
         "trainer_1": "Reshma Sharma",
         "trainer_2": "",
         "cover": "",
         "room": "PowerCycle Studio",
         "capacity": 10,
-        "duration_min": 30,
-        "predicted_fill_rate": 0.38,
-        "score": 0.0,
-        "recommendation": "DROP",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle Express with Reshma Sharma \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4011980713272727,
-        "trainer_overall_checkin": 6.214196762141968,
-        "trainer_total_sessions": 803
-      },
-      {
-        "location": "Kwality House, Kemps Corner",
-        "date": "2026-05-09",
-        "day_of_week": "Saturday",
-        "time": "08:30",
-        "class_name": "Studio Mat 57 Express",
-        "trainer_1": "Reshma Sharma",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
         "duration_min": 45,
         "predicted_fill_rate": 0.38,
-        "score": 0.0,
+        "score": 10.0,
         "recommendation": "DROP",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 Express with Reshma Sharma \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Reshma Sharma \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -2014,19 +1918,19 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-09",
         "day_of_week": "Saturday",
-        "time": "07:15",
-        "class_name": "Studio Barre 57",
+        "time": "11:00",
+        "class_name": "Studio Recovery",
         "trainer_1": "Reshma Sharma",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 13,
-        "duration_min": 57,
+        "duration_min": 30,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
+        "score": 5.0,
+        "recommendation": "DROP",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Reshma Sharma \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Recovery with Reshma Sharma \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -2042,23 +1946,23 @@ const SCHEDULE_DATA = {
         "date": "2026-05-10",
         "day_of_week": "Sunday",
         "time": "10:15",
-        "class_name": "Studio Cardio Barre",
+        "class_name": "Studio PowerCycle",
         "trainer_1": "Rohan Dahima",
         "trainer_2": "",
         "cover": "",
-        "room": "Studio 1",
-        "capacity": 22,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.42919732441538466,
-        "score": 20.0,
+        "room": "PowerCycle Studio",
+        "capacity": 10,
+        "duration_min": 45,
+        "predicted_fill_rate": 0.38,
+        "score": 20.31,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: 65 sessions, fill 43% \u2014 included to diversify schedule",
-        "historical_avg_fill": 0.42919732441538466,
-        "historical_avg_checkin": 8.784615384615385,
-        "historical_session_count": 65,
-        "historical_late_cancel_rate": 0.14436406227846157,
-        "historical_no_show_rate": 0.14590252381692306,
+        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Rohan Dahima \u2014 included for class variety",
+        "historical_avg_fill": 0.0,
+        "historical_avg_checkin": 0.0,
+        "historical_session_count": 0,
+        "historical_late_cancel_rate": 0.0,
+        "historical_no_show_rate": 0.0,
         "constraint_violations": [],
         "trainer_overall_fill": 0.4257609553470021,
         "trainer_overall_checkin": 6.8211991434689505,
@@ -2068,19 +1972,19 @@ const SCHEDULE_DATA = {
         "location": "Kwality House, Kemps Corner",
         "date": "2026-05-10",
         "day_of_week": "Sunday",
-        "time": "11:30",
-        "class_name": "Studio PowerCycle",
+        "time": "11:00",
+        "class_name": "Studio Barre 57",
         "trainer_1": "Rohan Dahima",
         "trainer_2": "",
         "cover": "",
-        "room": "PowerCycle Studio",
-        "capacity": 10,
-        "duration_min": 45,
+        "room": "Studio 1",
+        "capacity": 22,
+        "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 22.12,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio PowerCycle with Rohan Dahima \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Rohan Dahima \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -2106,10 +2010,10 @@ const SCHEDULE_DATA = {
         "capacity": 14,
         "duration_min": 45,
         "predicted_fill_rate": 0.45,
-        "score": 20.0,
+        "score": 22.48,
         "recommendation": "CONSIDER",
         "is_experimental": false,
-        "scheduling_reason": "[DIVERSITY-FLAG: Studio PowerCycle appears 6\u00d7 at 19:00] Enforced class slot: Studio PowerCycle. Score 20.0; trainer chosen for fill-rate potential, trainer-hour balance, and class-mix logic.",
+        "scheduling_reason": "Enforced class slot: Studio PowerCycle. Score 22.5; trainer chosen for fill-rate potential, trainer-hour balance, and class-mix logic.",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -2268,8 +2172,8 @@ const SCHEDULE_DATA = {
         "capacity": 14,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
+        "score": 19.72,
+        "recommendation": "DROP",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze with Vivaran Dhasmana \u2014 included for class variety",
         "historical_avg_fill": 0.0,
@@ -2583,28 +2487,28 @@ const SCHEDULE_DATA = {
         "location": "Supreme HQ, Bandra",
         "date": "2026-05-05",
         "day_of_week": "Tuesday",
-        "time": "11:30",
-        "class_name": "Studio Recovery",
-        "trainer_1": "Karanvir Bhatia",
+        "time": "10:15",
+        "class_name": "Studio Back Body Blaze Express",
+        "trainer_1": "Reshma Sharma",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 14,
-        "duration_min": 30,
+        "duration_min": 45,
         "predicted_fill_rate": 0.38,
-        "score": 8.75,
-        "recommendation": "DROP",
+        "score": 20.0,
+        "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Recovery with Karanvir Bhatia \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze Express with Reshma Sharma \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
         "historical_late_cancel_rate": 0.0,
         "historical_no_show_rate": 0.0,
         "constraint_violations": [],
-        "trainer_overall_fill": 0.3402717939330986,
-        "trainer_overall_checkin": 4.304225352112676,
-        "trainer_total_sessions": 710
+        "trainer_overall_fill": 0.37107186122195124,
+        "trainer_overall_checkin": 4.769230769230769,
+        "trainer_total_sessions": 533
       },
       {
         "location": "Supreme HQ, Bandra",
@@ -2935,23 +2839,50 @@ const SCHEDULE_DATA = {
         "date": "2026-05-07",
         "day_of_week": "Thursday",
         "time": "19:15",
-        "class_name": "Studio Cardio Barre",
-        "trainer_1": "Atulan Purohit",
+        "class_name": "Studio Barre 57",
+        "trainer_1": "Karanvir Bhatia",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 2",
         "capacity": 14,
         "duration_min": 57,
-        "predicted_fill_rate": 0.38,
+        "predicted_fill_rate": 0.2667677150448276,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Cardio Barre with Atulan Purohit \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
+        "scheduling_reason": "Experimental: 29 sessions, fill 27% \u2014 included to diversify schedule",
+        "historical_avg_fill": 0.2667677150448276,
+        "historical_avg_checkin": 3.6551724137931036,
+        "historical_session_count": 29,
+        "historical_late_cancel_rate": 0.22636960740344822,
+        "historical_no_show_rate": 0.22636960740344822,
+        "constraint_violations": [],
+        "trainer_overall_fill": 0.3402717939330986,
+        "trainer_overall_checkin": 4.304225352112676,
+        "trainer_total_sessions": 710
+      },
+      {
+        "location": "Supreme HQ, Bandra",
+        "date": "2026-05-07",
+        "day_of_week": "Thursday",
+        "time": "19:30",
+        "class_name": "Studio FIT",
+        "trainer_1": "Atulan Purohit",
+        "trainer_2": "",
+        "cover": "",
+        "room": "Studio 1",
+        "capacity": 14,
+        "duration_min": 57,
+        "predicted_fill_rate": 1.0,
+        "score": 21.6,
+        "recommendation": "CONSIDER",
+        "is_experimental": true,
+        "scheduling_reason": "Experimental: 1 sessions, fill 100% \u2014 included to diversify schedule",
+        "historical_avg_fill": 1.0,
+        "historical_avg_checkin": 10.0,
+        "historical_session_count": 1,
+        "historical_late_cancel_rate": 0.1666666667,
+        "historical_no_show_rate": 0.1666666667,
         "constraint_violations": [],
         "trainer_overall_fill": 0.4456716165188135,
         "trainer_overall_checkin": 5.31864406779661,
@@ -2961,7 +2892,7 @@ const SCHEDULE_DATA = {
         "location": "Supreme HQ, Bandra",
         "date": "2026-05-07",
         "day_of_week": "Thursday",
-        "time": "19:30",
+        "time": "09:00",
         "class_name": "Studio Mat 57",
         "trainer_1": "Karanvir Bhatia",
         "trainer_2": "",
@@ -2988,19 +2919,19 @@ const SCHEDULE_DATA = {
         "location": "Supreme HQ, Bandra",
         "date": "2026-05-07",
         "day_of_week": "Thursday",
-        "time": "09:00",
-        "class_name": "Studio FIT",
+        "time": "09:30",
+        "class_name": "Studio Back Body Blaze Express",
         "trainer_1": "Atulan Purohit",
         "trainer_2": "",
         "cover": "",
-        "room": "Studio 1",
+        "room": "Studio 2",
         "capacity": 14,
-        "duration_min": 57,
+        "duration_min": 45,
         "predicted_fill_rate": 0.38,
         "score": 20.0,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Atulan Purohit \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze Express with Atulan Purohit \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -3010,33 +2941,6 @@ const SCHEDULE_DATA = {
         "trainer_overall_fill": 0.4456716165188135,
         "trainer_overall_checkin": 5.31864406779661,
         "trainer_total_sessions": 590
-      },
-      {
-        "location": "Supreme HQ, Bandra",
-        "date": "2026-05-07",
-        "day_of_week": "Thursday",
-        "time": "09:30",
-        "class_name": "Studio Back Body Blaze",
-        "trainer_1": "Cauveri Vikrant",
-        "trainer_2": "",
-        "cover": "",
-        "room": "Studio 2",
-        "capacity": 14,
-        "duration_min": 57,
-        "predicted_fill_rate": 0.38,
-        "score": 0.0,
-        "recommendation": "DROP",
-        "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze with Cauveri Vikrant \u2014 included for class variety",
-        "historical_avg_fill": 0.0,
-        "historical_avg_checkin": 0.0,
-        "historical_session_count": 0,
-        "historical_late_cancel_rate": 0.0,
-        "historical_no_show_rate": 0.0,
-        "constraint_violations": [],
-        "trainer_overall_fill": 0.4141864082206422,
-        "trainer_overall_checkin": 5.382262996941896,
-        "trainer_total_sessions": 654
       },
       {
         "location": "Supreme HQ, Bandra",
@@ -3071,26 +2975,26 @@ const SCHEDULE_DATA = {
         "day_of_week": "Thursday",
         "time": "11:00",
         "class_name": "Studio Recovery",
-        "trainer_1": "Cauveri Vikrant",
+        "trainer_1": "Karanvir Bhatia",
         "trainer_2": "",
         "cover": "",
         "room": "Studio 1",
         "capacity": 14,
         "duration_min": 30,
         "predicted_fill_rate": 0.38,
-        "score": 0.0,
+        "score": 8.75,
         "recommendation": "DROP",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio Recovery with Cauveri Vikrant \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Recovery with Karanvir Bhatia \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
         "historical_late_cancel_rate": 0.0,
         "historical_no_show_rate": 0.0,
         "constraint_violations": [],
-        "trainer_overall_fill": 0.4141864082206422,
-        "trainer_overall_checkin": 5.382262996941896,
-        "trainer_total_sessions": 654
+        "trainer_overall_fill": 0.3402717939330986,
+        "trainer_overall_checkin": 4.304225352112676,
+        "trainer_total_sessions": 710
       },
       {
         "location": "Supreme HQ, Bandra",
@@ -3105,10 +3009,10 @@ const SCHEDULE_DATA = {
         "capacity": 14,
         "duration_min": 45,
         "predicted_fill_rate": 0.45,
-        "score": 20.0,
-        "recommendation": "CONSIDER",
+        "score": 19.44,
+        "recommendation": "DROP",
         "is_experimental": false,
-        "scheduling_reason": "Enforced class slot: Studio PowerCycle. Score 20.0; trainer chosen for fill-rate potential, trainer-hour balance, and class-mix logic.",
+        "scheduling_reason": "[DIVERSITY-FLAG: Studio PowerCycle appears 6\u00d7 at 19:00] Enforced class slot: Studio PowerCycle. Score 19.4; trainer chosen for fill-rate potential, trainer-hour balance, and class-mix logic.",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -3483,7 +3387,7 @@ const SCHEDULE_DATA = {
         "capacity": 14,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.24,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio FIT with Atulan Purohit \u2014 included for class variety",
@@ -4133,7 +4037,7 @@ const SCHEDULE_DATA = {
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.30769230769,
-        "score": 20.0,
+        "score": 22.62,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: 10 sessions, fill 31% \u2014 included to diversify schedule",
@@ -4187,7 +4091,7 @@ const SCHEDULE_DATA = {
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.05,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze with Shruti Kulkarni \u2014 included for class variety",
@@ -4214,7 +4118,7 @@ const SCHEDULE_DATA = {
         "capacity": 15,
         "duration_min": 57,
         "predicted_fill_rate": 0.0,
-        "score": 20.0,
+        "score": 22.62,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: 1 sessions, fill 0% \u2014 included to diversify schedule",
@@ -4268,7 +4172,7 @@ const SCHEDULE_DATA = {
         "capacity": 15,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 22.62,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Barre 57 with Siddhartha Kusuma \u2014 included for class variety",
@@ -4538,7 +4442,7 @@ const SCHEDULE_DATA = {
         "capacity": 15,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 22.99,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Cardio Barre with Shruti Kulkarni \u2014 included for class variety",
@@ -4557,7 +4461,7 @@ const SCHEDULE_DATA = {
         "date": "2026-05-08",
         "day_of_week": "Friday",
         "time": "18:15",
-        "class_name": "Studio FIT",
+        "class_name": "Studio Mat 57",
         "trainer_1": "Pushyank Nahar",
         "trainer_2": "",
         "cover": "",
@@ -4565,10 +4469,10 @@ const SCHEDULE_DATA = {
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 24.77,
         "recommendation": "CONSIDER",
         "is_experimental": true,
-        "scheduling_reason": "Experimental: no historical data for Studio FIT with Pushyank Nahar \u2014 included for class variety",
+        "scheduling_reason": "Experimental: no historical data for Studio Mat 57 with Pushyank Nahar \u2014 included for class variety",
         "historical_avg_fill": 0.0,
         "historical_avg_checkin": 0.0,
         "historical_session_count": 0,
@@ -4781,7 +4685,7 @@ const SCHEDULE_DATA = {
         "capacity": 13,
         "duration_min": 57,
         "predicted_fill_rate": 0.16742081447058824,
-        "score": 20.0,
+        "score": 22.99,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: 17 sessions, fill 17% \u2014 included to diversify schedule",
@@ -4862,7 +4766,7 @@ const SCHEDULE_DATA = {
         "capacity": 15,
         "duration_min": 57,
         "predicted_fill_rate": 0.38,
-        "score": 20.0,
+        "score": 21.05,
         "recommendation": "CONSIDER",
         "is_experimental": true,
         "scheduling_reason": "Experimental: no historical data for Studio Back Body Blaze with Shruti Kulkarni \u2014 included for class variety",
@@ -4884,16 +4788,16 @@ const SCORECARD    = {
   "locations": {
     "Kwality House, Kemps Corner": {
       "total_classes": 56,
-      "predicted_avg_fill_rate": 0.395,
+      "predicted_avg_fill_rate": 0.393,
       "experimental_pct": 0.893,
       "barre_pct": 0.714,
-      "barre_family_count": 17,
-      "barre_family_pct": 0.304,
+      "barre_family_count": 16,
+      "barre_family_pct": 0.286,
       "format_counts": {
-        "Studio Barre 57": 12,
-        "Studio Mat 57": 11,
+        "Studio Barre 57": 13,
+        "Studio Mat 57": 12,
         "Studio FIT": 6,
-        "Studio Cardio Barre": 5,
+        "Studio Cardio Barre": 3,
         "Studio PowerCycle": 7,
         "Studio Strength Lab": 3,
         "Studio HIIT": 3,
@@ -4904,18 +4808,17 @@ const SCORECARD    = {
       },
       "class_mix": {
         "Studio Strength Lab": 0.036,
-        "Studio Barre 57": 0.214,
+        "Studio Barre 57": 0.232,
         "Studio Mat 57": 0.107,
         "Studio FIT": 0.107,
-        "Studio PowerCycle": 0.107,
+        "Studio PowerCycle": 0.125,
         "Studio Amped Up!": 0.036,
         "Studio Back Body Blaze": 0.071,
-        "Studio Mat 57 Express": 0.089,
+        "Studio Mat 57 Express": 0.107,
         "Studio HIIT": 0.054,
         "Studio Recovery": 0.054,
         "Studio Strength Lab (Pull)": 0.018,
-        "Studio Cardio Barre": 0.089,
-        "Studio PowerCycle Express": 0.018
+        "Studio Cardio Barre": 0.054
       },
       "hard_constraint_violations": [],
       "soft_constraint_penalties": 0,
@@ -4930,34 +4833,34 @@ const SCORECARD    = {
     },
     "Supreme HQ, Bandra": {
       "total_classes": 62,
-      "predicted_avg_fill_rate": 0.416,
+      "predicted_avg_fill_rate": 0.424,
       "experimental_pct": 0.645,
-      "barre_pct": 0.758,
+      "barre_pct": 0.774,
       "barre_family_count": 22,
       "barre_family_pct": 0.355,
       "format_counts": {
-        "Studio Barre 57": 16,
+        "Studio Barre 57": 17,
         "Studio Mat 57": 11,
         "Studio FIT": 6,
-        "Studio Cardio Barre": 6,
+        "Studio Cardio Barre": 5,
         "Studio PowerCycle": 7,
         "Studio Strength Lab": 0,
         "Studio HIIT": 1,
         "Studio Amped Up!": 0,
-        "Studio Recovery": 7,
-        "Studio Back Body Blaze": 8,
+        "Studio Recovery": 6,
+        "Studio Back Body Blaze": 9,
         "Studio Foundations": 0
       },
       "class_mix": {
         "Studio PowerCycle": 0.113,
-        "Studio Barre 57": 0.258,
+        "Studio Barre 57": 0.274,
         "Studio FIT": 0.097,
         "Studio Mat 57 Express": 0.065,
         "Studio Mat 57": 0.113,
-        "Studio Back Body Blaze": 0.097,
-        "Studio Recovery": 0.113,
-        "Studio Cardio Barre": 0.081,
-        "Studio Back Body Blaze Express": 0.032,
+        "Studio Back Body Blaze": 0.081,
+        "Studio Recovery": 0.097,
+        "Studio Cardio Barre": 0.065,
+        "Studio Back Body Blaze Express": 0.065,
         "Studio Cardio Barre Express": 0.016,
         "Studio HIIT": 0.016
       },
@@ -4981,8 +4884,8 @@ const SCORECARD    = {
       "barre_family_pct": 0.463,
       "format_counts": {
         "Studio Barre 57": 15,
-        "Studio Mat 57": 6,
-        "Studio FIT": 4,
+        "Studio Mat 57": 7,
+        "Studio FIT": 3,
         "Studio Cardio Barre": 4,
         "Studio PowerCycle": 0,
         "Studio Strength Lab": 0,
@@ -4995,10 +4898,10 @@ const SCORECARD    = {
       "class_mix": {
         "Studio Barre 57": 0.366,
         "Studio Back Body Blaze": 0.171,
-        "Studio Mat 57": 0.146,
+        "Studio Mat 57": 0.171,
         "Studio Cardio Barre": 0.098,
         "Studio Recovery": 0.098,
-        "Studio FIT": 0.098,
+        "Studio FIT": 0.073,
         "Unknown Class": 0.024
       },
       "hard_constraint_violations": [],
@@ -5308,13 +5211,12 @@ function renderView(){
   area.innerHTML="";
   const slots=_loc?getSlots(_loc):[];
   const filtered=filterSlots(slots);
-  if(_view==="grid")       renderGrid(area,filtered,slots);
-  else if(_view==="timeline")  renderTimeline(area,filtered);
-  else if(_view==="list")      renderList(area,filtered);
-  else if(_view==="trainer")   renderTrainer(area,filtered);
-  else if(_view==="cross")     renderCrossLocation(area);
-  else if(_view==="analytics") renderAnalytics(area,slots);
-  else if(_view==="rules")     renderRulesView(area);
+  if(_view==="grid")     renderGrid(area,filtered,slots);
+  else if(_view==="timeline") renderTimeline(area,filtered);
+  else if(_view==="list")     renderList(area,filtered);
+  else if(_view==="trainer")  renderTrainer(area,filtered);
+  else if(_view==="cross")    renderCrossLocation(area);
+  else if(_view==="analytics")renderAnalytics(area,slots);
 }
 
 // ============================================================
@@ -5921,207 +5823,6 @@ function openModal(s){
 function closeModal(){document.getElementById("modal-overlay").classList.remove("open")}
 
 // ============================================================
-// TOAST UTILITY
-// ============================================================
-let _toastTimer=null;
-function showToast(msg,type,dur){
-  const el=document.getElementById("toast-el");
-  if(!el)return;
-  el.textContent=msg;
-  el.className="toast"+(type?" "+type:"");
-  void el.offsetWidth;
-  el.classList.add("visible");
-  clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(()=>el.classList.remove("visible"),dur||3000);
-}
-
-// ============================================================
-// PIPELINE CONTROLS
-// ============================================================
-let _pipelinePolling=null;
-
-function setPipelineRunning(running,msg){
-  const btn=document.getElementById("gen-btn");
-  const bar=document.getElementById("pipeline-bar");
-  const pbMsg=document.getElementById("pb-msg");
-  const lbl=document.getElementById("gen-btn-label");
-  if(btn){btn.disabled=running;btn.classList.toggle("running",running)}
-  if(lbl)lbl.textContent=running?"Running…":"Generate";
-  if(bar)bar.classList.toggle("visible",running);
-  if(pbMsg&&msg)pbMsg.textContent=msg;
-}
-
-function pollPipelineStatus(){
-  fetch("/api/pipeline-status")
-    .then(r=>r.json())
-    .then(d=>{
-      setPipelineRunning(d.running,d.message);
-      if(d.running){
-        clearTimeout(_pipelinePolling);
-        _pipelinePolling=setTimeout(pollPipelineStatus,8000);
-      } else {
-        clearTimeout(_pipelinePolling);
-        if(d.message&&d.message.startsWith("Complete")){
-          showToast("Pipeline complete — reload for new schedule","success",5000);
-        }
-      }
-    })
-    .catch(()=>{
-      clearTimeout(_pipelinePolling);
-    });
-}
-
-function runPipelineFromHeader(){
-  const btn=document.getElementById("gen-btn");
-  if(btn)btn.disabled=true;
-  fetch("/api/run-pipeline",{method:"POST"})
-    .then(r=>r.json())
-    .then(res=>{
-      if(res.ok){
-        if(res.already_running){
-          showToast("Pipeline already running — please wait","warn");
-          setPipelineRunning(true,"Pipeline already running…");
-        } else {
-          showToast("Pipeline started — results ready in ~2 minutes","success");
-          setPipelineRunning(true,"Running — Agent 1: Ingesting data…");
-        }
-        clearTimeout(_pipelinePolling);
-        _pipelinePolling=setTimeout(pollPipelineStatus,12000);
-      } else {
-        showToast("Error: "+(res.error||"unknown"),"error");
-        if(btn)btn.disabled=false;
-      }
-    })
-    .catch(()=>{
-      showToast("Server offline — start the server and retry","error");
-      if(btn)btn.disabled=false;
-    });
-}
-
-// ============================================================
-// RULES VIEW (full-page tab)
-// ============================================================
-let RV_CATALOG=null;
-
-function renderRulesView(area){
-  const wrap=document.createElement("div");
-  wrap.className="rules-view";
-
-  // Header
-  wrap.innerHTML=`
-    <div class="rv-header">
-      <div>
-        <div class="rv-title">Scheduling Rules</div>
-        <div class="rv-sub">Enable or disable rule categories, edit individual rule text, then re-run the pipeline to apply changes.</div>
-      </div>
-      <div class="rv-actions">
-        <div class="rv-status" id="rv-status-msg"></div>
-        <button class="rv-run-btn" id="rv-run-btn" onclick="runPipelineFromHeader();setRVStatus('Pipeline started — results ready in ~2 min','ok')">
-          &#9654; Re-run Pipeline
-        </button>
-      </div>
-    </div>
-    <div class="rv-grid" id="rv-grid">
-      <div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Loading rules…</div>
-    </div>
-  `;
-  area.appendChild(wrap);
-
-  fetch("/api/rules-config")
-    .then(r=>r.json())
-    .then(data=>{
-      RV_CATALOG=data;
-      renderRVGrid(document.getElementById("rv-grid"),data);
-      setRVStatus("Rules loaded","ok");
-    })
-    .catch(()=>setRVStatus("Could not load rules — is the server running?","warn"));
-}
-
-function setRVStatus(msg,tone){
-  const el=document.getElementById("rv-status-msg");
-  if(!el)return;
-  el.style.color=tone==="error"?"var(--red)":tone==="warn"?"var(--prime)":"var(--green)";
-  el.textContent=msg||"";
-}
-
-function renderRVGrid(grid,catalog){
-  if(!grid)return;
-  grid.innerHTML="";
-  if(!catalog||!Array.isArray(catalog.groups)){
-    grid.innerHTML='<div style="grid-column:1/-1;padding:20px;color:var(--text-muted);font-size:13px">No rule catalog available.</div>';
-    return;
-  }
-  catalog.groups.forEach(group=>{
-    const enabled=(group.rules||[]).filter(r=>r.enabled).length;
-    const total=(group.rules||[]).length;
-    const groupEl=document.createElement("div");
-    groupEl.className="rv-group";
-    groupEl.innerHTML=`
-      <div class="rv-group-hdr">
-        <div>
-          <div class="rv-group-label">${escapeHtml(group.label)}</div>
-          <div class="rv-group-desc">${escapeHtml(group.description||"")}</div>
-          <div class="rv-group-count">${enabled}/${total} enabled</div>
-        </div>
-        <label class="toggle-switch" title="Enable/disable entire category">
-          <input type="checkbox" ${group.enabled?"checked":""} onchange="rvSaveCategory('${group.id}',this.checked)">
-          <div class="toggle-track"></div><div class="toggle-knob"></div>
-        </label>
-      </div>
-      <div class="rv-rules-list" id="rvlist-${group.id}"></div>
-    `;
-    const list=groupEl.querySelector(`#rvlist-${group.id}`);
-    (group.rules||[]).forEach(rule=>{
-      const ruleEl=document.createElement("div");
-      ruleEl.className="rv-rule"+(rule.enabled?"":" off");
-      ruleEl.id=`rv-rule-${rule.id}`;
-      ruleEl.innerHTML=`
-        <div class="rv-rule-top">
-          <div>
-            <div class="rv-rule-name">${escapeHtml(rule.title||rule.id)}</div>
-            <div class="rv-rule-id">${escapeHtml(rule.id)}</div>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" ${rule.enabled?"checked":""} onchange="rvSaveRuleEnabled('${rule.id}',this.checked)">
-            <div class="toggle-track"></div><div class="toggle-knob"></div>
-          </label>
-        </div>
-        <textarea class="rv-rule-textarea" id="rv-ta-${rule.id}" data-default="${escapeAttr(rule.description||"")}">${escapeTextarea(rule.description||"")}</textarea>
-        <div class="rv-rule-btns">
-          <button class="rv-btn" onclick="rvResetRule('${rule.id}')">Reset</button>
-          <button class="rv-btn primary" onclick="rvSaveRuleText('${rule.id}')">Save text</button>
-        </div>
-      `;
-      list.appendChild(ruleEl);
-    });
-    grid.appendChild(groupEl);
-  });
-}
-
-function rvPostUpdate(payload,msg){
-  fetch("/api/save-rules",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
-    .then(r=>r.json())
-    .then(res=>{
-      if(!res.ok&&res.error)throw new Error(res.error);
-      if(res.catalog){RV_CATALOG=res.catalog;renderRVGrid(document.getElementById("rv-grid"),res.catalog);}
-      setRVStatus(msg||"Saved ✓","ok");
-    })
-    .catch(err=>setRVStatus(err&&err.message?err.message:"Save failed","error"));
-}
-
-function rvSaveCategory(id,enabled){rvPostUpdate({categories:{[id]:{enabled:enabled}}},"Category saved ✓")}
-function rvSaveRuleEnabled(id,enabled){rvPostUpdate({rules:{[id]:{enabled:enabled}}},"Rule saved ✓")}
-function rvSaveRuleText(id){
-  const el=document.getElementById(`rv-ta-${id}`);
-  if(!el)return;
-  rvPostUpdate({rules:{[id]:{description:el.value}}},"Rule text saved ✓");
-}
-function rvResetRule(id){
-  const el=document.getElementById(`rv-ta-${id}`);
-  if(el)el.value=el.dataset.default||"";
-}
-
-// ============================================================
 // INIT
 // ============================================================
 function init(){
@@ -6134,8 +5835,6 @@ function init(){
     populateDropdowns(getSlots(_loc));
     renderView();
   }
-  // Poll for running pipeline on load
-  pollPipelineStatus();
 }
 
 document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal()});
@@ -6186,7 +5885,7 @@ window.addEventListener("DOMContentLoaded",init);
 #rules-run-btn:hover{background:#047857;}
 #rules-run-btn:disabled{background:#374151;cursor:not-allowed;}
 </style>
-<button id="rules-fab" onclick="setView('rules');window.scrollTo({top:0,behavior:'smooth'})">&#9881; Rules</button>
+<button id="rules-fab" onclick="toggleRulesDrawer()">&#9881; Rules</button>
 <div id="rules-drawer">
   <div class="rules-hdr">
     <div>
