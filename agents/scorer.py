@@ -32,12 +32,13 @@ COL_FILL_RATE = "ClassAvgExclEmpty"  # ACTUAL fill rate as "XX.XX%" (mislabelled
 COL_REV_PER_SESSION = "FillRate"     # avg revenue per session INR (mislabelled as FillRate in CSV)
 
 # Absolute recommendation thresholds (not percentile — prevents 38%==78% problem)
-PROTECT_SCORE = 65
+PROTECT_SCORE = 55          # Lowered from 65 — high data quality combos deserve protection
 PROTECT_SESSIONS = 10
-INCLUDE_SCORE = 40
+INCLUDE_SCORE = 38
 INCLUDE_SESSIONS = 5
-CONSIDER_SCORE = 20
+CONSIDER_SCORE = 18
 CONSIDER_SESSIONS = 3
+AUTO_PROTECT_MIN_SESSIONS = 8  # Min sessions to auto-protect above-studio-avg combos
 
 PERMITTED_LOCATIONS = {
     "Kwality House, Kemps Corner",
@@ -194,6 +195,26 @@ class ClassScorer:
         _normalize_within_location(records, "blended_rev", "blended_rev_norm", locations)
 
         # -----------------------------------------------------------------
+        # 5c. Studio average fill per location — basis for auto-protection
+        #     Combos whose blended_fill > studio_avg AND >= AUTO_PROTECT_MIN_SESSIONS
+        #     are automatically elevated to PROTECT regardless of score
+        # -----------------------------------------------------------------
+        studio_avg_fill: dict = {}
+        for loc in locations:
+            loc_recs = [r for r in records if r.get(COL_LOCATION) == loc]
+            if loc_recs:
+                studio_avg_fill[loc] = sum(r["blended_fill"] for r in loc_recs) / len(loc_recs)
+
+        for r in records:
+            loc = r.get(COL_LOCATION, "")
+            avg = studio_avg_fill.get(loc, 0.0)
+            r["studio_avg_fill"] = round(avg, 4)
+            r["above_studio_avg"] = bool(
+                r["blended_fill"] > avg
+                and int(r.get("trainer_sessions", 0)) >= AUTO_PROTECT_MIN_SESSIONS
+            )
+
+        # -----------------------------------------------------------------
         # 5b. Recency boost — load raw sessions to compute recent vs all-time fill
         #     Slots that perform better in the last 8 weeks get up to +8 points
         # -----------------------------------------------------------------
@@ -251,10 +272,14 @@ class ClassScorer:
             r["score"] = round(float(np.clip(base_score + boost, 0, 100)), 2)
 
         # -----------------------------------------------------------------
-        # 7. Absolute recommendation thresholds (not percentile)
+        # 7. Absolute recommendation thresholds + above-studio-avg auto-protect
         # -----------------------------------------------------------------
         for r in records:
-            r["recommendation"] = _recommendation(r["score"], r["trainer_sessions"])
+            rec = _recommendation(r["score"], r["trainer_sessions"])
+            # Auto-elevate: above studio avg fill with enough history → always PROTECT
+            if rec != "PROTECT" and r.get("above_studio_avg"):
+                rec = "PROTECT"
+            r["recommendation"] = rec
 
         # -----------------------------------------------------------------
         # 8. Normalise key names to match downstream schema
@@ -289,6 +314,8 @@ class ClassScorer:
                 "base_score": r["base_score"],
                 "score": r["score"],
                 "recommendation": r["recommendation"],
+                "studio_avg_fill": r.get("studio_avg_fill", 0.0),
+                "above_studio_avg": r.get("above_studio_avg", False),
             })
 
         class_slot_ranking.sort(key=lambda x: -x["score"])
@@ -325,13 +352,18 @@ class ClassScorer:
         include = sum(1 for r in class_slot_ranking if r["recommendation"] == "INCLUDE")
         consider = sum(1 for r in class_slot_ranking if r["recommendation"] == "CONSIDER")
         drop = sum(1 for r in class_slot_ranking if r["recommendation"] == "DROP")
+        auto_prot = sum(1 for r in class_slot_ranking if r.get("above_studio_avg"))
         total = len(class_slot_ranking)
+
+        for loc, avg in sorted(studio_avg_fill.items()):
+            print(f"  Studio avg fill [{loc[:25]}]: {avg:.1%}")
 
         print(f"[Agent 3] Scorer complete — {total:,} unique combos scored")
         print(f"  PROTECT: {protect} ({protect/total*100:.1f}%)  "
               f"INCLUDE: {include} ({include/total*100:.1f}%)  "
               f"CONSIDER: {consider} ({consider/total*100:.1f}%)  "
               f"DROP: {drop} ({drop/total*100:.1f}%)")
+        print(f"  Auto-protected (above studio avg): {auto_prot}")
         print(f"  Thresholds: PROTECT≥{PROTECT_SCORE}+{PROTECT_SESSIONS}sess  "
               f"INCLUDE≥{INCLUDE_SCORE}+{INCLUDE_SESSIONS}sess  "
               f"CONSIDER≥{CONSIDER_SCORE}+{CONSIDER_SESSIONS}sess")

@@ -523,25 +523,63 @@ class OutputReporter:
             key = f"{tm['location']}::{tm['trainer']}"
             trainer_metrics[key] = tm
 
+        # Build scoring lookup from 03_scores.json for modal enrichment
+        # Key: (location, class_name, trainer, day_of_week, time) → score record
+        scores_lookup: Dict[tuple, dict] = {}
+        scores_path = STATE_DIR / "03_scores.json"
+        if scores_path.exists():
+            try:
+                with open(scores_path) as _sf:
+                    _sd = json.load(_sf)
+                for _sr in _sd.get("class_slot_ranking", []):
+                    _k = (
+                        _sr.get("location", ""),
+                        _sr.get("class", ""),
+                        _sr.get("trainer", ""),
+                        _sr.get("day_name", ""),
+                        _sr.get("time", ""),
+                    )
+                    scores_lookup[_k] = _sr
+            except Exception:
+                pass
+
         web_data = {
             "generated_for_week": week_start,
             "day_dates": day_dates,
             "locations": {},
         }
 
+        def _enrich_slot(s, loc, tm_map):
+            trainer_key = f"{loc}::{s['trainer_1']}"
+            tm = tm_map.get(trainer_key, {})
+            sr_key = (
+                loc,
+                s.get("class_name", ""),
+                s.get("trainer_1", ""),
+                s.get("day_of_week", ""),
+                s.get("time", ""),
+            )
+            sr = scores_lookup.get(sr_key, {})
+            return {
+                **s,
+                "room": self._display_room(s.get("room", "")),
+                "trainer_overall_fill": tm.get("trainer_fill_rate", 0),
+                "trainer_overall_checkin": tm.get("trainer_avg_checkin", 0),
+                "trainer_total_sessions": tm.get("trainer_session_count", 0),
+                # Scoring breakdown fields (from scorer output)
+                "blended_fill": sr.get("blended_fill", None),
+                "base_score": sr.get("base_score", None),
+                "recency_boost": sr.get("recency_boost", None),
+                "slot_trust": sr.get("slot_trust", None),
+                "studio_avg_fill": sr.get("studio_avg_fill", None),
+                "above_studio_avg": sr.get("above_studio_avg", None),
+                "slot_sessions": sr.get("session_count", None),
+                "slot_avg_checkin": sr.get("avg_checkin", None),
+                "slot_avg_fill_rate": sr.get("avg_fill_rate", None),
+            }
+
         for loc, slots in by_location.items():
-            enriched = []
-            for s in slots:
-                trainer_key = f"{loc}::{s['trainer_1']}"
-                tm = trainer_metrics.get(trainer_key, {})
-                enriched.append({
-                    **s,
-                  "room": self._display_room(s.get("room", "")),
-                    "trainer_overall_fill": tm.get("trainer_fill_rate", 0),
-                    "trainer_overall_checkin": tm.get("trainer_avg_checkin", 0),
-                    "trainer_total_sessions": tm.get("trainer_session_count", 0),
-                })
-            web_data["locations"][loc] = enriched
+            web_data["locations"][loc] = [_enrich_slot(s, loc, trainer_metrics) for s in slots]
 
         # Add iteration data for web UI
         if all_by_location and len(all_by_location) > 1:
@@ -551,18 +589,9 @@ class OutputReporter:
                 iter_name = iter_names[iter_idx]
                 web_data["iterations"][iter_name] = {}
                 for loc, iter_slots in loc_map.items():
-                    enriched_iter = []
-                    for s in iter_slots:
-                        trainer_key = f"{loc}::{s['trainer_1']}"
-                        tm = trainer_metrics.get(trainer_key, {})
-                        enriched_iter.append({
-                            **s,
-                            "room": self._display_room(s.get("room", "")),
-                            "trainer_overall_fill": tm.get("trainer_fill_rate", 0),
-                            "trainer_overall_checkin": tm.get("trainer_avg_checkin", 0),
-                            "trainer_total_sessions": tm.get("trainer_session_count", 0),
-                        })
-                    web_data["iterations"][iter_name][loc] = enriched_iter
+                    web_data["iterations"][iter_name][loc] = [
+                        _enrich_slot(s, loc, trainer_metrics) for s in iter_slots
+                    ]
 
         with open(WEB_DIR / "schedule_data.json", "w") as f:
             json.dump(web_data, f, indent=2)

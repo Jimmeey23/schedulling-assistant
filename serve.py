@@ -81,6 +81,34 @@ class RulesHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # API: trainer profiles
+        if path == "/api/trainer-profiles":
+            profiles_path = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+            if profiles_path.exists():
+                self._send(200, "application/json", profiles_path.read_bytes())
+            else:
+                self._send_json(200, [])
+            return
+
+        # API: historic slot scores (03_scores.json class_slot_ranking)
+        if path == "/api/historic-slots":
+            scores_path = PROJECT_ROOT / "state" / "03_scores.json"
+            if scores_path.exists():
+                self._send(200, "application/json", scores_path.read_bytes())
+            else:
+                self._send_json(200, {"class_slot_ranking": [], "trainer_metrics": [], "class_metrics": []})
+            return
+
+        # API: schedule config (targets, manual protections)
+        if path == "/api/schedule-config":
+            cfg_path = PROJECT_ROOT / "config" / "schedule_config.json"
+            if cfg_path.exists():
+                self._send(200, "application/json", cfg_path.read_bytes())
+            else:
+                default = {"targets": {}, "manual_protected": [], "manual_excluded": []}
+                self._send_json(200, default)
+            return
+
         # Serve root → web/index.html
         if path == "/":
             self._serve_file(WEB_DIR / "index.html")
@@ -180,6 +208,32 @@ class RulesHandler(BaseHTTPRequestHandler):
                 })
             except Exception as e:
                 _pipeline_state["running"] = False
+                self._send_json(500, {"error": str(e)})
+            return
+
+        # API: save trainer profiles
+        if path == "/api/save-trainer-profiles":
+            try:
+                payload = json.loads(body_raw)
+                profiles_path = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+                with open(profiles_path, "w") as f:
+                    json.dump(payload, f, indent=2)
+                print("  [API] Trainer profiles saved")
+                self._send_json(200, {"ok": True})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+
+        # API: save schedule config
+        if path == "/api/save-schedule-config":
+            try:
+                payload = json.loads(body_raw)
+                cfg_path = PROJECT_ROOT / "config" / "schedule_config.json"
+                with open(cfg_path, "w") as f:
+                    json.dump(payload, f, indent=2)
+                print("  [API] Schedule config saved")
+                self._send_json(200, {"ok": True})
+            except Exception as e:
                 self._send_json(500, {"error": str(e)})
             return
 

@@ -457,6 +457,123 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .rv-btn:hover{background:var(--surface);color:var(--text)}
 .rv-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .rv-btn.primary:hover{background:var(--primary-600)}
+/* RULES SEARCH + BULK */
+.rv-search-row{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.rv-search{flex:1;padding:7px 12px;border:1px solid var(--border);border-radius:var(--r8);font-size:12px;font-family:inherit;color:var(--text);background:#fff;min-width:160px}
+.rv-search:focus{outline:none;border-color:var(--primary-600)}
+.rv-bulk-row{display:flex;gap:5px;align-items:center}
+.rv-bulk-btn{padding:5px 10px;border-radius:var(--r6);border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.1s;white-space:nowrap}
+.rv-bulk-btn:hover{background:var(--surface);color:var(--text)}
+.rv-group-bulk{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.rv-group-hdr-left{display:flex;align-items:flex-start;gap:12px;flex:1}
+/* MODAL SCORE BREAKDOWN */
+.modal-badge-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.modal-rec-badge{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif}
+.modal-badge-protect{background:#D1FAE5;color:#065F46}
+.modal-badge-pinned{background:#FEF3C7;color:#92400E}
+.modal-badge-include{background:var(--primary-mid);color:var(--primary)}
+.modal-badge-consider{background:#F3F4F6;color:#374151}
+.modal-badge-drop{background:#FEE2E2;color:#991B1B}
+.modal-above-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:#F0FDF4;color:#15803D;border:1px solid #86EFAC}
+.modal-below-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
+.modal-prime-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:var(--prime-light);color:var(--prime);border:1px solid #FDE68A}
+.modal-exp-badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border-strong)}
+.modal-score-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r8);padding:14px;margin-bottom:10px}
+.modal-score-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.modal-score-ring-wrap{flex-shrink:0}
+.modal-score-details{flex:1}
+.modal-score-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px}
+.modal-score-bar-bg{height:7px;background:var(--border);border-radius:100px;overflow:hidden;margin:4px 0}
+.modal-score-bar-fill{height:7px;border-radius:100px;transition:width 0.5s ease}
+.modal-score-sub{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);flex-wrap:wrap;gap:4px}
+.modal-score-boost{font-size:10px;font-weight:700}
+.modal-trust-row{display:flex;align-items:center;gap:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.modal-trust-dots{display:flex;gap:2px}
+.modal-trust-dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.modal-trust-dot.lit{background:var(--primary)}
+.modal-trust-label{font-size:10px;color:var(--text-muted)}
+.modal-compare-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.modal-compare-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:4px 8px;border-bottom:2px solid var(--border);text-align:left}
+.modal-compare-table th:nth-child(n+2){text-align:right}
+.modal-compare-table td{padding:5px 8px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:12px}
+.modal-compare-table tr:last-child td{border-bottom:none}
+.modal-compare-table td:nth-child(n+2){text-align:right;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif}
+.modal-compare-table .cmp-this{background:var(--primary-light)}
+/* HISTORY VIEW */
+.hist-view{padding-bottom:48px}
+.hist-view-header{padding:20px 24px 12px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.hist-view-title{font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.3px}
+.hist-view-sub{font-size:12px;color:var(--text-muted);margin-top:3px}
+.hist-loc-tabs{display:flex;gap:4px;padding:0 24px;margin-bottom:16px;flex-wrap:wrap}
+.hist-loc-tab{padding:5px 12px;border-radius:var(--r6);font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all 0.1s}
+.hist-loc-tab.active{background:var(--primary-mid);border-color:var(--primary);color:var(--primary)}
+.hist-summary-row{display:flex;gap:16px;padding:0 24px;margin-bottom:16px;flex-wrap:wrap}
+.hist-sum-chip{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted)}
+.hist-sum-chip span{color:var(--text)}
+.hist-section{padding:0 24px;margin-bottom:20px}
+.hist-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px}
+.hist-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.hist-card{border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;background:#fff;box-shadow:var(--sh-sm);cursor:default;transition:box-shadow 0.1s}
+.hist-card:hover{box-shadow:var(--sh-md)}
+.hist-card.prot{border-color:#86EFAC;background:#F0FDF4}
+.hist-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.hist-card-fill{font-size:18px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif}
+.hist-card-lock{font-size:12px;color:#15803D}
+.hist-card-class{font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
+.hist-card-trainer{font-size:10px;color:var(--text-muted)}
+.hist-card-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.hist-card-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;background:var(--surface2);color:var(--text-muted)}
+.hist-card-tag.prot{background:#D1FAE5;color:#065F46}
+.hist-card-tag.inc{background:var(--primary-mid);color:var(--primary)}
+.hist-card-tag.con{background:#F3F4F6;color:#374151}
+.hist-sort-row{display:flex;gap:8px;padding:0 24px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.hist-sort-label{font-size:11px;color:var(--text-muted);font-weight:600}
+.hist-sort-btn{padding:4px 10px;border-radius:var(--r6);font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-family:inherit;transition:all 0.1s}
+.hist-sort-btn.active{background:var(--primary-mid);border-color:var(--primary);color:var(--primary)}
+.hist-empty{padding:40px 24px;text-align:center;color:var(--text-muted);font-size:13px}
+/* SETTINGS VIEW */
+.sett-view{padding-bottom:48px}
+.sett-view-header{padding:20px 24px 0;border-bottom:1px solid var(--border)}
+.sett-view-title{font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.3px}
+.sett-view-sub{font-size:12px;color:var(--text-muted);margin-top:3px;margin-bottom:12px}
+.sett-tabs{display:flex;gap:0;padding:0 24px;border-bottom:1px solid var(--border);background:#fff;position:sticky;top:96px;z-index:50;overflow-x:auto}
+.sett-tab{padding:10px 18px;font-size:12px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.1s;white-space:nowrap}
+.sett-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.sett-tab:hover:not(.active){color:var(--text)}
+.sett-section{padding:24px;display:none}
+.sett-section.active{display:block}
+.sett-section-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sett-section-desc{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5}
+.qual-wrap{overflow-x:auto}
+.qual-table{border-collapse:collapse;font-size:11px;min-width:640px;width:100%}
+.qual-table th{padding:8px 10px;background:var(--surface);border:1px solid var(--border);font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;text-align:center;white-space:nowrap}
+.qual-table th:first-child{text-align:left;min-width:150px}
+.qual-table td{padding:5px 8px;border:1px solid var(--border);text-align:center;vertical-align:middle}
+.qual-table td:first-child{text-align:left;font-weight:600;font-size:11px;color:var(--text);white-space:nowrap}
+.qual-table tr:nth-child(even) td{background:var(--surface)}
+.qual-cb{width:15px;height:15px;cursor:pointer;accent-color:var(--primary)}
+.qual-tier{display:inline-block;padding:1px 5px;border-radius:100px;font-size:8px;font-weight:700;background:var(--primary-mid);color:var(--primary);margin-left:4px;text-transform:uppercase;vertical-align:middle}
+.sett-save-bar{display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.sett-save-btn{padding:8px 20px;background:var(--primary);color:#fff;border:none;border-radius:var(--r8);font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background 0.1s}
+.sett-save-btn:hover{background:var(--primary-600)}
+.sett-save-status{font-size:12px;color:var(--text-muted);font-style:italic}
+.avail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.avail-card{border:1px solid var(--border);border-radius:var(--r12);padding:14px;background:#fff;box-shadow:var(--sh-sm)}
+.avail-name{font-size:13px;font-weight:700;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif}
+.avail-loc-lbl{font-size:10px;color:var(--text-muted);margin-top:2px;margin-bottom:8px;text-transform:uppercase;font-weight:600;letter-spacing:0.05em}
+.avail-days{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.avail-day-chip{padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:all 0.1s;user-select:none;font-family:'Plus Jakarta Sans',sans-serif}
+.avail-day-chip.on{background:var(--primary-mid);border-color:var(--primary);color:var(--primary)}
+.avail-time-row{display:flex;gap:12px;align-items:center;font-size:11px}
+.avail-time-row label{color:var(--text-muted);font-size:10px;font-weight:600;min-width:38px}
+.avail-time-row input{border:1px solid var(--border);border-radius:var(--r4);padding:3px 6px;font-size:11px;color:var(--text);font-family:inherit;width:80px}
+.target-loc-hdr{font-size:14px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.target-day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.target-day-card{border:1px solid var(--border);border-radius:var(--r8);padding:10px 12px;background:#fff}
+.target-day-lbl{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif}
+.target-input-row{display:flex;gap:8px;align-items:center}
+.target-input-row label{font-size:10px;color:var(--text-muted);min-width:54px}
+.target-input-row input{width:46px;border:1px solid var(--border);border-radius:var(--r4);padding:3px 6px;font-size:12px;font-weight:700;font-family:inherit;text-align:center;color:var(--text)}
 </style>
 </head>
 <body>
@@ -495,6 +612,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <button class="vbtn" id="vbtn-cross" onclick="setView('cross')">⊕ Cross-Location</button>
     <button class="vbtn" id="vbtn-analytics" onclick="setView('analytics')">▦ Analytics</button>
     <button class="vbtn" id="vbtn-rules" onclick="setView('rules')">&#9881; Rules</button>
+    <button class="vbtn" id="vbtn-history" onclick="setView('history')">&#128200; History</button>
+    <button class="vbtn" id="vbtn-settings" onclick="setView('settings')">&#9741; Settings</button>
   </div>
   <div class="ctrl-right">
     <div id="iter-row" style="display:flex;gap:3px"></div>
@@ -5292,11 +5411,10 @@ function setView(v){
   document.querySelectorAll(".vbtn").forEach(b=>b.classList.remove("active"));
   const el=document.getElementById("vbtn-"+v);
   if(el)el.classList.add("active");
-  // Hide loc/filter bars when in Rules view
-  const locBarTop = v==="rules"?"none":"";
-  document.getElementById("loc-bar").style.display=locBarTop;
-  document.getElementById("filter-panel").style.display=v==="rules"?"none":"";
-  document.querySelector(".ctrl-right").style.display=v==="rules"?"none":"";
+  const fullScreen=v==="rules"||v==="history"||v==="settings";
+  document.getElementById("loc-bar").style.display=fullScreen?"none":"";
+  document.getElementById("filter-panel").style.display=fullScreen?"none":"";
+  document.querySelector(".ctrl-right").style.display=fullScreen?"none":"";
   renderView();
 }
 
@@ -5312,6 +5430,8 @@ function renderView(){
   else if(_view==="cross")    renderCrossLocation(area);
   else if(_view==="analytics")renderAnalytics(area,slots);
   else if(_view==="rules")    renderRulesView(area);
+  else if(_view==="history")  renderHistoryView(area);
+  else if(_view==="settings") renderSettingsView(area);
 }
 
 // ============================================================
@@ -5850,15 +5970,35 @@ function renderAnalytics(area,allLocSlots){
 }
 
 // ============================================================
-// MODAL
+// MODAL — Enhanced with scoring breakdown + comparisons
 // ============================================================
+function _modalRecBadge(rec){
+  const cls={PINNED:"modal-badge-pinned",PROTECT:"modal-badge-protect",PROTECT_EXACT:"modal-badge-protect",INCLUDE:"modal-badge-include",CONSIDER:"modal-badge-consider",DROP:"modal-badge-drop"}[rec]||"modal-badge-consider";
+  const lbl={PINNED:"📌 Pinned",PROTECT:"🛡 Protect",PROTECT_EXACT:"🛡 Protect",INCLUDE:"✓ Include",CONSIDER:"◎ Consider",DROP:"✗ Drop"}[rec]||rec||"—";
+  return`<span class="modal-rec-badge ${cls}">${lbl}</span>`;
+}
+function _trustDots(trust){
+  const n=Math.round((trust||0)*10);
+  return Array.from({length:10},(_,i)=>`<div class="modal-trust-dot${i<n?" lit":""}"></div>`).join("");
+}
 function openModal(s){
-  const fam=getFamily(s.class_name);
   const fill=s.predicted_fill_rate||0;
   const fc=fillColor(fill);
   const viols=s.constraint_violations||[];
   const dayDates=SCHEDULE_DATA.day_dates||{};
   const dateStr=dayDates[s.day_of_week]?new Date(dayDates[s.day_of_week]).toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"}):s.day_of_week;
+  const score=s.score||0;
+  const scoreClr=score>=70?"#15803D":score>=45?"#1D4ED8":score>=25?"#D97706":"#DC2626";
+  const baseScore=s.base_score!=null?s.base_score:score;
+  const recBoost=s.recency_boost||0;
+  const trust=s.slot_trust;
+  const blendedFill=s.blended_fill;
+  const studioAvg=s.studio_avg_fill;
+  const aboveAvg=s.above_studio_avg;
+  const slotSessions=s.slot_sessions;
+  const slotFill=s.slot_avg_fill_rate;
+
+  const hasScoreData=s.base_score!=null;
 
   const box=document.getElementById("modal-box");
   box.innerHTML=`
@@ -5871,15 +6011,66 @@ function openModal(s){
     </div>
     <div class="modal-body">
 
+      <div class="modal-badge-row">
+        ${_modalRecBadge(s.recommendation)}
+        ${isPrime(s.time)?`<span class="modal-prime-badge">★ Prime Slot</span>`:""}
+        ${aboveAvg===true?`<span class="modal-above-badge">🔒 Auto-Protected · Above Studio Avg</span>`:aboveAvg===false&&blendedFill!=null?`<span class="modal-below-badge">Below Studio Avg</span>`:""}
+        ${s.is_experimental?`<span class="modal-exp-badge">Experimental</span>`:""}
+      </div>
+
+      <div class="modal-section">
+        <div class="ms-title">Score & Confidence</div>
+        <div class="modal-score-panel">
+          <div class="modal-score-top">
+            <div class="modal-score-ring-wrap">${scoreRing(score,42)}</div>
+            <div class="modal-score-details">
+              <div class="modal-score-label">Composite Score</div>
+              <div class="modal-score-bar-bg"><div class="modal-score-bar-fill" style="width:${score}%;background:${scoreClr}"></div></div>
+              <div class="modal-score-sub">
+                <span>${hasScoreData?`Base: <strong>${Math.round(baseScore)}</strong>${recBoost!==0?` &nbsp;+&nbsp; Recency: <span class="modal-score-boost" style="color:${recBoost>=0?"var(--green)":"var(--red)"}">${recBoost>=0?"+":""}${recBoost.toFixed(1)}</span>`:""}`:"Score / 100"}</span>
+                <span style="color:${scoreClr};font-weight:700">${Math.round(score)} / 100</span>
+              </div>
+            </div>
+          </div>
+          ${trust!=null?`<div class="modal-trust-row">
+            <div class="modal-trust-dots">${_trustDots(trust)}</div>
+            <span class="modal-trust-label">Data confidence: <strong>${Math.round(trust*100)}%</strong>${slotSessions!=null?` · ${slotSessions} historical sessions at this slot`:""}</span>
+          </div>`:""}
+        </div>
+
+        ${blendedFill!=null||studioAvg!=null?`
+        <table class="modal-compare-table">
+          <thead><tr>
+            <th>Metric</th>
+            <th>This Slot</th>
+            <th>Trainer Overall</th>
+            <th>Studio Avg</th>
+          </tr></thead>
+          <tbody>
+            <tr class="cmp-this">
+              <td>Fill Rate</td>
+              <td style="color:${fillColor(blendedFill||0)}">${pct(blendedFill)}<span style="font-size:9px;font-weight:400;color:var(--text-muted)"> blended</span></td>
+              <td style="color:${fillColor(s.trainer_overall_fill||0)}">${pct(s.trainer_overall_fill)}</td>
+              <td style="color:${fillColor(studioAvg||0)}">${pct(studioAvg)}</td>
+            </tr>
+            ${slotFill!=null?`<tr>
+              <td>Raw Hist Fill</td>
+              <td style="color:${fillColor(slotFill)}">${pct(slotFill)}</td>
+              <td>—</td><td>—</td>
+            </tr>`:""}
+          </tbody>
+        </table>`:""}
+      </div>
+
       <div class="modal-section">
         <div class="ms-title">Performance Metrics</div>
         <div class="modal-metrics">
           <div class="mm"><div class="mm-l">Predicted Fill</div><div class="mm-v" style="color:${fc}">${pct(fill,1)}</div><div class="mm-s">of ${s.capacity||"—"} capacity</div></div>
-          <div class="mm"><div class="mm-l">Composite Score</div><div class="mm-v">${scoreRing(s.score,32)}</div><div class="mm-s">${s.recommendation||"—"}</div></div>
-          <div class="mm"><div class="mm-l">Historical Fill</div><div class="mm-v" style="color:${fillColor(s.historical_avg_fill||0)}">${pct(s.historical_avg_fill)}</div><div class="mm-s">${s.historical_session_count||0} sessions</div></div>
+          <div class="mm"><div class="mm-l">Historical Fill</div><div class="mm-v" style="color:${fillColor(s.historical_avg_fill||0)}">${pct(s.historical_avg_fill)}</div><div class="mm-s">${s.historical_session_count||0} sess (this slot)</div></div>
           <div class="mm"><div class="mm-l">Avg Check-In</div><div class="mm-v">${round1(s.historical_avg_checkin)}</div><div class="mm-s">per session</div></div>
           <div class="mm"><div class="mm-l">Late Cancel</div><div class="mm-v" style="color:${(s.historical_late_cancel_rate||0)>0.15?"var(--red)":"var(--text)"}">${pct(s.historical_late_cancel_rate)}</div><div class="mm-s">rate</div></div>
           <div class="mm"><div class="mm-l">No Show</div><div class="mm-v" style="color:${(s.historical_no_show_rate||0)>0.2?"var(--red)":"var(--text)"}">${pct(s.historical_no_show_rate)}</div><div class="mm-s">rate</div></div>
+          <div class="mm"><div class="mm-l">Duration</div><div class="mm-v">${s.duration_min||57}</div><div class="mm-s">minutes</div></div>
         </div>
       </div>
 
@@ -5887,10 +6078,12 @@ function openModal(s){
         <div class="ms-title">Trainer — ${s.trainer_1||"—"}</div>
         <div class="trainer-hist">
           <div class="th-card"><div class="th-lbl">Overall Fill Rate</div><div class="th-val" style="color:${fillColor(s.trainer_overall_fill||0)}">${pct(s.trainer_overall_fill)}</div></div>
-          <div class="th-card"><div class="th-lbl">Avg Check-In (all)</div><div class="th-val">${round1(s.trainer_overall_checkin)}</div></div>
+          <div class="th-card"><div class="th-lbl">Avg Check-In (all classes)</div><div class="th-val">${round1(s.trainer_overall_checkin)}</div></div>
           <div class="th-card"><div class="th-lbl">Total Sessions</div><div class="th-val">${s.trainer_total_sessions||0}</div></div>
-          <div class="th-card"><div class="th-lbl">Duration</div><div class="th-val">${s.duration_min||57} min</div></div>
+          <div class="th-card"><div class="th-lbl">This Class Sessions</div><div class="th-val">${slotSessions!=null?slotSessions:"—"}</div></div>
         </div>
+        ${s.trainer_2?`<div style="margin-top:8px;font-size:11px;color:var(--text-muted)">Co-trainer: <strong style="color:var(--text)">${s.trainer_2}</strong></div>`:""}
+        ${s.cover?`<div style="margin-top:4px;font-size:11px;color:var(--text-muted)">Cover: <strong style="color:var(--text)">${s.cover}</strong></div>`:""}
       </div>
 
       <div class="modal-section">
@@ -5901,8 +6094,6 @@ function openModal(s){
           ${s.is_experimental?`<span class="chip chip-exp">Experimental</span>`:""}
           <span class="chip chip-room">${s.room||"—"}</span>
           <span class="chip chip-dur">${s.duration_min||57} min</span>
-          ${s.trainer_2?`<span class="chip chip-room">Co: ${s.trainer_2}</span>`:""}
-          ${s.cover?`<span class="chip">Cover: ${s.cover}</span>`:""}
         </div>
       </div>
 
@@ -6021,11 +6212,18 @@ function renderRulesView(area){
     <div class="rv-header">
       <div>
         <div class="rv-title">Scheduling Rules</div>
-        <div class="rv-sub">Enable or disable rule categories and individual rules. Edit rule text used by the AI planner.</div>
+        <div class="rv-sub">Enable or disable rule categories and individual rules. Use bulk buttons to toggle all rules in a group. Edit rule text used by the AI planner.</div>
       </div>
       <div class="rv-actions">
         <span class="rv-status" id="rv-status"></span>
         <button class="rv-run-btn" id="rv-run-btn" onclick="rvRunPipeline()">&#9654; Re-run Pipeline</button>
+      </div>
+    </div>
+    <div class="rv-search-row">
+      <input class="rv-search" id="rv-search" type="text" placeholder="Search rules by name or content…" oninput="rvRenderCatalog(this.value)">
+      <div class="rv-bulk-row">
+        <button class="rv-bulk-btn" onclick="rvGlobalBulk(true)">Enable All</button>
+        <button class="rv-bulk-btn" onclick="rvGlobalBulk(false)">Disable All</button>
       </div>
     </div>
     <div id="rv-groups"><div style="padding:20px;color:var(--text-muted);font-size:13px">Loading rules…</div></div>`;
@@ -6072,34 +6270,42 @@ function rvLoadRules(){
     .catch(()=>setRVStatus("Could not load rules","error"));
 }
 
-function rvRenderCatalog(){
+function rvRenderCatalog(searchTerm){
   const host=document.getElementById("rv-groups");
   if(!host)return;
   if(!_rulesCatalog||!Array.isArray(_rulesCatalog.groups)){
     host.innerHTML='<div style="padding:20px;color:var(--text-muted)">No rule catalog available.</div>';
     return;
   }
+  const q=(searchTerm||"").toLowerCase();
   host.innerHTML="";
   _rulesCatalog.groups.forEach(group=>{
-    const enabled=(group.rules||[]).filter(r=>r.enabled).length;
-    const total=(group.rules||[]).length;
+    const rules=(group.rules||[]);
+    const filtered=q?rules.filter(r=>(r.title||r.id||"").toLowerCase().includes(q)||(r.description||"").toLowerCase().includes(q)):rules;
+    if(q&&filtered.length===0)return;
+    const enabled=rules.filter(r=>r.enabled).length;
+    const total=rules.length;
     const gEl=document.createElement("div");
     gEl.className="rv-group";
     gEl.innerHTML=`
       <div class="rv-group-hdr">
-        <div class="rv-group-left">
+        <div class="rv-group-left" style="flex:1">
           <div class="rv-group-title">${rvEscapeHtml(group.label)}</div>
           <div class="rv-group-desc">${rvEscapeHtml(group.description||"")}</div>
           <span class="rv-count">${enabled}/${total} enabled</span>
         </div>
-        <label class="rv-toggle" title="${group.enabled?"Disable":"Enable"} category">
+        <div class="rv-group-bulk">
+          <button class="rv-bulk-btn" onclick="rvBulkToggle('${group.id}',true)">Enable All</button>
+          <button class="rv-bulk-btn" onclick="rvBulkToggle('${group.id}',false)">Disable All</button>
+        </div>
+        <label class="rv-toggle" title="${group.enabled?"Disable":"Enable"} category" style="margin-left:8px">
           <input type="checkbox" ${group.enabled?"checked":""} onchange="rvSaveCategory('${group.id}',this.checked)">
           <div class="rv-track"></div><div class="rv-knob"></div>
         </label>
       </div>
       <div class="rv-rules-list" id="rv-list-${group.id}"></div>`;
     const listEl=gEl.querySelector(".rv-rules-list");
-    (group.rules||[]).forEach(rule=>{
+    (q?filtered:rules).forEach(rule=>{
       const rEl=document.createElement("div");
       rEl.className="rv-rule"+(rule.enabled?"":" off");
       rEl.id="rv-rule-"+rule.id;
@@ -6119,8 +6325,9 @@ function rvRenderCatalog(){
         </div>
         <textarea class="rv-textarea" id="rv-text-${rule.id}" data-default="${rvEscapeAttr(rule.description||"")}">${rvEscapeHtml(rule.description||"")}</textarea>
         <div class="rv-rule-actions">
-          <span class="rv-hint">Edit the rule copy used by the AI scheduler.</span>
+          <span class="rv-hint">Edit the rule text used by the AI scheduler.</span>
           <div class="rv-btns">
+            <button class="rv-btn" title="Copy rule text" onclick="rvCopyText('${rule.id}')">Copy</button>
             <button class="rv-btn" onclick="rvResetText('${rule.id}')">Reset</button>
             <button class="rv-btn primary" onclick="rvSaveText('${rule.id}')">Save</button>
           </div>
@@ -6129,6 +6336,410 @@ function rvRenderCatalog(){
     });
     host.appendChild(gEl);
   });
+  if(q&&host.children.length===0){
+    host.innerHTML=`<div style="padding:20px;color:var(--text-muted);font-size:13px">No rules match "<strong>${rvEscapeHtml(q)}</strong>"</div>`;
+  }
+}
+
+function rvBulkToggle(groupId,enable){
+  const group=(_rulesCatalog&&_rulesCatalog.groups||[]).find(g=>g.id===groupId);
+  if(!group)return;
+  const ruleIds=(group.rules||[]).map(r=>r.id);
+  const rules={};
+  ruleIds.forEach(id=>{rules[id]={enabled:enable}});
+  rvPostUpdate({rules},enable?"All enabled":"All disabled",true);
+}
+
+function rvCopyText(id){
+  const el=document.getElementById("rv-text-"+id);
+  if(!el)return;
+  navigator.clipboard.writeText(el.value).then(()=>showToast("Rule text copied","")).catch(()=>{});
+}
+
+function rvGlobalBulk(enable){
+  if(!_rulesCatalog||!Array.isArray(_rulesCatalog.groups))return;
+  const rules={};
+  _rulesCatalog.groups.forEach(g=>(g.rules||[]).forEach(r=>{rules[r.id]={enabled:enable}}));
+  rvPostUpdate({rules},enable?"All rules enabled":"All rules disabled",true);
+}
+
+// ============================================================
+// HISTORY VIEW — Historical slot baseline from scored data
+// ============================================================
+let _histData=null;
+let _histLoc=null;
+let _histSort="score";
+
+function renderHistoryView(area){
+  const wrap=document.createElement("div");
+  wrap.className="hist-view";
+  wrap.innerHTML=`
+    <div class="hist-view-header">
+      <div class="hist-view-title">📊 Historical Baseline</div>
+      <div class="hist-view-sub">All known class+trainer+slot combinations ranked by performance. Auto-protected slots (🔒) are those above the studio average fill rate with sufficient history.</div>
+    </div>
+    <div id="hist-loc-tabs" class="hist-loc-tabs"></div>
+    <div class="hist-sort-row">
+      <span class="hist-sort-label">Sort by:</span>
+      <button class="hist-sort-btn active" id="hsort-score" onclick="histSetSort('score')">Score</button>
+      <button class="hist-sort-btn" id="hsort-fill" onclick="histSetSort('fill')">Fill Rate</button>
+      <button class="hist-sort-btn" id="hsort-sessions" onclick="histSetSort('sessions')">Sessions</button>
+      <button class="hist-sort-btn" id="hsort-day" onclick="histSetSort('day')">Day/Time</button>
+    </div>
+    <div id="hist-summary-row" class="hist-summary-row"></div>
+    <div id="hist-content"></div>`;
+  area.appendChild(wrap);
+  if(_histData){histRenderContent();}
+  else{
+    document.getElementById("hist-content").innerHTML=`<div class="hist-empty">Loading historical data…</div>`;
+    fetch("/api/historic-slots")
+      .then(r=>r.json())
+      .then(d=>{_histData=d;histRenderContent();})
+      .catch(()=>{document.getElementById("hist-content").innerHTML=`<div class="hist-empty">Could not load historical data. Run the pipeline first to generate scores.</div>`;});
+  }
+}
+
+function histSetSort(s){
+  _histSort=s;
+  document.querySelectorAll(".hist-sort-btn").forEach(b=>b.classList.remove("active"));
+  const el=document.getElementById("hsort-"+s);
+  if(el)el.classList.add("active");
+  histRenderContent();
+}
+
+function histRenderContent(){
+  if(!_histData)return;
+  const ranking=(_histData.class_slot_ranking||[]);
+  const locs=[...new Set(ranking.map(r=>r.location))].filter(Boolean).sort();
+  if(!_histLoc&&locs.length)_histLoc=locs[0];
+
+  // Build location tabs
+  const tabBar=document.getElementById("hist-loc-tabs");
+  if(tabBar){
+    tabBar.innerHTML=locs.map(l=>`<button class="hist-loc-tab${l===_histLoc?" active":""}" onclick="histSetLoc('${l.replace(/'/g,"\\'")}')"> ${l.length>28?l.slice(0,26)+"…":l}</button>`).join("");
+  }
+
+  const locSlots=ranking.filter(r=>r.location===_histLoc);
+  const sorted=[...locSlots].sort((a,b)=>{
+    if(_histSort==="score")return(b.score||0)-(a.score||0);
+    if(_histSort==="fill")return(b.blended_fill||0)-(a.blended_fill||0);
+    if(_histSort==="sessions")return(b.session_count||0)-(a.session_count||0);
+    if(_histSort==="day"){
+      const dayOrd={Monday:0,Tuesday:1,Wednesday:2,Thursday:3,Friday:4,Saturday:5,Sunday:6};
+      const dc=(dayOrd[a.day_name]||0)-(dayOrd[b.day_name]||0);
+      return dc!==0?dc:(a.time||"").localeCompare(b.time||"");
+    }
+    return 0;
+  });
+
+  // Summary
+  const sumEl=document.getElementById("hist-summary-row");
+  if(sumEl){
+    const protect=locSlots.filter(r=>r.recommendation==="PROTECT").length;
+    const autoP=locSlots.filter(r=>r.above_studio_avg).length;
+    const avgFill=locSlots.length?locSlots.reduce((a,r)=>a+(r.blended_fill||0),0)/locSlots.length:0;
+    const studioAvg=locSlots.length?locSlots[0].studio_avg_fill:null;
+    sumEl.innerHTML=`
+      <span class="hist-sum-chip"><span>${locSlots.length}</span> combos tracked</span>
+      <span class="hist-sum-chip">Avg fill <span>${pct(avgFill)}</span></span>
+      ${studioAvg!=null?`<span class="hist-sum-chip">Studio avg <span>${pct(studioAvg)}</span></span>`:""}
+      <span class="hist-sum-chip">🛡 Protect <span>${protect}</span></span>
+      <span class="hist-sum-chip">🔒 Auto-protected <span>${autoP}</span></span>`;
+  }
+
+  const content=document.getElementById("hist-content");
+  if(!content)return;
+  if(!sorted.length){content.innerHTML=`<div class="hist-empty">No historical data for this location. Run the pipeline to generate scores.</div>`;return;}
+
+  // Group by recommendation
+  const groups=[
+    {label:"🔒 Auto-Protected — Above Studio Average",filter:r=>r.above_studio_avg,cls:"prot"},
+    {label:"🛡 Protect — High Performers",filter:r=>!r.above_studio_avg&&r.recommendation==="PROTECT",cls:"prot"},
+    {label:"✓ Include — Strong Regulars",filter:r=>r.recommendation==="INCLUDE",cls:"inc"},
+    {label:"◎ Consider — Moderate History",filter:r=>r.recommendation==="CONSIDER",cls:"con"},
+    {label:"✗ Drop — Weak Performance",filter:r=>r.recommendation==="DROP",cls:"drop"},
+  ];
+
+  content.innerHTML="";
+  groups.forEach(g=>{
+    const slots=sorted.filter(g.filter);
+    if(!slots.length)return;
+    const sec=document.createElement("div");
+    sec.className="hist-section";
+    sec.innerHTML=`<div class="hist-section-title">${g.label} <span style="opacity:0.6">(${slots.length})</span></div>`;
+    const grid=document.createElement("div");
+    grid.className="hist-cards-grid";
+    slots.forEach(r=>{
+      const fc=fillColor(r.blended_fill||0);
+      const isProtected=r.above_studio_avg;
+      const card=document.createElement("div");
+      card.className="hist-card"+(isProtected?" prot":"");
+      const trustPct=Math.round((r.slot_trust||0)*100);
+      const recTag={PROTECT:"prot",INCLUDE:"inc",CONSIDER:"con",DROP:"drop"}[r.recommendation]||"con";
+      card.innerHTML=`
+        <div class="hist-card-top">
+          <div class="hist-card-fill" style="color:${fc}">${pct(r.blended_fill)}</div>
+          ${isProtected?`<span class="hist-card-lock" title="Auto-protected — above studio avg">🔒</span>`:""}
+        </div>
+        <div class="hist-card-class">${displayClass(r.class)}</div>
+        <div class="hist-card-trainer">${r.trainer}</div>
+        <div class="hist-card-meta">
+          <span class="hist-card-tag ${recTag}">${r.recommendation}</span>
+          <span class="hist-card-tag">${r.day_name?.slice(0,3)} ${r.time}</span>
+          <span class="hist-card-tag">${r.session_count} sess</span>
+          ${trustPct>=50?`<span class="hist-card-tag" style="background:var(--primary-mid);color:var(--primary)">${trustPct}% conf</span>`:""}
+          <span class="hist-card-tag" style="background:#F5F3FF;color:#7C3AED">${Math.round(r.score||0)} pts</span>
+        </div>`;
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    content.appendChild(sec);
+  });
+}
+
+function histSetLoc(loc){
+  _histLoc=loc;
+  histRenderContent();
+}
+
+// ============================================================
+// SETTINGS VIEW — Trainer qualifications, availability, targets
+// ============================================================
+let _settTrainerProfiles=null;
+let _settSchedConfig=null;
+let _settSection="qualifications";
+
+const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery"];
+const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery"};
+const DAYS_ALL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const LOCS_ALL=["Kwality House, Kemps Corner","Supreme HQ, Bandra","Kenkere House"];
+
+function renderSettingsView(area){
+  const wrap=document.createElement("div");
+  wrap.className="sett-view";
+  wrap.innerHTML=`
+    <div class="sett-view-header">
+      <div class="sett-view-title">⚙ Settings</div>
+      <div class="sett-view-sub">Configure trainer qualifications, availability, and scheduling targets. Changes take effect on the next pipeline run.</div>
+    </div>
+    <div class="sett-tabs">
+      <button class="sett-tab active" id="stab-qualifications" onclick="settSetTab('qualifications')">Trainer Qualifications</button>
+      <button class="sett-tab" id="stab-availability" onclick="settSetTab('availability')">Trainer Availability</button>
+      <button class="sett-tab" id="stab-targets" onclick="settSetTab('targets')">Schedule Targets</button>
+    </div>
+    <div class="sett-section active" id="ssec-qualifications">
+      <div class="sett-section-label">Trainer Qualifications</div>
+      <div class="sett-section-desc">Check the formats each trainer is certified to teach. These determine which class types the AI planner can assign to each trainer.</div>
+      <div id="qual-table-wrap"><div style="color:var(--text-muted);font-size:13px">Loading trainer profiles…</div></div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveQualifications()">Save Qualifications</button>
+        <span class="sett-save-status" id="qual-save-status"></span>
+      </div>
+    </div>
+    <div class="sett-section" id="ssec-availability">
+      <div class="sett-section-label">Trainer Availability</div>
+      <div class="sett-section-desc">Set which days each trainer is available at each location, and their preferred time window. Changes affect which slots they can be assigned to.</div>
+      <div id="avail-grid-wrap" class="avail-grid"></div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button>
+        <span class="sett-save-status" id="avail-save-status"></span>
+      </div>
+    </div>
+    <div class="sett-section" id="ssec-targets">
+      <div class="sett-section-label">Schedule Targets</div>
+      <div class="sett-section-desc">Set target and maximum classes per day per location. The AI planner uses these as soft constraints when building the schedule.</div>
+      <div id="targets-wrap"></div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveTargets()">Save Targets</button>
+        <span class="sett-save-status" id="targets-save-status"></span>
+      </div>
+    </div>`;
+  area.appendChild(wrap);
+  settLoadData();
+}
+
+function settSetTab(tab){
+  _settSection=tab;
+  document.querySelectorAll(".sett-tab").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".sett-section").forEach(s=>s.classList.remove("active"));
+  const btn=document.getElementById("stab-"+tab);
+  if(btn)btn.classList.add("active");
+  const sec=document.getElementById("ssec-"+tab);
+  if(sec)sec.classList.add("active");
+}
+
+function settLoadData(){
+  const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{_settTrainerProfiles=d;return d;});
+  const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):fetch("/api/schedule-config").then(r=>r.json()).then(d=>{_settSchedConfig=d;return d;});
+  Promise.all([p1,p2]).then(()=>{settRenderQualifications();settRenderAvailability();settRenderTargets();}).catch(e=>console.error("Settings load error",e));
+}
+
+function settRenderQualifications(){
+  const wrap=document.getElementById("qual-table-wrap");
+  if(!wrap||!_settTrainerProfiles)return;
+  const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
+  const sorted=[...trainers].sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  wrap.innerHTML=`<div class="qual-wrap"><table class="qual-table" id="qual-table">
+    <thead><tr>
+      <th>Trainer</th>
+      ${QUAL_KEYS.map(k=>`<th>${QUAL_LABELS[k]||k}</th>`).join("")}
+    </tr></thead>
+    <tbody>
+      ${sorted.map(t=>`<tr>
+        <td>${t.name||""}${t.tier?`<span class="qual-tier">${t.tier}</span>`:""}</td>
+        ${QUAL_KEYS.map(k=>`<td><input type="checkbox" class="qual-cb" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" data-key="${k}" ${(t.qualifications||{})[k]?"checked":""}></td>`).join("")}
+      </tr>`).join("")}
+    </tbody>
+  </table></div>`;
+}
+
+function settSaveQualifications(){
+  if(!_settTrainerProfiles)return;
+  const table=document.getElementById("qual-table");
+  if(!table)return;
+  const cbs=table.querySelectorAll(".qual-cb");
+  const updates={};
+  cbs.forEach(cb=>{
+    const name=cb.dataset.trainer;
+    const key=cb.dataset.key;
+    if(!updates[name])updates[name]={};
+    updates[name][key]=cb.checked;
+  });
+  const updated=(_settTrainerProfiles||[]).map(t=>{
+    if(updates[t.name]){
+      return{...t,qualifications:{...t.qualifications,...updates[t.name]}};
+    }
+    return t;
+  });
+  _settTrainerProfiles=updated;
+  fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
+    .then(r=>r.json())
+    .then(res=>{
+      const s=document.getElementById("qual-save-status");
+      if(s)s.textContent=res.ok?"Saved successfully!":"Error saving";
+      showToast(res.ok?"Trainer qualifications saved":"Save failed",res.ok?"":"error");
+      setTimeout(()=>{if(s)s.textContent="";},3000);
+    }).catch(()=>{showToast("Server error","error");});
+}
+
+function settRenderAvailability(){
+  const wrap=document.getElementById("avail-grid-wrap");
+  if(!wrap||!_settTrainerProfiles)return;
+  const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
+  wrap.innerHTML="";
+  trainers.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(t=>{
+    const locs=t.locations||{};
+    Object.entries(locs).forEach(([loc,ld])=>{
+      const card=document.createElement("div");
+      card.className="avail-card";
+      const activeDays=new Set(ld.available_days||[]);
+      const tw=ld.time_window||{};
+      card.innerHTML=`
+        <div class="avail-name">${t.name||""}</div>
+        <div class="avail-loc-lbl">${loc.length>30?loc.slice(0,28)+"…":loc}</div>
+        <div class="avail-days" id="avail-days-${CSS.escape(t.name+":"+loc)}">
+          ${DAYS_ALL.map(d=>`<span class="avail-day-chip${activeDays.has(d)?" on":""}" data-trainer="${t.name}" data-loc="${loc}" data-day="${d}" onclick="settToggleDay(this)">${d.slice(0,3)}</span>`).join("")}
+        </div>
+        <div class="avail-time-row">
+          <label>From</label>
+          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="start" value="${tw.start||"06:00"}">
+          <label>To</label>
+          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="end" value="${tw.end||"22:00"}">
+        </div>`;
+      wrap.appendChild(card);
+    });
+  });
+  if(!wrap.children.length){
+    wrap.innerHTML=`<div style="color:var(--text-muted);font-size:13px">No trainer location data found. Check trainer_profiles.json.</div>`;
+  }
+}
+
+function settToggleDay(el){
+  el.classList.toggle("on");
+}
+
+function settSaveAvailability(){
+  if(!_settTrainerProfiles)return;
+  const updatedMap={};
+  document.querySelectorAll(".avail-day-chip").forEach(chip=>{
+    const k=chip.dataset.trainer+":"+chip.dataset.loc;
+    if(!updatedMap[k])updatedMap[k]={trainer:chip.dataset.trainer,loc:chip.dataset.loc,days:[]};
+    if(chip.classList.contains("on"))updatedMap[k].days.push(chip.dataset.day);
+  });
+  const timeInputs={};
+  document.querySelectorAll(".avail-time-row input").forEach(inp=>{
+    const k=inp.dataset.trainer+":"+inp.dataset.loc;
+    if(!timeInputs[k])timeInputs[k]={};
+    timeInputs[k][inp.dataset.field]=inp.value;
+  });
+  const updated=(_settTrainerProfiles||[]).map(t=>{
+    const locs={...t.locations};
+    Object.keys(locs).forEach(loc=>{
+      const k=t.name+":"+loc;
+      if(updatedMap[k]){
+        locs[loc]={...locs[loc],available_days:updatedMap[k].days};
+      }
+      if(timeInputs[k]){
+        locs[loc]={...locs[loc],time_window:{...(locs[loc].time_window||{}),...timeInputs[k]}};
+      }
+    });
+    return{...t,locations:locs};
+  });
+  _settTrainerProfiles=updated;
+  fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
+    .then(r=>r.json())
+    .then(res=>{
+      const s=document.getElementById("avail-save-status");
+      if(s)s.textContent=res.ok?"Saved!":"Error";
+      showToast(res.ok?"Availability saved":"Save failed",res.ok?"":"error");
+      setTimeout(()=>{if(s)s.textContent="";},3000);
+    }).catch(()=>showToast("Server error","error"));
+}
+
+function settRenderTargets(){
+  const wrap=document.getElementById("targets-wrap");
+  if(!wrap||!_settSchedConfig)return;
+  const targets=(_settSchedConfig.targets||{});
+  wrap.innerHTML=LOCS_ALL.map(loc=>{
+    const locT=targets[loc]||{};
+    return`<div class="target-loc-hdr">${loc}</div>
+    <div class="target-day-grid">
+      ${DAYS_ALL.map(day=>{
+        const dt=locT[day]||{};
+        return`<div class="target-day-card">
+          <div class="target-day-lbl">${day}</div>
+          <div class="target-input-row">
+            <label>Target</label>
+            <input type="number" min="0" max="20" data-loc="${loc}" data-day="${day}" data-field="target" value="${dt.target||8}" class="target-inp">
+          </div>
+          <div class="target-input-row" style="margin-top:5px">
+            <label>Maximum</label>
+            <input type="number" min="0" max="25" data-loc="${loc}" data-day="${day}" data-field="max" value="${dt.max||12}" class="target-inp">
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+
+function settSaveTargets(){
+  const targets={};
+  document.querySelectorAll(".target-inp").forEach(inp=>{
+    const{loc,day,field}=inp.dataset;
+    if(!targets[loc])targets[loc]={};
+    if(!targets[loc][day])targets[loc][day]={};
+    targets[loc][day][field]=parseInt(inp.value)||0;
+  });
+  const config={...(_settSchedConfig||{}),targets};
+  _settSchedConfig=config;
+  fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(config)})
+    .then(r=>r.json())
+    .then(res=>{
+      const s=document.getElementById("targets-save-status");
+      if(s)s.textContent=res.ok?"Saved!":"Error";
+      showToast(res.ok?"Schedule targets saved":"Save failed",res.ok?"":"error");
+      setTimeout(()=>{if(s)s.textContent="";},3000);
+    }).catch(()=>showToast("Server error","error"));
 }
 
 function rvPostUpdate(payload,successMsg,rerender){
@@ -6157,5 +6768,6 @@ function rvResetText(id){
   el.value=el.dataset.default||"";
 }
 </script>
+
 </body>
 </html>
