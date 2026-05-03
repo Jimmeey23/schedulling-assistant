@@ -11,6 +11,7 @@ import subprocess
 import sys
 import threading
 import time as _time
+import uuid
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -46,6 +47,7 @@ PIPELINE_WEEK = os.environ.get("PIPELINE_WEEK") or _next_monday()
 
 # In-memory pipeline state (per worker process)
 _pipeline_state = {"running": False, "pid": None, "started": None, "message": "Idle"}
+_run_counter = 0
 
 # ── Flask app ─────────────────────────────────────────────────
 
@@ -148,6 +150,7 @@ def save_rules():
 
 @app.route("/api/run-pipeline", methods=["POST"])
 def run_pipeline():
+    global _run_counter
     if _pipeline_state["running"]:
         return _json({
             "ok": True,
@@ -155,12 +158,18 @@ def run_pipeline():
             "message": "Pipeline is already running. Please wait.",
         })
 
+    _run_counter += 1
+    variation_seed = int(_time.time()) % 100000 + _run_counter
+    output_suffix = f"run{_run_counter}_{uuid.uuid4().hex[:6]}"
     csv_path = PIPELINE_CSV
     week = PIPELINE_WEEK
     cmd = [
         sys.executable, str(PROJECT_ROOT / "orchestrator.py"),
         "--csv", csv_path,
         "--week", week,
+        "--debug",
+        "--variation-seed", str(variation_seed),
+        "--output-suffix", output_suffix,
     ]
     print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
     try:

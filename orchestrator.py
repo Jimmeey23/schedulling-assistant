@@ -78,8 +78,21 @@ def state_exists(filename: str) -> bool:
     default=None,
     help="Path to trainer_overrides.json (defaults to config/trainer_overrides.json)",
 )
+@click.option(
+    "--variation-seed",
+    "variation_seed",
+    type=int,
+    default=0,
+    help="Optional seed to vary schedule generation",
+)
+@click.option(
+    "--output-suffix",
+    "output_suffix",
+    default="",
+    help="Optional suffix for output artifacts",
+)
 def run_pipeline(
-    csv_path, template_path, target_week, location, resume, debug, scoring_weights, overrides_path, perf_csv_path
+    csv_path, template_path, target_week, location, resume, debug, scoring_weights, overrides_path, perf_csv_path, variation_seed, output_suffix
 ):
     """Run the full 6-agent studio schedule optimisation pipeline."""
     STATE_DIR.mkdir(exist_ok=True)
@@ -179,6 +192,8 @@ def run_pipeline(
                 target_week_start=target_week,
                 locations=locations,
                 overrides_path=overrides_path,
+                variation_seed=variation_seed,
+                output_suffix=output_suffix,
             )
             planner.run()
         except Exception as e:
@@ -193,7 +208,10 @@ def run_pipeline(
     try:
         from agents.reporter import OutputReporter
 
-        if not (STATE_DIR / "05_draft_schedule.json").exists():
+        primary_draft = STATE_DIR / f"05_draft_schedule{('_' + output_suffix) if output_suffix else ''}.json"
+        if not primary_draft.exists():
+            primary_draft = STATE_DIR / "05_draft_schedule.json"
+        if not primary_draft.exists():
             console.print("[red][Agent 6] No schedule found — Agent 5 must have failed[/red]")
             sys.exit(1)
 

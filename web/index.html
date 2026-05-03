@@ -7766,6 +7766,13 @@ function pollPipelineStatus(){
           if(bar)bar.className="visible";
           if(msg)msg.textContent=d.message||"Schedule ready — reload to see new results";
           if(btn){btn.disabled=false;btn.classList.remove("loading");}
+          fetch(`/schedule_data.json?ts=${Date.now()}`)
+            .then(r=>r.json())
+            .then(data=>{
+              window.SCHEDULE_DATA=data;
+              location.reload();
+            })
+            .catch(()=>location.reload());
           showToast("Schedule updated — reload to see results","");
         } else if(status==="failed"){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
