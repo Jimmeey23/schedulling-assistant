@@ -568,7 +568,7 @@ class AISchedulePlanner:
             "Kenkere House",
         ]
         self.overrides_path = overrides_path
-        # variation_seed and output_suffix kept for compatibility but not used
+        self.variation_seed = variation_seed
         self.output_suffix = output_suffix
 
     def run(self) -> dict:
@@ -664,10 +664,12 @@ class AISchedulePlanner:
             "schedule": [asdict(s) for s in all_slots],
             "ai_planned": True,
             "parse_errors": all_errors,
+            "variation_seed": self.variation_seed,
+            "output_suffix": self.output_suffix,
         }
 
         STATE_DIR.mkdir(exist_ok=True)
-        out_path = STATE_DIR / "05_draft_schedule.json"
+        out_path = STATE_DIR / f"05_draft_schedule{('_' + self.output_suffix) if self.output_suffix else ''}.json"
         with open(out_path, "w") as f:
             json.dump(output, f, indent=2)
 
@@ -701,8 +703,8 @@ class AISchedulePlanner:
             target_week_start=self.target_week_start,
             locations=self.locations,
             overrides_path=self.overrides_path,
-            variation_seed=0,
-            output_suffix="",
+            variation_seed=self.variation_seed,
+            output_suffix=self.output_suffix,
         )
         return opt.run()
 
@@ -714,8 +716,8 @@ class AISchedulePlanner:
                 target_week_start=self.target_week_start,
                 locations=[location],
                 overrides_path=self.overrides_path,
-                variation_seed=0,
-                output_suffix="_fallback",
+                variation_seed=self.variation_seed,
+                output_suffix=f"{self.output_suffix}_fallback" if self.output_suffix else "fallback",
             )
             result = opt.run()
             slots = []

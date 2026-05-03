@@ -1816,7 +1816,9 @@ function pollPipelineStatus(){
           if(bar)bar.className="visible";
           if(msg)msg.textContent=d.message||"Schedule ready — reload to see new results";
           if(btn){btn.disabled=false;btn.classList.remove("loading");}
-          fetch(`/schedule_data.json?ts=${Date.now()}`)
+          fetch(`/api/latest-schedule-file`)
+            .then(r=>r.json())
+            .then(meta=>fetch(`/${meta.file}?ts=${Date.now()}`))
             .then(r=>r.json())
             .then(data=>{
               window.SCHEDULE_DATA=data;

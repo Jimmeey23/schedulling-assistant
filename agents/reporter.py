@@ -1,5 +1,6 @@
 import json
 import csv
+import glob
 from pathlib import Path
 from typing import Dict, List
 from collections import defaultdict
@@ -594,6 +595,9 @@ class OutputReporter:
                     ]
 
         with open(WEB_DIR / "schedule_data.json", "w") as f:
+            json.dump(web_data, f, indent=2)
+        versioned = WEB_DIR / f"schedule_data_{week_start}.json"
+        with open(versioned, "w") as f:
             json.dump(web_data, f, indent=2)
 
     # ------------------------------------------------------------------ #

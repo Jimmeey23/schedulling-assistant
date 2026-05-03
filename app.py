@@ -48,6 +48,7 @@ PIPELINE_WEEK = os.environ.get("PIPELINE_WEEK") or _next_monday()
 # In-memory pipeline state (per worker process)
 _pipeline_state = {"running": False, "pid": None, "started": None, "message": "Idle"}
 _run_counter = 0
+_latest_schedule_file = "schedule_data.json"
 
 # ── Flask app ─────────────────────────────────────────────────
 
@@ -127,6 +128,11 @@ def output_file(fname=""):
     return _file(OUTPUTS_DIR / name)
 
 
+@app.route("/api/latest-schedule-file")
+def latest_schedule_file():
+    return _json({"file": _latest_schedule_file})
+
+
 @app.route("/<path:name>")
 def static_file(name):
     candidate = WEB_DIR / name
@@ -173,6 +179,8 @@ def run_pipeline():
     ]
     print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
     try:
+        global _latest_schedule_file
+        _latest_schedule_file = f"schedule_data_run{_run_counter}_{uuid.uuid4().hex[:6]}.json"
         proc = subprocess.Popen(
             cmd,
             cwd=str(PROJECT_ROOT),
