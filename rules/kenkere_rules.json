@@ -12,12 +12,12 @@
     {"id": "KE-009", "type": "class_location", "description": "Foundations certified trainers only at Kenkere", "check_fn_name": "check_ke_foundations_certified"}
   ],
   "target_classes_per_day": {
-    "Monday": 7,
-    "Tuesday": 7,
-    "Wednesday": 7,
-    "Thursday": 7,
-    "Friday": 6,
-    "Saturday": 8,
+    "Monday": 8,
+    "Tuesday": 8,
+    "Wednesday": 6,
+    "Thursday": 8,
+    "Friday": 8,
+    "Saturday": 7,
     "Sunday": 5
   }
 }

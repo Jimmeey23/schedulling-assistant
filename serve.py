@@ -115,12 +115,7 @@ def build_pipeline_command(csv_path: str, week: str, variation_seed: int, output
 
 def supabase_settings() -> tuple[str, str]:
     url = os.environ.get("SUPABASE_URL", "").rstrip("/")
-    key = (
-        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-        or os.environ.get("SUPABASE_ANON_KEY")
-        or os.environ.get("SUPABASE_KEY")
-        or ""
-    )
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""
     return url, key
 
 
@@ -132,7 +127,7 @@ def supabase_configured() -> bool:
 def supabase_request(method: str, path: str, body=None, prefer: str | None = None):
     url, key = supabase_settings()
     if not url or not key:
-        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY")
+        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY")
     payload = json.dumps(body).encode() if body is not None else None
     headers = {
         "apikey": key,
@@ -170,7 +165,10 @@ def load_json_file(path: Path, fallback):
 
 
 def push_supabase_config():
-    schedule_config = load_json_file(SCHEDULE_CONFIG_PATH, {"targets": {}, "manual_protected": [], "manual_excluded": []})
+    schedule_config = load_json_file(
+        SCHEDULE_CONFIG_PATH,
+        {"targets": {}, "manual_protected": [], "manual_excluded": [], "custom_rules": []},
+    )
     trainer_profiles = load_json_file(TRAINER_PROFILES_PATH, [])
     rules_catalog = build_rules_catalog(load_rules_config())
     supabase_upsert("schedule_config", schedule_config)
@@ -293,7 +291,7 @@ class RulesHandler(BaseHTTPRequestHandler):
             if cfg_path.exists():
                 self._send(200, "application/json", cfg_path.read_bytes())
             else:
-                default = {"targets": {}, "manual_protected": [], "manual_excluded": []}
+                default = {"targets": {}, "manual_protected": [], "manual_excluded": [], "custom_rules": []}
                 self._send_json(200, default)
             return
 
@@ -395,7 +393,6 @@ class RulesHandler(BaseHTTPRequestHandler):
                         ("Agent 2", "Running — Agent 2: Analysing history..."),
                         ("Agent 3", "Running — Agent 3: Scoring slots..."),
                         ("Agent 4", "Running — Agent 4: Applying rules..."),
-                        ("Agent 5", "Running — Agent 5: AI planning..."),
                         ("Agent 6", "Running — Agent 6: Building report..."),
                     ]
                     tail = []
@@ -406,6 +403,10 @@ class RulesHandler(BaseHTTPRequestHandler):
                         print(f"  [PIPELINE] {clean}")
                         tail.append(clean)
                         tail = tail[-20:]
+                        if "[Agent 5]" in clean:
+                            inner = clean.split("[Agent 5]", 1)[-1].strip()
+                            state["message"] = f"Optimising schedule — {inner}"
+                            continue
                         for marker, message in stage_markers:
                             if marker in clean:
                                 state["message"] = message

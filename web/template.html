@@ -797,7 +797,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 
 /* SETTINGS VIEW */
 .sett-view{padding-bottom:48px}
-.sett-view-header{padding:22px 24px 14px;border:1px solid #DCE3EB;background:linear-gradient(135deg,#F8FAFC,#EFF6FF);border-radius:16px;margin:0 0 14px;box-shadow:0 10px 28px rgba(15,23,42,.055)}
+.sett-view-header{padding:22px 24px 14px;border:1px solid #DCE3EB;background:#F8FAFC;border-radius:16px;margin:0 0 14px;box-shadow:0 10px 28px rgba(15,23,42,.055)}
 .sett-view-title{font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.3px}
 .sett-view-sub{font-size:12px;color:var(--text-muted);margin-top:3px;margin-bottom:12px}
 .sett-tabs{display:flex;gap:6px;padding:8px;border:1px solid #DCE3EB;background:#fff;position:sticky;top:96px;z-index:50;overflow-x:auto;border-radius:14px;margin-bottom:14px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
@@ -858,6 +858,77 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .target-input-row{display:flex;gap:8px;align-items:center}
 .target-input-row label{font-size:10px;color:var(--text-muted);min-width:54px}
 .target-input-row input{width:46px;border:1px solid var(--border);border-radius:var(--r4);padding:3px 6px;font-size:12px;font-weight:700;font-family:inherit;text-align:center;color:var(--text)}
+.sett-command{display:grid;grid-template-columns:228px minmax(0,1fr)292px;gap:14px;align-items:start}
+.sett-rail,.sett-inspector{position:sticky;top:108px;background:#fff;border:1px solid #DCE3EB;border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.045);padding:14px}
+.sett-source-card{border:1px solid #BBF7D0;background:#F0FDF4;border-radius:12px;padding:10px;margin-bottom:12px}
+.sett-source-card.warn{border-color:#FDE68A;background:#FFFBEB}.sett-source-card.error{border-color:#FECACA;background:#FEF2F2}
+.sett-source-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#166534;font-family:'Plus Jakarta Sans',sans-serif}
+.sett-source-card.warn .sett-source-title{color:#A16207}.sett-source-card.error .sett-source-title{color:#B91C1C}
+.sett-source-sub{font-size:11px;color:#475569;line-height:1.4;margin-top:4px}
+.sett-nav{display:flex;flex-direction:column;gap:5px}
+.sett-nav-group-label{padding:9px 4px 2px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.11em;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
+.sett-nav-btn{display:flex;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:transparent;color:#475569;font-size:12px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;cursor:pointer}
+.sett-nav-btn:hover{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.sett-nav-btn.active{background:#0F172A;color:#fff;border-color:#0F172A}
+.sett-nav-count{font-size:10px;font-weight:900;opacity:.75}
+.sett-main{min-width:0}
+.sett-main-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;padding:10px;border:1px solid #E2E8F0;background:#F8FAFC;border-radius:14px}
+.sett-action-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sett-ghost-btn{padding:8px 12px;border-radius:10px;border:1px solid #CBD5E1;background:#fff;color:#334155;font-size:12px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif}
+.sett-ghost-btn:hover{background:#F8FAFC;border-color:#94A3B8}
+.sett-ghost-btn.primary{background:#1E40AF;color:#fff;border-color:#1E40AF}.sett-ghost-btn.primary:hover{background:#2563EB}
+.sett-ghost-btn.danger{background:#FEF2F2;color:#B91C1C;border-color:#FECACA}
+.sett-overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.sett-kpi-card{border:1px solid #E2E8F0;border-radius:14px;background:#F8FAFC;padding:14px;min-height:98px}
+.sett-kpi-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#64748B;margin-bottom:8px}
+.sett-kpi-value{font-size:24px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+.sett-kpi-note{font-size:11px;color:#64748B;margin-top:8px;line-height:1.35}
+.sett-config-panel{border:1px solid #DCE3EB;border-radius:14px;background:#fff;padding:14px;margin-top:12px}
+.sett-section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+.sett-section-kicker{font-size:10px;font-weight:900;color:#1D4ED8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.sett-card-title{font-size:13px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.sett-card-copy{font-size:12px;color:#64748B;line-height:1.45;margin-top:4px}
+.sett-location-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sett-location-card{border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;padding:12px}
+.sett-location-card strong{display:block;font-size:12px;color:#0F172A;margin-bottom:6px}
+.sett-location-line{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#64748B;border-top:1px solid #E2E8F0;padding-top:6px;margin-top:6px}
+.sett-option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sett-option-card{border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;padding:12px;display:flex;flex-direction:column;gap:8px}
+.sett-option-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.sett-option-title{font-size:12px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.sett-option-desc{font-size:11px;color:#64748B;line-height:1.4}
+.sett-switch{position:relative;display:inline-flex;width:38px;height:22px;flex:0 0 auto}
+.sett-switch input{opacity:0;width:0;height:0}
+.sett-slider{position:absolute;cursor:pointer;inset:0;background:#CBD5E1;border-radius:999px;transition:.14s}
+.sett-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;top:3px;background:white;border-radius:50%;transition:.14s;box-shadow:0 1px 3px rgba(15,23,42,.24)}
+.sett-switch input:checked+.sett-slider{background:#1E40AF}
+.sett-switch input:checked+.sett-slider:before{transform:translateX(16px)}
+.sett-option-card input[type="number"],.sett-option-card select{height:34px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:800;padding:0 9px;font-family:inherit;width:100%}
+.sett-matrix-toolbar{display:flex;gap:8px;align-items:end;flex-wrap:wrap;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;padding:12px;margin-bottom:12px}
+.sett-bulk-field{display:flex;flex-direction:column;gap:4px}
+.sett-bulk-field label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#64748B}
+.sett-bulk-field select,.sett-bulk-field input{height:32px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:700;padding:0 8px;font-family:inherit}
+.sett-matrix-wrap{overflow:auto;border:1px solid #DCE3EB;border-radius:14px;background:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.sett-matrix{width:100%;border-collapse:separate;border-spacing:0;min-width:840px;font-size:12px}
+.sett-matrix th{position:sticky;top:0;z-index:2;background:#F8FAFC;border-bottom:1px solid #DCE3EB;color:#475569;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;padding:8px;text-align:center}
+.sett-matrix th:first-child,.sett-matrix td:first-child{position:sticky;left:0;z-index:3;background:#F8FAFC;text-align:left}
+.sett-matrix td{border-bottom:1px solid #EEF2F7;border-right:1px solid #EEF2F7;padding:7px;vertical-align:middle;text-align:center;background:#fff}
+.sett-matrix tr:hover td{background:#FAFCFF}.sett-matrix tr:hover td:first-child{background:#EFF6FF}
+.sett-matrix-rowhead{font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;min-width:140px}
+.sett-matrix-cell{border:1px solid #E2E8F0;border-radius:8px;background:#F8FAFC;padding:6px;cursor:pointer;transition:all .12s;min-width:96px}
+.sett-matrix-cell:hover{border-color:#93C5FD;background:#EFF6FF}.sett-matrix-cell.selected{border-color:#1E40AF;background:#DBEAFE;box-shadow:0 0 0 2px rgba(30,64,175,.12)}
+.sett-matrix-cell.invalid{border-color:#F87171;background:#FEF2F2}
+.sett-matrix-pair{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:center}
+.sett-matrix-mini{display:flex;flex-direction:column;gap:2px}.sett-matrix-mini span{font-size:9px;font-weight:900;color:#64748B;text-transform:uppercase}
+.sett-matrix-mini input{width:100%;height:28px;text-align:center;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-weight:900;color:#0F172A;background:#fff;font-family:inherit}
+.sett-conflict-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sett-conflict-item{border:1px solid #E2E8F0;border-radius:10px;padding:9px;background:#F8FAFC;font-size:11px;color:#475569;line-height:1.4}
+.sett-conflict-item.error{border-color:#FECACA;background:#FEF2F2;color:#991B1B}.sett-conflict-item.warn{border-color:#FDE68A;background:#FFFBEB;color:#92400E}
+.sett-inspector-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#334155;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:8px}
+.sett-inspector-box{border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;padding:10px;margin-bottom:10px;font-size:11px;color:#475569;line-height:1.5}
+@media(max-width:1280px){.sett-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sett-location-summary,.sett-option-grid{grid-template-columns:1fr}}
+@media(max-width:1160px){.sett-command{grid-template-columns:1fr}.sett-rail,.sett-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}}
+@media(max-width:720px){.sett-overview-grid{grid-template-columns:1fr}.sett-main-actions{align-items:stretch}.sett-action-group{width:100%}.sett-ghost-btn{flex:1}}
 </style>
 </head>
 <body>
@@ -1085,7 +1156,7 @@ const CLASS_COLOR = {
 function classColor(cn){return CLASS_COLOR[cn]||FAM_COLOR[getFamily(cn)]||FAM_COLOR.default;}
 const PRIME_TIMES = new Set(["08:00","08:30","09:00","09:30","10:00","10:15","11:00","11:30","17:30","17:45","18:00","18:15","19:00","19:15","19:30"]);
 const REC_LIST = ["PINNED","PROTECT","EXPERIMENTAL","VARIETY","MANUAL"];
-const REC_LABEL = {PINNED:"Pinned",PROTECT:"Protect",PROTECT_EXACT:"Protect",PROTECT_SLOT:"Protect",EXPERIMENTAL:"Experimental",INCLUDE:"Experimental",VARIETY:"Variety",CONSIDER:"Variety",MANUAL:"Manual",DROP:"Manual"};
+const REC_LABEL = {PINNED:"Pinned",PROTECT:"Protect",PROTECT_EXACT:"Protect",PROTECT_SLOT:"Protect",EXPERIMENTAL:"Experimental",INCLUDE:"Experimental",VARIETY:"Variety",CONSIDER:"Variety",MANUAL:"Manual",DROP:"Review"};
 
 // ============================================================
 // STATE
@@ -1130,6 +1201,20 @@ function round1(v){return v==null?"—":v.toFixed(1)}
 function fillColor(v){if(v==null)return"#9CA3AF";if(v>=0.6)return"#15803D";if(v>=0.4)return"#D97706";return"#DC2626"}
 function timeBand(t){const m=tmins(t);if(m>=7*60&&m<10*60)return"morning";if(m>=10*60&&m<13*60)return"midday";return"evening"}
 function displayClass(cn){return(cn||"").replace(/^Studio /,"")}
+function canonicalMixClass(cn){
+  const l=String(cn||"").toLowerCase();
+  if(l.includes("strength lab"))return"Studio Strength Lab";
+  if(l.includes("back body blaze"))return"Studio Back Body Blaze";
+  if(l.includes("powercycle")||l.includes("power cycle"))return"Studio PowerCycle";
+  if(l.includes("cardio barre"))return"Studio Cardio Barre";
+  if(l.includes("mat 57"))return"Studio Mat 57";
+  if(l.includes("barre 57"))return"Studio Barre 57";
+  if(l.includes("amped"))return"Studio Amped Up!";
+  if(l.includes("hiit"))return"Studio HIIT";
+  if(l.includes("recovery"))return"Studio Recovery";
+  if(l.includes("foundation"))return"Studio Foundations";
+  return cn||"Unknown";
+}
 const CLASS_SHORT={
   "Barre 57":"B57","Barre 57 Express":"B57E",
   "Cardio Barre":"CB","Cardio Barre Express":"CBE","Cardio Barre Plus":"CB+",
@@ -1157,15 +1242,15 @@ function recGroup(r){
   if(r==="PINNED")return"PINNED";
   if(r==="PROTECT_EXACT"||r==="PROTECT_SLOT"||r==="PROTECT")return"PROTECT";
   if(r==="INCLUDE"||r==="EXPERIMENTAL")return"EXPERIMENTAL";
-  if(r==="CONSIDER"||r==="VARIETY")return"VARIETY";
-  if(r==="DROP"||r==="MANUAL")return"MANUAL";
+  if(r==="CONSIDER"||r==="VARIETY"||r==="DROP")return"VARIETY";
+  if(r==="MANUAL")return"MANUAL";
   return"VARIETY";
 }
 function recBadgeCls(r){
   const g=recGroup(r);
   return{PINNED:"bp",PROTECT:"bpe",EXPERIMENTAL:"bps",VARIETY:"bi",MANUAL:"bd"}[g]||"bd";
 }
-function recLabel(r){return REC_LABEL[recGroup(r)]||r||"Include"}
+function recLabel(r){return REC_LABEL[r]||REC_LABEL[recGroup(r)]||r||"Include"}
 
 function scoreRing(score,size=22){
   const s=score||0;
@@ -2282,16 +2367,16 @@ function renderAnalytics(area,allLocSlots){
   locs.forEach(loc=>{
     const locSlots=filterSlots(getSlots(loc));
     const mixCounts={};
-    locSlots.forEach(s=>{const cn=s.class_name||"Unknown";mixCounts[cn]=(mixCounts[cn]||0)+1});
+    locSlots.forEach(s=>{const cn=canonicalMixClass(s.class_name||"Unknown");mixCounts[cn]=(mixCounts[cn]||0)+1});
     const total=locSlots.length;
-    const sorted=Object.entries(mixCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const sorted=Object.entries(mixCounts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
 
     const card=document.createElement("div");
     card.className="ac";
     card.innerHTML=`<div class="ac-title">📊 ${LOC_SHORT[loc]||loc} — Class Mix</div>
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">${total} classes · Week of ${WEEK_LABEL||""}</div>
       ${sorted.map(([cn,cnt])=>{
-        const pctV=(cnt/total);
+        const pctV=total?(cnt/total):0;
         const fam=getFamily(cn);
         const col=FAM_COLOR[fam]||FAM_COLOR.default;
         return`<div class="mix-row">
@@ -2412,6 +2497,8 @@ const TRAINER_IMAGE_MAP={
   "kajol":"/images/004-Kajol-Kanchan-1.jpg",
   "kanchan":"/images/004-Kajol-Kanchan-1.jpg",
   "karan bhatia":"/images/005-Karan-Bhatia-1-1.jpeg",
+  "karanvir":"/images/Karanvir.jpg",
+  "karanvir bhatia":"/images/Karanvir.jpg",
   "mrigakshi":"/images/007-Mrigakshi-Image-2.jpg",
   "pranjali":"/images/008-Pranjali-Image-1.jpg",
   "pushyank":"/images/009-Pushyank-Nahar-1.jpeg",
@@ -2423,7 +2510,6 @@ const TRAINER_IMAGE_MAP={
   "vivaran":"/images/015-Vivaran-Image-4.jpg",
   "anmol":"/images/Anmol.jpeg",
   "bret":"/images/Bret.jpeg",
-  "karanveer":"/images/Karanveer.jpg",
   "raunak":"/images/Raunak.jpeg",
   "simonelle":"/images/Simonelle.jpeg",
   "simran":"/images/Simran.jpeg",
@@ -3237,6 +3323,10 @@ function runPipelineFromHeader(){
     .then(r=>r.json())
     .then(res=>{
       if(res.ok){
+        const bar=document.getElementById("pipeline-bar");
+        const msg=document.getElementById("pb-msg");
+        if(bar)bar.className="visible";
+        if(msg)msg.textContent=res.message||"Pipeline started…";
         showToast("Pipeline started — results ready in ~2 min","");
         pollPipelineStatus();
       } else {
@@ -3254,7 +3344,7 @@ function pollPipelineStatus(){
   if(_pipelinePoller)clearInterval(_pipelinePoller);
   const TIMEOUT_MS=5*60*1000;
   const started=Date.now();
-  _pipelinePoller=setInterval(()=>{
+  const tick=()=>{
     if(Date.now()-started>TIMEOUT_MS){
       clearInterval(_pipelinePoller);_pipelinePoller=null;
       const btn=document.getElementById("gen-btn");
@@ -3300,7 +3390,9 @@ function pollPipelineStatus(){
         }
       })
       .catch(()=>{});
-  },4000);
+  };
+  tick();
+  _pipelinePoller=setInterval(tick,2000);
 }
 
 // ============================================================
@@ -3771,11 +3863,13 @@ function histModalTab(id){
 // ============================================================
 let _settTrainerProfiles=null;
 let _settSchedConfig=null;
-let _settSection="trainers";
+let _settSection="overview";
 let _qualSearch="";
 let _trainerMgmtSearch="";
 let _trainerMgmtStatusFilter="";
 let _trainerMgmtLocFilter="";
+let _settMatrixSelection=new Set();
+let _settLastValidation={errors:[],warnings:[],info:[]};
 
 const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery"];
 const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery"};
@@ -3800,24 +3894,266 @@ const CLASS_MIX_TARGETS={
   }
 };
 
+function settDefaultConfig(){
+  return {
+    targets:{},
+    manual_protected:[],
+    manual_excluded:[],
+    custom_rules:[],
+    leave_periods:[],
+    off_days:[],
+    inactive_trainers:[],
+    class_mix:{},
+    settings_options:{
+      enforce_exact_daily_targets:true,
+      auto_repair_underfilled_days:true,
+      allow_soft_mix_overrides:false,
+      block_hard_conflict_saves:true,
+      show_superseded_rules:true,
+      save_snapshot_on_publish:true,
+      pipeline_requires_validation:true,
+      default_bulk_scope:"selection",
+      target_cap_buffer:1,
+      target_selection_strategy:"seeded_range",
+      weekly_hours_cap:15,
+      max_classes_per_day_default:3,
+      conflict_policy:"settings_override_soft_rules",
+    },
+    source_of_truth:{
+      owner:"settings-command-center",
+      conflict_policy:"settings_override_soft_rules",
+      updated_at:new Date().toISOString(),
+    },
+  };
+}
+
+function settNormalizeConfig(config){
+  const base=settDefaultConfig();
+  const next={...base,...(config||{})};
+  next.targets=next.targets||{};
+  next.class_mix=next.class_mix||{};
+  next.settings_options={...base.settings_options,...(next.settings_options||{})};
+  const validBulkScopes=new Set(["selection","visible","weekdays","weekend"]);
+  if(!validBulkScopes.has(next.settings_options.default_bulk_scope))next.settings_options.default_bulk_scope=base.settings_options.default_bulk_scope;
+  const validPolicies=new Set(["settings_override_soft_rules","block_all_conflicts","manual_review_required"]);
+  if(!validPolicies.has(next.settings_options.conflict_policy))next.settings_options.conflict_policy=base.settings_options.conflict_policy;
+  const validTargetStrategies=new Set(["seeded_range","balanced_midpoint","lower_bias","upper_bias"]);
+  if(!validTargetStrategies.has(next.settings_options.target_selection_strategy))next.settings_options.target_selection_strategy=base.settings_options.target_selection_strategy;
+  next.settings_options.target_cap_buffer=Number(next.settings_options.target_cap_buffer??base.settings_options.target_cap_buffer);
+  next.settings_options.weekly_hours_cap=Number(next.settings_options.weekly_hours_cap??base.settings_options.weekly_hours_cap);
+  next.settings_options.max_classes_per_day_default=Number(next.settings_options.max_classes_per_day_default??base.settings_options.max_classes_per_day_default);
+  next.manual_protected=Array.isArray(next.manual_protected)?next.manual_protected:[];
+  next.manual_excluded=Array.isArray(next.manual_excluded)?next.manual_excluded:[];
+  next.custom_rules=Array.isArray(next.custom_rules)?next.custom_rules:[];
+  next.leave_periods=Array.isArray(next.leave_periods)?next.leave_periods:[];
+  next.off_days=Array.isArray(next.off_days)?next.off_days:[];
+  next.inactive_trainers=Array.isArray(next.inactive_trainers)?next.inactive_trainers:[];
+  next.source_of_truth={
+    ...base.source_of_truth,
+    ...(next.source_of_truth||{}),
+    owner:"settings-command-center",
+    conflict_policy:next.settings_options.conflict_policy||"settings_override_soft_rules",
+  };
+  LOCS_ALL.forEach(loc=>{
+    if(!next.targets[loc])next.targets[loc]={};
+    DAYS_ALL.forEach(day=>{
+      const cur=next.targets[loc][day]||{};
+      const fallback=loc==="Kwality House, Kemps Corner"?{target:10,max:12}:loc==="Supreme HQ, Bandra"?{target:9,max:10}:{target:7,max:9};
+      next.targets[loc][day]={
+        target:Number(cur.target??fallback.target),
+        max:Number(cur.max??Math.max(Number(cur.target??fallback.target),fallback.max)),
+        source:cur.source||"settings",
+      };
+    });
+    if(!next.class_mix[loc])next.class_mix[loc]={};
+    const defaults=CLASS_MIX_TARGETS[loc]||{};
+    Object.keys(defaults).forEach(cls=>{
+      const cur=next.class_mix[loc][cls]||defaults[cls]||{};
+      next.class_mix[loc][cls]={
+        min:Number(cur.min??0),
+        max:Number(cur.max??Math.max(Number(cur.min??0),defaults[cls]?.max??10)),
+        source:cur.source||"settings",
+      };
+    });
+  });
+  return next;
+}
+
+function settValidateConfig(config){
+  const cfg=settNormalizeConfig(config||_settSchedConfig||{});
+  const errors=[];
+  const warnings=[];
+  const info=[];
+  LOCS_ALL.forEach(loc=>{
+    let weeklyTarget=0;
+    let weeklyMax=0;
+    DAYS_ALL.forEach(day=>{
+      const row=cfg.targets?.[loc]?.[day]||{};
+      const target=Number(row.target||0);
+      const max=Number(row.max||0);
+      weeklyTarget+=target; weeklyMax+=max;
+      if(target<0||max<0)errors.push(`${loc} ${day}: min and max must be non-negative.`);
+      if(target>max)errors.push(`${loc} ${day}: min ${target} exceeds max ${max}.`);
+      if(max===target&&target>=12)warnings.push(`${loc} ${day}: max equals a high target; optimiser has no recovery room.`);
+      const buffer=Number(cfg.settings_options?.target_cap_buffer||0);
+      if(buffer>0&&max<target+buffer)warnings.push(`${loc} ${day}: max should be at least target + ${buffer} for repair room.`);
+    });
+    info.push(`${LOC_SHORT[loc]||loc}: weekly target ${weeklyTarget}, max ${weeklyMax}`);
+    Object.entries(cfg.class_mix?.[loc]||{}).forEach(([cls,limits])=>{
+      const min=Number(limits.min||0), max=Number(limits.max||0);
+      if(min<0||max<0)errors.push(`${loc} ${displayClass(cls)}: min and max must be non-negative.`);
+      if(min>max)errors.push(`${loc} ${displayClass(cls)}: min ${min} exceeds max ${max}.`);
+    });
+  });
+  const pinKeys=new Set();
+  (cfg.manual_protected||[]).forEach((pin,i)=>{
+    const key=[pin.location,pin.day||pin.day_of_week,pin.time,pin.class||pin.class_name].join("|");
+    if(pinKeys.has(key))errors.push(`Manual pin ${i+1}: duplicate pinned class/time.`);
+    pinKeys.add(key);
+  });
+  (cfg.custom_rules||[]).forEach(rule=>{
+    if(rule.enabled!==false&&rule.rule_type==="daily_target"&&rule.location&&rule.day){
+      const target=cfg.targets?.[rule.location]?.[rule.day]?.target;
+      if(target!=null&&Number(rule.value)!==Number(target)){
+        warnings.push(`${rule.location} ${rule.day}: custom daily rule ${rule.value} is superseded by Settings target ${target}.`);
+      }
+    }
+  });
+  if(Number(cfg.settings_options?.weekly_hours_cap||0)<=0)errors.push("Advanced: weekly trainer hours cap must be greater than zero.");
+  if(Number(cfg.settings_options?.max_classes_per_day_default||0)<=0)errors.push("Advanced: default classes per day cap must be greater than zero.");
+  if(cfg.settings_options?.block_hard_conflict_saves===false)warnings.push("Advanced: invalid saves are allowed; Settings will still be treated as canonical.");
+  if(!cfg.settings_options?.pipeline_requires_validation)warnings.push("Advanced: pipeline validation gate is disabled.");
+  return {errors,warnings,info};
+}
+
+function settUpdateCounts(){
+  const cfg=settNormalizeConfig(_settSchedConfig||{});
+  const profiles=_settTrainerProfiles||[];
+  const setText=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  setText("sett-count-trainers",profiles.length);
+  setText("sett-count-qualifications",profiles.length);
+  setText("sett-count-availability",profiles.reduce((n,t)=>n+Object.keys(t.locations||{}).length,0));
+  setText("sett-count-leave",(cfg.leave_periods||[]).length+(cfg.off_days||[]).length);
+  setText("sett-count-targets",LOCS_ALL.length*DAYS_ALL.length);
+  setText("sett-count-classmix",Object.values(cfg.class_mix||{}).reduce((n,m)=>n+Object.keys(m||{}).length,0));
+  setText("sett-count-customrules",(cfg.custom_rules||[]).length+(cfg.manual_protected||[]).length);
+  setText("sett-count-advanced",Object.keys(cfg.settings_options||{}).length);
+  setText("sett-count-overview",(_settLastValidation.errors.length+_settLastValidation.warnings.length)||"OK");
+}
+
+function settValidateAndRender(){
+  if(!_settSchedConfig)return true;
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+  _settLastValidation=settValidateConfig(_settSchedConfig);
+  settUpdateCounts();
+  const card=document.getElementById("sett-source-card");
+  const sub=document.getElementById("sett-source-sub");
+  if(card){
+    card.classList.toggle("error",_settLastValidation.errors.length>0);
+    card.classList.toggle("warn",!_settLastValidation.errors.length&&_settLastValidation.warnings.length>0);
+  }
+  if(sub){
+    sub.textContent=_settLastValidation.errors.length
+      ? `${_settLastValidation.errors.length} blocking conflict${_settLastValidation.errors.length===1?"":"s"}`
+      : `${_settLastValidation.warnings.length} warning${_settLastValidation.warnings.length===1?"":"s"} · Settings is canonical`;
+  }
+  const list=document.getElementById("sett-conflict-list");
+  if(list){
+    const items=[
+      ..._settLastValidation.errors.map(x=>({type:"error",text:x})),
+      ..._settLastValidation.warnings.map(x=>({type:"warn",text:x})),
+      ...(!_settLastValidation.errors.length&&!_settLastValidation.warnings.length?_settLastValidation.info.slice(0,4).map(x=>({type:"",text:x})):[]),
+    ];
+    list.innerHTML=items.map(i=>`<div class="sett-conflict-item ${i.type}">${rvEscapeHtml(i.text)}</div>`).join("")||`<div class="sett-conflict-item">No conflicts found.</div>`;
+  }
+  settRenderOverview();
+  return _settLastValidation.errors.length===0;
+}
+
+function settSaveCanonicalConfig(statusId="settings",successMsg="Canonical settings saved"){
+  if(!_settSchedConfig)_settSchedConfig=settDefaultConfig();
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+  _settSchedConfig.source_of_truth.updated_at=new Date().toISOString();
+  const valid=settValidateAndRender();
+  if(!valid&&_settSchedConfig.settings_options?.block_hard_conflict_saves!==false){
+    showToast("Fix blocking settings conflicts before saving","error");
+    return Promise.resolve({ok:false});
+  }
+  return fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig)})
+    .then(r=>r.json())
+    .then(res=>{
+      const s=document.getElementById(`${statusId}-save-status`);
+      if(s)s.textContent=res.ok?"Saved!":"Error";
+      showToast(res.ok?successMsg:"Save failed",res.ok?"":"error");
+      setTimeout(()=>{if(s)s.textContent="";},3000);
+      return res;
+    }).catch(()=>{
+      showToast("Server error","error");
+      return {ok:false};
+    });
+}
+
+function settExportConfig(){
+  const text=JSON.stringify(settNormalizeConfig(_settSchedConfig||{}),null,2);
+  navigator.clipboard?.writeText(text).then(()=>showToast("Settings JSON copied","")).catch(()=>showToast("Could not copy JSON","error"));
+}
+
 function renderSettingsView(area){
   const wrap=document.createElement("div");
   wrap.className="sett-view";
   wrap.innerHTML=`
     <div class="sett-view-header">
-      <div class="sett-view-title">Settings</div>
-      <div class="sett-view-sub">Configure trainer profiles, qualifications, availability, leave, class mix rules, and schedule targets. Changes take effect on the next pipeline run.</div>
-    </div>
-    <div class="sett-tabs" style="flex-wrap:wrap">
-      <button class="sett-tab active" id="stab-trainers" onclick="settSetTab('trainers')">Trainers</button>
-      <button class="sett-tab" id="stab-qualifications" onclick="settSetTab('qualifications')">Qualifications</button>
-      <button class="sett-tab" id="stab-availability" onclick="settSetTab('availability')">Availability</button>
-      <button class="sett-tab" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days</button>
-      <button class="sett-tab" id="stab-classmix" onclick="settSetTab('classmix')">Class Mix Rules</button>
-      <button class="sett-tab" id="stab-targets" onclick="settSetTab('targets')">Schedule Targets</button>
+      <div class="sett-view-title">Settings Command Center</div>
+      <div class="sett-view-sub">The canonical source of truth for schedule targets, class mix, trainer eligibility, availability, manual pins, and conflict resolution. Settings overrides planner defaults and soft rules; hard-invalid configurations are blocked before save.</div>
     </div>
 
-    <div class="sett-section active" id="ssec-trainers">
+    <div class="sett-command">
+      <aside class="sett-rail">
+        <div class="sett-source-card" id="sett-source-card">
+          <div class="sett-source-title">Settings Source Active</div>
+          <div class="sett-source-sub" id="sett-source-sub">Loading canonical configuration…</div>
+        </div>
+        <div class="sett-nav">
+          <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">Overview <span class="sett-nav-count" id="sett-count-overview">—</span></button>
+          <div class="sett-nav-group-label">People</div>
+          <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">Trainers <span class="sett-nav-count" id="sett-count-trainers">—</span></button>
+          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')">Qualifications <span class="sett-nav-count" id="sett-count-qualifications">—</span></button>
+          <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">Availability <span class="sett-nav-count" id="sett-count-availability">—</span></button>
+          <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days <span class="sett-nav-count" id="sett-count-leave">0</span></button>
+          <div class="sett-nav-group-label">Schedule Rules</div>
+          <button class="sett-nav-btn" id="stab-targets" onclick="settSetTab('targets')">Daily Targets <span class="sett-nav-count" id="sett-count-targets">21</span></button>
+          <button class="sett-nav-btn" id="stab-classmix" onclick="settSetTab('classmix')">Class Mix <span class="sett-nav-count" id="sett-count-classmix">—</span></button>
+          <button class="sett-nav-btn" id="stab-customrules" onclick="settSetTab('customrules')">Rules & Pins <span class="sett-nav-count" id="sett-count-customrules">0</span></button>
+          <div class="sett-nav-group-label">System</div>
+          <button class="sett-nav-btn" id="stab-advanced" onclick="settSetTab('advanced')">Advanced <span class="sett-nav-count" id="sett-count-advanced">—</span></button>
+        </div>
+      </aside>
+
+      <main class="sett-main">
+        <div class="sett-main-actions">
+          <div class="sett-action-group">
+            <button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Config</button>
+            <button class="sett-ghost-btn" onclick="settExportConfig()">Export JSON</button>
+            <button class="sett-ghost-btn" onclick="settResetMatrixSelection()">Clear Selection</button>
+          </div>
+          <div class="sett-action-group">
+            <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save Canonical Settings</button>
+          </div>
+        </div>
+
+    <div class="sett-section active" id="ssec-overview">
+      <div class="sett-section-head">
+        <div>
+          <div class="sett-section-kicker">Command Center</div>
+          <div class="sett-section-label">Settings Overview</div>
+          <div class="sett-section-desc">A cleaner landing view for configuration health, weekly target load, active guardrails, and quick routing into the detailed editors.</div>
+        </div>
+        <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig('overview','Settings snapshot saved')">Save Snapshot</button>
+      </div>
+      <div id="sett-overview-wrap"></div>
+    </div>
+
+    <div class="sett-section" id="ssec-trainers">
       <div class="sett-section-label">Trainer Directory</div>
       <div class="sett-section-desc">Add, edit, deactivate, delete, search, and bulk update trainer profiles. Inactive trainers are excluded from scoring and generation.</div>
       <div class="sett-subtabs">
@@ -3960,7 +4296,7 @@ function renderSettingsView(area){
 
     <div class="sett-section" id="ssec-classmix">
       <div class="sett-section-label">Class Mix Rules</div>
-      <div class="sett-section-desc">Set minimum and maximum classes per format per week at each location. The AI planner uses these as scheduling targets.</div>
+      <div class="sett-section-desc">Set minimum and maximum classes per format per week at each location. The planner must keep generated format counts inside these ranges.</div>
       <div id="classmix-wrap"></div>
       <div class="sett-save-bar">
         <button class="sett-save-btn" onclick="settSaveClassMix()">Save Class Mix</button>
@@ -3970,13 +4306,68 @@ function renderSettingsView(area){
 
     <div class="sett-section" id="ssec-targets">
       <div class="sett-section-label">Schedule Targets</div>
-      <div class="sett-section-desc">Set target (min) and maximum classes per day per location. Weekly totals: Kwality 70-80 · Supreme 60-70 · Kenkere 50-60.</div>
+      <div class="sett-section-desc">Set minimum and maximum classes per day per location. Each run picks a desired count inside the range, so total classes can vary while staying within configured bounds.</div>
       <div id="targets-wrap"></div>
       <div class="sett-save-bar">
         <button class="sett-save-btn" onclick="settSaveTargets()">Save Targets</button>
         <span class="sett-save-status" id="targets-save-status"></span>
       </div>
     </div>
+
+    <div class="sett-section" id="ssec-customrules">
+      <div class="sett-section-label">Custom Rules & Pinned Classes</div>
+      <div class="sett-section-desc">Use dropdown-guided controls to build custom scheduling rules and pin classes that should be placed before optimiser-generated slots.</div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px">
+        <div style="border:1px solid var(--border);border-radius:var(--r12);padding:14px;background:var(--surface)">
+          <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">Custom Rule Builder</div>
+          <div id="customrules-list"></div>
+          <div id="customrules-builder" style="margin-top:12px"></div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:var(--r12);padding:14px;background:var(--surface)">
+          <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">Manual Pinned Classes</div>
+          <div id="manualpins-list"></div>
+          <div id="manualpins-builder" style="margin-top:12px"></div>
+        </div>
+      </div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveCustomRules()">Save Custom Rules & Pins</button>
+        <span class="sett-save-status" id="customrules-save-status"></span>
+      </div>
+    </div>
+
+    <div class="sett-section" id="ssec-advanced">
+      <div class="sett-section-head">
+        <div>
+          <div class="sett-section-kicker">Canonical Policy</div>
+          <div class="sett-section-label">Advanced Settings</div>
+          <div class="sett-section-desc">Control how Settings resolves conflicts, how strict the planner should be, and what metadata is saved with each configuration.</div>
+        </div>
+        <button class="sett-ghost-btn" onclick="settRenderAdvancedOptions()">Reset Unsaved Fields</button>
+      </div>
+      <div id="advanced-options-wrap"></div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveAdvancedOptions()">Save Advanced Settings</button>
+        <span class="sett-save-status" id="advanced-save-status"></span>
+      </div>
+    </div>
+
+        </main>
+        <aside class="sett-inspector">
+          <div class="sett-inspector-title">Inspector</div>
+          <div class="sett-inspector-box" id="sett-inspector-selection">Select target or class-mix cells to apply row, column, or selection bulk operators.</div>
+          <div class="sett-inspector-title">Conflict Resolver</div>
+          <div id="sett-conflict-list" class="sett-conflict-list">
+            <div class="sett-conflict-item">Config validation will appear after settings load.</div>
+          </div>
+          <div class="sett-inspector-title" style="margin-top:14px">Precedence</div>
+          <div class="sett-inspector-box">
+            <strong>1.</strong> Settings Command Center<br>
+            <strong>2.</strong> Manual pins and hard custom rules<br>
+            <strong>3.</strong> Rules catalog toggles<br>
+            <strong>4.</strong> Planner defaults and historical ranges
+          </div>
+        </aside>
+      </div>
 
     `;
   area.appendChild(wrap);
@@ -3985,17 +4376,181 @@ function renderSettingsView(area){
 
 function settSetTab(tab){
   _settSection=tab;
-  document.querySelectorAll(".sett-tab").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".sett-tab,.sett-nav-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".sett-section").forEach(s=>s.classList.remove("active"));
   const btn=document.getElementById("stab-"+tab);
   if(btn)btn.classList.add("active");
   const sec=document.getElementById("ssec-"+tab);
   if(sec)sec.classList.add("active");
+  if(tab==="targets")settRenderTargets();
+  if(tab==="classmix")settRenderClassMix();
+  settResetMatrixSelection(false);
+  if(tab==="overview")settRenderOverview();
+  if(tab==="advanced")settRenderAdvancedOptions();
+  settValidateAndRender();
 }
 
 function settSetSub(section,sub){
   document.querySelectorAll(`.sett-subtab[data-section="${section}"]`).forEach(b=>b.classList.toggle("active",b.dataset.subtab===sub));
   document.querySelectorAll(`.sett-subpanel[data-section="${section}"]`).forEach(p=>p.classList.toggle("active",p.dataset.subpanel===sub));
+}
+
+function settWeeklyTargetStats(cfg,loc){
+  const rows=cfg.targets?.[loc]||{};
+  return DAYS_ALL.reduce((acc,day)=>{
+    const row=rows[day]||{};
+    acc.target+=Number(row.target||0);
+    acc.max+=Number(row.max||0);
+    return acc;
+  },{target:0,max:0});
+}
+
+function settRenderOverview(){
+  const wrap=document.getElementById("sett-overview-wrap");
+  if(!wrap||!_settSchedConfig)return;
+  const cfg=settNormalizeConfig(_settSchedConfig);
+  const profiles=_settTrainerProfiles||[];
+  const active=profiles.filter(trainerIsActive).length;
+  const inactive=Math.max(0,profiles.length-active);
+  const targetCells=LOCS_ALL.length*DAYS_ALL.length;
+  const mixCells=Object.values(cfg.class_mix||{}).reduce((n,m)=>n+Object.keys(m||{}).length,0);
+  const issueCount=(_settLastValidation.errors||[]).length+(_settLastValidation.warnings||[]).length;
+  const optionCount=Object.keys(cfg.settings_options||{}).length;
+  const policy=(cfg.settings_options?.conflict_policy||"").replaceAll("_"," ");
+  wrap.innerHTML=`
+    <div class="sett-overview-grid">
+      <div class="sett-kpi-card">
+        <div class="sett-kpi-label">Config Health</div>
+        <div class="sett-kpi-value">${issueCount||"OK"}</div>
+        <div class="sett-kpi-note">${_settLastValidation.errors.length} blocking · ${_settLastValidation.warnings.length} warnings</div>
+      </div>
+      <div class="sett-kpi-card">
+        <div class="sett-kpi-label">Trainer Control</div>
+        <div class="sett-kpi-value">${active}</div>
+        <div class="sett-kpi-note">${inactive} inactive · ${profiles.length} total profiles</div>
+      </div>
+      <div class="sett-kpi-card">
+        <div class="sett-kpi-label">Schedule Surface</div>
+        <div class="sett-kpi-value">${targetCells}</div>
+        <div class="sett-kpi-note">daily target cells · ${mixCells} class mix controls</div>
+      </div>
+      <div class="sett-kpi-card">
+        <div class="sett-kpi-label">Advanced Options</div>
+        <div class="sett-kpi-value">${optionCount}</div>
+        <div class="sett-kpi-note">${rvEscapeHtml(policy)} policy</div>
+      </div>
+    </div>
+    <div class="sett-config-panel">
+      <div class="sett-section-head">
+        <div>
+          <div class="sett-card-title">Weekly Load By Studio</div>
+          <div class="sett-card-copy">Daily targets and max caps are centralized here before the pipeline sees them.</div>
+        </div>
+        <button class="sett-ghost-btn" onclick="settSetTab('targets')">Edit Targets</button>
+      </div>
+      <div class="sett-location-summary">
+        ${LOCS_ALL.map(loc=>{
+          const stats=settWeeklyTargetStats(cfg,loc);
+          return `<div class="sett-location-card">
+            <strong>${rvEscapeHtml(LOC_SHORT[loc]||loc)}</strong>
+            <div class="sett-location-line"><span>Weekly min</span><b>${stats.target}</b></div>
+            <div class="sett-location-line"><span>Weekly max</span><b>${stats.max}</b></div>
+            <div class="sett-location-line"><span>Repair room</span><b>${Math.max(0,stats.max-stats.target)}</b></div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="sett-config-panel">
+      <div class="sett-section-head">
+        <div>
+          <div class="sett-card-title">Fast Routes</div>
+          <div class="sett-card-copy">Use the focused editors for people data, schedule targets, class mix, rules, and system policy.</div>
+        </div>
+      </div>
+      <div class="sett-option-grid">
+        <button class="sett-option-card" onclick="settSetTab('qualifications')" style="text-align:left;cursor:pointer">
+          <div class="sett-option-title">Trainer eligibility matrix</div>
+          <div class="sett-option-desc">Control which instructors can teach each format before replacements or generated slots are assigned.</div>
+        </button>
+        <button class="sett-option-card" onclick="settSetTab('classmix')" style="text-align:left;cursor:pointer">
+          <div class="sett-option-title">Class mix floors and ceilings</div>
+          <div class="sett-option-desc">Set weekly min/max format targets with bulk row and column operators.</div>
+        </button>
+        <button class="sett-option-card" onclick="settSetTab('customrules')" style="text-align:left;cursor:pointer">
+          <div class="sett-option-title">Rules and manual pins</div>
+          <div class="sett-option-desc">Keep intentional overrides visible and resolve superseded daily-target rules.</div>
+        </button>
+        <button class="sett-option-card" onclick="settSetTab('advanced')" style="text-align:left;cursor:pointer">
+          <div class="sett-option-title">Advanced guardrails</div>
+          <div class="sett-option-desc">Tune conflict behavior, repair buffer, validation gates, and planner policy metadata.</div>
+        </button>
+      </div>
+    </div>`;
+}
+
+function settAdvancedOptionCard(kind,key,title,desc,controlHtml){
+  return `<div class="sett-option-card" data-advanced-key="${rvEscapeAttr(key)}">
+    <div class="sett-option-top">
+      <div>
+        <div class="sett-option-title">${rvEscapeHtml(title)}</div>
+        <div class="sett-option-desc">${rvEscapeHtml(desc)}</div>
+      </div>
+      ${kind==="toggle"?controlHtml:""}
+    </div>
+    ${kind==="field"?controlHtml:""}
+  </div>`;
+}
+
+function settRenderAdvancedOptions(){
+  const wrap=document.getElementById("advanced-options-wrap");
+  if(!wrap||!_settSchedConfig)return;
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+  const o=_settSchedConfig.settings_options||{};
+  const toggle=(key)=>`<label class="sett-switch"><input type="checkbox" ${o[key]?"checked":""} onchange="settSetAdvancedOption('${key}',this.checked,'boolean')"><span class="sett-slider"></span></label>`;
+  const number=(key,min,max,step=1)=>`<input type="number" min="${min}" max="${max}" step="${step}" value="${Number(o[key]??0)}" onchange="settSetAdvancedOption('${key}',this.value,'number')">`;
+  const select=(key,choices)=>`<select onchange="settSetAdvancedOption('${key}',this.value,'string')">${choices.map(([v,l])=>`<option value="${v}" ${o[key]===v?"selected":""}>${l}</option>`).join("")}</select>`;
+  wrap.innerHTML=`
+    <div class="sett-config-panel">
+      <div class="sett-section-kicker">Conflict Resolution</div>
+      <div class="sett-option-grid">
+        ${settAdvancedOptionCard("toggle","block_hard_conflict_saves","Block invalid saves","Prevent target, class-mix, and policy conflicts from becoming the saved source of truth.",toggle("block_hard_conflict_saves"))}
+        ${settAdvancedOptionCard("toggle","show_superseded_rules","Show superseded rules","Keep daily target rules visible when Settings overrides them, so conflicts are explicit.",toggle("show_superseded_rules"))}
+        ${settAdvancedOptionCard("field","conflict_policy","Conflict policy","Choose how the Settings source of truth wins when planner defaults or soft rules disagree.",select("conflict_policy",[["settings_override_soft_rules","Settings override soft rules"],["block_all_conflicts","Block all conflicts"],["manual_review_required","Manual review required"]]))}
+        ${settAdvancedOptionCard("toggle","pipeline_requires_validation","Require validation before pipeline","Treat Settings validation as the gate before generation and publishing.",toggle("pipeline_requires_validation"))}
+      </div>
+    </div>
+    <div class="sett-config-panel">
+      <div class="sett-section-kicker">Planner Behavior</div>
+      <div class="sett-option-grid">
+        ${settAdvancedOptionCard("toggle","enforce_exact_daily_targets","Prioritize exact daily targets","Tell the planner to treat daily target counts as the preferred allocation before exploratory classes.",toggle("enforce_exact_daily_targets"))}
+        ${settAdvancedOptionCard("toggle","auto_repair_underfilled_days","Auto-repair underfilled days","Allow the planner to add safe classes when a day cannot reach the target.",toggle("auto_repair_underfilled_days"))}
+        ${settAdvancedOptionCard("toggle","allow_soft_mix_overrides","Allow soft class-mix overrides","Permit controlled deviations from class-mix targets when trainer availability blocks a cleaner plan.",toggle("allow_soft_mix_overrides"))}
+        ${settAdvancedOptionCard("field","target_selection_strategy","Daily count selection","Choose how the planner picks the desired class count inside each min/max day range.",select("target_selection_strategy",[["seeded_range","Seeded range per run"],["balanced_midpoint","Balanced midpoint"],["lower_bias","Lower bias"],["upper_bias","Upper bias"]]))}
+        ${settAdvancedOptionCard("field","target_cap_buffer","Target cap buffer","Minimum gap between daily min and max before validation warns about low repair room.",number("target_cap_buffer",0,8,1))}
+        ${settAdvancedOptionCard("field","weekly_hours_cap","Tier-1 weekly hours cap","Default weekly utilization cap used by planner guardrail copy and reporting metadata.",number("weekly_hours_cap",1,40,0.5))}
+        ${settAdvancedOptionCard("field","max_classes_per_day_default","Default classes per instructor/day","Fallback per-day instructor cap when a profile does not specify a tighter value.",number("max_classes_per_day_default",1,8,1))}
+      </div>
+    </div>
+    <div class="sett-config-panel">
+      <div class="sett-section-kicker">Operations</div>
+      <div class="sett-option-grid">
+        ${settAdvancedOptionCard("field","default_bulk_scope","Default bulk scope","Preselect the bulk-operator scope used by target and class-mix matrices.",select("default_bulk_scope",[["selection","Selected cells"],["visible","All visible cells"],["weekdays","Weekdays"],["weekend","Weekend"]]))}
+        ${settAdvancedOptionCard("toggle","save_snapshot_on_publish","Save snapshot on publish","Mark each canonical save as a versioned settings snapshot for traceability.",toggle("save_snapshot_on_publish"))}
+      </div>
+    </div>`;
+}
+
+function settSetAdvancedOption(key,value,type){
+  if(!_settSchedConfig)_settSchedConfig=settDefaultConfig();
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+  _settSchedConfig.settings_options[key]=type==="number"?Number(value):type==="boolean"?Boolean(value):value;
+  if(key==="conflict_policy")_settSchedConfig.source_of_truth.conflict_policy=value;
+  settValidateAndRender();
+}
+
+function settSaveAdvancedOptions(){
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
+  settSaveCanonicalConfig("advanced","Advanced settings saved");
 }
 
 function settLoadData(){
@@ -4004,13 +4559,15 @@ function settLoadData(){
     return _settTrainerProfiles;
   }).catch(()=>{_settTrainerProfiles=[];return[];});
   const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):fetch("/api/schedule-config").then(r=>r.json()).then(d=>{
-    _settSchedConfig=(d&&!d.error)?d:{targets:{},manual_protected:[],manual_excluded:[],leave_periods:[],off_days:[],class_mix:{}};
+    _settSchedConfig=settNormalizeConfig((d&&!d.error)?d:settDefaultConfig());
     return _settSchedConfig;
-  }).catch(()=>{_settSchedConfig={targets:{},manual_protected:[],manual_excluded:[],leave_periods:[],off_days:[],class_mix:{}};return _settSchedConfig;});
+  }).catch(()=>{_settSchedConfig=settNormalizeConfig(settDefaultConfig());return _settSchedConfig;});
   Promise.all([p1,p2]).then(()=>{
+    settRenderOverview();
     settRenderTrainerManager();settRenderQualifications();settRenderAvailability();settRenderTargets();
-    settRenderLeave();settRenderClassMix();
+    settRenderLeave();settRenderClassMix();settRenderCustomRules();settRenderAdvancedOptions();
     settPopulateLeaveTrainerList();
+    settValidateAndRender();
   }).catch(e=>console.error("Settings load error",e));
 }
 
@@ -4137,6 +4694,7 @@ function settSaveTrainerManager(){
   try{updated=settCollectTrainerManager();}
   catch(e){showToast(e.message||"Invalid trainer data","error");return;}
   _settTrainerProfiles=updated;
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
   Promise.all([
     fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)}).then(r=>r.json()),
     fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig||{})}).then(r=>r.json()),
@@ -4191,6 +4749,8 @@ function settTrainerBulkActive(active){
   });
   _settSchedConfig.inactive_trainers=[...inactive].sort();
   settRenderTrainerManager();
+  showToast(`${visible.size} trainer${visible.size===1?"":"s"} ${active?"activated":"deactivated"} — saving…`,"");
+  settSaveTrainerManager();
 }
 
 function settRenderQualifications(){
@@ -4222,6 +4782,8 @@ function settRenderQualifications(){
 
 function settQualBulk(on){
   document.querySelectorAll(".qual-cb").forEach(cb=>{cb.checked=on;});
+  showToast(`${on?"Checked":"Unchecked"} visible qualifications — saving…`,"");
+  settSaveQualifications();
 }
 
 function settFilterAvail(q){
@@ -4326,50 +4888,168 @@ function settSaveAvailability(){
     }).catch(()=>showToast("Server error","error"));
 }
 
+function settBulkToolbarHtml(matrix,title){
+  const defaultScope=(_settSchedConfig?.settings_options?.default_bulk_scope)||"selection";
+  return`<div class="sett-matrix-toolbar" data-toolbar="${matrix}">
+    <div class="sett-bulk-field">
+      <label>${title}</label>
+      <select id="${matrix}-bulk-op">
+        <option value="set-target">Set target/min</option>
+        <option value="inc-target">Increment target/min</option>
+        <option value="set-max">Set max</option>
+        <option value="max-plus">Max = target/min + N</option>
+        <option value="weekday-template">Apply weekday template</option>
+        <option value="weekend-template">Apply weekend template</option>
+        <option value="clear-selection">Clear selected to zero</option>
+      </select>
+    </div>
+    <div class="sett-bulk-field"><label>Value</label><input type="number" id="${matrix}-bulk-value" value="1"></div>
+    <div class="sett-bulk-field">
+      <label>Scope</label>
+      <select id="${matrix}-bulk-scope">
+        <option value="selection" ${defaultScope==="selection"?"selected":""}>Selected cells</option>
+        <option value="visible" ${defaultScope==="visible"?"selected":""}>All visible cells</option>
+        <option value="weekdays" ${defaultScope==="weekdays"?"selected":""}>Weekdays</option>
+        <option value="weekend" ${defaultScope==="weekend"?"selected":""}>Weekend</option>
+      </select>
+    </div>
+    <button class="sett-ghost-btn" onclick="settApplyBulk('${matrix}')">Preview & Apply</button>
+    <button class="sett-ghost-btn" onclick="settResetMatrixSelection()">Clear Selection</button>
+  </div>`;
+}
+
+function settMatrixCellKey(el){return `${el.dataset.matrix}|${el.dataset.loc}|${el.dataset.key}`;}
+function settSelectMatrixElement(el,on=true){
+  const key=settMatrixCellKey(el);
+  el.classList.toggle("selected",on);
+  if(on)_settMatrixSelection.add(key);else _settMatrixSelection.delete(key);
+}
+function settToggleMatrixCell(event,el){
+  if(event.metaKey||event.ctrlKey){
+    document.querySelectorAll(`.sett-matrix-cell[data-matrix="${el.dataset.matrix}"][data-loc="${CSS.escape(el.dataset.loc)}"]`).forEach(cell=>settSelectMatrixElement(cell,true));
+  } else {
+    settSelectMatrixElement(el,!el.classList.contains("selected"));
+  }
+  settUpdateSelectionInspector();
+}
+function settSelectMatrixRow(matrix,loc){
+  document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-loc="${CSS.escape(loc)}"]`).forEach(el=>settSelectMatrixElement(el,true));
+  settUpdateSelectionInspector();
+}
+function settSelectMatrixColumn(matrix,key){
+  document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-key="${CSS.escape(key)}"]`).forEach(el=>settSelectMatrixElement(el,true));
+  settUpdateSelectionInspector();
+}
+function settResetMatrixSelection(update=true){
+  _settMatrixSelection.clear();
+  document.querySelectorAll(".sett-matrix-cell.selected").forEach(el=>el.classList.remove("selected"));
+  if(update)settUpdateSelectionInspector();
+}
+function settCellsForScope(matrix,scope){
+  if(scope==="selection"){
+    const selected=[...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"].selected`)];
+    return selected.length?selected:[...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"]`)];
+  }
+  if(scope==="weekdays")return [...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"]`)].filter(el=>DAYS_ALL.slice(0,5).includes(el.dataset.key));
+  if(scope==="weekend")return [...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"]`)].filter(el=>["Saturday","Sunday"].includes(el.dataset.key));
+  return [...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"]`)];
+}
+function settUpdateSelectionInspector(){
+  const box=document.getElementById("sett-inspector-selection");
+  if(!box)return;
+  const selected=[...document.querySelectorAll(".sett-matrix-cell.selected")];
+  if(!selected.length){box.innerHTML="Select target or class-mix cells to apply row, column, or selection bulk operators.";return;}
+  const locs=new Set(selected.map(el=>el.dataset.loc));
+  const keys=new Set(selected.map(el=>el.dataset.key));
+  box.innerHTML=`<strong>${selected.length} selected cell${selected.length===1?"":"s"}</strong><br>${[...locs].map(l=>LOC_SHORT[l]||l).join(", ")}<br><span style="color:#64748B">${[...keys].slice(0,8).join(", ")}${keys.size>8?"…":""}</span>`;
+}
+function settApplyBulk(matrix){
+  const op=document.getElementById(`${matrix}-bulk-op`)?.value||"set-target";
+  const raw=Number(document.getElementById(`${matrix}-bulk-value`)?.value||0);
+  const scope=document.getElementById(`${matrix}-bulk-scope`)?.value||"selection";
+  const cells=settCellsForScope(matrix,scope);
+  cells.forEach(cell=>{
+    const inputs=[...cell.querySelectorAll("input")];
+    const first=inputs.find(inp=>["target","min"].includes(inp.dataset.field));
+    const max=inputs.find(inp=>inp.dataset.field==="max");
+    if(!first||!max)return;
+    const a=Number(first.value||0);
+    if(op==="set-target")first.value=Math.max(0,raw);
+    if(op==="inc-target")first.value=Math.max(0,a+raw);
+    if(op==="set-max")max.value=Math.max(0,raw);
+    if(op==="max-plus")max.value=Math.max(Number(first.value||0),Number(first.value||0)+raw);
+    if(op==="weekday-template"){first.value=matrix==="targets"?10:2;max.value=matrix==="targets"?12:4;}
+    if(op==="weekend-template"){first.value=matrix==="targets"?6:1;max.value=matrix==="targets"?8:3;}
+    if(op==="clear-selection"){first.value=0;max.value=0;}
+  });
+  if(matrix==="targets")settTargetsChanged();
+  if(matrix==="classmix")settClassMixChanged();
+  showToast(`${cells.length} ${matrix==="targets"?"target":"class mix"} cell${cells.length===1?"":"s"} updated`,"");
+}
+
 function settRenderTargets(){
   const wrap=document.getElementById("targets-wrap");
   if(!wrap||!_settSchedConfig)return;
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
   const targets=(_settSchedConfig.targets||{});
-  wrap.innerHTML=LOCS_ALL.map(loc=>{
-    const locT=targets[loc]||{};
-    return`<div class="target-loc-hdr">${loc}</div>
-    <div class="target-day-grid">
-      ${DAYS_ALL.map(day=>{
-        const dt=locT[day]||{};
-        return`<div class="target-day-card">
-          <div class="target-day-lbl">${day}</div>
-          <div class="target-input-row">
-            <label>Target</label>
-            <input type="number" min="0" max="20" data-loc="${loc}" data-day="${day}" data-field="target" value="${dt.target||8}" class="target-inp">
-          </div>
-          <div class="target-input-row" style="margin-top:5px">
-            <label>Maximum</label>
-            <input type="number" min="0" max="25" data-loc="${loc}" data-day="${day}" data-field="max" value="${dt.max||12}" class="target-inp">
-          </div>
-        </div>`;
-      }).join("")}
+  wrap.innerHTML=`
+    ${settBulkToolbarHtml("targets","Daily target bulk operators")}
+    <div class="sett-matrix-wrap">
+      <table class="sett-matrix" id="targets-matrix">
+        <thead><tr>
+          <th>Studio</th>
+          ${DAYS_ALL.map(day=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('targets','${day}')">${day.slice(0,3)}</button></th>`).join("")}
+        </tr></thead>
+        <tbody>
+          ${LOCS_ALL.map(loc=>`<tr>
+            <td class="sett-matrix-rowhead"><button class="sett-mini-btn" onclick="settSelectMatrixRow('targets','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button><div style="font-size:10px;color:#64748B;margin-top:3px">${rvEscapeHtml(loc)}</div></td>
+            ${DAYS_ALL.map(day=>{
+              const dt=targets[loc]?.[day]||{};
+              const invalid=Number(dt.target||0)>Number(dt.max||0);
+              return`<td>
+                <div class="sett-matrix-cell ${invalid?"invalid":""}" data-matrix="targets" data-loc="${rvEscapeAttr(loc)}" data-key="${day}" onclick="settToggleMatrixCell(event,this)">
+                  <div class="sett-matrix-pair">
+                    <label class="sett-matrix-mini"><span>Min</span><input type="number" min="0" max="30" data-loc="${rvEscapeAttr(loc)}" data-day="${day}" data-field="target" value="${Number(dt.target||0)}" class="target-inp" onclick="event.stopPropagation()" oninput="settTargetsChanged()"></label>
+                    <label class="sett-matrix-mini"><span>Max</span><input type="number" min="0" max="35" data-loc="${rvEscapeAttr(loc)}" data-day="${day}" data-field="max" value="${Number(dt.max||0)}" class="target-inp" onclick="event.stopPropagation()" oninput="settTargetsChanged()"></label>
+                  </div>
+                </div>
+              </td>`;
+            }).join("")}
+          </tr>`).join("")}
+        </tbody>
+      </table>
     </div>`;
-  }).join("");
+  settValidateAndRender();
 }
 
 function settSaveTargets(){
+  settCollectTargetsFromDom();
+  settSaveCanonicalConfig("targets","Schedule targets saved");
+}
+
+function settCollectTargetsFromDom(){
   const targets={};
   document.querySelectorAll(".target-inp").forEach(inp=>{
     const{loc,day,field}=inp.dataset;
     if(!targets[loc])targets[loc]={};
     if(!targets[loc][day])targets[loc][day]={};
     targets[loc][day][field]=parseInt(inp.value)||0;
+    targets[loc][day].source="settings";
   });
-  const config={...(_settSchedConfig||{}),targets};
-  _settSchedConfig=config;
-  fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(config)})
-    .then(r=>r.json())
-    .then(res=>{
-      const s=document.getElementById("targets-save-status");
-      if(s)s.textContent=res.ok?"Saved!":"Error";
-      showToast(res.ok?"Schedule targets saved":"Save failed",res.ok?"":"error");
-      setTimeout(()=>{if(s)s.textContent="";},3000);
-    }).catch(()=>showToast("Server error","error"));
+  _settSchedConfig={...(_settSchedConfig||{}),targets};
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+}
+
+function settTargetsChanged(){
+  settCollectTargetsFromDom();
+  document.querySelectorAll(".target-inp").forEach(inp=>{
+    const cell=inp.closest(".sett-matrix-cell");
+    if(!cell)return;
+    const loc=inp.dataset.loc, day=inp.dataset.day;
+    const cur=_settSchedConfig.targets?.[loc]?.[day]||{};
+    cell.classList.toggle("invalid",Number(cur.target||0)>Number(cur.max||0));
+  });
+  settValidateAndRender();
 }
 
 // ---------- Leave & Off Days ----------
@@ -4449,65 +5129,251 @@ function settRemoveOffDay(idx){
 }
 
 function settSaveLeave(){
-  fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig||{})})
-    .then(r=>r.json())
-    .then(res=>{
-      const s=document.getElementById("leave-save-status");
-      if(s)s.textContent=res.ok?"Saved!":"Error";
-      showToast(res.ok?"Leave config saved":"Save failed",res.ok?"":"error");
-      setTimeout(()=>{if(s)s.textContent="";},3000);
-    }).catch(()=>showToast("Server error","error"));
+  settSaveCanonicalConfig("leave","Leave config saved");
 }
 
 // ---------- Class Mix Rules ----------
 function settRenderClassMix(){
   const wrap=document.getElementById("classmix-wrap");
   if(!wrap)return;
-  const cfg=_settSchedConfig?.class_mix||{};
-  wrap.innerHTML=LOCS_ALL.map(loc=>{
-    const defaults=CLASS_MIX_TARGETS[loc]||{};
-    const locCfg=cfg[loc]||{};
-    const classes=Object.keys(defaults);
-    const lc=LOC_COLORS[loc]||{fg:"#374151",bg:"#F9FAFB",border:"#E5E7EB"};
-    return`<div style="margin-bottom:20px">
-      <div style="font-size:11px;font-weight:800;color:${lc.fg};text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding:6px 10px;background:${lc.bg};border-radius:var(--r6)">${loc}</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-        ${classes.map(cls=>{
-          const def=defaults[cls]||{min:0,max:10};
-          const cur=locCfg[cls]||def;
-          return`<div style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--r8);background:var(--surface)">
-            <div style="font-size:11px;font-weight:600;color:${classColor(cls)};margin-bottom:6px">${displayClass(cls)}</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <label style="font-size:10px;color:var(--text-muted);flex-shrink:0">Min/wk</label>
-              <input type="number" min="0" max="30" data-loc="${loc}" data-cls="${cls}" data-field="min" value="${cur.min||0}" class="classmix-inp" style="width:50px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-              <label style="font-size:10px;color:var(--text-muted);flex-shrink:0">Max/wk</label>
-              <input type="number" min="0" max="30" data-loc="${loc}" data-cls="${cls}" data-field="max" value="${cur.max||10}" class="classmix-inp" style="width:50px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:12px">
-            </div>
-          </div>`;
-        }).join("")}
-      </div>
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
+  const cfg=_settSchedConfig.class_mix||{};
+  const classes=[...new Set(LOCS_ALL.flatMap(loc=>Object.keys(CLASS_MIX_TARGETS[loc]||{})))];
+  wrap.innerHTML=`
+    ${settBulkToolbarHtml("classmix","Class mix bulk operators")}
+    <div class="sett-matrix-wrap">
+      <table class="sett-matrix" id="classmix-matrix">
+        <thead><tr>
+          <th>Studio / Format</th>
+          ${classes.map(cls=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(shortClass(cls))}</button></th>`).join("")}
+        </tr></thead>
+        <tbody>
+          ${LOCS_ALL.map(loc=>`<tr>
+            <td class="sett-matrix-rowhead"><button class="sett-mini-btn" onclick="settSelectMatrixRow('classmix','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button><div style="font-size:10px;color:#64748B;margin-top:3px">${rvEscapeHtml(loc)}</div></td>
+            ${classes.map(cls=>{
+              const supported=(CLASS_MIX_TARGETS[loc]||{})[cls];
+              const cur=(cfg[loc]||{})[cls]||supported||{min:0,max:0};
+              const invalid=Number(cur.min||0)>Number(cur.max||0);
+              return`<td>
+                <div class="sett-matrix-cell ${invalid?"invalid":""}" data-matrix="classmix" data-loc="${rvEscapeAttr(loc)}" data-key="${rvEscapeAttr(cls)}" onclick="settToggleMatrixCell(event,this)" style="${supported?"":"opacity:.45"}">
+                  <div style="font-size:10px;font-weight:900;color:${classColor(cls)};margin-bottom:5px;white-space:nowrap" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(shortClass(cls))}</div>
+                  <div class="sett-matrix-pair">
+                    <label class="sett-matrix-mini"><span>Min</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="min" value="${Number(cur.min||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
+                    <label class="sett-matrix-mini"><span>Max</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="max" value="${Number(cur.max||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
+                  </div>
+                </div>
+              </td>`;
+            }).join("")}
+          </tr>`).join("")}
+        </tbody>
+      </table>
     </div>`;
-  }).join("");
+  settValidateAndRender();
 }
 
 function settSaveClassMix(){
+  settCollectClassMixFromDom();
+  settSaveCanonicalConfig("classmix","Class mix saved");
+}
+
+function settCollectClassMixFromDom(){
   const mix={};
   document.querySelectorAll(".classmix-inp").forEach(inp=>{
     const{loc,cls,field}=inp.dataset;
     if(!mix[loc])mix[loc]={};
     if(!mix[loc][cls])mix[loc][cls]={};
     mix[loc][cls][field]=parseInt(inp.value)||0;
+    mix[loc][cls].source="settings";
   });
   if(!_settSchedConfig)_settSchedConfig={};
   _settSchedConfig.class_mix=mix;
-  fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig)})
-    .then(r=>r.json())
-    .then(res=>{
-      const s=document.getElementById("classmix-save-status");
-      if(s)s.textContent=res.ok?"Saved!":"Error";
-      showToast(res.ok?"Class mix saved":"Save failed",res.ok?"":"error");
-      setTimeout(()=>{if(s)s.textContent="";},3000);
-    }).catch(()=>showToast("Server error","error"));
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig);
+}
+
+function settClassMixChanged(){
+  settCollectClassMixFromDom();
+  document.querySelectorAll(".classmix-inp").forEach(inp=>{
+    const cell=inp.closest(".sett-matrix-cell");
+    if(!cell)return;
+    const loc=inp.dataset.loc, cls=inp.dataset.cls;
+    const cur=_settSchedConfig.class_mix?.[loc]?.[cls]||{};
+    cell.classList.toggle("invalid",Number(cur.min||0)>Number(cur.max||0));
+  });
+  settValidateAndRender();
+}
+
+// ---------- Custom Rules & Manual Pins ----------
+function settAllClassOptions(){
+  const names=new Set();
+  Object.values(CLASS_MIX_TARGETS||{}).forEach(mix=>Object.keys(mix||{}).forEach(c=>names.add(c)));
+  getAllLocSlots().forEach(s=>{if(s.class_name)names.add(canonicalMixClass(s.class_name));});
+  return [...names].sort((a,b)=>displayClass(a).localeCompare(displayClass(b)));
+}
+
+function settTrainerOptions(){
+  return (_settTrainerProfiles||[]).map(t=>t.name).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+}
+
+function settRoomOptions(){
+  return [
+    ["","Auto room"],
+    ["studio_a","Studio 1 / A"],
+    ["studio_b","Studio 2 / B"],
+    ["powercycle","PowerCycle Studio"],
+    ["strength_lab","Strength Lab"],
+  ];
+}
+
+function settRenderCustomRules(){
+  settRenderCustomRuleList();
+  settRenderCustomRuleBuilder();
+  settRenderManualPinList();
+  settRenderManualPinBuilder();
+}
+
+function settRenderCustomRuleList(){
+  const wrap=document.getElementById("customrules-list");
+  if(!wrap)return;
+  const rules=(_settSchedConfig?.custom_rules)||[];
+  if(!rules.length){
+    wrap.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No custom rules created.</div>`;
+    return;
+  }
+  wrap.innerHTML=rules.map((r,i)=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r8);background:#fff;margin-bottom:6px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:800;color:var(--text)">${rvEscapeHtml(settRuleSummary(r))}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${rvEscapeHtml(r.priority||"soft").toUpperCase()} · ${rvEscapeHtml(r.location||"All studios")}</div>
+    </div>
+    <button class="sett-mini-btn danger" onclick="settRemoveCustomRule(${i})">Remove</button>
+  </div>`).join("");
+}
+
+function settRuleSummary(r){
+  const subject=r.class_name||r.trainer||"schedule";
+  if(r.rule_type==="daily_target")return `${r.day||"Any day"} ${r.operator||"exactly"} ${r.value||0} classes`;
+  if(r.rule_type==="weekly_class_mix")return `${subject} ${r.operator||"max"} ${r.value||0} per week`;
+  if(r.rule_type==="trainer_availability")return `${r.trainer||"Trainer"} ${r.operator||"only"} ${r.day||"selected day"} ${r.time||""}`;
+  if(r.rule_type==="class_time_restriction")return `${subject} ${r.operator||"never"} at ${r.time||"selected time"}`;
+  if(r.rule_type==="class_location_restriction")return `${subject} ${r.operator||"only"} at ${r.location||"selected studio"}`;
+  return `${subject} ${r.operator||"rule"} ${r.value||""}`.trim();
+}
+
+function settRenderCustomRuleBuilder(){
+  const wrap=document.getElementById("customrules-builder");
+  if(!wrap)return;
+  const classes=settAllClassOptions();
+  const trainers=settTrainerOptions();
+  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;align-items:end">
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Studio</label><select class="sett-select" id="cr-location" style="width:100%"><option value="">All Studios</option>${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Rule Type</label><select class="sett-select" id="cr-type" style="width:100%">
+      <option value="daily_target">Daily target</option>
+      <option value="weekly_class_mix">Weekly class mix</option>
+      <option value="trainer_availability">Trainer availability</option>
+      <option value="class_time_restriction">Class-time restriction</option>
+      <option value="class_location_restriction">Class-location restriction</option>
+    </select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Class</label><select class="sett-select" id="cr-class" style="width:100%"><option value="">Any Class</option>${classes.map(c=>`<option value="${rvEscapeAttr(c)}">${rvEscapeHtml(displayClass(c))}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Trainer</label><select class="sett-select" id="cr-trainer" style="width:100%"><option value="">Any Trainer</option>${trainers.map(t=>`<option value="${rvEscapeAttr(t)}">${rvEscapeHtml(t)}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Day</label><select class="sett-select" id="cr-day" style="width:100%"><option value="">Any Day</option>${DAYS_ALL.map(d=>`<option value="${d}">${d}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Time</label><input class="sett-input" id="cr-time" type="time" style="width:100%;min-width:0"></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Operator</label><select class="sett-select" id="cr-operator" style="width:100%"><option value="exactly">Exactly</option><option value="min">Minimum</option><option value="max">Maximum</option><option value="never">Never</option><option value="only">Only</option><option value="prefer">Prefer</option></select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Value</label><input class="sett-input" id="cr-value" type="number" min="0" max="40" value="1" style="width:100%;min-width:0"></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Priority</label><select class="sett-select" id="cr-priority" style="width:100%"><option value="hard">Hard</option><option value="soft">Soft</option></select></div>
+    <button class="sett-save-btn" onclick="settAddCustomRule()">Add Rule</button>
+  </div>`;
+}
+
+function settAddCustomRule(){
+  const rule={
+    id:"custom-rule-"+Date.now(),
+    location:document.getElementById("cr-location")?.value||"",
+    rule_type:document.getElementById("cr-type")?.value||"daily_target",
+    class_name:document.getElementById("cr-class")?.value||"",
+    trainer:document.getElementById("cr-trainer")?.value||"",
+    day:document.getElementById("cr-day")?.value||"",
+    time:document.getElementById("cr-time")?.value||"",
+    operator:document.getElementById("cr-operator")?.value||"exactly",
+    value:Number(document.getElementById("cr-value")?.value||0),
+    priority:document.getElementById("cr-priority")?.value||"hard",
+    enabled:true,
+  };
+  if(!_settSchedConfig)_settSchedConfig={};
+  if(!_settSchedConfig.custom_rules)_settSchedConfig.custom_rules=[];
+  _settSchedConfig.custom_rules.push(rule);
+  settRenderCustomRules();
+  showToast("Custom rule added — save to persist","");
+}
+
+function settRemoveCustomRule(idx){
+  if(!_settSchedConfig?.custom_rules)return;
+  _settSchedConfig.custom_rules.splice(idx,1);
+  settRenderCustomRules();
+}
+
+function settRenderManualPinList(){
+  const wrap=document.getElementById("manualpins-list");
+  if(!wrap)return;
+  const pins=(_settSchedConfig?.manual_protected)||[];
+  if(!pins.length){
+    wrap.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No manual pinned classes created.</div>`;
+    return;
+  }
+  wrap.innerHTML=pins.map((p,i)=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r8);background:#fff;margin-bottom:6px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:800;color:var(--text)">${rvEscapeHtml(p.day||p.day_of_week||"")} ${rvEscapeHtml(p.time||"")} · ${rvEscapeHtml(displayClass(p.class||p.class_name||""))}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${rvEscapeHtml(p.location||"")} · ${rvEscapeHtml(p.trainer||p.trainer_1||"")} ${p.room?`· ${rvEscapeHtml(p.room)}`:""}</div>
+    </div>
+    <button class="sett-mini-btn danger" onclick="settRemoveManualPin(${i})">Remove</button>
+  </div>`).join("");
+}
+
+function settRenderManualPinBuilder(){
+  const wrap=document.getElementById("manualpins-builder");
+  if(!wrap)return;
+  const classes=settAllClassOptions();
+  const trainers=settTrainerOptions();
+  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;align-items:end">
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Studio</label><select class="sett-select" id="pin-location" style="width:100%">${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Day</label><select class="sett-select" id="pin-day" style="width:100%">${DAYS_ALL.map(d=>`<option value="${d}">${d}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Time</label><input class="sett-input" id="pin-time" type="time" value="09:00" style="width:100%;min-width:0"></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Class</label><select class="sett-select" id="pin-class" style="width:100%">${classes.map(c=>`<option value="${rvEscapeAttr(c)}">${rvEscapeHtml(displayClass(c))}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Instructor</label><select class="sett-select" id="pin-trainer" style="width:100%">${trainers.map(t=>`<option value="${rvEscapeAttr(t)}">${rvEscapeHtml(t)}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Room</label><select class="sett-select" id="pin-room" style="width:100%">${settRoomOptions().map(([v,l])=>`<option value="${rvEscapeAttr(v)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
+    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Note</label><input class="sett-input" id="pin-note" placeholder="Optional" style="width:100%;min-width:0"></div>
+    <button class="sett-save-btn" onclick="settAddManualPin()">Pin Class</button>
+  </div>`;
+}
+
+function settAddManualPin(){
+  const pin={
+    id:"manual-pin-"+Date.now(),
+    location:document.getElementById("pin-location")?.value||"",
+    day:document.getElementById("pin-day")?.value||"",
+    time:document.getElementById("pin-time")?.value||"",
+    class:document.getElementById("pin-class")?.value||"",
+    trainer:document.getElementById("pin-trainer")?.value||"",
+    room:document.getElementById("pin-room")?.value||"",
+    note:document.getElementById("pin-note")?.value||"",
+  };
+  if(!pin.location||!pin.day||!pin.time||!pin.class||!pin.trainer){showToast("Choose studio, day, time, class, and instructor","error");return;}
+  if(!_settSchedConfig)_settSchedConfig={};
+  if(!_settSchedConfig.manual_protected)_settSchedConfig.manual_protected=[];
+  _settSchedConfig.manual_protected.push(pin);
+  settRenderCustomRules();
+  showToast("Pinned class added — save to persist","");
+}
+
+function settRemoveManualPin(idx){
+  if(!_settSchedConfig?.manual_protected)return;
+  _settSchedConfig.manual_protected.splice(idx,1);
+  settRenderCustomRules();
+}
+
+function settSaveCustomRules(){
+  if(!_settSchedConfig)_settSchedConfig={};
+  _settSchedConfig.custom_rules=_settSchedConfig.custom_rules||[];
+  _settSchedConfig.manual_protected=_settSchedConfig.manual_protected||[];
+  settSaveCanonicalConfig("customrules","Custom rules and pinned classes saved");
 }
 
 </script>

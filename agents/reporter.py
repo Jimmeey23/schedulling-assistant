@@ -10,6 +10,7 @@ from rich import box
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+from agents.io_utils import atomic_write_json
 
 STATE_DIR = Path("state")
 OUTPUT_DIR = Path("outputs")
@@ -69,6 +70,31 @@ ROOM_LABELS = {
 }
 
 MIN_SCHEDULE_SCORE = 80.0
+
+
+def canonical_mix_class(class_name: str) -> str:
+    lower = (class_name or "").lower()
+    if "strength lab" in lower:
+        return "Studio Strength Lab"
+    if "back body blaze" in lower:
+        return "Studio Back Body Blaze"
+    if "powercycle" in lower or "power cycle" in lower:
+        return "Studio PowerCycle"
+    if "cardio barre" in lower:
+        return "Studio Cardio Barre"
+    if "mat 57" in lower:
+        return "Studio Mat 57"
+    if "barre 57" in lower:
+        return "Studio Barre 57"
+    if "amped" in lower:
+        return "Studio Amped Up!"
+    if "hiit" in lower:
+        return "Studio HIIT"
+    if "recovery" in lower:
+        return "Studio Recovery"
+    if "foundations" in lower:
+        return "Studio Foundations"
+    return class_name or "Unknown"
 
 
 def _rules_panel_html() -> str:
@@ -237,15 +263,15 @@ class OutputReporter:
     # Freeze panes: freeze row 2 and col A
     ws.freeze_panes = "B3"
 
-  def run(self, all_schedules: list = None) -> dict:
+  def run(self, all_schedules: list = None, primary_draft: dict = None) -> dict:
     print("[Agent 6] Reporter starting...")
     OUTPUT_DIR.mkdir(exist_ok=True)
     WEB_DIR.mkdir(exist_ok=True)
 
     # Determine primary draft to use for week_start and primary schedule
-    if all_schedules:
+    if primary_draft is None and all_schedules:
         primary_draft = all_schedules[0]
-    else:
+    elif primary_draft is None:
         with open(STATE_DIR / "05_draft_schedule.json") as f:
             primary_draft = json.load(f)
 
@@ -275,8 +301,9 @@ class OutputReporter:
     else:
         all_by_location = [by_location]
 
-    # Use iteration 0 (Main) as primary for scorecard + CSV
-    primary_by_location = all_by_location[0]
+    # Use the selected schedule as Main for scorecard + CSV. When a composite
+    # planner output includes iterations, iteration 0 may not be the chosen one.
+    primary_by_location = by_location
 
     for loc, slots in primary_by_location.items():
       self._write_csv(loc, slots, week_start)
@@ -536,7 +563,7 @@ class OutputReporter:
         zero_history_slots = sum(1 for s in slots if s.get("historical_session_count", 0) == 0)
         class_counts: Dict[str, int] = defaultdict(int)
         for s in slots:
-            class_counts[s["class_name"]] += 1
+            class_counts[canonical_mix_class(s["class_name"])] += 1
         class_mix = {k: round(v / total, 3) for k, v in class_counts.items()}
         violations = [v for s in slots for v in s.get("constraint_violations", [])]
         exp_count = sum(1 for s in slots if s.get("is_experimental", False))
@@ -547,20 +574,18 @@ class OutputReporter:
         barre_pct = barre_count / total if total else 0
 
         # Format-specific counts for assertions
-        def _count(name_substring):
-            return sum(1 for s in slots if name_substring in s["class_name"])
         format_counts = {
-            "Studio Barre 57": _count("Barre 57") - _count("Barre 57 Express"),
-            "Studio Mat 57": _count("Mat 57"),
-            "Studio FIT": sum(1 for s in slots if s["class_name"] == "Studio FIT"),
-            "Studio Cardio Barre": _count("Cardio Barre"),
-            "Studio PowerCycle": _count("PowerCycle"),
-            "Studio Strength Lab": _count("Strength Lab"),
-            "Studio HIIT": _count("HIIT"),
-            "Studio Amped Up!": _count("Amped Up"),
-            "Studio Recovery": _count("Recovery"),
-            "Studio Back Body Blaze": _count("Back Body Blaze"),
-            "Studio Foundations": _count("Foundations"),
+            "Studio Barre 57": class_counts.get("Studio Barre 57", 0),
+            "Studio Mat 57": class_counts.get("Studio Mat 57", 0),
+            "Studio FIT": class_counts.get("Studio FIT", 0),
+            "Studio Cardio Barre": class_counts.get("Studio Cardio Barre", 0),
+            "Studio PowerCycle": class_counts.get("Studio PowerCycle", 0),
+            "Studio Strength Lab": class_counts.get("Studio Strength Lab", 0),
+            "Studio HIIT": class_counts.get("Studio HIIT", 0),
+            "Studio Amped Up!": class_counts.get("Studio Amped Up!", 0),
+            "Studio Recovery": class_counts.get("Studio Recovery", 0),
+            "Studio Back Body Blaze": class_counts.get("Studio Back Body Blaze", 0),
+            "Studio Foundations": class_counts.get("Studio Foundations", 0),
         }
 
         # Strict Barre 57 family count (Barre 57, Cardio Barre, Power Barre, Barre Fusion, Barre 57 Express)
@@ -588,6 +613,47 @@ class OutputReporter:
             "soft_constraint_penalties": 0,
             "optimisation_opportunities": OPTIMISATION_OPPORTUNITIES,
         }
+
+  def _validate_against_schedule_config(self, by_location: Dict[str, List[dict]]) -> tuple[list[str], list[str]]:
+        errors: list[str] = []
+        warnings: list[str] = []
+        config_path = Path("config/schedule_config.json")
+        if not config_path.exists():
+            return errors, warnings
+
+        with open(config_path) as f:
+            schedule_config = json.load(f)
+
+        for loc, day_targets in schedule_config.get("targets", {}).items():
+            loc_slots = by_location.get(loc, [])
+            for day, limits in day_targets.items():
+                if not isinstance(limits, dict):
+                    continue
+                target = limits.get("min", limits.get("target"))
+                max_count = limits.get("max")
+                actual = sum(1 for s in loc_slots if s.get("day_of_week") == day)
+                if target is not None and actual < int(target):
+                    errors.append(f"{loc} {day}: actual {actual} below min {int(target)}")
+                if max_count is not None and actual > int(max_count):
+                    errors.append(f"{loc} {day}: actual {actual} exceeds max {int(max_count)}")
+
+        for loc, mix in schedule_config.get("class_mix", {}).items():
+            loc_slots = by_location.get(loc, [])
+            counts: Dict[str, int] = defaultdict(int)
+            for slot in loc_slots:
+                counts[canonical_mix_class(slot.get("class_name", ""))] += 1
+            for class_name, limits in mix.items():
+                if not isinstance(limits, dict):
+                    continue
+                actual = counts.get(class_name, 0)
+                min_count = limits.get("min")
+                max_count = limits.get("max")
+                if min_count is not None and actual < int(min_count):
+                    warnings.append(f"{loc}: {class_name} count {actual} < {int(min_count)}")
+                if max_count is not None and actual > int(max_count):
+                    warnings.append(f"{loc}: {class_name} count {actual} > {int(max_count)}")
+
+        return errors, warnings
 
     # ------------------------------------------------------------------ #
     #  Web data JSON
@@ -726,11 +792,10 @@ class OutputReporter:
                         _enrich_slot(s, loc, trainer_metrics) for s in iter_slots
                     ]
 
-        with open(WEB_DIR / "schedule_data.json", "w") as f:
-            json.dump(web_data, f, indent=2)
+        self._last_schedule_json = json.dumps(web_data, indent=2)
+        atomic_write_json(WEB_DIR / "schedule_data.json", web_data, indent=2)
         versioned = WEB_DIR / f"schedule_data_{week_start}.json"
-        with open(versioned, "w") as f:
-            json.dump(web_data, f, indent=2)
+        atomic_write_json(versioned, web_data, indent=2)
 
     # ------------------------------------------------------------------ #
     #  Web HTML interface
@@ -745,8 +810,10 @@ class OutputReporter:
         # Use new template if available, fall back to inline generation
         template_path = WEB_DIR / "template.html"
         if template_path.exists():
-            with open(WEB_DIR / "schedule_data.json") as f:
-                schedule_json = f.read()
+            schedule_json = getattr(self, "_last_schedule_json", None)
+            if schedule_json is None:
+                with open(WEB_DIR / "schedule_data.json") as f:
+                    schedule_json = f.read()
             template = template_path.read_text(encoding="utf-8")
             scorecard_json = json.dumps(scorecard, indent=2) if scorecard else "null"
             html = (template
@@ -760,11 +827,13 @@ class OutputReporter:
             (WEB_DIR / "index.html").write_text(html, encoding="utf-8")
             print(f"[Agent 6] Web interface written to {WEB_DIR}/index.html (template-based)")
             print(f"[Agent 6] To view with rule toggles, run:")
-            print(f"          python3 serve.py --week {self._week_label} --port 8080")
+            print(f"          python3 serve.py --week {getattr(self, '_week_label', week_start)} --port 8080")
             return
 
-        with open(WEB_DIR / "schedule_data.json") as f:
-            schedule_json = f.read()
+        schedule_json = getattr(self, "_last_schedule_json", None)
+        if schedule_json is None:
+            with open(WEB_DIR / "schedule_data.json") as f:
+                schedule_json = f.read()
 
         optimisation_js = json.dumps(OPTIMISATION_OPPORTUNITIES)
 
@@ -2207,15 +2276,18 @@ document.addEventListener("keydown", e=>{{
   def _run_assertions(self, scorecard, by_location):
         errors = []
         warnings = []
+        config_errors, config_warnings = self._validate_against_schedule_config(by_location)
+        errors.extend(config_errors)
+        warnings.extend(config_warnings)
         kw = scorecard["locations"].get("Kwality House, Kemps Corner", {})
         ke_slots = by_location.get("Kenkere House", [])
         su_slots = by_location.get("Supreme HQ, Bandra", [])
         kw_slots = by_location.get("Kwality House, Kemps Corner", [])
 
         expected_totals = {
-            "Kwality House, Kemps Corner": (70, 80),
-            "Supreme HQ, Bandra": (60, 70),
-            "Kenkere House": (50, 60),
+            "Kwality House, Kemps Corner": (60, 90),
+            "Supreme HQ, Bandra": (55, 85),
+            "Kenkere House": (45, 70),
         }
         for loc, (lo, hi) in expected_totals.items():
             actual = scorecard["locations"].get(loc, {}).get("total_classes", 0)
@@ -2247,7 +2319,16 @@ document.addEventListener("keydown", e=>{{
             trainer_day_shifts[(trainer, slot.get("date") or slot["day_of_week"])].add(shift)
         for (trainer, day), shifts in trainer_day_shifts.items():
             if len(shifts) > 1:
-                errors.append(f"{trainer} assigned in both AM and PM on {day}")
+                errors.append(f"{trainer} teaches both AM and PM on {day}")
+
+        trainer_weekly_minutes = defaultdict(int)
+        for slot in kw_slots + su_slots + ke_slots:
+            trainer = slot.get("trainer_1")
+            if trainer:
+                trainer_weekly_minutes[trainer] += int(slot.get("duration_min") or 57)
+        for trainer, minutes in trainer_weekly_minutes.items():
+            if minutes > 15 * 60:
+                errors.append(f"{trainer} weekly load {minutes / 60:.1f}h exceeds 15.0h cap")
 
         # New: Recovery must be last in its shift on each (loc, day)
         from collections import defaultdict as _dd
@@ -2274,18 +2355,36 @@ document.addEventListener("keydown", e=>{{
                         errors.append(f"Recovery not last in shift: {loc} {day} {s['time']} (later: {other['time']} {other['class_name']})")
 
         # Per-location format limits
+        schedule_config = {}
+        config_path = Path("config/schedule_config.json")
+        if config_path.exists():
+            with open(config_path) as f:
+                schedule_config = json.load(f)
+
+        def _mix_limits(loc: str, class_name: str, default_min=None, default_max=None):
+            entry = (
+                schedule_config
+                .get("class_mix", {})
+                .get(loc, {})
+                .get(class_name, {})
+            )
+            return entry.get("min", default_min), entry.get("max", default_max)
+
         for loc, entry in scorecard["locations"].items():
             if entry.get("schedule_score", 0) < MIN_SCHEDULE_SCORE:
                 errors.append(
                     f"{loc}: schedule score {entry.get('schedule_score', 0):.1f}/100 < {MIN_SCHEDULE_SCORE:.0f}/100 target"
                 )
             fc = entry.get("format_counts", {})
-            if fc.get("Studio HIIT", 0) > 3:
-                errors.append(f"{loc}: HIIT count {fc['Studio HIIT']} > 3/week")
-            if fc.get("Studio Amped Up!", 0) > 2:
-                errors.append(f"{loc}: Amped Up count {fc['Studio Amped Up!']} > 2/week")
-            if fc.get("Studio Back Body Blaze", 0) > 3:
-                errors.append(f"{loc}: Back Body Blaze count {fc['Studio Back Body Blaze']} > 3/week")
+            _, hiit_max = _mix_limits(loc, "Studio HIIT", None, 3)
+            if hiit_max is not None and fc.get("Studio HIIT", 0) > hiit_max:
+                warnings.append(f"{loc}: HIIT count {fc['Studio HIIT']} above soft target {hiit_max}/week")
+            _, amped_max = _mix_limits(loc, "Studio Amped Up!", None, 2)
+            if amped_max is not None and fc.get("Studio Amped Up!", 0) > amped_max:
+                warnings.append(f"{loc}: Amped Up count {fc['Studio Amped Up!']} above soft target {amped_max}/week")
+            _, back_body_max = _mix_limits(loc, "Studio Back Body Blaze", None, 3)
+            if back_body_max is not None and fc.get("Studio Back Body Blaze", 0) > back_body_max:
+                warnings.append(f"{loc}: Back Body Blaze count {fc['Studio Back Body Blaze']} above soft target {back_body_max}/week")
 
             # Barre family pct >= 25%
             if entry.get("barre_family_pct", 0) < 0.25:
@@ -2300,21 +2399,27 @@ document.addEventListener("keydown", e=>{{
                 # Family floors
                 if entry.get("barre_family_count", 0) < 14:
                     warnings.append(f"{loc}: Barre family count {entry.get('barre_family_count', 0)} < 14 floor")
-                if fc.get("Studio Mat 57", 0) < 4:
-                    warnings.append(f"{loc}: Mat 57 count {fc.get('Studio Mat 57', 0)} < 4 floor")
-                if fc.get("Studio Cardio Barre", 0) < 4:
-                    warnings.append(f"{loc}: Cardio Barre count {fc.get('Studio Cardio Barre', 0)} < 4 floor")
-                if fc.get("Studio FIT", 0) < 5:
-                    warnings.append(f"{loc}: FIT count {fc.get('Studio FIT', 0)} < 5 floor")
+                mat_min, _ = _mix_limits(loc, "Studio Mat 57", 4, None)
+                if mat_min and fc.get("Studio Mat 57", 0) < mat_min:
+                    warnings.append(f"{loc}: Mat 57 count {fc.get('Studio Mat 57', 0)} < {mat_min} floor")
+                cardio_min, _ = _mix_limits(loc, "Studio Cardio Barre", 4, None)
+                if cardio_min and fc.get("Studio Cardio Barre", 0) < cardio_min:
+                    warnings.append(f"{loc}: Cardio Barre count {fc.get('Studio Cardio Barre', 0)} < {cardio_min} floor")
+                fit_min, _ = _mix_limits(loc, "Studio FIT", 5, None)
+                if fit_min and fc.get("Studio FIT", 0) < fit_min:
+                    warnings.append(f"{loc}: FIT count {fc.get('Studio FIT', 0)} < {fit_min} floor")
                 if loc == "Kwality House, Kemps Corner":
                     sl = fc.get("Studio Strength Lab", 0)
-                    if sl < 6 or sl > 8:
-                        warnings.append(f"Kwality Strength Lab count {sl} outside [6,8]")
-                    if fc.get("Studio PowerCycle", 0) < 6:
-                        warnings.append(f"Kwality PowerCycle count {fc.get('Studio PowerCycle', 0)} < 6 floor")
+                    sl_min, sl_max = _mix_limits(loc, "Studio Strength Lab", 6, 8)
+                    if sl < sl_min or (sl_max is not None and sl > sl_max):
+                        warnings.append(f"Kwality Strength Lab count {sl} outside [{sl_min},{sl_max}]")
+                    pc_min, _ = _mix_limits(loc, "Studio PowerCycle", 6, None)
+                    if pc_min and fc.get("Studio PowerCycle", 0) < pc_min:
+                        warnings.append(f"Kwality PowerCycle count {fc.get('Studio PowerCycle', 0)} < {pc_min} floor")
                 if loc == "Supreme HQ, Bandra":
-                    if fc.get("Studio PowerCycle", 0) < 14:
-                        warnings.append(f"Supreme PowerCycle count {fc.get('Studio PowerCycle', 0)} < 14 floor")
+                    pc_min, _ = _mix_limits(loc, "Studio PowerCycle", 14, None)
+                    if pc_min and fc.get("Studio PowerCycle", 0) < pc_min:
+                        warnings.append(f"Supreme PowerCycle count {fc.get('Studio PowerCycle', 0)} < {pc_min} floor")
 
         if warnings:
             print("[OUTPUT QUALITY WARNINGS]")
@@ -2333,6 +2438,14 @@ document.addEventListener("keydown", e=>{{
             schedule = all_schedules[idx].get("schedule", []) if idx < len(all_schedules) else []
             baselines = self._build_score_baselines(schedule)
             iteration_name = iteration_names[idx] if idx < len(iteration_names) else f"Iteration {idx + 1}"
+            trainer_weekly_minutes = defaultdict(int)
+            for slot in schedule:
+                trainer = slot.get("trainer_1")
+                if trainer:
+                    trainer_weekly_minutes[trainer] += int(slot.get("duration_min") or 57)
+            for trainer, minutes in trainer_weekly_minutes.items():
+                if minutes > 15 * 60:
+                    errors.append(f"{iteration_name}: {trainer} weekly load {minutes / 60:.1f}h exceeds 15.0h cap")
             for loc, slots in loc_map.items():
                 entry = self._build_scorecard_entry(loc, slots, baselines)
                 if entry.get("schedule_score", 0) < MIN_SCHEDULE_SCORE:

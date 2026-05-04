@@ -2,209 +2,121 @@
   "targets": {
     "Kwality House, Kemps Corner": {
       "Monday": {
-        "target": 13,
-        "max": 13
+        "target": 12,
+        "max": 14,
+        "source": "settings"
       },
       "Tuesday": {
-        "target": 12,
-        "max": 12
+        "target": 11,
+        "max": 14,
+        "source": "settings"
       },
       "Wednesday": {
-        "target": 12,
-        "max": 13
+        "target": 11,
+        "max": 14,
+        "source": "settings"
       },
       "Thursday": {
         "target": 12,
-        "max": 13
+        "max": 14,
+        "source": "settings"
       },
       "Friday": {
-        "target": 11,
-        "max": 11
+        "target": 10,
+        "max": 13,
+        "source": "settings"
       },
       "Saturday": {
-        "target": 14,
-        "max": 14
+        "target": 12,
+        "max": 16,
+        "source": "settings"
       },
       "Sunday": {
-        "target": 7,
-        "max": 7
+        "target": 4,
+        "max": 8,
+        "source": "settings"
       }
     },
     "Supreme HQ, Bandra": {
       "Monday": {
-        "target": 11,
-        "max": 12
+        "target": 9,
+        "max": 12,
+        "source": "settings"
       },
       "Tuesday": {
         "target": 10,
-        "max": 10
+        "max": 12,
+        "source": "settings"
       },
       "Wednesday": {
-        "target": 11,
-        "max": 11
+        "target": 9,
+        "max": 12,
+        "source": "settings"
       },
       "Thursday": {
         "target": 10,
-        "max": 11
+        "max": 12,
+        "source": "settings"
       },
       "Friday": {
-        "target": 10,
-        "max": 11
+        "target": 9,
+        "max": 12,
+        "source": "settings"
       },
       "Saturday": {
-        "target": 13,
-        "max": 12
+        "target": 10,
+        "max": 13,
+        "source": "settings"
       },
       "Sunday": {
-        "target": 8,
-        "max": 8
+        "target": 5,
+        "max": 8,
+        "source": "settings"
       }
     },
     "Kenkere House": {
       "Monday": {
         "target": 8,
-        "max": 12
+        "max": 12,
+        "source": "settings"
       },
       "Tuesday": {
         "target": 8,
-        "max": 9
+        "max": 9,
+        "source": "settings"
       },
       "Wednesday": {
         "target": 6,
-        "max": 12
+        "max": 12,
+        "source": "settings"
       },
       "Thursday": {
         "target": 8,
-        "max": 8
+        "max": 8,
+        "source": "settings"
       },
       "Friday": {
         "target": 8,
-        "max": 8
+        "max": 8,
+        "source": "settings"
       },
       "Saturday": {
         "target": 7,
-        "max": 11
+        "max": 11,
+        "source": "settings"
       },
       "Sunday": {
-        "target": 4,
-        "max": 6
+        "target": 5,
+        "max": 6,
+        "source": "settings"
       }
     }
   },
   "manual_protected": [],
   "manual_excluded": [],
-  "class_mix": {
-    "Kwality House, Kemps Corner": {
-      "Studio Barre 57": {
-        "min": 14,
-        "max": 22
-      },
-      "Studio Cardio Barre": {
-        "min": 8,
-        "max": 10
-      },
-      "Studio Mat 57": {
-        "min": 9,
-        "max": 9
-      },
-      "Studio PowerCycle": {
-        "min": 15,
-        "max": 15
-      },
-      "Studio Strength Lab": {
-        "min": 12,
-        "max": 14
-      },
-      "Studio Back Body Blaze": {
-        "min": 0,
-        "max": 2
-      },
-      "Studio FIT": {
-        "min": 12,
-        "max": 15
-      },
-      "Studio Recovery": {
-        "min": 1,
-        "max": 2
-      },
-      "Studio Foundations": {
-        "min": 0,
-        "max": 0
-      },
-      "Studio Amped Up!": {
-        "min": 1,
-        "max": 2
-      },
-      "Studio HIIT": {
-        "min": 1,
-        "max": 2
-      }
-    },
-    "Supreme HQ, Bandra": {
-      "Studio Barre 57": {
-        "min": 16,
-        "max": 20
-      },
-      "Studio Cardio Barre": {
-        "min": 12,
-        "max": 12
-      },
-      "Studio Mat 57": {
-        "min": 11,
-        "max": 11
-      },
-      "Studio PowerCycle": {
-        "min": 21,
-        "max": 21
-      },
-      "Studio Back Body Blaze": {
-        "min": 0,
-        "max": 1
-      },
-      "Studio FIT": {
-        "min": 11,
-        "max": 11
-      },
-      "Studio Recovery": {
-        "min": 1,
-        "max": 2
-      },
-      "Studio Foundations": {
-        "min": 0,
-        "max": 0
-      }
-    },
-    "Kenkere House": {
-      "Studio Barre 57": {
-        "min": 12,
-        "max": 20
-      },
-      "Studio Cardio Barre": {
-        "min": 4,
-        "max": 8
-      },
-      "Studio Mat 57": {
-        "min": 3,
-        "max": 6
-      },
-      "Studio Back Body Blaze": {
-        "min": 0,
-        "max": 3
-      },
-      "Studio FIT": {
-        "min": 3,
-        "max": 6
-      },
-      "Studio Recovery": {
-        "min": 1,
-        "max": 3
-      },
-      "Studio Foundations": {
-        "min": 3,
-        "max": 6
-      }
-    }
-  },
+  "custom_rules": [],
+  "leave_periods": [],
+  "off_days": [],
   "inactive_trainers": [
     "Dhruv Mehta",
     "Janhavi Jain",
@@ -219,5 +131,198 @@
     "Ria Kapoor",
     "Saniya Jaiswal",
     "Varun Chadha"
-  ]
+  ],
+  "class_mix": {
+    "Kwality House, Kemps Corner": {
+      "Studio Barre 57": {
+        "min": 18,
+        "max": 22,
+        "source": "settings"
+      },
+      "Studio Cardio Barre": {
+        "min": 9,
+        "max": 12,
+        "source": "settings"
+      },
+      "Studio Mat 57": {
+        "min": 8,
+        "max": 11,
+        "source": "settings"
+      },
+      "Studio PowerCycle": {
+        "min": 15,
+        "max": 17,
+        "source": "settings"
+      },
+      "Studio Strength Lab": {
+        "min": 10,
+        "max": 15,
+        "source": "settings"
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 4,
+        "source": "settings"
+      },
+      "Studio FIT": {
+        "min": 12,
+        "max": 15,
+        "source": "settings"
+      },
+      "Studio Recovery": {
+        "min": 0,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Amped Up!": {
+        "min": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio HIIT": {
+        "min": 1,
+        "max": 2,
+        "source": "settings"
+      }
+    },
+    "Supreme HQ, Bandra": {
+      "Studio Barre 57": {
+        "min": 18,
+        "max": 22,
+        "source": "settings"
+      },
+      "Studio Cardio Barre": {
+        "min": 12,
+        "max": 12,
+        "source": "settings"
+      },
+      "Studio Mat 57": {
+        "min": 11,
+        "max": 11,
+        "source": "settings"
+      },
+      "Studio PowerCycle": {
+        "min": 18,
+        "max": 23,
+        "source": "settings"
+      },
+      "Studio Strength Lab": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio FIT": {
+        "min": 11,
+        "max": 11,
+        "source": "settings"
+      },
+      "Studio Recovery": {
+        "min": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Amped Up!": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio HIIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      }
+    },
+    "Kenkere House": {
+      "Studio Barre 57": {
+        "min": 12,
+        "max": 20,
+        "source": "settings"
+      },
+      "Studio Cardio Barre": {
+        "min": 4,
+        "max": 8,
+        "source": "settings"
+      },
+      "Studio Mat 57": {
+        "min": 3,
+        "max": 6,
+        "source": "settings"
+      },
+      "Studio PowerCycle": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Strength Lab": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 3,
+        "source": "settings"
+      },
+      "Studio FIT": {
+        "min": 3,
+        "max": 6,
+        "source": "settings"
+      },
+      "Studio Recovery": {
+        "min": 1,
+        "max": 3,
+        "source": "settings"
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Amped Up!": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio HIIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      }
+    }
+  },
+  "settings_options": {
+    "enforce_exact_daily_targets": true,
+    "auto_repair_underfilled_days": true,
+    "allow_soft_mix_overrides": false,
+    "block_hard_conflict_saves": true,
+    "show_superseded_rules": true,
+    "save_snapshot_on_publish": true,
+    "pipeline_requires_validation": true,
+    "default_bulk_scope": "selection",
+    "target_cap_buffer": 1,
+    "target_selection_strategy": "seeded_range",
+    "weekly_hours_cap": 15,
+    "max_classes_per_day_default": 3,
+    "conflict_policy": "settings_override_soft_rules"
+  },
+  "source_of_truth": {
+    "owner": "settings-command-center",
+    "conflict_policy": "settings_override_soft_rules",
+    "updated_at": "2026-05-04T10:26:02.931Z"
+  }
 }

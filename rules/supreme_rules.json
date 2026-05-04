@@ -13,12 +13,12 @@
     {"id": "SU-010", "type": "never_do", "description": "No Pre/Post Natal at Supreme HQ", "check_fn_name": "check_su_no_prenatal"}
   ],
   "target_classes_per_day": {
-    "Monday": 12,
-    "Tuesday": 11,
-    "Wednesday": 10,
-    "Thursday": 11,
-    "Friday": 9,
-    "Saturday": 11,
-    "Sunday": 8
+    "Monday": 11,
+    "Tuesday": 10,
+    "Wednesday": 11,
+    "Thursday": 12,
+    "Friday": 10,
+    "Saturday": 13,
+    "Sunday": 4
   }
 }

@@ -1,0 +1,86 @@
+<h2>Command Center Detail</h2>
+<p class="subtitle">This is the proposed structure for the Settings tab as the authoritative configuration surface.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Settings Command Center · Proposed Layout</div>
+  <div class="mockup-body">
+    <div style="display:grid;grid-template-columns:210px minmax(0,1fr) 280px;gap:14px;min-height:620px">
+      <div class="mock-sidebar">
+        <div class="label">Single Source of Truth</div>
+        <div class="placeholder" style="height:54px;margin:8px 0;background:#ecfdf5;border-color:#bbf7d0">Config valid · 0 blocking conflicts</div>
+        <div class="mock-button">Overview</div>
+        <div class="mock-button">Daily Targets</div>
+        <div class="mock-button">Class Mix</div>
+        <div class="mock-button">Trainer Profiles</div>
+        <div class="mock-button">Qualifications</div>
+        <div class="mock-button">Availability & Leave</div>
+        <div class="mock-button">Custom Rules & Pins</div>
+        <div class="mock-button">Conflict Resolver</div>
+        <div class="mock-button">Import / Export</div>
+        <div class="placeholder" style="height:88px;margin-top:14px">Last saved config snapshot<br>Run impact preview<br>Rollback available</div>
+      </div>
+
+      <div class="mock-content">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
+          <div>
+            <h3 style="margin:0">Daily Targets Matrix</h3>
+            <p style="margin:4px 0 0;color:#6b7280;font-size:12px">Targets and max values are canonical. Generated iterations and rule toggles must defer to this matrix.</p>
+          </div>
+          <div style="display:flex;gap:6px;white-space:nowrap">
+            <button class="mock-button">Validate</button>
+            <button class="mock-button">Save & Push</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:118px repeat(7,1fr);gap:4px;margin-bottom:8px">
+          <div class="placeholder" style="height:28px;background:#111827;color:white">Studio / Day</div>
+          <div class="placeholder" style="height:28px;background:#eff6ff">Mon<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#eff6ff">Tue<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#eff6ff">Wed<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#eff6ff">Thu<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#eff6ff">Fri<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#fff7ed">Sat<br><small>Bulk col</small></div>
+          <div class="placeholder" style="height:28px;background:#fff7ed">Sun<br><small>Bulk col</small></div>
+
+          <div class="placeholder" style="height:56px;background:#f8fafc"><strong>Kwality</strong><br><small>Bulk row</small></div>
+          <div class="placeholder" style="height:56px">Target 12<br>Max 15</div><div class="placeholder" style="height:56px">11 / 15</div><div class="placeholder" style="height:56px">12 / 16</div><div class="placeholder" style="height:56px">12 / 15</div><div class="placeholder" style="height:56px">11 / 14</div><div class="placeholder" style="height:56px">14 / 17</div><div class="placeholder" style="height:56px">5 / 8</div>
+
+          <div class="placeholder" style="height:56px;background:#f8fafc"><strong>Supreme</strong><br><small>Bulk row</small></div>
+          <div class="placeholder" style="height:56px">11 / 12</div><div class="placeholder" style="height:56px">10 / 10</div><div class="placeholder" style="height:56px">11 / 11</div><div class="placeholder" style="height:56px">12 / 12</div><div class="placeholder" style="height:56px">10 / 11</div><div class="placeholder" style="height:56px;background:#fef2f2;border-color:#fecaca">13 / 13<br><small>tight cap</small></div><div class="placeholder" style="height:56px">4 / 6</div>
+
+          <div class="placeholder" style="height:56px;background:#f8fafc"><strong>Kenkere</strong><br><small>Bulk row</small></div>
+          <div class="placeholder" style="height:56px">8 / 12</div><div class="placeholder" style="height:56px">8 / 9</div><div class="placeholder" style="height:56px">6 / 12</div><div class="placeholder" style="height:56px">8 / 8</div><div class="placeholder" style="height:56px">8 / 8</div><div class="placeholder" style="height:56px">7 / 11</div><div class="placeholder" style="height:56px">5 / 6</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px">
+          <div class="placeholder" style="height:90px"><strong>Row operators</strong><br>Set target · +/- target · max = target + N · copy row · weekday/weekend split</div>
+          <div class="placeholder" style="height:90px"><strong>Column operators</strong><br>Set all studios for day · normalize caps · copy weekday · weekend template</div>
+          <div class="placeholder" style="height:90px"><strong>Selection operators</strong><br>Apply to selected cells · clear overrides · lock/unlock · validate selection</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+          <div class="placeholder" style="height:112px"><strong>Class Mix Matrix</strong><br>Same row/column/selection operators for min/max class counts by location and class format.</div>
+          <div class="placeholder" style="height:112px"><strong>Trainer Bulk Console</strong><br>Activate/deactivate, tier changes, location access, qualifications, availability templates, leave import.</div>
+        </div>
+      </div>
+
+      <div class="mock-sidebar">
+        <div class="label">Inspector / Conflict Resolver</div>
+        <div class="placeholder" style="height:72px;background:#fefce8;border-color:#fde68a"><strong>Selected:</strong> Supreme Saturday<br>Target 13 · Max 13<br>Source: Settings</div>
+        <input class="mock-input" value="Operator: +1 target">
+        <input class="mock-input" value="Scope: selected column">
+        <input class="mock-input" value="Guardrail: keep max >= target">
+        <button class="mock-button">Preview Change Set</button>
+        <button class="mock-button">Apply Bulk Update</button>
+        <div class="placeholder" style="height:116px;margin-top:12px"><strong>Conflict policy</strong><br>1. Settings override generated planner defaults<br>2. Manual pins override soft class mix<br>3. Hard constraints block invalid saves<br>4. Conflicts require explicit resolution</div>
+        <div class="placeholder" style="height:116px;margin-top:12px"><strong>Change preview</strong><br>3 cells modified<br>1 custom daily rule superseded<br>0 save blockers<br>Pipeline rerun required</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Design proposal</h3>
+  <p><strong>Settings becomes canonical</strong>: the UI edits one merged config object, validates it before save, and saves with conflict metadata. The optimiser, reporter, and rules views read from that config instead of treating generated defaults as equally authoritative.</p>
+  <p><strong>Bulk operators are contextual</strong>: each matrix supports row, column, and selected-cell operations. Trainer tables get column toggles and filtered bulk edits. Every operation shows a preview before mutation.</p>
+</div>

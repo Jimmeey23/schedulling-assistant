@@ -1,11 +1,15 @@
 import json
 import sys
+import builtins
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agents.ai_planner import AISchedulePlanner, PlannedSlot, _enforce_hard_limits, _parse_schedule_response, _score_slots
-from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState
+import agents.reporter as reporter_module
+import app as flask_app_module
+from agents.ai_planner import AISchedulePlanner, PlannedSlot, _build_location_prompt, _enforce_hard_limits, _parse_schedule_response, _score_slots
+from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, MAX_TRAINER_WEEKLY_MINUTES, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState, get_class_duration, slot_time_to_minutes
 from agents.reporter import OutputReporter
 from serve import build_pipeline_command, find_available_port
 
@@ -52,6 +56,30 @@ def test_room_selection_falls_back_when_only_same_format_room_is_free():
     room = optimiser._find_best_room(occ, "Monday", "barre_57", 615, 57, "barre_family")
 
     assert room == "studio_a"
+
+
+def test_class_mix_max_is_hard_generation_ceiling():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.schedule_config = {
+        "class_mix": {
+            "Kwality House, Kemps Corner": {
+                "Studio HIIT": {"min": 1, "max": 2}
+            }
+        }
+    }
+
+    assert optimiser._weekly_over_target_penalty(
+        "Kwality House, Kemps Corner", "Studio HIIT", current_count=1
+    ) == 0
+    assert optimiser._weekly_over_target_penalty(
+        "Kwality House, Kemps Corner", "Studio HIIT", current_count=2
+    ) < 0
+    assert not optimiser._class_mix_allows_candidate(
+        "Kwality House, Kemps Corner", "Studio HIIT", current_count=2
+    )
+    assert not optimiser._class_mix_hard_blocked(
+        "Kwality House, Kemps Corner", "Studio HIIT"
+    )
 
 
 def test_ai_scoring_uses_exact_time_before_day_level_fallback():
@@ -203,6 +231,27 @@ def test_scorecard_reports_historical_evidence_exposure():
     assert entry["historical_avg_fill_rate"] == 0.3
 
 
+def test_scorecard_class_mix_canonicalizes_class_variants():
+    reporter = OutputReporter()
+    slots = [
+        make_slot(class_name="Studio Strength Lab (Push)").__dict__,
+        make_slot(class_name="Studio Strength Lab (Full Body)").__dict__,
+        make_slot(class_name="Studio Back Body Blaze Express").__dict__,
+        make_slot(class_name="Studio Mat 57 Express").__dict__,
+    ]
+
+    entry = reporter._build_scorecard_entry("Kwality House, Kemps Corner", slots)
+
+    assert entry["class_mix"] == {
+        "Studio Strength Lab": 0.5,
+        "Studio Back Body Blaze": 0.25,
+        "Studio Mat 57": 0.25,
+    }
+    assert entry["format_counts"]["Studio Strength Lab"] == 2
+    assert entry["format_counts"]["Studio Back Body Blaze"] == 1
+    assert entry["format_counts"]["Studio Mat 57"] == 1
+
+
 def test_scorecard_schedule_score_uses_relative_baseline_and_floor_target():
     reporter = OutputReporter()
     slots = [
@@ -234,6 +283,100 @@ def test_scorecard_schedule_score_penalizes_underperforming_schedule():
     )
 
     assert entry["schedule_score"] < 80
+
+
+def test_reporter_validates_daily_target_range(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "targets": {
+            "Kwality House, Kemps Corner": {
+                "Monday": {"target": 2, "max": 4},
+            }
+        }
+    }))
+    reporter = OutputReporter()
+    slots = [
+        make_slot(time="09:00").__dict__,
+        make_slot(time="10:00").__dict__,
+        make_slot(time="11:00").__dict__,
+    ]
+
+    errors, warnings = reporter._validate_against_schedule_config({
+        "Kwality House, Kemps Corner": slots,
+    })
+
+    assert not errors
+
+    errors, warnings = reporter._validate_against_schedule_config({
+        "Kwality House, Kemps Corner": slots[:1],
+    })
+
+    assert any("below min 2" in e for e in errors)
+
+
+def test_reporter_warns_on_class_mix_floor_mismatch(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "class_mix": {
+            "Kwality House, Kemps Corner": {
+                "Studio Mat 57": {"min": 1, "max": 2},
+            }
+        }
+    }))
+    reporter = OutputReporter()
+    slots = [make_slot(class_name="Studio Barre 57").__dict__]
+
+    errors, warnings = reporter._validate_against_schedule_config({
+        "Kwality House, Kemps Corner": slots,
+    })
+
+    assert not errors
+    assert any("Studio Mat 57 count 0 < 1" in w for w in warnings)
+
+
+def test_schedule_config_api_persists_source_of_truth_metadata(tmp_path, monkeypatch):
+    monkeypatch.setattr(flask_app_module, "PROJECT_ROOT", tmp_path)
+    (tmp_path / "config").mkdir()
+    payload = {
+        "targets": {
+            "Supreme HQ, Bandra": {
+                "Saturday": {"target": 13, "max": 13, "source": "settings"}
+            }
+        },
+        "class_mix": {
+            "Supreme HQ, Bandra": {
+                "Studio PowerCycle": {"min": 21, "max": 24, "source": "settings"}
+            }
+        },
+        "manual_protected": [],
+        "manual_excluded": [],
+        "custom_rules": [
+            {
+                "enabled": True,
+                "priority": "hard",
+                "rule_type": "daily_target",
+                "location": "Supreme HQ, Bandra",
+                "day": "Saturday",
+                "operator": "exactly",
+                "value": 13,
+                "superseded_by": "settings.targets",
+            }
+        ],
+        "source_of_truth": {
+            "owner": "settings-command-center",
+            "conflict_policy": "settings_override_soft_rules",
+        },
+    }
+
+    response = flask_app_module.app.test_client().post(
+        "/api/save-schedule-config",
+        json=payload,
+    )
+
+    assert response.status_code == 200
+    assert json.loads((tmp_path / "config" / "schedule_config.json").read_text()) == payload
 
 
 def test_find_available_port_skips_occupied_port():
@@ -272,16 +415,262 @@ def test_trainer_cannot_work_am_and_pm_on_same_day():
     assert not state.can_add("Monday", "18:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
 
 
-def test_schedule_config_targets_override_data_ranges(tmp_path, monkeypatch):
+def test_trainer_cannot_exceed_weekly_15_hour_cap():
+    state = TrainerState("Anisha Shah", 1)
+    state.weekly_minutes = MAX_TRAINER_WEEKLY_MINUTES - get_class_duration("Studio Barre 57") + 1
+
+    assert not state.can_add("Monday", "09:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
+
+
+def test_schedule_config_targets_are_selected_within_min_max_range(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "config").mkdir()
     (tmp_path / "config" / "schedule_config.json").write_text(
-        '{"targets":{"Kwality House, Kemps Corner":{"Monday":{"target":13,"max":14}}}}'
+        '{"targets":{"Kwality House, Kemps Corner":{"Monday":{"target":10,"max":14}}}}'
     )
+
+    picked = {
+        ScheduleOptimiser(target_week_start="2026-05-04", locations=[], variation_seed=seed)._pick_daily_target(
+            "Kwality House, Kemps Corner", "Monday"
+        )
+        for seed in [0, 1, 42, 137, 999]
+    }
+
+    assert all(10 <= value <= 14 for value in picked)
+    assert len(picked) > 1
+
+
+def test_optimiser_daily_top_up_uses_selected_target_within_range(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "targets": {
+            "Supreme HQ, Bandra": {
+                "Monday": {"target": 2, "max": 4}
+            }
+        }
+    }))
+
+    optimiser = ScheduleOptimiser(
+        target_week_start="2026-05-04",
+        locations=["Supreme HQ, Bandra"],
+    )
+    optimiser.schedule_config = json.loads((tmp_path / "config" / "schedule_config.json").read_text())
+    optimiser.trainer_states = {"Trainer B": TrainerState("Trainer B", 2)}
+    monkeypatch.setattr(optimiser, "_pick_daily_target", lambda location, day_name: 3)
+
+    all_slots = [
+        make_slot(location="Supreme HQ, Bandra", day_of_week="Monday", time="09:00", trainer_1="Trainer A", room="studio_a"),
+        make_slot(location="Supreme HQ, Bandra", day_of_week="Monday", time="10:00", trainer_1="Trainer C", room="studio_b"),
+    ]
+    room_occ = RoomOccupancy({
+        "powercycle": {"capacity": 14, "families": ["powercycle"]},
+        "studio_a": {"capacity": 14, "families": None},
+        "studio_b": {"capacity": 14, "families": None},
+    })
+
+    def fake_fill_slot(location, day_name, date_str, time_str, used_at_time, shift_trainers,
+                       room_occ, slots_today, exp_today, opt_today, is_prime=False,
+                       weekly_class_counts=None, class_format_count_today=None):
+        if time_str == "10:15":
+            return make_slot(
+                location=location,
+                date=date_str,
+                day_of_week=day_name,
+                time=time_str,
+                class_name="Studio Mat 57",
+                trainer_1="Trainer B",
+                room="studio_b",
+                capacity=14,
+            )
+        return None
+
+    monkeypatch.setattr(optimiser, "_fill_slot", fake_fill_slot)
+
+    optimiser._daily_target_top_up(
+        "Supreme HQ, Bandra",
+        date.fromisoformat("2026-05-04"),
+        all_slots,
+        room_occ,
+        weekly_class_counts={},
+        am_slots=["10:15"],
+        pm_slots=[],
+    )
+
+    assert len([s for s in all_slots if s.day_of_week == "Monday"]) == 3
+
+
+def test_optimiser_daily_target_top_up_repairs_underfilled_day(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "targets": {
+            "Supreme HQ, Bandra": {
+                "Monday": {"target": 2, "max": 2}
+            }
+        }
+    }))
+
+    optimiser = ScheduleOptimiser(
+        target_week_start="2026-05-04",
+        locations=["Supreme HQ, Bandra"],
+    )
+    optimiser.schedule_config = json.loads((tmp_path / "config" / "schedule_config.json").read_text())
+    optimiser.trainer_states = {"Trainer B": TrainerState("Trainer B", 2)}
+
+    existing = make_slot(
+        location="Supreme HQ, Bandra",
+        day_of_week="Monday",
+        time="09:00",
+        class_name="Studio Barre 57",
+        trainer_1="Trainer A",
+        room="studio_a",
+        capacity=14,
+    )
+    all_slots = [existing]
+    room_occ = RoomOccupancy({
+        "powercycle": {"capacity": 14, "families": ["powercycle"]},
+        "studio_a": {"capacity": 14, "families": None},
+        "studio_b": {"capacity": 14, "families": None},
+    })
+    room_occ.occupy("Monday", "studio_a", slot_time_to_minutes("09:00"), 57, "Studio Barre 57", "Trainer A")
+
+    def fake_fill_slot(location, day_name, date_str, time_str, used_at_time, shift_trainers,
+                       room_occ, slots_today, exp_today, opt_today, is_prime=False,
+                       weekly_class_counts=None, class_format_count_today=None):
+        if time_str == "10:15":
+            return make_slot(
+                location=location,
+                date=date_str,
+                day_of_week=day_name,
+                time=time_str,
+                class_name="Studio Mat 57",
+                trainer_1="Trainer B",
+                room="studio_b",
+                capacity=14,
+            )
+        return None
+
+    monkeypatch.setattr(optimiser, "_fill_slot", fake_fill_slot)
+
+    optimiser._daily_target_top_up(
+        "Supreme HQ, Bandra",
+        date.fromisoformat("2026-05-04"),
+        all_slots,
+        room_occ,
+        weekly_class_counts={},
+        am_slots=["10:15"],
+        pm_slots=[],
+    )
+
+    assert len([s for s in all_slots if s.day_of_week == "Monday"]) == 2
+
+
+def test_optimiser_loads_manual_protected_pins_from_schedule_config():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.schedule_config = {
+        "manual_protected": [
+            {
+                "id": "manual-pin-1",
+                "location": "Supreme HQ, Bandra",
+                "day": "Monday",
+                "time": "07:30",
+                "class": "Studio Barre 57",
+                "trainer": "Anisha Shah",
+                "room": "studio_a",
+                "note": "Founder request",
+            },
+            {
+                "location": "Kenkere House",
+                "day_of_week": "Monday",
+                "time": "09:00",
+                "class_name": "Studio Mat 57",
+                "trainer_1": "Pushyank Nahar",
+            },
+        ]
+    }
+
+    pins = optimiser._get_pinned_slots("Supreme HQ, Bandra", "Monday")
+
+    assert pins[0] == {
+        "id": "manual-pin-1",
+        "time": "07:30",
+        "trainer": "Anisha Shah",
+        "class": "Studio Barre 57",
+        "room": "studio_a",
+        "note": "Founder request",
+        "manual": True,
+    }
+
+
+def test_optimiser_applies_custom_rule_targets_and_restrictions(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "custom_rules": [
+            {
+                "enabled": True,
+                "priority": "hard",
+                "rule_type": "daily_target",
+                "location": "Supreme HQ, Bandra",
+                "day": "Monday",
+                "operator": "exactly",
+                "value": 9,
+            },
+            {
+                "enabled": True,
+                "priority": "hard",
+                "rule_type": "class_time_restriction",
+                "location": "Supreme HQ, Bandra",
+                "day": "Monday",
+                "time": "10:15",
+                "class_name": "Studio Mat 57",
+                "operator": "never",
+            },
+        ]
+    }))
 
     optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
 
-    assert optimiser._pick_daily_target("Kwality House, Kemps Corner", "Monday") == 13
+    assert optimiser._pick_daily_target("Supreme HQ, Bandra", "Monday") == 9
+    assert optimiser._custom_rule_blocks(
+        "Supreme HQ, Bandra", "Monday", "10:15", "Studio Mat 57", "Any Trainer"
+    )
+    assert not optimiser._custom_rule_blocks(
+        "Supreme HQ, Bandra", "Monday", "10:15", "Studio Barre 57", "Any Trainer"
+    )
+
+
+def test_ai_location_prompt_uses_persisted_schedule_targets(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(
+        json.dumps({
+            "targets": {
+                "Kwality House, Kemps Corner": {
+                    "Monday": {"target": 13, "max": 14},
+                    "Tuesday": {"target": 12, "max": 14},
+                    "Wednesday": {"target": 12, "max": 14},
+                    "Thursday": {"target": 12, "max": 14},
+                    "Friday": {"target": 11, "max": 12},
+                    "Saturday": {"target": 14, "max": 14},
+                    "Sunday": {"target": 4, "max": 6},
+                }
+            }
+        })
+    )
+
+    prompt = _build_location_prompt(
+        "Kwality House, Kemps Corner",
+        "2026-05-04",
+        {"class_slot_ranking": []},
+        {"trainer_metrics": [], "day_band_metrics": []},
+        profiles=[],
+    )
+
+    assert "  Monday: 13" in prompt
+    assert "  Sunday: 4" in prompt
+    assert "  WEEK TOTAL: 78" in prompt
 
 
 def test_pipeline_command_includes_variation_and_output_suffix():
@@ -298,7 +687,8 @@ def test_pipeline_command_includes_variation_and_output_suffix():
     assert "run_test" in cmd
 
 
-def test_ai_fallback_generates_three_named_optimisation_iterations(monkeypatch):
+def test_ai_fallback_generates_three_named_optimisation_iterations(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
     calls = []
 
     class FakeScheduleOptimiser:
@@ -349,6 +739,111 @@ def test_ai_fallback_generates_three_named_optimisation_iterations(monkeypatch):
     assert output["iteration_names"] == ["Max Score", "Trainer Hours", "Class Variety"]
 
 
+def test_ai_fallback_with_output_suffix_refreshes_canonical_draft(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    class FakeScheduleOptimiser:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+        def run(self):
+            mode = self.kwargs["optimization_mode"]
+            return {
+                "target_week_start": self.kwargs["target_week_start"],
+                "schedule": [
+                    {
+                        "location": "Kenkere House",
+                        "date": self.kwargs["target_week_start"],
+                        "day_of_week": "Monday",
+                        "time": "09:00",
+                        "class_name": f"Studio Barre 57 {mode}",
+                        "trainer_1": "Trainer A",
+                        "score": 90.0,
+                        "constraint_violations": [],
+                    }
+                ],
+                "optimization_mode": mode,
+            }
+
+    monkeypatch.setattr("agents.optimiser.ScheduleOptimiser", FakeScheduleOptimiser)
+
+    planner = AISchedulePlanner(
+        target_week_start="2026-05-04",
+        locations=["Kenkere House"],
+        variation_seed=100,
+        output_suffix="web_run",
+    )
+    output = planner._fallback()
+
+    suffixed_path = tmp_path / "state" / "05_draft_schedule_web_run.json"
+    canonical_path = tmp_path / "state" / "05_draft_schedule.json"
+
+    assert suffixed_path.exists()
+    assert canonical_path.exists()
+    assert json.loads(suffixed_path.read_text())["schedule"] == output["schedule"]
+    assert json.loads(canonical_path.read_text())["schedule"] == output["schedule"]
+
+
+def test_ai_fallback_promotes_daily_target_valid_iteration(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({
+        "targets": {
+            "Supreme HQ, Bandra": {
+                "Saturday": {"target": 2, "max": 2}
+            }
+        }
+    }))
+
+    class FakeScheduleOptimiser:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+        def run(self):
+            mode = self.kwargs["optimization_mode"]
+            slots = [
+                {
+                    "location": "Supreme HQ, Bandra",
+                    "date": self.kwargs["target_week_start"],
+                    "day_of_week": "Saturday",
+                    "time": "09:00",
+                    "class_name": f"Studio Barre 57 {mode}",
+                    "trainer_1": "Trainer A",
+                    "score": 90.0,
+                    "constraint_violations": [],
+                }
+            ]
+            if mode == "trainer_hours":
+                slots.append({
+                    "location": "Supreme HQ, Bandra",
+                    "date": self.kwargs["target_week_start"],
+                    "day_of_week": "Saturday",
+                    "time": "10:00",
+                    "class_name": "Studio Mat 57",
+                    "trainer_1": "Trainer B",
+                    "score": 80.0,
+                    "constraint_violations": [],
+                })
+            return {
+                "target_week_start": self.kwargs["target_week_start"],
+                "schedule": slots,
+                "optimization_mode": mode,
+            }
+
+    monkeypatch.setattr("agents.optimiser.ScheduleOptimiser", FakeScheduleOptimiser)
+
+    planner = AISchedulePlanner(
+        target_week_start="2026-05-04",
+        locations=["Supreme HQ, Bandra"],
+        output_suffix="web_run",
+    )
+    output = planner._fallback()
+
+    assert len(output["schedule"]) == 2
+    assert output["selected_iteration_name"] == "Trainer Hours"
+    assert output["schedule"] == output["iterations"][1]["schedule"]
+
+
 def test_reporter_iteration_names_prefer_schedule_metadata():
     reporter = OutputReporter()
     schedules = [
@@ -362,3 +857,87 @@ def test_reporter_iteration_names_prefer_schedule_metadata():
         "Trainer Hours",
         "Class Variety",
     ]
+
+
+def test_reporter_run_uses_selected_primary_schedule_for_assertions(tmp_path, monkeypatch):
+    state_dir = tmp_path / "state"
+    output_dir = tmp_path / "outputs"
+    web_dir = tmp_path / "web"
+    state_dir.mkdir()
+    output_dir.mkdir()
+    web_dir.mkdir()
+    (state_dir / "02_metrics.json").write_text("{}")
+
+    monkeypatch.setattr(reporter_module, "STATE_DIR", state_dir)
+    monkeypatch.setattr(reporter_module, "OUTPUT_DIR", output_dir)
+    monkeypatch.setattr(reporter_module, "WEB_DIR", web_dir)
+    monkeypatch.setattr(OutputReporter, "_write_csv", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_write_detailed_csv", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_write_excel_multi_sheet", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_write_schedule_data", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_generate_web_interface", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_print_summary", lambda *args, **kwargs: None)
+    monkeypatch.setattr(OutputReporter, "_run_iteration_score_assertions", lambda *args, **kwargs: None)
+
+    bad_iteration = {
+        "target_week_start": "2026-05-04",
+        "schedule": [make_slot(location="Supreme HQ, Bandra", day_of_week="Monday").__dict__],
+        "iteration_name": "Max Score",
+    }
+    selected_schedule = [
+        make_slot(location="Supreme HQ, Bandra", day_of_week="Sunday").__dict__,
+        make_slot(location="Kenkere House", day_of_week="Wednesday").__dict__,
+    ]
+    composite_draft = {
+        "target_week_start": "2026-05-04",
+        "schedule": selected_schedule,
+        "iterations": [bad_iteration],
+        "selected_iteration_name": "Trainer Hours",
+    }
+
+    seen = {}
+
+    def capture_assertions(self, scorecard, primary_by_location):
+        seen["primary_by_location"] = primary_by_location
+
+    monkeypatch.setattr(OutputReporter, "_run_assertions", capture_assertions)
+
+    OutputReporter().run(
+        all_schedules=composite_draft["iterations"],
+        primary_draft=composite_draft,
+    )
+
+    assert [s["day_of_week"] for s in seen["primary_by_location"]["Supreme HQ, Bandra"]] == ["Sunday"]
+    assert [s["day_of_week"] for s in seen["primary_by_location"]["Kenkere House"]] == ["Wednesday"]
+
+
+def test_reporter_web_interface_uses_cached_schedule_json_when_file_read_fails(tmp_path, monkeypatch):
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    (web_dir / "template.html").write_text(
+        "const SCHEDULE_DATA = /*INJECT_SCHEDULE_DATA*/;\n"
+        "const SCORECARD = /*INJECT_SCORECARD*/;\n"
+        "const WEEK_LABEL = /*INJECT_WEEK_LABEL*/;\n"
+        "const OPPORTUNITIES = /*INJECT_OPPORTUNITIES*/;\n"
+        "</body>",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(reporter_module, "WEB_DIR", web_dir)
+    reporter = OutputReporter()
+    reporter._last_schedule_json = '{"locations": {}}'
+
+    real_open = builtins.open
+
+    def flaky_open(path, *args, **kwargs):
+        mode = args[0] if args else kwargs.get("mode", "r")
+        if Path(path).name == "schedule_data.json" and "r" in mode:
+            raise OSError(5, "Input/output error")
+        return real_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "open", flaky_open)
+
+    reporter._generate_web_interface({}, "2026-05-04", {}, {}, None)
+
+    html = (web_dir / "index.html").read_text(encoding="utf-8")
+    assert 'const SCHEDULE_DATA = {"locations": {}};' in html

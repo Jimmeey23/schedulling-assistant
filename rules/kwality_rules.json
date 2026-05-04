@@ -12,11 +12,11 @@
   ],
   "target_classes_per_day": {
     "Monday": 13,
-    "Tuesday": 14,
+    "Tuesday": 12,
     "Wednesday": 12,
-    "Thursday": 14,
+    "Thursday": 12,
     "Friday": 11,
     "Saturday": 14,
-    "Sunday": 8
+    "Sunday": 4
   }
 }

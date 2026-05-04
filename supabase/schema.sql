@@ -42,28 +42,27 @@ execute function public.touch_updated_at();
 
 alter table public.studio_rules enable row level security;
 
--- Service-role requests bypass RLS. These policies also allow backend clients
--- configured with SUPABASE_ANON_KEY to read/write through the server. For
--- production, prefer SUPABASE_SERVICE_ROLE_KEY on the backend only.
+-- Service-role requests bypass RLS. Backend reads and writes must use
+-- SUPABASE_SERVICE_ROLE_KEY; do not expose this key to browser code.
 drop policy if exists "studio_rules_backend_read" on public.studio_rules;
 create policy "studio_rules_backend_read"
 on public.studio_rules
 for select
-to anon, authenticated
+to authenticated
 using (true);
 
 drop policy if exists "studio_rules_backend_insert" on public.studio_rules;
 create policy "studio_rules_backend_insert"
 on public.studio_rules
 for insert
-to anon, authenticated
+to authenticated
 with check (true);
 
 drop policy if exists "studio_rules_backend_update" on public.studio_rules;
 create policy "studio_rules_backend_update"
 on public.studio_rules
 for update
-to anon, authenticated
+to authenticated
 using (true)
 with check (true);
 

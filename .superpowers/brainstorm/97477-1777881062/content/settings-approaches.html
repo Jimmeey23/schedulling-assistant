@@ -1,0 +1,114 @@
+<h2>Settings Tab Direction</h2>
+<p class="subtitle">Three possible structures for making Settings more organised, advanced, and authoritative. Click one if a direction feels right, then tell me what you want adjusted.</p>
+
+<div class="cards">
+  <div class="card" data-choice="command-center" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A · Command Center</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:170px 1fr 230px;gap:12px;min-height:280px">
+            <div class="mock-sidebar">
+              <div class="label">Configuration</div>
+              <div class="mock-button" style="margin-top:10px">Targets</div>
+              <div class="mock-button">Class Mix</div>
+              <div class="mock-button">Trainers</div>
+              <div class="mock-button">Rules & Pins</div>
+              <div class="mock-button">Conflicts</div>
+            </div>
+            <div class="mock-content">
+              <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:12px">
+                <div>
+                  <h3 style="margin:0">Schedule Targets Matrix</h3>
+                  <p style="margin:3px 0 0;color:#6b7280;font-size:12px">Settings override generated rules when conflicts exist.</p>
+                </div>
+                <button class="mock-button">Save Source of Truth</button>
+              </div>
+              <div style="display:grid;grid-template-columns:90px repeat(7,1fr);gap:4px">
+                <div class="placeholder" style="height:28px">Studio</div>
+                <div class="placeholder" style="height:28px">Mon</div><div class="placeholder" style="height:28px">Tue</div><div class="placeholder" style="height:28px">Wed</div><div class="placeholder" style="height:28px">Thu</div><div class="placeholder" style="height:28px">Fri</div><div class="placeholder" style="height:28px">Sat</div><div class="placeholder" style="height:28px">Sun</div>
+                <div class="placeholder" style="height:36px">Kwality</div>
+                <div class="placeholder" style="height:36px">12 / 15</div><div class="placeholder" style="height:36px">11 / 15</div><div class="placeholder" style="height:36px">12 / 16</div><div class="placeholder" style="height:36px">12 / 15</div><div class="placeholder" style="height:36px">11 / 14</div><div class="placeholder" style="height:36px">14 / 17</div><div class="placeholder" style="height:36px">5 / 8</div>
+                <div class="placeholder" style="height:36px">Supreme</div>
+                <div class="placeholder" style="height:36px">11 / 12</div><div class="placeholder" style="height:36px">10 / 10</div><div class="placeholder" style="height:36px">11 / 11</div><div class="placeholder" style="height:36px">12 / 12</div><div class="placeholder" style="height:36px">10 / 11</div><div class="placeholder" style="height:36px">13 / 13</div><div class="placeholder" style="height:36px">4 / 6</div>
+              </div>
+            </div>
+            <div class="mock-sidebar">
+              <div class="label">Bulk Operators</div>
+              <input class="mock-input" value="+1 target for selected row">
+              <input class="mock-input" value="Cap max = target + 2">
+              <input class="mock-input" value="Copy Saturday column">
+              <button class="mock-button">Apply to Selection</button>
+              <div class="placeholder" style="height:70px;margin-top:12px">Conflict queue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Command Center</h3>
+      <p>Recommended: left navigation, central editable matrices, right-side bulk/action rail, and a dedicated conflict queue.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="spreadsheet-first" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B · Spreadsheet First</div>
+        <div class="mockup-body">
+          <div class="mock-content">
+            <div style="display:flex;gap:8px;margin-bottom:10px">
+              <button class="mock-button">Targets</button><button class="mock-button">Class Mix</button><button class="mock-button">Availability</button>
+              <input class="mock-input" value="Bulk: selected cells +1">
+            </div>
+            <div style="display:grid;grid-template-columns:120px repeat(7,1fr);gap:3px">
+              <div class="placeholder" style="height:26px">Field</div>
+              <div class="placeholder" style="height:26px">Mon</div><div class="placeholder" style="height:26px">Tue</div><div class="placeholder" style="height:26px">Wed</div><div class="placeholder" style="height:26px">Thu</div><div class="placeholder" style="height:26px">Fri</div><div class="placeholder" style="height:26px">Sat</div><div class="placeholder" style="height:26px">Sun</div>
+              <div class="placeholder" style="height:38px">Kwality target</div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div>
+              <div class="placeholder" style="height:38px">Supreme target</div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div>
+              <div class="placeholder" style="height:38px">Kenkere target</div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div><div class="placeholder" style="height:38px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Spreadsheet First</h3>
+      <p>Fastest for power editing. Better for matrices, weaker for complex trainer and custom-rule workflows.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="guided-workflows" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">C · Guided Workflows</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="mock-content">
+              <h3 style="margin-top:0">Change Assistant</h3>
+              <div class="placeholder" style="height:42px">1. Select area</div>
+              <div class="placeholder" style="height:42px">2. Choose operator</div>
+              <div class="placeholder" style="height:42px">3. Preview conflict impact</div>
+              <button class="mock-button">Apply Change Set</button>
+            </div>
+            <div class="mock-sidebar">
+              <div class="label">Preview</div>
+              <div class="placeholder" style="height:50px">3 targets updated</div>
+              <div class="placeholder" style="height:50px">1 rule superseded</div>
+              <div class="placeholder" style="height:50px">0 validation errors</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Guided Workflows</h3>
+      <p>Safest for non-technical users. More modal/wizard-heavy and slower for dense weekly edits.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>My recommended scope</h3>
+  <p>Use <strong>Command Center</strong> as the main structure, add spreadsheet-style bulk operators inside matrices, and include a lightweight conflict resolver that treats Settings as authoritative when saving or generating.</p>
+</div>

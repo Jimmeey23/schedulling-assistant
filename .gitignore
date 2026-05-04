@@ -5,3 +5,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Generated scheduler run variants. Keep the canonical state files trackable.
+state/05_draft_schedule_*.json

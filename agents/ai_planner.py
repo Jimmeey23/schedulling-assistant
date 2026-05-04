@@ -13,6 +13,7 @@ from dataclasses import dataclass, asdict, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
+from agents.io_utils import atomic_write_json
 from ai_provider import OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
 from rule_config import build_rules_catalog, get_active_format_rules, load_rules_config
 
@@ -227,7 +228,19 @@ def _build_location_prompt(location: str, week_start: str,
     loc_trainers = [t for t in trainer_metrics if t["location"] == location]
     loc_trainers.sort(key=lambda x: -x.get("trainer_avg_checkin", 0))
 
-    targets = DAILY_TARGETS.get(location, {d: 7 for d in DAY_NAMES})
+    targets = DAILY_TARGETS.get(location, {d: 7 for d in DAY_NAMES}).copy()
+    schedule_config_path = CONFIG_DIR / "schedule_config.json"
+    if schedule_config_path.exists():
+        try:
+            with open(schedule_config_path) as f:
+                schedule_config = json.load(f)
+            configured_targets = schedule_config.get("targets", {}).get(location, {})
+            for day in DAY_NAMES:
+                day_limits = configured_targets.get(day)
+                if isinstance(day_limits, dict) and day_limits.get("target") is not None:
+                    targets[day] = int(day_limits["target"])
+        except Exception:
+            pass
     slots = LOCATION_SLOTS.get(location, {"am": [], "pm": []})
 
     lines = [
@@ -622,6 +635,47 @@ def _print_utilisation(slots: List[PlannedSlot], profiles_by_name: dict):
         print(f"    {name:<26} {mins/60:4.1f}h  ({pct}% of 15h target)")
 
 
+def _daily_target_errors(schedule: List[dict]) -> List[str]:
+    config_path = CONFIG_DIR / "schedule_config.json"
+    if not config_path.exists():
+        return []
+
+    try:
+        with open(config_path) as f:
+            schedule_config = json.load(f)
+    except Exception:
+        return []
+
+    errors: List[str] = []
+    for location, day_targets in schedule_config.get("targets", {}).items():
+        loc_slots = [s for s in schedule if s.get("location") == location]
+        for day, limits in day_targets.items():
+            if not isinstance(limits, dict):
+                continue
+            actual = sum(1 for s in loc_slots if s.get("day_of_week") == day)
+            target = limits.get("target")
+            max_count = limits.get("max")
+            if target is not None and actual != int(target):
+                errors.append(f"{location} {day}: actual {actual} != target {int(target)}")
+            if max_count is not None and actual > int(max_count):
+                errors.append(f"{location} {day}: actual {actual} exceeds max {int(max_count)}")
+    return errors
+
+
+def _select_primary_iteration(iterations: List[dict]) -> dict:
+    if not iterations:
+        return {"schedule": []}
+
+    for iteration in iterations:
+        if not _daily_target_errors(iteration.get("schedule", [])):
+            return iteration
+
+    return min(
+        iterations,
+        key=lambda iteration: len(_daily_target_errors(iteration.get("schedule", []))),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Main planner class
 # ---------------------------------------------------------------------------
@@ -645,6 +699,16 @@ class AISchedulePlanner:
         self.overrides_path = overrides_path
         self.variation_seed = variation_seed
         self.output_suffix = output_suffix
+
+    def _write_draft_output(self, output: dict) -> None:
+        STATE_DIR.mkdir(exist_ok=True)
+        paths = [STATE_DIR / f"05_draft_schedule{('_' + self.output_suffix) if self.output_suffix else ''}.json"]
+        canonical_path = STATE_DIR / "05_draft_schedule.json"
+        if canonical_path not in paths:
+            paths.append(canonical_path)
+
+        for path in paths:
+            atomic_write_json(path, output, indent=2)
 
     def run(self) -> dict:
         if not OPENAI_AVAILABLE:
@@ -743,10 +807,7 @@ class AISchedulePlanner:
             "output_suffix": self.output_suffix,
         }
 
-        STATE_DIR.mkdir(exist_ok=True)
-        out_path = STATE_DIR / f"05_draft_schedule{('_' + self.output_suffix) if self.output_suffix else ''}.json"
-        with open(out_path, "w") as f:
-            json.dump(output, f, indent=2)
+        self._write_draft_output(output)
 
         print(f"[Agent 5] AI Planner complete — {len(all_slots)} total slots across {len(self.locations)} locations")
         return output
@@ -798,18 +859,18 @@ class AISchedulePlanner:
             result["optimization_mode"] = mode
             iterations.append(result)
 
+        primary_iteration = _select_primary_iteration(iterations)
+
         output = {
             "target_week_start": self.target_week_start,
-            "schedule": iterations[0]["schedule"],
+            "schedule": primary_iteration["schedule"],
             "iterations": iterations,
             "iteration_names": [name for name, _, _ in iteration_configs],
+            "selected_iteration_name": primary_iteration.get("iteration_name"),
             "variation_seed": self.variation_seed,
             "output_suffix": self.output_suffix,
         }
-        STATE_DIR.mkdir(exist_ok=True)
-        out_path = STATE_DIR / f"05_draft_schedule{('_' + self.output_suffix) if self.output_suffix else ''}.json"
-        with open(out_path, "w") as f:
-            json.dump(output, f, indent=2)
+        self._write_draft_output(output)
         return output
 
     def _fallback_location(self, location: str, scores_data: dict,

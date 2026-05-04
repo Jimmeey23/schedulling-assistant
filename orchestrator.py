@@ -220,7 +220,10 @@ def run_pipeline(
             draft_data = json.load(f)
 
         reporter = OutputReporter()
-        reporter.run(all_schedules=draft_data.get("iterations") or [draft_data])
+        reporter.run(
+            all_schedules=draft_data.get("iterations") or [draft_data],
+            primary_draft=draft_data,
+        )
     except AssertionError as e:
         console.print(f"[red][Agent 6] Output quality check FAILED: {e}[/red]")
         if debug:

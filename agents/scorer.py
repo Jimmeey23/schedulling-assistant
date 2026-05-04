@@ -12,6 +12,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from agents.io_utils import atomic_write_json
+
 STATE_DIR = Path("state")
 
 # CSV column interpretation (column names are misleading — see comments)
@@ -49,10 +51,6 @@ SCORING_WEIGHTS = {
     "capacity_fill": 0.55,
     "revenue": 0.15,
     "sessions": 0.05,
-    "blended_fill": 0.55,
-    "blended_checkin": 0.20,
-    "rev_per_session": 0.15,
-    "longevity": 0.10,
 }
 EXCLUDED_CLASS_KEYWORDS = (
     "hosted class",
@@ -254,20 +252,59 @@ class ClassScorer:
             "Friday": 4, "Saturday": 5, "Sunday": 6,
         }
 
+        PRIME_AM = {"08:00","08:15","08:30","09:00","09:15","09:30","10:00","10:15","10:30","11:00","11:15","11:30"}
+        PRIME_PM = {"17:30","17:45","18:00","18:15","18:30","19:00","19:15","19:30"}
+
         def _score_record(r):
             w = self.weights
             attendance_points = float(r.get("avg_attendance_norm", 0.0)) * w["avg_attendance"] * 100
             fill_points = float(r.get("avg_fill_rate", 0.0)) * w["capacity_fill"] * 100
             revenue_points = float(r.get("revenue_norm", 0.0)) * w["revenue"] * 100
             session_points = float(r.get("sessions_norm", 0.0)) * w["sessions"] * 100
-            score = round(float(np.clip(attendance_points + fill_points + revenue_points + session_points, 0, 100)), 2)
+            base = attendance_points + fill_points + revenue_points + session_points
+            # Prime slot bonus: classes at peak times get a reliability boost
+            t = str(r.get("time", "")).strip()[:5]
+            prime_bonus = 7.0 if t in PRIME_AM or t in PRIME_PM else 0.0
+            # Volume reliability bonus: more sessions = more confident prediction (max +5)
+            sc = int(r.get("session_count", 0))
+            volume_bonus = min(5.0, sc / 12.0)
+            # Fill-rate absolute floor bonus: if avg fill > 60% it's genuinely performing
+            fill_val = float(r.get("avg_fill_rate", 0.0))
+            fill_abs_bonus = 6.0 if fill_val >= 0.60 else (3.0 if fill_val >= 0.45 else 0.0)
+            score = round(float(np.clip(base + prime_bonus + volume_bonus + fill_abs_bonus, 0, 100)), 2)
             return score, {
                 "total_score": score,
-                "base_score": score,
-                "recency_boost": 0.0,
+                "base_score": round(base, 2),
+                "recency_boost": round(prime_bonus + volume_bonus + fill_abs_bonus, 2),
+                "bonus_components": [
+                    {
+                        "key": "prime_slot",
+                        "label": "Prime Time Bonus",
+                        "raw_value": t,
+                        "points": round(prime_bonus, 2),
+                        "max_points": 7.0,
+                        "explanation": "+7 pts for peak AM (08:00-11:30) or peak PM (17:30-19:30) slots.",
+                    },
+                    {
+                        "key": "volume_reliability",
+                        "label": "Volume Reliability",
+                        "raw_value": sc,
+                        "points": round(volume_bonus, 2),
+                        "max_points": 5.0,
+                        "explanation": "Up to +5 pts for stronger historical volume.",
+                    },
+                    {
+                        "key": "fill_abs",
+                        "label": "Fill Rate Absolute Bonus",
+                        "raw_value": round(fill_val, 4),
+                        "points": round(fill_abs_bonus, 2),
+                        "max_points": 6.0,
+                        "explanation": "+6 pts if avg fill >= 60%, +3 if >= 45%.",
+                    },
+                ],
                 "formula": (
                     "score = avg_fill_rate*55 + avg_attendance_norm*25 + "
-                    "revenue_norm*15 + sessions_norm*5"
+                    "revenue_norm*15 + sessions_norm*5 + prime_bonus + volume_bonus + fill_abs_bonus"
                 ),
                 "components": [
                     {
@@ -316,8 +353,8 @@ class ClassScorer:
         for r in group_records:
             r["day"] = day_name_map.get(r["day_name"], -1)
             r["score"], r["score_breakdown"] = _score_record(r)
-            r["base_score"] = r["score"]
-            r["recency_boost"] = 0.0
+            r["base_score"] = r["score_breakdown"]["base_score"]
+            r["recency_boost"] = r["score_breakdown"]["recency_boost"]
             r["recommendation"] = _recommendation(r["score"], int(r["session_count"]))
             r["pinned_slot"] = False
             r["protect_class_time"] = False
@@ -368,8 +405,8 @@ class ClassScorer:
                 "avg_revenue": tr["avg_revenue"],
                 "session_count": tr["session_count"],
             })
-            tr["base_score"] = tr["score"]
-            tr["recency_boost"] = 0.0
+            tr["base_score"] = tr["score_breakdown"]["base_score"]
+            tr["recency_boost"] = tr["score_breakdown"]["recency_boost"]
             tr["recommendation"] = _recommendation(tr["score"], int(tr["session_count"]))
             tr["protect_exact_combo"] = False
             tr["protect_class_time"] = False
@@ -499,7 +536,7 @@ class ClassScorer:
                 "trainer_avg_ci": tr["trainer_avg_ci"],
                 "slot_trust": round(float(tr["slot_trust"]), 3),
                 "longevity": round(float(tr["longevity"]), 3),
-                "recency_boost": 0.0,
+                "recency_boost": tr["recency_boost"],
                 "base_score": tr["base_score"],
                 "score": tr["score"],
                 "score_breakdown": tr["score_breakdown"],
@@ -567,7 +604,7 @@ class ClassScorer:
         print(f"  PINNED: {pinned}  PROTECT: {protect} ({protect/total*100:.1f}%)  "
               f"INCLUDE: {include} ({include/total*100:.1f}%)  "
               f"CONSIDER: {consider} ({consider/total*100:.1f}%)  DROP: {drop} ({drop/total*100:.1f}%)")
-        print("  Formula: avg attendance 45%, fill rate 30%, revenue 20%, sessions 5%")
+        print("  Formula: avg attendance 25%, fill rate 55%, revenue 15%, sessions 5%")
 
         output = {
             "weights_used": self.weights,
@@ -580,9 +617,7 @@ class ClassScorer:
             "class_metrics": class_metrics,
         }
 
-        STATE_DIR.mkdir(exist_ok=True)
-        with open(STATE_DIR / "03_scores.json", "w") as f:
-            json.dump(output, f)
+        atomic_write_json(STATE_DIR / "03_scores.json", output)
 
         return output
 
@@ -896,7 +931,6 @@ class ClassScorer:
             "class_metrics": class_metrics,
         }
 
-        with open(STATE_DIR / "03_scores.json", "w") as f:
-            json.dump(output, f)
+        atomic_write_json(STATE_DIR / "03_scores.json", output)
 
         return output

@@ -89,19 +89,14 @@ def _file(path: Path):
 
 def supabase_settings() -> tuple[str, str]:
     url = os.environ.get("SUPABASE_URL", "").rstrip("/")
-    key = (
-        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-        or os.environ.get("SUPABASE_ANON_KEY")
-        or os.environ.get("SUPABASE_KEY")
-        or ""
-    )
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""
     return url, key
 
 
 def supabase_request(method: str, path: str, body=None, prefer: str | None = None):
     url, key = supabase_settings()
     if not url or not key:
-        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY")
+        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY")
     payload = json.dumps(body).encode() if body is not None else None
     headers = {
         "apikey": key,
@@ -139,7 +134,10 @@ def load_json_file(path: Path, fallback):
 
 
 def push_supabase_config():
-    schedule_config = load_json_file(SCHEDULE_CONFIG_PATH, {"targets": {}, "manual_protected": [], "manual_excluded": []})
+    schedule_config = load_json_file(
+        SCHEDULE_CONFIG_PATH,
+        {"targets": {}, "manual_protected": [], "manual_excluded": [], "custom_rules": []},
+    )
     trainer_profiles = load_json_file(TRAINER_PROFILES_PATH, [])
     rules_catalog = build_rules_catalog(load_rules_config())
     supabase_upsert("schedule_config", schedule_config)
@@ -230,7 +228,7 @@ def schedule_config():
     p = PROJECT_ROOT / "config" / "schedule_config.json"
     if p.exists():
         return _file(p)
-    return _json({"targets": {}, "manual_protected": [], "manual_excluded": []})
+    return _json({"targets": {}, "manual_protected": [], "manual_excluded": [], "custom_rules": []})
 
 
 @app.route("/schedule_<path:fname>")
@@ -334,13 +332,12 @@ def run_pipeline():
         _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
 
         def _monitor(p, state):
-            stage_markers = [
-                ("Agent 1", "Running — Agent 1: Ingesting data..."),
-                ("Agent 2", "Running — Agent 2: Analysing history..."),
-                ("Agent 3", "Running — Agent 3: Scoring slots..."),
-                ("Agent 4", "Running — Agent 4: Applying rules..."),
-                ("Agent 5", "Running — Agent 5: AI planning..."),
-                ("Agent 6", "Running — Agent 6: Building report..."),
+            stage_prefixes = [
+                ("Agent 1", "Ingesting session data"),
+                ("Agent 2", "Analysing performance history"),
+                ("Agent 3", "Scoring class combinations"),
+                ("Agent 4", "Applying scheduling rules"),
+                ("Agent 6", "Building final report"),
             ]
             tail = []
             for line in p.stdout or []:
@@ -349,10 +346,15 @@ def run_pipeline():
                     continue
                 print(f"  [PIPELINE] {clean}")
                 tail.append(clean)
-                tail = tail[-20:]
-                for marker, message in stage_markers:
+                tail = tail[-30:]
+                # Agent 5 — show per-location/day progress verbatim
+                if "[Agent 5]" in clean:
+                    inner = clean.split("[Agent 5]", 1)[-1].strip()
+                    state["message"] = f"Optimising schedule — {inner}"
+                    continue
+                for marker, label in stage_prefixes:
                     if marker in clean:
-                        state["message"] = message
+                        state["message"] = f"Running — {label}..."
                         break
             p.wait()
             if p.returncode == 0:
