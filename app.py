@@ -87,6 +87,16 @@ def _file(path: Path):
     return Response(path.read_bytes(), mimetype=mime)
 
 
+def is_output_artifact_name(name: str) -> bool:
+    if name in {"ai_insights.json", "scorecard.json"}:
+        return True
+    if not name.startswith("schedule_"):
+        return False
+    if name.startswith("schedule_data"):
+        return False
+    return name.endswith((".csv", ".xlsx", ".json"))
+
+
 def supabase_settings() -> tuple[str, str]:
     url = os.environ.get("SUPABASE_URL", "").rstrip("/")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""
@@ -236,7 +246,12 @@ def schedule_config():
 @app.route("/scorecard<path:fname>")
 def output_file(fname=""):
     name = request.path.lstrip("/")
-    return _file(OUTPUTS_DIR / name)
+    if is_output_artifact_name(name):
+        return _file(OUTPUTS_DIR / name)
+    candidate = WEB_DIR / name
+    if candidate.exists() and candidate.is_file():
+        return _file(candidate)
+    return _json({"error": f"Not found: {name}"}, 404)
 
 
 @app.route("/api/latest-schedule-file")

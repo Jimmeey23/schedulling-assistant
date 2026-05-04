@@ -11,7 +11,7 @@ import app as flask_app_module
 from agents.ai_planner import AISchedulePlanner, PlannedSlot, _build_location_prompt, _enforce_hard_limits, _parse_schedule_response, _score_slots
 from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, MAX_TRAINER_WEEKLY_MINUTES, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState, get_class_duration, slot_time_to_minutes
 from agents.reporter import OutputReporter
-from serve import build_pipeline_command, find_available_port
+from serve import build_pipeline_command, find_available_port, is_output_artifact_path
 
 
 def make_slot(**kwargs):
@@ -377,6 +377,15 @@ def test_schedule_config_api_persists_source_of_truth_metadata(tmp_path, monkeyp
 
     assert response.status_code == 200
     assert json.loads((tmp_path / "config" / "schedule_config.json").read_text()) == payload
+
+
+def test_schedule_data_json_is_not_routed_as_output_artifact():
+    assert not is_output_artifact_path("/schedule_data.json")
+    assert not is_output_artifact_path("/schedule_data_2026-05-04.json")
+    assert is_output_artifact_path("/schedule_kwality.xlsx")
+    assert is_output_artifact_path("/schedule_supreme_detailed.csv")
+    assert is_output_artifact_path("/ai_insights.json")
+    assert is_output_artifact_path("/scorecard.json")
 
 
 def test_find_available_port_skips_occupied_port():

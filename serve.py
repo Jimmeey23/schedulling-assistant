@@ -113,6 +113,18 @@ def build_pipeline_command(csv_path: str, week: str, variation_seed: int, output
     ]
 
 
+def is_output_artifact_path(path: str) -> bool:
+    """Return true only for generated files that live under outputs/."""
+    filename = path.lstrip("/")
+    if filename in {"ai_insights.json", "scorecard.json"}:
+        return True
+    if not filename.startswith("schedule_"):
+        return False
+    if filename.startswith("schedule_data"):
+        return False
+    return filename.endswith((".csv", ".xlsx", ".json"))
+
+
 def supabase_settings() -> tuple[str, str]:
     url = os.environ.get("SUPABASE_URL", "").rstrip("/")
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""
@@ -301,7 +313,7 @@ class RulesHandler(BaseHTTPRequestHandler):
             return
 
         # Serve outputs/ files (schedule CSVs, XLSXs, JSON)
-        if path.startswith("/schedule_") or path.startswith("/ai_") or path.startswith("/scorecard"):
+        if is_output_artifact_path(path):
             filename = path.lstrip("/")
             self._serve_file(OUTPUTS_DIR / filename)
             return
