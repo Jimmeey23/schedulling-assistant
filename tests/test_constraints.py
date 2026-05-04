@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from agents.optimiser import (
+    ScheduleOptimiser,
     ScheduleSlot,
     TrainerState,
     build_constraint_violations,
@@ -41,6 +42,13 @@ def make_slot(**kwargs):
 
 
 class TestUniversalConstraints:
+    def test_optimiser_treats_profile_disabled_trainers_as_inactive(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+        opt.inactive_profile_trainers = {"Disabled Trainer"}
+
+        assert opt._is_inactive("Disabled Trainer")
+
     def test_banned_classes_detected(self):
         violations = build_constraint_violations(
             "Kwality House, Kemps Corner",

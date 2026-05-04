@@ -68,6 +68,8 @@ ROOM_LABELS = {
   "strength_lab": "Strength Lab",
 }
 
+MIN_SCHEDULE_SCORE = 80.0
+
 
 def _rules_panel_html() -> str:
     """Deprecated floating drawer — now replaced by the Rules nav tab in the main UI template."""
@@ -77,6 +79,20 @@ def _rules_panel_html() -> str:
 class OutputReporter:
   def _display_room(self, room: str) -> str:
     return ROOM_LABELS.get(room, room)
+
+  def _format_score_breakdown(self, breakdown: dict) -> str:
+    if not breakdown:
+        return ""
+    parts = []
+    for comp in breakdown.get("components", []):
+        parts.append(
+            f"{comp.get('label', comp.get('key', 'Component'))}: "
+            f"{comp.get('points', 0)}/{comp.get('max_points', 0)}"
+        )
+    boost = breakdown.get("recency_boost", 0)
+    parts.append(f"Recency: {boost:+.1f}")
+    parts.append(f"Final: {breakdown.get('total_score', 0):.1f}")
+    return " | ".join(parts)
 
   def _get_excel_family(self, class_name: str) -> str:
     lower = class_name.lower()
@@ -96,7 +112,19 @@ class OutputReporter:
         return "hiit"
     return "default"
 
-  def _write_excel_multi_sheet(self, location: str, iterations_slots: list, week_start: str):
+  def _iteration_names_for(self, all_schedules: list = None) -> list:
+    defaults = ["Max Score", "Trainer Hours", "Class Variety"]
+    if not all_schedules:
+        return defaults
+    names = []
+    for idx, sched in enumerate(all_schedules[:3]):
+        name = sched.get("iteration_name") if isinstance(sched, dict) else None
+        names.append(name or defaults[idx])
+    while len(names) < 3:
+        names.append(defaults[len(names)])
+    return names
+
+  def _write_excel_multi_sheet(self, location: str, iterations_slots: list, week_start: str, sheet_names: list = None):
     """Write 3-sheet Excel file: Main, Iteration 2, Iteration 3."""
     from datetime import date, timedelta
     ws_date = date.fromisoformat(week_start)
@@ -108,7 +136,7 @@ class OutputReporter:
     wb = openpyxl.Workbook()
     wb.remove(wb.active)  # remove default sheet
 
-    sheet_names = ["Main", "Iteration 2", "Iteration 3"]
+    sheet_names = sheet_names or self._iteration_names_for()
 
     for iter_idx, (slots, sheet_name) in enumerate(zip(iterations_slots, sheet_names)):
         ws = wb.create_sheet(title=sheet_name)
@@ -223,10 +251,12 @@ class OutputReporter:
 
     with open(STATE_DIR / "02_metrics.json") as f:
       metrics = json.load(f)
+    score_baselines = self._build_score_baselines(primary_draft["schedule"])
 
     schedule = primary_draft["schedule"]
     week_start = primary_draft["target_week_start"]
     self._week_label = week_start
+    iteration_names = self._iteration_names_for(all_schedules)
 
     by_location: Dict[str, List[dict]] = defaultdict(list)
     for slot in schedule:
@@ -251,7 +281,7 @@ class OutputReporter:
     for loc, slots in primary_by_location.items():
       self._write_csv(loc, slots, week_start)
       self._write_detailed_csv(loc, slots, week_start)
-      scorecard["locations"][loc] = self._build_scorecard_entry(loc, slots)
+      scorecard["locations"][loc] = self._build_scorecard_entry(loc, slots, score_baselines)
 
     # Write multi-sheet Excel per location
     all_locations = list(primary_by_location.keys())
@@ -260,17 +290,18 @@ class OutputReporter:
         # Pad to 3 if fewer iterations
         while len(iterations_slots) < 3:
             iterations_slots.append(iterations_slots[-1] if iterations_slots else [])
-        self._write_excel_multi_sheet(loc, iterations_slots[:3], week_start)
+        self._write_excel_multi_sheet(loc, iterations_slots[:3], week_start, iteration_names)
 
     with open(OUTPUT_DIR / "scorecard.json", "w") as f:
       json.dump(scorecard, f, indent=2)
 
     # Generate web data and interface
-    self._write_schedule_data(primary_by_location, week_start, metrics, all_by_location)
+    self._write_schedule_data(primary_by_location, week_start, metrics, all_by_location, iteration_names)
     self._generate_web_interface(primary_by_location, week_start, metrics, scorecard, all_by_location)
 
     self._print_summary(scorecard)
     self._run_assertions(scorecard, primary_by_location)
+    self._run_iteration_score_assertions(all_by_location, all_schedules or [primary_draft], iteration_names)
 
     print(f"[Agent 6] Reporter complete — schedules + web UI written to {OUTPUT_DIR}/ and {WEB_DIR}/")
     return scorecard
@@ -413,6 +444,7 @@ class OutputReporter:
             "Date", "Day", "Time", "Class", "Trainer 1", "Trainer 2", "Cover",
             "Room", "Capacity", "Duration (min)",
             "Score", "Recommendation", "Reason",
+            "Score Breakdown",
             "Historic Sessions", "Historic Checkins", "Historic Fill Rate",
             "Projected Avg Checkin", "Projected Fill Rate",
             "Late Cancel Rate", "No Show Rate",
@@ -441,6 +473,7 @@ class OutputReporter:
                     f"{s.get('score', 0):.1f}",
                     s.get("recommendation", ""),
                     s.get("scheduling_reason", ""),
+                    self._format_score_breakdown(s.get("score_breakdown")),
                     s.get("historical_session_count", 0),
                     f"{hist_checkin:.2f}",
                     f"{hist_fill:.4f}",
@@ -455,11 +488,52 @@ class OutputReporter:
     #  Scorecard
     # ------------------------------------------------------------------ #
 
-  def _build_scorecard_entry(self, location: str, slots: List[dict]) -> dict:
+  def _build_score_baselines(self, schedule: List[dict]) -> Dict[str, float]:
+        """Best-available average score for each location at the generated class count."""
+        try:
+            with open(STATE_DIR / "03_scores.json") as f:
+                scores_data = json.load(f)
+        except Exception:
+            return {}
+
+        counts: Dict[str, int] = defaultdict(int)
+        for slot in schedule:
+            counts[slot["location"]] += 1
+
+        baselines: Dict[str, float] = {}
+        for loc, count in counts.items():
+            loc_scores = sorted(
+                [
+                    float(r.get("score", 0))
+                    for r in scores_data.get("class_slot_ranking", [])
+                    if r.get("location") == loc
+                ],
+                reverse=True,
+            )
+            if count and len(loc_scores) >= count:
+                baselines[loc] = sum(loc_scores[:count]) / count
+        return baselines
+
+  def _calculate_schedule_score(self, location: str, slots: List[dict], score_baselines: Dict[str, float]) -> float:
+        if not slots:
+            return 0.0
+        avg_slot_score = sum(float(s.get("score", 0)) for s in slots) / len(slots)
+        baseline = score_baselines.get(location) or avg_slot_score or 1.0
+        relative_performance = min(100.0, (avg_slot_score / max(baseline, 1.0)) * 100.0)
+        violations = sum(len(s.get("constraint_violations", []) or []) for s in slots)
+        compliance_score = max(0.0, 100.0 - violations * 10.0)
+        return round(min(100.0, relative_performance * 0.75 + compliance_score * 0.25), 1)
+
+  def _build_scorecard_entry(self, location: str, slots: List[dict], score_baselines: Dict[str, float] = None) -> dict:
         total = len(slots)
         if total == 0:
             return {}
+        score_baselines = score_baselines or {}
         avg_fill = sum(s.get("predicted_fill_rate", 0) for s in slots) / total
+        avg_slot_score = sum(float(s.get("score", 0)) for s in slots) / total
+        schedule_score = self._calculate_schedule_score(location, slots, score_baselines)
+        historical_avg_fill = sum(s.get("historical_avg_fill", 0) for s in slots) / total
+        zero_history_slots = sum(1 for s in slots if s.get("historical_session_count", 0) == 0)
         class_counts: Dict[str, int] = defaultdict(int)
         for s in slots:
             class_counts[s["class_name"]] += 1
@@ -497,7 +571,13 @@ class OutputReporter:
 
         return {
             "total_classes": total,
+            "target_schedule_score": int(MIN_SCHEDULE_SCORE),
+            "schedule_score": schedule_score,
+            "avg_slot_score": round(avg_slot_score, 1),
             "predicted_avg_fill_rate": round(avg_fill, 3),
+            "historical_avg_fill_rate": round(historical_avg_fill, 3),
+            "zero_history_slots": zero_history_slots,
+            "zero_history_pct": round(zero_history_slots / total, 3) if total else 0,
             "experimental_pct": round(exp_count / total, 3) if total else 0,
             "barre_pct": round(barre_pct, 3),
             "barre_family_count": barre_family_count,
@@ -513,7 +593,7 @@ class OutputReporter:
     #  Web data JSON
     # ------------------------------------------------------------------ #
 
-  def _write_schedule_data(self, by_location, week_start, metrics, all_by_location=None):
+  def _write_schedule_data(self, by_location, week_start, metrics, all_by_location=None, iteration_names=None):
         from datetime import date, timedelta
         ws = date.fromisoformat(week_start)
         day_dates = {DAY_ORDER[i]: (ws + timedelta(days=i)).isoformat() for i in range(7)}
@@ -524,9 +604,11 @@ class OutputReporter:
             key = f"{tm['location']}::{tm['trainer']}"
             trainer_metrics[key] = tm
 
-        # Build scoring lookup from 03_scores.json for modal enrichment
-        # Key: (location, class_name, trainer, day_of_week, time) → score record
+        # Build scoring lookups from 03_scores.json for modal enrichment.
+        # exact key: (location, class_name, trainer, day_of_week, time)
+        # slot key:  (location, class_name, day_of_week, time)
         scores_lookup: Dict[tuple, dict] = {}
+        slot_scores_lookup: Dict[tuple, dict] = {}
         scores_path = STATE_DIR / "03_scores.json"
         if scores_path.exists():
             try:
@@ -541,6 +623,14 @@ class OutputReporter:
                         _sr.get("time", ""),
                     )
                     scores_lookup[_k] = _sr
+                for _sr in _sd.get("slot_group_ranking", []):
+                    _k = (
+                        _sr.get("location", ""),
+                        _sr.get("class", ""),
+                        _sr.get("day_name", ""),
+                        _sr.get("time", ""),
+                    )
+                    slot_scores_lookup[_k] = _sr
             except Exception:
                 pass
 
@@ -560,7 +650,42 @@ class OutputReporter:
                 s.get("day_of_week", ""),
                 s.get("time", ""),
             )
+            slot_key = (
+                loc,
+                s.get("class_name", ""),
+                s.get("day_of_week", ""),
+                s.get("time", ""),
+            )
             sr = scores_lookup.get(sr_key, {})
+            slot_sr = slot_scores_lookup.get(slot_key, {})
+            score_src = sr or slot_sr
+
+            # Synthesize historic_detail from top-level fields when scorer didn't find exact match
+            raw_hist = sr.get("historic_detail", None)
+            raw_slot_hist = slot_sr.get("historic_detail", None)
+            if not raw_hist and raw_slot_hist:
+                raw_hist = {**raw_slot_hist, "_fallback_source": "day_class_time_location"}
+            if raw_hist is None:
+                avg_ci = s.get("historical_avg_checkin", 0) or 0
+                avg_fill = s.get("historical_avg_fill", 0) or 0
+                session_count = s.get("historical_session_count", 0) or 0
+                if avg_ci > 0 or session_count > 0:
+                    cap = s.get("capacity", 22) or 22
+                    avg_booked = round(avg_ci / max(avg_fill, 0.05), 1) if avg_fill > 0 else avg_ci
+                    raw_hist = {
+                        "session_rows": session_count,
+                        "avg_checked_in": avg_ci,
+                        "avg_booked": avg_booked,
+                        "avg_capacity": cap,
+                        "avg_fill_rate": avg_fill,
+                        "avg_revenue": 0,
+                        "total_revenue": 0,
+                        "avg_late_cancel_rate": s.get("historical_late_cancel_rate", 0) or 0,
+                        "avg_no_show_rate": s.get("historical_no_show_rate", 0) or 0,
+                        "individual_sessions": [],
+                        "_synthetic": True,
+                    }
+
             return {
                 **s,
                 "room": self._display_room(s.get("room", "")),
@@ -568,15 +693,21 @@ class OutputReporter:
                 "trainer_overall_checkin": tm.get("trainer_avg_checkin", 0),
                 "trainer_total_sessions": tm.get("trainer_session_count", 0),
                 # Scoring breakdown fields (from scorer output)
-                "blended_fill": sr.get("blended_fill", None),
-                "base_score": sr.get("base_score", None),
-                "recency_boost": sr.get("recency_boost", None),
-                "slot_trust": sr.get("slot_trust", None),
-                "studio_avg_fill": sr.get("studio_avg_fill", None),
-                "above_studio_avg": sr.get("above_studio_avg", None),
-                "slot_sessions": sr.get("session_count", None),
-                "slot_avg_checkin": sr.get("avg_checkin", None),
-                "slot_avg_fill_rate": sr.get("avg_fill_rate", None),
+                "blended_fill": score_src.get("blended_fill", None),
+                "base_score": score_src.get("base_score", None),
+                "recency_boost": score_src.get("recency_boost", None),
+                "score_breakdown": score_src.get("score_breakdown", None),
+                "historic_detail": raw_hist,
+                "slot_historic_detail": raw_slot_hist,
+                "slot_top_trainers": slot_sr.get("top_trainers", []),
+                "slot_score_breakdown": slot_sr.get("score_breakdown", None),
+                "slot_group_score": slot_sr.get("score", None),
+                "slot_trust": score_src.get("slot_trust", None),
+                "studio_avg_fill": score_src.get("studio_avg_fill", None),
+                "above_studio_avg": score_src.get("above_studio_avg", None),
+                "slot_sessions": score_src.get("session_count", None),
+                "slot_avg_checkin": score_src.get("avg_checkin", score_src.get("avg_attendance", None)),
+                "slot_avg_fill_rate": score_src.get("avg_fill_rate", None),
             }
 
         for loc, slots in by_location.items():
@@ -584,9 +715,10 @@ class OutputReporter:
 
         # Add iteration data for web UI
         if all_by_location and len(all_by_location) > 1:
+            iter_names = iteration_names or self._iteration_names_for()
+            web_data["iteration_labels"] = {"Main": iter_names[0] if iter_names else "Max Score"}
             web_data["iterations"] = {}
-            iter_names = ["Main", "Iteration 2", "Iteration 3"]
-            for iter_idx, loc_map in enumerate(all_by_location[:3]):
+            for iter_idx, loc_map in enumerate(all_by_location[1:3], start=1):
                 iter_name = iter_names[iter_idx]
                 web_data["iterations"][iter_name] = {}
                 for loc, iter_slots in loc_map.items():
@@ -2080,8 +2212,15 @@ document.addEventListener("keydown", e=>{{
         su_slots = by_location.get("Supreme HQ, Bandra", [])
         kw_slots = by_location.get("Kwality House, Kemps Corner", [])
 
-        if kw.get("total_classes", 0) < 55:
-            errors.append(f"Kwality total classes {kw.get('total_classes')} < 55 minimum")
+        expected_totals = {
+            "Kwality House, Kemps Corner": (70, 80),
+            "Supreme HQ, Bandra": (60, 70),
+            "Kenkere House": (50, 60),
+        }
+        for loc, (lo, hi) in expected_totals.items():
+            actual = scorecard["locations"].get(loc, {}).get("total_classes", 0)
+            if actual < lo or actual > hi:
+                errors.append(f"{loc}: total classes {actual} outside [{lo},{hi}]")
         for slot in ke_slots:
             if "PowerCycle" in slot.get("class_name", ""):
                 errors.append(f"PowerCycle at Kenkere: {slot['time']} {slot['day_of_week']}")
@@ -2096,6 +2235,19 @@ document.addEventListener("keydown", e=>{{
         for slot in kw_slots + su_slots + ke_slots:
             if not slot.get("trainer_1"):
                 errors.append(f"Empty trainer_1 at {slot['location']} {slot['day_of_week']} {slot['time']}")
+            if "Unknown Class" in slot.get("class_name", ""):
+                errors.append(f"Unknown Class scheduled at {slot['location']} {slot['day_of_week']} {slot['time']}")
+
+        trainer_day_shifts = defaultdict(set)
+        for slot in kw_slots + su_slots + ke_slots:
+            trainer = slot.get("trainer_1")
+            if not trainer:
+                continue
+            shift = "AM" if int(slot["time"][:2]) < 13 else "PM"
+            trainer_day_shifts[(trainer, slot.get("date") or slot["day_of_week"])].add(shift)
+        for (trainer, day), shifts in trainer_day_shifts.items():
+            if len(shifts) > 1:
+                errors.append(f"{trainer} assigned in both AM and PM on {day}")
 
         # New: Recovery must be last in its shift on each (loc, day)
         from collections import defaultdict as _dd
@@ -2123,11 +2275,17 @@ document.addEventListener("keydown", e=>{{
 
         # Per-location format limits
         for loc, entry in scorecard["locations"].items():
+            if entry.get("schedule_score", 0) < MIN_SCHEDULE_SCORE:
+                errors.append(
+                    f"{loc}: schedule score {entry.get('schedule_score', 0):.1f}/100 < {MIN_SCHEDULE_SCORE:.0f}/100 target"
+                )
             fc = entry.get("format_counts", {})
             if fc.get("Studio HIIT", 0) > 3:
                 errors.append(f"{loc}: HIIT count {fc['Studio HIIT']} > 3/week")
             if fc.get("Studio Amped Up!", 0) > 2:
                 errors.append(f"{loc}: Amped Up count {fc['Studio Amped Up!']} > 2/week")
+            if fc.get("Studio Back Body Blaze", 0) > 3:
+                errors.append(f"{loc}: Back Body Blaze count {fc['Studio Back Body Blaze']} > 3/week")
 
             # Barre family pct >= 25%
             if entry.get("barre_family_pct", 0) < 0.25:
@@ -2144,14 +2302,14 @@ document.addEventListener("keydown", e=>{{
                     warnings.append(f"{loc}: Barre family count {entry.get('barre_family_count', 0)} < 14 floor")
                 if fc.get("Studio Mat 57", 0) < 4:
                     warnings.append(f"{loc}: Mat 57 count {fc.get('Studio Mat 57', 0)} < 4 floor")
-                if fc.get("Studio Cardio Barre", 0) < 5:
-                    warnings.append(f"{loc}: Cardio Barre count {fc.get('Studio Cardio Barre', 0)} < 5 floor")
+                if fc.get("Studio Cardio Barre", 0) < 4:
+                    warnings.append(f"{loc}: Cardio Barre count {fc.get('Studio Cardio Barre', 0)} < 4 floor")
                 if fc.get("Studio FIT", 0) < 5:
                     warnings.append(f"{loc}: FIT count {fc.get('Studio FIT', 0)} < 5 floor")
                 if loc == "Kwality House, Kemps Corner":
                     sl = fc.get("Studio Strength Lab", 0)
-                    if sl < 1 or sl > 2:
-                        warnings.append(f"Kwality Strength Lab count {sl} outside [1,2]")
+                    if sl < 6 or sl > 8:
+                        warnings.append(f"Kwality Strength Lab count {sl} outside [6,8]")
                     if fc.get("Studio PowerCycle", 0) < 6:
                         warnings.append(f"Kwality PowerCycle count {fc.get('Studio PowerCycle', 0)} < 6 floor")
                 if loc == "Supreme HQ, Bandra":
@@ -2168,3 +2326,23 @@ document.addEventListener("keydown", e=>{{
                 print(f"  ERROR: {e}")
             raise AssertionError(f"{len(errors)} output quality failure(s)")
         print("[Output quality checks passed]")
+
+  def _run_iteration_score_assertions(self, all_by_location, all_schedules, iteration_names):
+        errors = []
+        for idx, loc_map in enumerate(all_by_location[:3]):
+            schedule = all_schedules[idx].get("schedule", []) if idx < len(all_schedules) else []
+            baselines = self._build_score_baselines(schedule)
+            iteration_name = iteration_names[idx] if idx < len(iteration_names) else f"Iteration {idx + 1}"
+            for loc, slots in loc_map.items():
+                entry = self._build_scorecard_entry(loc, slots, baselines)
+                if entry.get("schedule_score", 0) < MIN_SCHEDULE_SCORE:
+                    errors.append(
+                        f"{iteration_name} / {loc}: schedule score "
+                        f"{entry.get('schedule_score', 0):.1f}/100 < {MIN_SCHEDULE_SCORE:.0f}/100 target"
+                    )
+        if errors:
+            print("[ITERATION SCORE FAILURES]")
+            for e in errors:
+                print(f"  ERROR: {e}")
+            raise AssertionError(f"{len(errors)} iteration score failure(s)")
+        print("[Iteration score checks passed]")

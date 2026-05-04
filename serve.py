@@ -7,12 +7,17 @@ Usage:
 """
 import argparse
 import json
+import os
+import socket
 import subprocess
 import sys
 import threading
 import time as _time
+import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from urllib import error as urlerror
+from urllib import request as urlrequest
 from urllib.parse import urlparse
 
 from rule_config import build_rules_catalog, load_rules_config, update_rules_config
@@ -21,9 +26,29 @@ PROJECT_ROOT = Path(__file__).parent
 WEB_DIR = PROJECT_ROOT / "web"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 CONFIG_PATH = PROJECT_ROOT / "config" / "rules_config.json"
+SCHEDULE_CONFIG_PATH = PROJECT_ROOT / "config" / "schedule_config.json"
+TRAINER_PROFILES_PATH = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+
+
+def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
+    if not path.exists():
+        return
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+load_env_file()
 
 # Pipeline process state
 _pipeline_state = {"running": False, "pid": None, "started": None, "message": "Idle"}
+_run_counter = 0
 
 MIME_TYPES = {
     ".html": "text/html; charset=utf-8",
@@ -35,6 +60,144 @@ MIME_TYPES = {
     ".png": "image/png",
     ".ico": "image/x-icon",
 }
+
+
+def find_available_port(start_port: int = 8080, host: str = "", max_tries: int = 100) -> int:
+    """Return the first bindable port at or above start_port."""
+    for port in range(start_port, start_port + max_tries):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind((host, port))
+            except OSError:
+                continue
+            return port
+    raise RuntimeError(f"No available port found from {start_port} to {start_port + max_tries - 1}")
+
+
+def resolve_port(port_arg: str) -> int:
+    if str(port_arg).lower() == "auto":
+        return find_available_port(8080, host="")
+    port = int(port_arg)
+    if port == 0:
+        return find_available_port(8080, host="")
+    return port
+
+
+def create_server(port_arg: str) -> tuple[HTTPServer, int]:
+    """Create the HTTP server, retrying if an auto-selected port is raced."""
+    if str(port_arg).lower() not in {"auto", "0"}:
+        port = int(port_arg)
+        return HTTPServer(("", port), RulesHandler), port
+
+    last_error = None
+    start_port = 8080
+    for _ in range(100):
+        port = find_available_port(start_port, host="")
+        try:
+            return HTTPServer(("", port), RulesHandler), port
+        except OSError as exc:
+            last_error = exc
+            start_port = port + 1
+    raise RuntimeError("Could not bind an available port") from last_error
+
+
+def build_pipeline_command(csv_path: str, week: str, variation_seed: int, output_suffix: str) -> list[str]:
+    return [
+        sys.executable, str(PROJECT_ROOT / "orchestrator.py"),
+        "--csv", csv_path,
+        "--week", week,
+        "--debug",
+        "--variation-seed", str(variation_seed),
+        "--output-suffix", output_suffix,
+    ]
+
+
+def supabase_settings() -> tuple[str, str]:
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = (
+        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        or os.environ.get("SUPABASE_ANON_KEY")
+        or os.environ.get("SUPABASE_KEY")
+        or ""
+    )
+    return url, key
+
+
+def supabase_configured() -> bool:
+    url, key = supabase_settings()
+    return bool(url and key)
+
+
+def supabase_request(method: str, path: str, body=None, prefer: str | None = None):
+    url, key = supabase_settings()
+    if not url or not key:
+        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY")
+    payload = json.dumps(body).encode() if body is not None else None
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+    if prefer:
+        headers["Prefer"] = prefer
+    elif method != "GET":
+        headers["Prefer"] = "return=representation"
+    req = urlrequest.Request(f"{url}/rest/v1{path}", data=payload, method=method, headers=headers)
+    try:
+        with urlrequest.urlopen(req, timeout=20) as resp:
+            data = resp.read().decode()
+    except urlerror.HTTPError as exc:
+        detail = exc.read().decode(errors="replace")
+        raise RuntimeError(detail or str(exc)) from exc
+    return json.loads(data) if data else {}
+
+
+def supabase_upsert(config_key: str, data):
+    return supabase_request(
+        "POST",
+        "/studio_rules?on_conflict=config_key",
+        [{"config_key": config_key, "data": data}],
+        "resolution=merge-duplicates,return=representation",
+    )
+
+
+def load_json_file(path: Path, fallback):
+    if not path.exists():
+        return fallback
+    with open(path) as f:
+        return json.load(f)
+
+
+def push_supabase_config():
+    schedule_config = load_json_file(SCHEDULE_CONFIG_PATH, {"targets": {}, "manual_protected": [], "manual_excluded": []})
+    trainer_profiles = load_json_file(TRAINER_PROFILES_PATH, [])
+    rules_catalog = build_rules_catalog(load_rules_config())
+    supabase_upsert("schedule_config", schedule_config)
+    supabase_upsert("trainer_profiles", trainer_profiles)
+    supabase_upsert("rules_catalog", rules_catalog)
+    studio_groups = {
+        "rules_kwality": ["location_kwality"],
+        "rules_supreme": ["location_supreme"],
+        "rules_kenkere": ["location_kenkere"],
+    }
+    for key, group_ids in studio_groups.items():
+        groups = [g for g in rules_catalog.get("groups", []) if g.get("id") in group_ids]
+        supabase_upsert(key, {"groups": groups})
+    return {"schedule_config": schedule_config, "trainer_profiles": trainer_profiles, "rules_catalog": rules_catalog}
+
+
+def pull_supabase_config():
+    rows = supabase_request("GET", "/studio_rules?select=config_key,data")
+    pulled = {row.get("config_key"): row.get("data") for row in rows if isinstance(row, dict)}
+    if pulled.get("schedule_config"):
+        SCHEDULE_CONFIG_PATH.parent.mkdir(exist_ok=True)
+        SCHEDULE_CONFIG_PATH.write_text(json.dumps(pulled["schedule_config"], indent=2))
+    if pulled.get("trainer_profiles"):
+        TRAINER_PROFILES_PATH.write_text(json.dumps(pulled["trainer_profiles"], indent=2))
+    return pulled
+
+
 class RulesHandler(BaseHTTPRequestHandler):
     # Set via class variable from CLI arg
     pipeline_week: str = "2026-05-04"
@@ -71,6 +234,16 @@ class RulesHandler(BaseHTTPRequestHandler):
             self._send_json(200, build_rules_catalog(load_rules_config()))
             return
 
+        if path == "/api/supabase/status":
+            url, key = supabase_settings()
+            self._send_json(200, {
+                "configured": bool(url and key),
+                "has_url": bool(url),
+                "has_key": bool(key),
+                "url_host": urlparse(url).netloc if url else "",
+            })
+            return
+
         # API: pipeline status
         if path == "/api/pipeline-status":
             msg = _pipeline_state["message"]
@@ -90,6 +263,10 @@ class RulesHandler(BaseHTTPRequestHandler):
                 "started": _pipeline_state["started"],
                 "message": msg,
             })
+            return
+
+        if path == "/api/latest-schedule-file":
+            self._send_json(200, {"file": "schedule_data.json"})
             return
 
         # API: trainer profiles
@@ -159,7 +336,32 @@ class RulesHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"ok": True, "config": current, "catalog": catalog})
             return
 
+        if path == "/api/supabase/test":
+            try:
+                supabase_request("GET", "/studio_rules?limit=1")
+                self._send_json(200, {"ok": True})
+            except Exception as e:
+                self._send_json(500, {"ok": False, "error": str(e)})
+            return
+
+        if path == "/api/supabase/push":
+            try:
+                data = push_supabase_config()
+                self._send_json(200, {"ok": True, **data})
+            except Exception as e:
+                self._send_json(500, {"ok": False, "error": str(e)})
+            return
+
+        if path == "/api/supabase/pull":
+            try:
+                data = pull_supabase_config()
+                self._send_json(200, {"ok": True, "data": data})
+            except Exception as e:
+                self._send_json(500, {"ok": False, "error": str(e)})
+            return
+
         if path == "/api/run-pipeline":
+            global _run_counter
             if _pipeline_state["running"]:
                 self._send_json(200, {
                     "ok": True,
@@ -167,13 +369,12 @@ class RulesHandler(BaseHTTPRequestHandler):
                     "message": "Pipeline is already running. Please wait.",
                 })
                 return
+            _run_counter += 1
             csv_path = self.pipeline_csv
             week = self.pipeline_week
-            cmd = [
-                sys.executable, str(PROJECT_ROOT / "orchestrator.py"),
-                "--csv", csv_path,
-                "--week", week,
-            ]
+            variation_seed = int(_time.time()) % 100000 + _run_counter
+            output_suffix = f"run{_run_counter}_{uuid.uuid4().hex[:6]}"
+            cmd = build_pipeline_command(csv_path, week, variation_seed, output_suffix)
             print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
             try:
                 proc = subprocess.Popen(
@@ -189,23 +390,32 @@ class RulesHandler(BaseHTTPRequestHandler):
                 _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
 
                 def _monitor(p, state):
-                    stages = [
-                        "Running — Agent 1: Ingesting data...",
-                        "Running — Agent 2: Analysing history...",
-                        "Running — Agent 3: Scoring slots...",
-                        "Running — Agent 4: Applying rules...",
-                        "Running — Agent 5: AI planning...",
-                        "Running — Agent 6: Building report...",
+                    stage_markers = [
+                        ("Agent 1", "Running — Agent 1: Ingesting data..."),
+                        ("Agent 2", "Running — Agent 2: Analysing history..."),
+                        ("Agent 3", "Running — Agent 3: Scoring slots..."),
+                        ("Agent 4", "Running — Agent 4: Applying rules..."),
+                        ("Agent 5", "Running — Agent 5: AI planning..."),
+                        ("Agent 6", "Running — Agent 6: Building report..."),
                     ]
-                    idx = 0
-                    while p.poll() is None:
-                        _time.sleep(15)
-                        idx = min(idx + 1, len(stages) - 1)
-                        state["message"] = stages[idx]
+                    tail = []
+                    for line in p.stdout or []:
+                        clean = line.rstrip()
+                        if not clean:
+                            continue
+                        print(f"  [PIPELINE] {clean}")
+                        tail.append(clean)
+                        tail = tail[-20:]
+                        for marker, message in stage_markers:
+                            if marker in clean:
+                                state["message"] = message
+                                break
+                    p.wait()
                     if p.returncode == 0:
                         state["message"] = "Complete — reload to see new schedule."
                     else:
-                        state["message"] = f"Failed (exit {p.returncode}). Check server logs."
+                        detail = next((item for item in reversed(tail) if item.strip()), "")
+                        state["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
                     state["running"] = False
                     state["pid"] = None
 
@@ -262,9 +472,9 @@ class RulesHandler(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description="Studio Scheduler local web server")
-    parser.add_argument("--port", type=int, default=8080, help="Port to listen on")
+    parser.add_argument("--port", default="auto", help="Port to listen on, or 'auto' to choose from 8080 upward")
     parser.add_argument("--week", default="2026-05-04", help="Default week for pipeline re-run")
-    parser.add_argument("--csv", default="Class Performance by Trainer.csv",
+    parser.add_argument("--csv", default="Sessions Performance Data.csv",
                         help="CSV path for pipeline re-run")
     args = parser.parse_args()
 
@@ -272,10 +482,10 @@ def main():
     RulesHandler.pipeline_csv = args.csv
 
     HTTPServer.allow_reuse_address = True
-    server = HTTPServer(("", args.port), RulesHandler)
-    print(f"\n  Studio Scheduler — serving at http://localhost:{args.port}")
+    server, port = create_server(args.port)
+    print(f"\n  Studio Scheduler — serving at http://localhost:{port}")
     print(f"  Pipeline week: {args.week} | CSV: {args.csv}")
-    print(f"  Rule toggles: http://localhost:{args.port}  (⚙ Rules panel)")
+    print(f"  Rule toggles: http://localhost:{port}  (Rules panel)")
     print(f"  Press Ctrl+C to stop\n")
     try:
         server.serve_forever()

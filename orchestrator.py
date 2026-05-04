@@ -68,9 +68,9 @@ def state_exists(filename: str) -> bool:
 @click.option(
     "--perf-csv",
     "perf_csv_path",
-    default="Class Performance by Trainer.csv",
+    default=None,
     show_default=True,
-    help="Path to 'Class Performance by Trainer.csv' (used by scorer)",
+    help="Optional scorer CSV override. Defaults to the same sessions CSV passed via --csv.",
 )
 @click.option(
     "--overrides",
@@ -99,6 +99,7 @@ def run_pipeline(
     Path("outputs").mkdir(exist_ok=True)
 
     locations = [location] if location else DEFAULT_LOCATIONS
+    perf_csv_path = perf_csv_path or csv_path
     weights = json.loads(scoring_weights) if scoring_weights else None
 
     console.print(
@@ -215,8 +216,11 @@ def run_pipeline(
             console.print("[red][Agent 6] No schedule found — Agent 5 must have failed[/red]")
             sys.exit(1)
 
+        with open(primary_draft) as f:
+            draft_data = json.load(f)
+
         reporter = OutputReporter()
-        reporter.run()
+        reporter.run(all_schedules=draft_data.get("iterations") or [draft_data])
     except AssertionError as e:
         console.print(f"[red][Agent 6] Output quality check FAILED: {e}[/red]")
         if debug:

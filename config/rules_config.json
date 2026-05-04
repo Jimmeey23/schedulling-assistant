@@ -26,139 +26,139 @@
       "description": "Rules specific to Kenkere House \u2014 PowerCycle ban, Barre-family minimums, and trainer ownership blocks."
     },
     "trainer_specific": {
-      "enabled": false,
+      "enabled": true,
       "label": "Strict Trainer Day Locks",
       "description": "Enforce trainer availability windows as hard constraints. When OFF, availability is treated as a scheduling preference and the AI may deviate for performance reasons."
     }
   },
   "rules": {
     "UNIV-001": {
-      "enabled": false,
+      "enabled": true,
       "description": "Barre 57 family must be >= 25% of total weekly classes at any location",
       "title": "UNIV-001"
     },
     "UNIV-002": {
-      "enabled": false,
+      "enabled": true,
       "description": "All 3 time bands must have >= 1 class every weekday",
       "title": "UNIV-002"
     },
     "UNIV-003": {
-      "enabled": false,
+      "enabled": true,
       "description": "Saturday must be max-load day",
       "title": "UNIV-003"
     },
     "UNIV-004": {
-      "enabled": false,
+      "enabled": true,
       "description": "Sunday max 5-6 classes",
       "title": "UNIV-004"
     },
     "UNIV-005": {
-      "enabled": false,
+      "enabled": true,
       "description": "Specialist classes only certified trainers",
       "title": "UNIV-005"
     },
     "UNIV-006": {
-      "enabled": false,
+      "enabled": true,
       "description": "Express class must be paired with full-length equivalent on same day",
       "title": "UNIV-006"
     },
     "UNIV-007": {
-      "enabled": false,
+      "enabled": true,
       "description": "Studio Recovery must never be first class of day",
       "title": "UNIV-007"
     },
     "UNIV-008": {
-      "enabled": false,
+      "enabled": true,
       "description": "Foundations never at 11:30 or 19:15",
       "title": "UNIV-008"
     },
     "UNIV-009": {
-      "enabled": false,
+      "enabled": true,
       "description": "No trainer > 3 consecutive classes without 5 min gap",
       "title": "UNIV-009"
     },
     "UNIV-010": {
-      "enabled": false,
+      "enabled": true,
       "description": "No trainer > 4 classes in one day",
       "title": "UNIV-010"
     },
     "UNIV-011": {
-      "enabled": false,
+      "enabled": true,
       "description": "PowerCycle NEVER at Kenkere House",
       "title": "UNIV-011"
     },
     "UNIV-012": {
-      "enabled": false,
+      "enabled": true,
       "description": "Strength Lab ONLY at Kwality House",
       "title": "UNIV-012"
     },
     "UNIV-013": {
-      "enabled": false,
+      "enabled": true,
       "description": "Pre/Post Natal NEVER at ANY LOCATION",
       "title": "UNIV-013"
     },
     "UNIV-014": {
-      "enabled": false,
+      "enabled": true,
       "description": "Peak midday slot must never be empty",
       "title": "UNIV-014"
     },
     "UNIV-015": {
-      "enabled": false,
+      "enabled": true,
       "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day",
       "title": "UNIV-015"
     },
     "UNIV-016": {
-      "enabled": false,
+      "enabled": true,
       "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays",
       "title": "UNIV-016"
     },
     "UNIV-017": {
-      "enabled": false,
+      "enabled": true,
       "description": "Always assign Tier 1 trainer to primary peak slot",
       "title": "UNIV-017"
     },
     "UNIV-018": {
-      "enabled": false,
+      "enabled": true,
       "description": "Trainer substitution protocol hierarchy",
       "title": "UNIV-018"
     },
     "UNIV-019": {
-      "enabled": false,
+      "enabled": true,
       "description": "Specialist classes no substitution with non-certified",
       "title": "UNIV-019"
     },
     "UNIV-020": {
-      "enabled": false,
+      "enabled": true,
       "description": "Never roster trainer at location with < 30 historical sessions",
       "title": "UNIV-020"
     },
     "UNIV-021": {
-      "enabled": false,
+      "enabled": true,
       "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations",
       "title": "UNIV-021"
     },
     "UNIV-022": {
-      "enabled": false,
+      "enabled": true,
       "description": "A trainer cannot be scheduled across 2 locations in the same shift",
       "title": "UNIV-022"
     },
     "UNIV-023": {
-      "enabled": false,
+      "enabled": true,
       "description": "Same class formats must not be scheduled consecutively",
       "title": "UNIV-023"
     },
     "UNIV-024": {
-      "enabled": false,
+      "enabled": true,
       "description": "No classes before 07:00, between 13:00-15:00, or after 20:30",
       "title": "UNIV-024"
     },
     "UNIV-025": {
-      "enabled": false,
+      "enabled": true,
       "description": "Every trainer must get at least 1 full day off each week; 2 is preferred",
       "title": "UNIV-025"
     },
     "UNIV-026": {
-      "enabled": false,
+      "enabled": true,
       "description": "Recovery sessions must be the last class in their shift at that location",
       "title": "UNIV-026"
     },
@@ -298,12 +298,12 @@
       "title": "KW-003"
     },
     "KW-004": {
-      "enabled": false,
+      "enabled": true,
       "description": "Pranjali Jain owns Saturday 10:15-12:30 block",
       "title": "KW-004"
     },
     "KW-005": {
-      "enabled": false,
+      "enabled": true,
       "description": "Rohan Dahima owns Thursday morning 09:15/10:15",
       "title": "KW-005"
     },
@@ -323,72 +323,72 @@
       "title": "KW-008"
     },
     "SU-001": {
-      "enabled": false,
+      "enabled": true,
       "description": "PowerCycle minimum 2 per day on weekdays",
       "title": "SU-001"
     },
     "SU-002": {
-      "enabled": false,
+      "enabled": true,
       "description": "Cauveri Vikrant first choice for all PowerCycle at Supreme",
       "title": "SU-002"
     },
     "SU-003": {
-      "enabled": false,
+      "enabled": true,
       "description": "Anisha Shah Thursdays ONLY at Supreme 08:00-11:00",
       "title": "SU-003"
     },
     "SU-004": {
-      "enabled": false,
+      "enabled": true,
       "description": "Vivaran Dhasmana owns Tue/Wed morning blocks 07:30-11:00",
       "title": "SU-004"
     },
     "SU-005": {
-      "enabled": false,
+      "enabled": true,
       "description": "Karan Bhatia owns Sunday 10:15 and 11:30 at Supreme",
       "title": "SU-005"
     },
     "SU-006": {
-      "enabled": false,
+      "enabled": true,
       "description": "Atulan Purohit owns Fri/Sat morning block 09:00-11:30",
       "title": "SU-006"
     },
     "SU-007": {
-      "enabled": false,
+      "enabled": true,
       "description": "Mrigakshi Jaiswal Mon/Tue/Wed evenings only at Supreme",
       "title": "SU-007"
     },
     "SU-008": {
-      "enabled": false,
+      "enabled": true,
       "description": "18:00 PM slot must always have Tier 1 trainer on weekdays",
       "title": "SU-008"
     },
     "SU-009": {
-      "enabled": false,
+      "enabled": true,
       "description": "No Strength Lab at Supreme HQ",
       "title": "SU-009"
     },
     "SU-010": {
-      "enabled": false,
+      "enabled": true,
       "description": "No Pre/Post Natal at Supreme HQ",
       "title": "SU-010"
     },
     "KE-001": {
-      "enabled": false,
+      "enabled": true,
       "description": "PowerCycle NEVER at Kenkere",
       "title": "KE-001"
     },
     "KE-002": {
-      "enabled": false,
+      "enabled": true,
       "description": "Kajol Kanchan 6-day anchor - never reduce without confirmed coverage",
       "title": "KE-002"
     },
     "KE-003": {
-      "enabled": false,
+      "enabled": true,
       "description": "Pushyank Nahar owns Mon/Tue/Thu morning blocks",
       "title": "KE-003"
     },
     "KE-004": {
-      "enabled": false,
+      "enabled": true,
       "description": "Shruti Kulkarni owns Thu/Fri mornings and Sunday midday",
       "title": "KE-004"
     },
@@ -403,12 +403,12 @@
       "title": "KE-006"
     },
     "KE-007": {
-      "enabled": false,
+      "enabled": true,
       "description": "09:00 AM must be filled with Tier 1 trainer every day",
       "title": "KE-007"
     },
     "KE-008": {
-      "enabled": false,
+      "enabled": true,
       "description": "Saturday 09:00-11:00: Kajol or Pushyank ONLY",
       "title": "KE-008"
     },

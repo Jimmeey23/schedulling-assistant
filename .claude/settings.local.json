@@ -3,7 +3,10 @@
     "allow": [
       "Bash(pip install *)",
       "Bash(python3 *)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(pip3 install *)",
+      "Read(//private/tmp/**)",
+      "Bash(gh repo *)"
     ]
   }
 }

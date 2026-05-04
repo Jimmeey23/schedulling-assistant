@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "dev": "PYTHONUNBUFFERED=1 python3 serve.py --port auto"
+  },
+  "devDependencies": {}
+}

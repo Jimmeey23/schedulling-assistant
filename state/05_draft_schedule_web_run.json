@@ -1,0 +1,75 @@
+{
+  "target_week_start": "2026-05-04",
+  "schedule": [
+    {
+      "location": "Kenkere House",
+      "date": "2026-05-04",
+      "day_of_week": "Monday",
+      "time": "09:00",
+      "class_name": "Studio Barre 57 max_score",
+      "trainer_1": "Trainer A",
+      "score": 90.0,
+      "constraint_violations": []
+    }
+  ],
+  "iterations": [
+    {
+      "target_week_start": "2026-05-04",
+      "schedule": [
+        {
+          "location": "Kenkere House",
+          "date": "2026-05-04",
+          "day_of_week": "Monday",
+          "time": "09:00",
+          "class_name": "Studio Barre 57 max_score",
+          "trainer_1": "Trainer A",
+          "score": 90.0,
+          "constraint_violations": []
+        }
+      ],
+      "optimization_mode": "max_score",
+      "iteration_name": "Max Score"
+    },
+    {
+      "target_week_start": "2026-05-04",
+      "schedule": [
+        {
+          "location": "Kenkere House",
+          "date": "2026-05-04",
+          "day_of_week": "Monday",
+          "time": "09:00",
+          "class_name": "Studio Barre 57 trainer_hours",
+          "trainer_1": "Trainer A",
+          "score": 90.0,
+          "constraint_violations": []
+        }
+      ],
+      "optimization_mode": "trainer_hours",
+      "iteration_name": "Trainer Hours"
+    },
+    {
+      "target_week_start": "2026-05-04",
+      "schedule": [
+        {
+          "location": "Kenkere House",
+          "date": "2026-05-04",
+          "day_of_week": "Monday",
+          "time": "09:00",
+          "class_name": "Studio Barre 57 class_variety",
+          "trainer_1": "Trainer A",
+          "score": 90.0,
+          "constraint_violations": []
+        }
+      ],
+      "optimization_mode": "class_variety",
+      "iteration_name": "Class Variety"
+    }
+  ],
+  "iteration_names": [
+    "Max Score",
+    "Trainer Hours",
+    "Class Variety"
+  ],
+  "variation_seed": 100,
+  "output_suffix": "web_run"
+}

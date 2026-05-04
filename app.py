@@ -14,6 +14,8 @@ import time as _time
 import uuid
 from datetime import date, timedelta
 from pathlib import Path
+from urllib import error as urlerror
+from urllib import request as urlrequest
 
 from flask import Flask, Response, request
 
@@ -22,6 +24,25 @@ from rule_config import build_rules_catalog, load_rules_config, update_rules_con
 PROJECT_ROOT = Path(__file__).parent
 WEB_DIR = PROJECT_ROOT / "web"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+SCHEDULE_CONFIG_PATH = PROJECT_ROOT / "config" / "schedule_config.json"
+TRAINER_PROFILES_PATH = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+
+
+def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
+    if not path.exists():
+        return
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+load_env_file()
 
 MIME = {
     ".html": "text/html; charset=utf-8",
@@ -66,6 +87,86 @@ def _file(path: Path):
     return Response(path.read_bytes(), mimetype=mime)
 
 
+def supabase_settings() -> tuple[str, str]:
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = (
+        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        or os.environ.get("SUPABASE_ANON_KEY")
+        or os.environ.get("SUPABASE_KEY")
+        or ""
+    )
+    return url, key
+
+
+def supabase_request(method: str, path: str, body=None, prefer: str | None = None):
+    url, key = supabase_settings()
+    if not url or not key:
+        raise RuntimeError("Supabase backend config is missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY")
+    payload = json.dumps(body).encode() if body is not None else None
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+    if prefer:
+        headers["Prefer"] = prefer
+    elif method != "GET":
+        headers["Prefer"] = "return=representation"
+    req = urlrequest.Request(f"{url}/rest/v1{path}", data=payload, method=method, headers=headers)
+    try:
+        with urlrequest.urlopen(req, timeout=20) as resp:
+            data = resp.read().decode()
+    except urlerror.HTTPError as exc:
+        detail = exc.read().decode(errors="replace")
+        raise RuntimeError(detail or str(exc)) from exc
+    return json.loads(data) if data else {}
+
+
+def supabase_upsert(config_key: str, data):
+    return supabase_request(
+        "POST",
+        "/studio_rules?on_conflict=config_key",
+        [{"config_key": config_key, "data": data}],
+        "resolution=merge-duplicates,return=representation",
+    )
+
+
+def load_json_file(path: Path, fallback):
+    if not path.exists():
+        return fallback
+    with open(path) as f:
+        return json.load(f)
+
+
+def push_supabase_config():
+    schedule_config = load_json_file(SCHEDULE_CONFIG_PATH, {"targets": {}, "manual_protected": [], "manual_excluded": []})
+    trainer_profiles = load_json_file(TRAINER_PROFILES_PATH, [])
+    rules_catalog = build_rules_catalog(load_rules_config())
+    supabase_upsert("schedule_config", schedule_config)
+    supabase_upsert("trainer_profiles", trainer_profiles)
+    supabase_upsert("rules_catalog", rules_catalog)
+    studio_groups = {
+        "rules_kwality": ["location_kwality"],
+        "rules_supreme": ["location_supreme"],
+        "rules_kenkere": ["location_kenkere"],
+    }
+    for key, group_ids in studio_groups.items():
+        groups = [g for g in rules_catalog.get("groups", []) if g.get("id") in group_ids]
+        supabase_upsert(key, {"groups": groups})
+    return {"schedule_config": schedule_config, "trainer_profiles": trainer_profiles, "rules_catalog": rules_catalog}
+
+
+def pull_supabase_config():
+    rows = supabase_request("GET", "/studio_rules?select=config_key,data")
+    pulled = {row.get("config_key"): row.get("data") for row in rows if isinstance(row, dict)}
+    if pulled.get("schedule_config"):
+        SCHEDULE_CONFIG_PATH.parent.mkdir(exist_ok=True)
+        SCHEDULE_CONFIG_PATH.write_text(json.dumps(pulled["schedule_config"], indent=2))
+    if pulled.get("trainer_profiles"):
+        TRAINER_PROFILES_PATH.write_text(json.dumps(pulled["trainer_profiles"], indent=2))
+    return pulled
+
+
 # ── GET routes ────────────────────────────────────────────────
 
 @app.route("/")
@@ -76,6 +177,18 @@ def index():
 @app.route("/api/rules-config")
 def rules_config():
     return _json(build_rules_catalog(load_rules_config()))
+
+
+@app.route("/api/supabase/status")
+def supabase_status():
+    url, key = supabase_settings()
+    from urllib.parse import urlparse
+    return _json({
+        "configured": bool(url and key),
+        "has_url": bool(url),
+        "has_key": bool(key),
+        "url_host": urlparse(url).netloc if url else "",
+    })
 
 
 @app.route("/api/pipeline-status")
@@ -154,6 +267,33 @@ def save_rules():
         return _json({"error": str(e)}, 500)
 
 
+@app.route("/api/supabase/test", methods=["POST"])
+def supabase_test():
+    try:
+        supabase_request("GET", "/studio_rules?limit=1")
+        return _json({"ok": True})
+    except Exception as e:
+        return _json({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/supabase/push", methods=["POST"])
+def supabase_push():
+    try:
+        data = push_supabase_config()
+        return _json({"ok": True, **data})
+    except Exception as e:
+        return _json({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/supabase/pull", methods=["POST"])
+def supabase_pull():
+    try:
+        data = pull_supabase_config()
+        return _json({"ok": True, "data": data})
+    except Exception as e:
+        return _json({"ok": False, "error": str(e)}, 500)
+
+
 @app.route("/api/run-pipeline", methods=["POST"])
 def run_pipeline():
     global _run_counter
@@ -180,7 +320,7 @@ def run_pipeline():
     print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
     try:
         global _latest_schedule_file
-        _latest_schedule_file = f"schedule_data_run{_run_counter}_{uuid.uuid4().hex[:6]}.json"
+        _latest_schedule_file = "schedule_data.json"
         proc = subprocess.Popen(
             cmd,
             cwd=str(PROJECT_ROOT),
@@ -194,23 +334,32 @@ def run_pipeline():
         _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
 
         def _monitor(p, state):
-            stages = [
-                "Running — Agent 1: Ingesting data...",
-                "Running — Agent 2: Analysing history...",
-                "Running — Agent 3: Scoring slots...",
-                "Running — Agent 4: Applying rules...",
-                "Running — Agent 5: AI planning...",
-                "Running — Agent 6: Building report...",
+            stage_markers = [
+                ("Agent 1", "Running — Agent 1: Ingesting data..."),
+                ("Agent 2", "Running — Agent 2: Analysing history..."),
+                ("Agent 3", "Running — Agent 3: Scoring slots..."),
+                ("Agent 4", "Running — Agent 4: Applying rules..."),
+                ("Agent 5", "Running — Agent 5: AI planning..."),
+                ("Agent 6", "Running — Agent 6: Building report..."),
             ]
-            idx = 0
-            while p.poll() is None:
-                _time.sleep(15)
-                idx = min(idx + 1, len(stages) - 1)
-                state["message"] = stages[idx]
+            tail = []
+            for line in p.stdout or []:
+                clean = line.rstrip()
+                if not clean:
+                    continue
+                print(f"  [PIPELINE] {clean}")
+                tail.append(clean)
+                tail = tail[-20:]
+                for marker, message in stage_markers:
+                    if marker in clean:
+                        state["message"] = message
+                        break
+            p.wait()
             if p.returncode == 0:
                 state["message"] = "Complete — reload to see new schedule."
             else:
-                state["message"] = f"Failed (exit {p.returncode}). Check server logs."
+                detail = next((item for item in reversed(tail) if item.strip()), "")
+                state["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
             state["running"] = False
             state["pid"] = None
 

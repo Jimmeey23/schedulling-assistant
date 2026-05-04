@@ -1,0 +1,223 @@
+{
+  "targets": {
+    "Kwality House, Kemps Corner": {
+      "Monday": {
+        "target": 13,
+        "max": 13
+      },
+      "Tuesday": {
+        "target": 12,
+        "max": 12
+      },
+      "Wednesday": {
+        "target": 12,
+        "max": 13
+      },
+      "Thursday": {
+        "target": 12,
+        "max": 13
+      },
+      "Friday": {
+        "target": 11,
+        "max": 11
+      },
+      "Saturday": {
+        "target": 14,
+        "max": 14
+      },
+      "Sunday": {
+        "target": 7,
+        "max": 7
+      }
+    },
+    "Supreme HQ, Bandra": {
+      "Monday": {
+        "target": 11,
+        "max": 12
+      },
+      "Tuesday": {
+        "target": 10,
+        "max": 10
+      },
+      "Wednesday": {
+        "target": 11,
+        "max": 11
+      },
+      "Thursday": {
+        "target": 10,
+        "max": 11
+      },
+      "Friday": {
+        "target": 10,
+        "max": 11
+      },
+      "Saturday": {
+        "target": 13,
+        "max": 12
+      },
+      "Sunday": {
+        "target": 8,
+        "max": 8
+      }
+    },
+    "Kenkere House": {
+      "Monday": {
+        "target": 8,
+        "max": 12
+      },
+      "Tuesday": {
+        "target": 8,
+        "max": 9
+      },
+      "Wednesday": {
+        "target": 6,
+        "max": 12
+      },
+      "Thursday": {
+        "target": 8,
+        "max": 8
+      },
+      "Friday": {
+        "target": 8,
+        "max": 8
+      },
+      "Saturday": {
+        "target": 7,
+        "max": 11
+      },
+      "Sunday": {
+        "target": 4,
+        "max": 6
+      }
+    }
+  },
+  "manual_protected": [],
+  "manual_excluded": [],
+  "class_mix": {
+    "Kwality House, Kemps Corner": {
+      "Studio Barre 57": {
+        "min": 14,
+        "max": 22
+      },
+      "Studio Cardio Barre": {
+        "min": 8,
+        "max": 10
+      },
+      "Studio Mat 57": {
+        "min": 9,
+        "max": 9
+      },
+      "Studio PowerCycle": {
+        "min": 15,
+        "max": 15
+      },
+      "Studio Strength Lab": {
+        "min": 12,
+        "max": 14
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 2
+      },
+      "Studio FIT": {
+        "min": 12,
+        "max": 15
+      },
+      "Studio Recovery": {
+        "min": 1,
+        "max": 2
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "max": 0
+      },
+      "Studio Amped Up!": {
+        "min": 1,
+        "max": 2
+      },
+      "Studio HIIT": {
+        "min": 1,
+        "max": 2
+      }
+    },
+    "Supreme HQ, Bandra": {
+      "Studio Barre 57": {
+        "min": 16,
+        "max": 20
+      },
+      "Studio Cardio Barre": {
+        "min": 12,
+        "max": 12
+      },
+      "Studio Mat 57": {
+        "min": 11,
+        "max": 11
+      },
+      "Studio PowerCycle": {
+        "min": 21,
+        "max": 21
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 1
+      },
+      "Studio FIT": {
+        "min": 11,
+        "max": 11
+      },
+      "Studio Recovery": {
+        "min": 1,
+        "max": 2
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "max": 0
+      }
+    },
+    "Kenkere House": {
+      "Studio Barre 57": {
+        "min": 12,
+        "max": 20
+      },
+      "Studio Cardio Barre": {
+        "min": 4,
+        "max": 8
+      },
+      "Studio Mat 57": {
+        "min": 3,
+        "max": 6
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "max": 3
+      },
+      "Studio FIT": {
+        "min": 3,
+        "max": 6
+      },
+      "Studio Recovery": {
+        "min": 1,
+        "max": 3
+      },
+      "Studio Foundations": {
+        "min": 3,
+        "max": 6
+      }
+    }
+  },
+  "inactive_trainers": [
+    "Dhruv Mehta",
+    "Janhavi Jain",
+    "Kabir Varma",
+    "Kavya Reddy",
+    "Naman Sheth",
+    "Nishanth Raj",
+    "Pooja Singh",
+    "Poojitha Bhaskar",
+    "Preeti Mohan",
+    "Priya Nair",
+    "Ria Kapoor",
+    "Saniya Jaiswal",
+    "Varun Chadha"
+  ]
+}

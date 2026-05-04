@@ -11,18 +11,23 @@ import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, asdict, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from ai_provider import OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
 from rule_config import build_rules_catalog, get_active_format_rules, load_rules_config
 
 STATE_DIR = Path("state")
 RULES_DIR = Path("rules")
+CONFIG_DIR = Path("config")
 
 MAX_TOKENS = 12000  # Supreme needs ~9k for 68 verbose slots; others ~3.5k
 
 DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 DOW_INT = {d: i for i, d in enumerate(DAY_NAMES)}
+
+
+def normalize_trainer_name(name: str) -> str:
+    return " ".join(str(name or "").split()).strip()
 
 # Historical data-driven daily class count targets
 DAILY_TARGETS = {
@@ -194,12 +199,15 @@ def _build_location_prompt(location: str, week_start: str,
     ranking = scores_data.get("class_slot_ranking", [])
     trainer_metrics = metrics_data.get("trainer_metrics", [])
     day_band = metrics_data.get("day_band_metrics", [])
+    profiles_by_name = {p.get("name"): p for p in (profiles or []) if p.get("name")}
+    disabled_trainers = _disabled_trainer_names(profiles_by_name)
 
     # Top performers for this location (fill ≥ 28%, trainer ran ≥ 5 sessions)
     # Sort by blended score first, then by recency-boosted score
     loc_top = [
         r for r in ranking
         if r["location"] == location
+        and normalize_trainer_name(r.get("trainer")) not in disabled_trainers
         and r.get("avg_fill_rate", 0) >= 0.28
         and (r.get("trainer_total_sessions") or r.get("session_count", 0)) >= 5
     ]
@@ -209,6 +217,7 @@ def _build_location_prompt(location: str, week_start: str,
     loc_avoid = [
         r for r in ranking
         if r["location"] == location
+        and normalize_trainer_name(r.get("trainer")) not in disabled_trainers
         and r.get("avg_fill_rate", 0) < 0.22
         and (r.get("trainer_total_sessions") or r.get("session_count", 0)) >= 5
     ]
@@ -249,6 +258,8 @@ def _build_location_prompt(location: str, week_start: str,
         )
         lines += ["", avail_header]
         for p in profiles:
+            if normalize_trainer_name(p.get("name")) in disabled_trainers:
+                continue
             loc_data = p.get("locations", {}).get(location)
             if not loc_data:
                 continue
@@ -369,6 +380,9 @@ def _parse_schedule_response(raw: str, location: str, week_start: str,
         if not time_str or not class_name or not trainer:
             errors.append(f"Incomplete slot: {entry}")
             continue
+        if _trainer_disabled(trainer, profiles_by_name):
+            errors.append(f"Disabled trainer skipped: {trainer} at {day} {time_str}")
+            continue
 
         # Normalize HH:MM
         time_str = time_str.strip()
@@ -414,6 +428,8 @@ def _validate_slots(slots: List[PlannedSlot], location: str,
     for slot in slots:
         v = slot.constraint_violations
         prof = profiles_by_name.get(slot.trainer_1, {})
+        if _trainer_disabled(slot.trainer_1, profiles_by_name):
+            v.append(f"UNIV-000: {slot.trainer_1} is inactive/disabled and cannot be scheduled")
         loc_data = prof.get("locations", {}).get(location, {})
         avail_days = loc_data.get("available_days", [])
         if avail_days and slot.day_of_week not in avail_days:
@@ -440,6 +456,28 @@ def _validate_slots(slots: List[PlannedSlot], location: str,
     return slots
 
 
+def _disabled_trainer_names(profiles_by_name: dict) -> Set[str]:
+    disabled = {
+        normalize_trainer_name(name)
+        for name, profile in (profiles_by_name or {}).items()
+        if profile.get("active") is False
+    }
+    for path in (CONFIG_DIR / "trainer_overrides.json", CONFIG_DIR / "schedule_config.json"):
+        if not path.exists():
+            continue
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            disabled.update(normalize_trainer_name(t) for t in data.get("inactive_trainers", []))
+        except Exception:
+            continue
+    return disabled
+
+
+def _trainer_disabled(trainer: str, profiles_by_name: dict) -> bool:
+    return normalize_trainer_name(trainer) in _disabled_trainer_names(profiles_by_name)
+
+
 def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
                          profiles_by_name: dict = None) -> List[PlannedSlot]:
     """Drop slots violating hard weekly caps, day/time rules, and trainer availability."""
@@ -449,6 +487,8 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
     trainer_allowed_days: Dict[str, set] = {}
     if profiles_by_name:
         for name, prof in profiles_by_name.items():
+            if _trainer_disabled(name, profiles_by_name):
+                continue
             loc_data = prof.get("locations", {}).get(location, {})
             avail = loc_data.get("available_days")
             if avail:
@@ -458,6 +498,8 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
     sl_count = 0
 
     for slot in slots:
+        if _trainer_disabled(slot.trainer_1, profiles_by_name or {}):
+            continue
         # Strength Lab: max 2/week at Kwality, 0 elsewhere
         if "Strength Lab" in slot.class_name:
             if location != "Kwality House, Kemps Corner":
@@ -510,16 +552,49 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
 def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlot]:
     score_lookup: Dict[tuple, float] = {}
     fill_lookup: Dict[tuple, float] = {}
+    group_score_lookup: Dict[tuple, float] = {}
+    group_fill_lookup: Dict[tuple, float] = {}
+    day_score_lookup: Dict[tuple, float] = {}
+    day_fill_lookup: Dict[tuple, float] = {}
+    group_day_score_lookup: Dict[tuple, float] = {}
+    group_day_fill_lookup: Dict[tuple, float] = {}
+    for r in scores_data.get("slot_group_ranking", []):
+        time_str = (r.get("time") or "")[:5]
+        day = r.get("day")
+        if day is None:
+            day = DOW_INT.get(r.get("day_name"), 0)
+        key = (r["location"], r["class"], day, time_str)
+        group_score_lookup[key] = r.get("score", 30.0)
+        group_fill_lookup[key] = r.get("avg_fill_rate", r.get("blended_fill", 0.35))
+        day_key = (r["location"], r["class"], day)
+        if day_key not in group_day_score_lookup or r.get("score", 30.0) > group_day_score_lookup[day_key]:
+            group_day_score_lookup[day_key] = r.get("score", 30.0)
+            group_day_fill_lookup[day_key] = r.get("avg_fill_rate", r.get("blended_fill", 0.35))
+
     for r in scores_data.get("class_slot_ranking", []):
-        key = (r["location"], r["class"], r["trainer"], r["day"])
+        time_str = (r.get("time") or "")[:5]
+        key = (r["location"], r["class"], r["trainer"], r["day"], time_str)
         score_lookup[key] = r.get("score", 30.0)
         fill_lookup[key] = r.get("avg_fill_rate", 0.35)
+        day_key = (r["location"], r["class"], r["trainer"], r["day"])
+        if day_key not in day_score_lookup or r.get("score", 30.0) > day_score_lookup[day_key]:
+            day_score_lookup[day_key] = r.get("score", 30.0)
+            day_fill_lookup[day_key] = r.get("avg_fill_rate", 0.35)
 
     for slot in slots:
         dow = DOW_INT.get(slot.day_of_week, 0)
-        key = (slot.location, slot.class_name, slot.trainer_1, dow)
-        slot.score = score_lookup.get(key, 30.0)
-        slot.predicted_fill_rate = fill_lookup.get(key, 0.35)
+        exact_key = (slot.location, slot.class_name, slot.trainer_1, dow, slot.time[:5])
+        day_key = (slot.location, slot.class_name, slot.trainer_1, dow)
+        group_key = (slot.location, slot.class_name, dow, slot.time[:5])
+        group_day_key = (slot.location, slot.class_name, dow)
+        slot.score = score_lookup.get(
+            exact_key,
+            group_score_lookup.get(group_key, day_score_lookup.get(day_key, group_day_score_lookup.get(group_day_key, 30.0))),
+        )
+        slot.predicted_fill_rate = fill_lookup.get(
+            exact_key,
+            group_fill_lookup.get(group_key, day_fill_lookup.get(day_key, group_day_fill_lookup.get(group_day_key, 0.20))),
+        )
 
     return slots
 
@@ -699,14 +774,43 @@ class AISchedulePlanner:
 
     def _fallback(self) -> dict:
         from agents.optimiser import ScheduleOptimiser
-        opt = ScheduleOptimiser(
-            target_week_start=self.target_week_start,
-            locations=self.locations,
-            overrides_path=self.overrides_path,
-            variation_seed=self.variation_seed,
-            output_suffix=self.output_suffix,
-        )
-        return opt.run()
+        iteration_configs = [
+            ("Max Score", "max_score", 0),
+            ("Trainer Hours", "trainer_hours", 42),
+            ("Class Variety", "class_variety", 137),
+        ]
+        base_seed = self.variation_seed or 0
+        iterations = []
+
+        for display_name, mode, seed_offset in iteration_configs:
+            suffix_bits = [self.output_suffix] if self.output_suffix else []
+            suffix_bits.append(mode)
+            opt = ScheduleOptimiser(
+                target_week_start=self.target_week_start,
+                locations=self.locations,
+                overrides_path=self.overrides_path,
+                variation_seed=base_seed + seed_offset,
+                output_suffix="_".join(suffix_bits),
+                optimization_mode=mode,
+            )
+            result = opt.run()
+            result["iteration_name"] = display_name
+            result["optimization_mode"] = mode
+            iterations.append(result)
+
+        output = {
+            "target_week_start": self.target_week_start,
+            "schedule": iterations[0]["schedule"],
+            "iterations": iterations,
+            "iteration_names": [name for name, _, _ in iteration_configs],
+            "variation_seed": self.variation_seed,
+            "output_suffix": self.output_suffix,
+        }
+        STATE_DIR.mkdir(exist_ok=True)
+        out_path = STATE_DIR / f"05_draft_schedule{('_' + self.output_suffix) if self.output_suffix else ''}.json"
+        with open(out_path, "w") as f:
+            json.dump(output, f, indent=2)
+        return output
 
     def _fallback_location(self, location: str, scores_data: dict,
                            profiles_by_name: dict) -> List[PlannedSlot]:
@@ -718,6 +822,7 @@ class AISchedulePlanner:
                 overrides_path=self.overrides_path,
                 variation_seed=self.variation_seed,
                 output_suffix=f"{self.output_suffix}_fallback" if self.output_suffix else "fallback",
+                optimization_mode="max_score",
             )
             result = opt.run()
             slots = []
