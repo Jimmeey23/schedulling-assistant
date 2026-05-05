@@ -48,13 +48,13 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
-      "strength_lab": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": true,
       "foundations": false,
       "pre_post_natal": false,
-      "amped_up": false,
+      "amped_up": true,
       "hiit": false,
       "recovery": false
     },
@@ -62,7 +62,7 @@
   },
   {
     "name": "Anmol Sharma",
-    "tier": 3,
+    "tier": 2,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -96,12 +96,28 @@
         "session_count": 55,
         "owned_blocks": [],
         "notes": "PowerCycle specialist. Evening only."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -182,13 +198,13 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
-      "strength_lab": false,
+      "strength_lab": true,
       "foundations": false,
       "pre_post_natal": false,
-      "amped_up": false,
+      "amped_up": true,
       "hiit": false,
       "recovery": false
     },
@@ -196,7 +212,7 @@
   },
   {
     "name": "Bret Saldanha",
-    "tier": 3,
+    "tier": 2,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -230,12 +246,28 @@
         "session_count": 60,
         "owned_blocks": [],
         "notes": "PowerCycle specialist. Evening only."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -282,12 +314,28 @@
         "session_count": 245,
         "owned_blocks": [],
         "notes": "PRIMARY PowerCycle trainer at Supreme."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -299,7 +347,7 @@
   },
   {
     "name": "Chaitanya Nahar",
-    "tier": 3,
+    "tier": 2,
     "locations": {
       "Kenkere House": {
         "available_days": [
@@ -317,11 +365,27 @@
         "session_count": 72,
         "owned_blocks": [],
         "notes": "Afternoons only. Never mornings."
+      },
+      "Copper & Cloves": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -364,11 +428,27 @@
           }
         ],
         "notes": "6-day anchor trainer. Sat 09:00 mandatory."
+      },
+      "Copper & Cloves": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -381,7 +461,7 @@
   },
   {
     "name": "Karan Bhatia",
-    "tier": 2,
+    "tier": 3,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -424,12 +504,28 @@
           }
         ],
         "notes": "Owns Sunday 10:15 and 11:30 at Supreme."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -480,9 +576,9 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -531,10 +627,10 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
-      "strength_lab": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": true,
       "foundations": false,
       "pre_post_natal": false,
       "amped_up": false,
@@ -592,8 +688,8 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -653,11 +749,27 @@
           }
         ],
         "notes": "Owns Mon/Tue/Thu morning blocks (pinned). Available all days for other slots."
+      },
+      "Copper & Cloves": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -704,12 +816,28 @@
         "session_count": 65,
         "owned_blocks": [],
         "notes": "PowerCycle specialist. Evening only. Low avg attendance."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -760,13 +888,13 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
-      "amped_up": false,
+      "amped_up": true,
       "hiit": false,
       "recovery": false
     },
@@ -812,16 +940,32 @@
         "avg_checkin": 5.8,
         "session_count": 91,
         "notes": "Multi-location trainer. PC qualified."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
-      "strength_lab": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
+      "strength_lab": true,
       "foundations": false,
       "pre_post_natal": false,
-      "amped_up": false,
+      "amped_up": true,
       "hiit": false,
       "recovery": false
     },
@@ -876,9 +1020,9 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -934,46 +1078,27 @@
           }
         ],
         "notes": "Owns Thu/Fri mornings and Sunday midday (pinned). Also available all other days."
-      }
-    },
-    "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
-      "strength_lab": false,
-      "foundations": false,
-      "pre_post_natal": false,
-      "amped_up": false,
-      "hiit": false,
-      "recovery": false
-    },
-    "active": true
-  },
-  {
-    "name": "Shruti Suresh",
-    "tier": 2,
-    "locations": {
-      "Kenkere House": {
+      },
+      "Copper & Cloves": {
         "available_days": [
+          "Monday",
           "Tuesday",
+          "Wednesday",
           "Thursday",
-          "Saturday"
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "19:00"
+          "start": "06:00",
+          "end": "22:00"
         },
-        "avg_classes_per_day": 2,
-        "max_classes_per_day": 3,
-        "avg_checkin": 4,
-        "session_count": 95,
-        "owned_blocks": [],
-        "notes": "Foundations certified."
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -1004,45 +1129,27 @@
         "session_count": 110,
         "owned_blocks": [],
         "notes": "Foundations certified."
-      }
-    },
-    "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
-      "strength_lab": false,
-      "foundations": false,
-      "pre_post_natal": false,
-      "amped_up": false,
-      "hiit": false,
-      "recovery": false
-    },
-    "active": true
-  },
-  {
-    "name": "Veena Narasimhan",
-    "tier": 3,
-    "locations": {
-      "Kenkere House": {
+      },
+      "Copper & Cloves": {
         "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
           "Saturday",
           "Sunday"
         ],
         "time_window": {
-          "start": "16:00",
-          "end": "17:15"
+          "start": "06:00",
+          "end": "22:00"
         },
-        "avg_classes_per_day": 1,
-        "max_classes_per_day": 1,
-        "avg_checkin": 3.2,
-        "session_count": 55,
-        "owned_blocks": [],
-        "notes": "Weekends only. 16:00-17:15 window only."
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
+      "all_barre": true,
+      "mat_57": true,
       "powercycle": false,
       "strength_lab": false,
       "foundations": false,
@@ -1112,9 +1219,9 @@
       }
     },
     "qualifications": {
-      "all_barre": false,
-      "mat_57": false,
-      "powercycle": false,
+      "all_barre": true,
+      "mat_57": true,
+      "powercycle": true,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,

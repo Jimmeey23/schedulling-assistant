@@ -1,0 +1,111 @@
+<style>
+  .scan-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+  .scan-card{border:1px solid #dbe3ee;border-radius:14px;background:#fff;padding:14px}
+  .scan-card b{display:block;font-size:24px;color:#0f172a;margin-bottom:4px}
+  .scan-card span{font-size:12px;color:#64748b}
+  .rule-shell{border:1px solid #cfd8e6;border-radius:18px;overflow:hidden;background:#f8fafc;box-shadow:0 12px 32px rgba(15,23,42,.08)}
+  .rule-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border-bottom:1px solid #e2e8f0}
+  .rule-top strong{font-size:14px;color:#0f172a}
+  .rule-action{background:#1e40af;color:#fff;border-radius:9px;padding:7px 11px;font-size:11px;font-weight:800}
+  .rule-body{display:grid;grid-template-columns:150px minmax(0,1fr)160px;gap:12px;padding:14px}
+  .rail{display:flex;flex-direction:column;gap:6px}
+  .rail div{border-radius:10px;padding:8px 9px;background:#fff;border:1px solid #e2e8f0;font-size:10px;font-weight:800;color:#475569}
+  .rail div.active{background:#0f172a;color:#fff;border-color:#0f172a}
+  .rule-main{display:flex;flex-direction:column;gap:8px}
+  .rule-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:9px 10px}
+  .rule-row b{font-size:11px;color:#0f172a}
+  .rule-row p{margin:2px 0 0;font-size:10px;color:#64748b;line-height:1.35}
+  .pill{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:9px;font-weight:900;background:#eff6ff;color:#1d4ed8}
+  .side-panel{display:flex;flex-direction:column;gap:8px}
+  .side-box{background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:10px}
+  .side-box b{display:block;font-size:11px;color:#0f172a;margin-bottom:5px}
+  .side-box p{font-size:10px;color:#64748b;margin:0;line-height:1.35}
+  .matrix{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+  .cell{min-height:32px;border-radius:8px;background:#fff;border:1px solid #e2e8f0;font-size:9px;color:#64748b;display:flex;align-items:center;justify-content:center;text-align:center}
+  .cell.on{background:#dbeafe;color:#1e40af;border-color:#93c5fd;font-weight:900}
+  @media(max-width:900px){.scan-grid{grid-template-columns:repeat(2,1fr)}.rule-body{grid-template-columns:1fr}.side-panel{display:none}}
+</style>
+
+<h2>Rules Tab Redesign: Choose The Direction</h2>
+<p class="subtitle">Project scan: the app has 6 rule groups and 89 rules. The current tab is functional but reads like a long settings list. These options restructure it into a more modern planning control center.</p>
+
+<div class="scan-grid">
+  <div class="scan-card"><b>89</b><span>total rules in catalog</span></div>
+  <div class="scan-card"><b>52</b><span>currently enabled</span></div>
+  <div class="scan-card"><b>24</b><span>class-format rules currently off</span></div>
+  <div class="scan-card"><b>3</b><span>studio-specific rule groups</span></div>
+</div>
+
+<div class="cards">
+  <div class="card" data-choice="a-command-center" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="rule-shell">
+        <div class="rule-top"><strong>Rules Command Center</strong><span class="rule-action">Validate & Run</span></div>
+        <div class="rule-body">
+          <div class="rail">
+            <div class="active">Overview</div><div>Universal</div><div>Studios</div><div>Trainer Locks</div><div>Class Formats</div>
+          </div>
+          <div class="rule-main">
+            <div class="rule-row"><div><b>Hard constraints active</b><p>Capacity, blocked windows, trainer shift rules, class location restrictions.</p></div><span class="pill">26/26</span></div>
+            <div class="rule-row"><div><b>Studio guardrails</b><p>Kwality, Supreme, Kenkere grouped with status, owner, and bulk tools.</p></div><span class="pill">18/27</span></div>
+            <div class="rule-row"><div><b>Class format policy</b><p>Collapsed by family, mapped to Settings min/max ranges and warnings.</p></div><span class="pill">0/24</span></div>
+          </div>
+          <div class="side-panel">
+            <div class="side-box"><b>Conflict Preview</b><p>Shows superseded rules, disabled hard rules, and Settings overrides.</p></div>
+            <div class="side-box"><b>Planner Impact</b><p>Forecasts which constraints changed before rerun.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Rules Command Center (recommended)</h3>
+      <p>Best balance: modern organized UI, source-of-truth clarity, rule health, impact preview, safer bulk actions.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b-studio-matrix" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="rule-shell">
+        <div class="rule-top"><strong>Studio Rule Matrix</strong><span class="rule-action">Compare</span></div>
+        <div style="padding:14px">
+          <div class="matrix">
+            <div class="cell on">Universal</div><div class="cell on">Kwality</div><div class="cell on">Supreme</div><div class="cell on">Kenkere</div><div class="cell">Trainer</div>
+            <div class="cell">Barre</div><div class="cell on">Power</div><div class="cell on">FIT</div><div class="cell">Recovery</div><div class="cell on">Pins</div>
+            <div class="cell on">AM</div><div class="cell">PM</div><div class="cell on">Rooms</div><div class="cell">Formats</div><div class="cell on">Caps</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Studio Rule Matrix</h3>
+      <p>Great for comparing studios and quickly spotting uneven constraints, but less natural for editing individual rules.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c-governance-console" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="rule-shell">
+        <div class="rule-top"><strong>Governance Console</strong><span class="rule-action">Publish Version</span></div>
+        <div class="rule-body" style="grid-template-columns:1fr 1fr">
+          <div class="rule-main">
+            <div class="rule-row"><div><b>Draft changes</b><p>Stage rule edits before applying.</p></div><span class="pill">7</span></div>
+            <div class="rule-row"><div><b>Approval checklist</b><p>Require validation before pipeline run.</p></div><span class="pill">OK</span></div>
+          </div>
+          <div class="side-panel">
+            <div class="side-box"><b>Version history</b><p>Snapshots, rollback, author, timestamp.</p></div>
+            <div class="side-box"><b>Audit trail</b><p>Tracks what changed and why.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Governance Console</h3>
+      <p>Most advanced and safest long-term, but bigger scope. Better after core planning controls stabilize.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Recommended implementation slice</h3>
+  <p>Build A first: Rules Command Center with overview health, grouped navigation, rule search/filter, conflict preview, planner impact notes, and safer bulk tools. Then add selected B/C features later.</p>
+</div>

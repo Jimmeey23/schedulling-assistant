@@ -100,6 +100,51 @@ def _summarise_format_rule(item: dict) -> str:
         return "; ".join(parts) or "Format-specific scheduling guidance"
 
 
+def _rule_command_metadata(rule: dict, enabled: bool = True) -> dict:
+        rule_type = rule.get("type", "")
+        source = rule.get("source_category", "")
+        description = (rule.get("description") or "").lower()
+
+        if not enabled:
+                status = "Disabled"
+        elif rule_type in {"never_do", "class_location", "trainer_availability"}:
+                status = "Recommended"
+        elif source == "format_rules":
+                status = "Recommended"
+        else:
+                status = "Recommended"
+
+        if not enabled and rule_type in {"never_do", "class_location", "trainer_availability", "slot_required"}:
+                risk = "high"
+        elif rule_type in {"never_do", "class_location"}:
+                risk = "critical"
+        elif rule_type in {"trainer_availability", "slot_required", "always_do"}:
+                risk = "high"
+        elif rule_type == "class_format":
+                risk = "medium"
+        else:
+                risk = "low"
+
+        if source == "format_rules" or rule_type == "class_format":
+                impact = "Class format policy"
+        elif rule_type == "trainer_availability":
+                impact = "Trainer eligibility"
+        elif rule_type == "class_location":
+                impact = "Studio placement"
+        elif rule_type == "slot_required" or "slot" in description or "time" in description:
+                impact = "Slot placement"
+        elif "target" in description or "minimum" in description or "maximum" in description:
+                impact = "Class count range"
+        else:
+                impact = "Operational guardrail"
+
+        return {
+                "impact_area": impact,
+                "risk_level": risk,
+                "status_tag": status,
+        }
+
+
 def _build_raw_groups() -> List[dict]:
         universal = _load_json(RULES_DIR / "universal_rules.json")
         kwality = _load_json(RULES_DIR / "kwality_rules.json")
@@ -290,6 +335,7 @@ def build_rules_catalog(config: dict | None = None) -> dict:
                         merged["title"] = override.get("title") or merged.get("title") or merged["id"]
                         merged["description"] = override.get("description") or merged.get("description") or ""
                         merged["enabled"] = bool(override.get("enabled", True))
+                        merged.update(_rule_command_metadata(merged, merged["enabled"]))
                         rules.append(merged)
                 payload_groups.append({
                         "id": group["id"],

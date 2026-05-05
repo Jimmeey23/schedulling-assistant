@@ -1,66 +1,61 @@
 ,4-May,,,,,,,,,,5-May,,,,,,,,,,6-May,,,,,,,,,,7-May,,,,,,,,,,8-May,,,,,,,,,,9-May,,,,,,,,,,10-May,,,,,,,,,
 ,Monday,,,,,,,,,,Tuesday,,,,,,,,,,Wednesday,,,,,,,,,,Thursday,,,,,,,,,,Friday,,,,,,,,,,Saturday,,,,,,,,,,Sunday,,,,,,,,,
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
-07:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Karan Bhatia,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Mat 57,Pushyank Nahar,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,
+07:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Pushyank Nahar,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Mat 57,Shruti Kulkarni,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,
 07:15,Studio Barre 57,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Pinned block — rule ownership ,,Studio Barre 57,Pushyank Nahar,Studio 1,15,19%,2,19%,2.5,Pinned block — rule ownership ,,Studio FIT,Kajol Kanchan,Studio 1,15,63%,55,63%,5.5,Protected slot — alternate tra,,Studio Barre 57,Pushyank Nahar,Studio 1,15,10%,6,10%,1.3,Pinned block — rule ownership ,,Studio Barre 57,Shruti Kulkarni,Studio 1,15,29%,56,29%,3.8,Pinned block — rule ownership ,,,,,,,,,,,,,,,,,,,,,
-07:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Shruti Suresh,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-08:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Pushyank Nahar,Studio 1,15,11%,3,11%,1.0,Weekly floor repair: conservat,,Studio Mat 57,Karan Bhatia,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Mat 57,Pushyank Nahar,Studio 2,13,90%,1,90%,9.0,Weekly floor repair: conservat,,,,,,,,,,,
-08:30,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Kajol Kanchan,Studio 1,15,46%,1,46%,6.0,Score 91.7/100 (CONSIDER) — 1 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+08:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Shruti Kulkarni,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Mat 57,Pushyank Nahar,Studio 2,13,90%,1,90%,9.0,Weekly floor repair: conservat,,,,,,,,,,,
+08:30,Studio Mat 57 Express,Siddhartha Kusuma,Studio 2,13,20%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,,Studio Barre 57,Kajol Kanchan,Studio 1,15,46%,1,46%,6.0,Score 100.0/100 (CONSIDER) — 1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 09:00,Studio Back Body Blaze,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Pinned block — rule ownership ,,Studio Back Body Blaze,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Pinned block — rule ownership ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Kajol Kanchan,Studio 1,15,46%,18,46%,5.9,Pinned block — rule ownership ,,,,,,,,,,,
 10:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Kajol Kanchan,Studio 1,15,77%,38,77%,7.0,Protected slot — alternate tra,,,,,,,,,,,
 11:00,Studio Barre 57,Pushyank Nahar,Studio 1,15,29%,35,29%,3.8,Pinned block — rule ownership ,,Studio Barre 57,Pushyank Nahar,Studio 1,15,22%,5,22%,2.8,Pinned block — rule ownership ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Shruti Kulkarni,Studio 1,15,68%,5,68%,8.8,Pinned block — rule ownership ,
-11:30,,,,,,,,,,,Studio Recovery,Shruti Suresh,Studio 2,13,20%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-12:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Shruti Suresh,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Cardio Barre,Karan Bhatia,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,,Studio Mat 57,Shruti Kulkarni,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,
-15:30,Studio Mat 57 Express,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-16:00,Studio Cardio Barre,Veena Narasimhan,Studio 2,13,20%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Veena Narasimhan,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,
-17:00,Studio FIT,Kajol Kanchan,Studio 1,15,42%,25,42%,3.8,Score 100.0/100 (CONSIDER) — 2,,Studio Barre 57,Shruti Kulkarni,Studio 1,15,19%,6,19%,2.5,Score 90.9/100 (INCLUDE) — 6 s,,Studio Mat 57 Express,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-18:00,Studio Mat 57,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (INCLUDE),,Studio Mat 57,Shruti Kulkarni,Studio 1,15,50%,2,50%,5.0,Score 98.1/100 (CONSIDER) — 2 ,,Studio Barre 57,Shruti Kulkarni,Studio 1,15,28%,5,28%,3.6,Score 100.0/100 (CONSIDER) — 5,,Studio FIT,Shruti Kulkarni,Studio 1,15,20%,0,0%,0.0,Score 93.7/100 (CONSIDER),,Studio FIT,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Shruti Kulkarni,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (INCLUDE),,,,,,,,,,,
-18:15,Studio Barre 57,Siddhartha Kusuma,Studio 2,13,0%,1,0%,0.0,Score 98.3/100 (CONSIDER) — 1 ,,Studio Cardio Barre Plus,Kajol Kanchan,Studio 2,13,26%,15,26%,3.4,Score 100.0/100 (CONSIDER) — 1,,Studio Mat 57,Pushyank Nahar,Studio 2,13,43%,26,43%,4.2,Score 100.0/100 (CONSIDER) — 2,,Studio Barre 57,Kajol Kanchan,Studio 2,13,58%,31,58%,7.5,Score 84.9/100 (CONSIDER) — 31,,Studio Cardio Barre,Pushyank Nahar,Studio 2,13,30%,12,30%,3.9,Score 70.0/100 (CONSIDER) — 12,,,,,,,,,,,,,,,,,,,,,
-19:15,Studio Back Body Blaze Express,Kajol Kanchan,Studio 1,15,28%,13,28%,3.6,Score 100.0/100 (CONSIDER) — 1,,Studio Mat 57 Express,Kajol Kanchan,Studio 2,13,20%,0,0%,0.0,Coverage: best available train,,Studio Barre 57,Shruti Kulkarni,Studio 2,13,26%,3,26%,3.3,Score 100.0/100 (CONSIDER) — 3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-19:30,Studio Recovery,Shruti Kulkarni,Studio 2,13,10%,1,10%,1.0,Score 100.0/100 (CONSIDER) — 1,,Studio FIT,Shruti Kulkarni,Studio 1,15,69%,29,69%,6.2,Protected slot — alternate tra,,Studio Recovery,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Score 98.2/100 (INCLUDE),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+12:00,,,,,,,,,,,,,,,,,,,,,Studio FIT,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,,Studio Cardio Barre,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,,Studio Mat 57,Shruti Kulkarni,Studio 1,15,70%,1,70%,7.0,Weekly floor repair: conservat,,Studio FIT,Shruti Kulkarni,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,
+12:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Shruti Kulkarni,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,,,,,,,,,,,
+16:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Shruti Kulkarni,Studio 2,13,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,,Studio FIT,Chaitanya Nahar,Studio 1,15,20%,0,0%,0.0,Weekly floor repair: conservat,,,,,,,,,,,
+17:00,Studio FIT,Shruti Kulkarni,Studio 1,15,56%,2,56%,5.0,Score 100.0/100 (CONSIDER) — 2,,,,,,,,,,,,Studio Mat 57 Express,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Experimental: no historical da,,Studio Cardio Barre,Kajol Kanchan,Studio 1,15,17%,20,17%,2.2,Weekly floor repair: conservat,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+18:00,Studio Mat 57,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (INCLUDE),,Studio Mat 57,Shruti Kulkarni,Studio 1,15,50%,2,50%,5.0,Score 100.0/100 (CONSIDER) — 2,,Studio Barre 57,Siddhartha Kusuma,Studio 1,15,31%,10,31%,4.0,Score 100.0/100 (CONSIDER) — 1,,Studio FIT,Shruti Kulkarni,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (CONSIDER),,Studio FIT,Kajol Kanchan,Studio 1,15,20%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Chaitanya Nahar,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (CONSIDER),,,,,,,,,,,
+18:15,Studio Barre 57,Chaitanya Nahar,Studio 2,13,19%,15,19%,2.5,Score 100.0/100 (CONSIDER) — 1,,Studio Cardio Barre,Kajol Kanchan,Studio 2,13,42%,2,42%,5.5,Score 100.0/100 (CONSIDER) — 2,,Studio Mat 57,Shruti Kulkarni,Studio 2,13,50%,16,50%,5.0,Score 100.0/100 (INCLUDE) — 16,,Studio Barre 57,Kajol Kanchan,Studio 2,13,58%,31,58%,7.5,Score 100.0/100 (CONSIDER) — 3,,Studio Cardio Barre,Siddhartha Kusuma,Studio 2,13,21%,33,21%,2.7,Score 100.0/100 (CONSIDER) — 3,,,,,,,,,,,,,,,,,,,,,
+19:15,Studio Back Body Blaze Express,Shruti Kulkarni,Studio 2,13,46%,1,46%,6.0,"Experimental: 1 sessions, fill",,Studio Mat 57 Express,Kajol Kanchan,Studio 2,13,20%,0,0%,0.0,Coverage: best available train,,Studio Barre 57 Express,Shruti Kulkarni,Studio 2,13,23%,14,23%,3.0,Score 100.0/100 (CONSIDER) — 1,,Studio Recovery,Kajol Kanchan,Studio 1,15,39%,36,39%,3.9,Score 100.0/100 (CONSIDER) — 3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+19:30,,,,,,,,,,,Studio FIT,Shruti Kulkarni,Studio 1,15,69%,29,69%,6.2,Protected slot — alternate tra,,Studio Recovery,Pushyank Nahar,Studio 1,15,20%,0,0%,0.0,Score 100.0/100 (INCLUDE),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+20:00,,,,,,,,,,,Studio Barre 57 Express,Kajol Kanchan,Studio 2,13,20%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 
 === WEEKLY BREAKDOWN ===
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Chaitanya Nahar,1,0.9,16%,Studio Cardio Barre
-Kajol Kanchan,13,11.7,37%,Studio FIT
-Karan Bhatia,3,2.8,20%,Studio FIT
-Pushyank Nahar,16,14.5,26%,Studio Barre 57
-Shruti Kulkarni,11,10.0,33%,Studio Barre 57
-Shruti Suresh,3,2.4,20%,Studio Mat 57
-Siddhartha Kusuma,1,0.9,0%,Studio Barre 57
-Veena Narasimhan,2,1.9,20%,Studio Cardio Barre
+Chaitanya Nahar,3,2.8,20%,Studio Barre 57
+Kajol Kanchan,15,12.9,36%,Studio FIT
+Pushyank Nahar,14,12.6,25%,Studio Barre 57
+Shruti Kulkarni,15,13.8,39%,Studio FIT
+Siddhartha Kusuma,3,2.6,24%,Studio Mat 57 Express
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
 Studio Back Body Blaze,2,20%,2
-Studio Back Body Blaze Express,1,28%,1
-Studio Barre 57,15,29%,7
-Studio Cardio Barre,5,21%,4
-Studio Cardio Barre Plus,1,26%,1
-Studio FIT,10,36%,7
-Studio Mat 57,10,32%,7
+Studio Back Body Blaze Express,1,46%,1
+Studio Barre 57,13,32%,7
+Studio Barre 57 Express,2,22%,2
+Studio Cardio Barre,4,25%,3
+Studio FIT,13,34%,7
+Studio Mat 57,9,40%,6
 Studio Mat 57 Express,3,20%,3
-Studio Recovery,3,17%,3
+Studio Recovery,3,31%,3
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
 07:00,-,-,-,-,Studio FIT,Studio Mat 57,-,2
 07:15,Studio Barre 57,Studio Barre 57,Studio FIT,Studio Barre 57,Studio Barre 57,-,-,5
-07:45,-,-,-,Studio Mat 57,-,-,-,1
-08:15,-,-,-,Studio FIT,Studio Mat 57,Studio Mat 57,-,3
-08:30,-,-,Studio Barre 57,-,-,-,-,1
+08:15,-,-,-,-,Studio FIT,Studio Mat 57,-,2
+08:30,Studio Mat 57 Express,-,Studio Barre 57,-,-,-,-,2
 09:00,Studio Back Body Blaze,Studio Back Body Blaze,-,-,-,Studio Barre 57,-,3
 10:15,-,-,-,-,-,Studio FIT,-,1
 11:00,Studio Barre 57,Studio Barre 57,-,-,-,-,Studio Barre 57,3
-11:30,-,Studio Recovery,-,-,-,-,-,1
-12:00,-,-,-,Studio Mat 57,Studio Cardio Barre,-,Studio Mat 57,3
-15:30,Studio Mat 57 Express,-,-,-,-,-,-,1
-16:00,Studio Cardio Barre,-,-,-,-,-,Studio Mat 57,2
-17:00,Studio FIT,Studio Barre 57,Studio Mat 57 Express,-,-,-,-,3
+12:00,-,-,Studio FIT,-,Studio Cardio Barre,Studio Mat 57,Studio FIT,4
+12:30,-,-,-,-,Studio Mat 57,-,-,1
+16:00,-,-,-,Studio FIT,-,Studio FIT,-,2
+17:00,Studio FIT,-,Studio Mat 57 Express,Studio Cardio Barre,-,-,-,3
 18:00,Studio Mat 57,Studio Mat 57,Studio Barre 57,Studio FIT,Studio FIT,Studio Barre 57,-,6
-18:15,Studio Barre 57,Studio Cardio Barre Plus,Studio Mat 57,Studio Barre 57,Studio Cardio Barre,-,-,5
-19:15,Studio Back Body Blaze Express,Studio Mat 57 Express,Studio Barre 57,-,-,-,-,3
-19:30,Studio Recovery,Studio FIT,Studio Recovery,-,-,-,-,3
+18:15,Studio Barre 57,Studio Cardio Barre,Studio Mat 57,Studio Barre 57,Studio Cardio Barre,-,-,5
+19:15,Studio Back Body Blaze Express,Studio Mat 57 Express,Studio Barre 57 Express,Studio Recovery,-,-,-,4
+19:30,-,Studio FIT,Studio Recovery,-,-,-,-,2
+20:00,-,Studio Barre 57 Express,-,-,-,-,-,1

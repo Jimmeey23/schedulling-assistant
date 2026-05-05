@@ -22,3 +22,24 @@ def test_supabase_settings_require_service_role_key(monkeypatch):
 
     assert stdlib_supabase_settings() == ("https://example.supabase.co", "")
     assert flask_supabase_settings() == ("https://example.supabase.co", "")
+
+
+def test_supabase_settings_accept_rest_endpoint_url(monkeypatch):
+    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co/rest/v1")
+    monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "service-key")
+
+    assert stdlib_supabase_settings() == ("https://example.supabase.co", "service-key")
+    assert flask_supabase_settings() == ("https://example.supabase.co", "service-key")
+
+
+def test_schedule_supabase_save_failure_does_not_raise(monkeypatch):
+    import app
+
+    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("SUPABASE_SERVICE_ROLE_KEY", "service-key")
+    monkeypatch.setattr(app, "supabase_upsert", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("bad path")))
+
+    result = app._save_schedule_to_supabase({"locations": {}})
+
+    assert result["saved"] is False
+    assert "bad path" in result["error"]

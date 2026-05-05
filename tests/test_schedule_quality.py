@@ -4,6 +4,8 @@ import builtins
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import agents.reporter as reporter_module
@@ -11,6 +13,7 @@ import app as flask_app_module
 from agents.ai_planner import AISchedulePlanner, PlannedSlot, _build_location_prompt, _enforce_hard_limits, _parse_schedule_response, _score_slots
 from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, MAX_TRAINER_WEEKLY_MINUTES, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState, get_class_duration, slot_time_to_minutes
 from agents.reporter import OutputReporter
+from rule_config import build_rules_catalog, load_rules_config
 from serve import build_pipeline_command, find_available_port, is_output_artifact_path
 
 
@@ -388,6 +391,20 @@ def test_schedule_data_json_is_not_routed_as_output_artifact():
     assert is_output_artifact_path("/scorecard.json")
 
 
+def test_rules_catalog_includes_command_center_metadata():
+    catalog = build_rules_catalog(load_rules_config())
+    all_rules = [rule for group in catalog["groups"] for rule in group["rules"]]
+
+    assert all_rules
+    assert all(rule.get("impact_area") for rule in all_rules)
+    assert all(rule.get("risk_level") in {"critical", "high", "medium", "low"} for rule in all_rules)
+    assert all(rule.get("status_tag") in {"Recommended", "Risky", "Disabled"} for rule in all_rules)
+
+    format_rules = [rule for rule in all_rules if rule.get("type") == "class_format"]
+    assert format_rules
+    assert all(rule["impact_area"] == "Class format policy" for rule in format_rules)
+
+
 def test_find_available_port_skips_occupied_port():
     import socket
 
@@ -424,11 +441,93 @@ def test_trainer_cannot_work_am_and_pm_on_same_day():
     assert not state.can_add("Monday", "18:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
 
 
+def test_trainer_cannot_work_multiple_main_studios_in_same_shift():
+    state = TrainerState("Trainer A", 1)
+
+    assert state.can_add("Monday", "07:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
+    state.add("Monday", "07:00", "Kwality House, Kemps Corner", "Studio Barre 57")
+
+    assert state.can_add("Monday", "10:00", "Kwality House, Kemps Corner", "Studio Mat 57", 4, "07:00", "20:30")
+    assert not state.can_add("Monday", "10:00", "Supreme HQ, Bandra", "Studio Barre 57", 4, "07:00", "20:30")
+    assert not state.can_add("Monday", "10:00", "Kenkere House", "Studio Barre 57", 4, "07:00", "20:30")
+
+
+def test_courtside_can_only_be_final_same_city_shift_stop():
+    state = TrainerState("Trainer A", 1)
+
+    state.add("Saturday", "07:00", "Kwality House, Kemps Corner", "Studio Barre 57")
+
+    assert state.can_add("Saturday", "10:00", "Courtside", "Studio Mat 57", 4, "07:00", "20:30")
+    state.add("Saturday", "10:00", "Courtside", "Studio Mat 57")
+
+    assert not state.can_add("Saturday", "11:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
+    assert not state.can_add("Saturday", "11:00", "Courtside", "Studio FIT", 4, "07:00", "20:30")
+
+
+def test_courtside_is_blocked_when_trainer_has_later_main_studio_class():
+    state = TrainerState("Trainer A", 1)
+
+    state.add("Saturday", "11:00", "Supreme HQ, Bandra", "Studio Barre 57")
+
+    assert not state.can_add("Saturday", "10:00", "Courtside", "Studio Mat 57", 4, "07:00", "20:30")
+
+
 def test_trainer_cannot_exceed_weekly_15_hour_cap():
     state = TrainerState("Anisha Shah", 1)
     state.weekly_minutes = MAX_TRAINER_WEEKLY_MINUTES - get_class_duration("Studio Barre 57") + 1
 
     assert not state.can_add("Monday", "09:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
+
+
+def test_lower_tier_is_blocked_when_eligible_tier1_is_under_target():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.trainer_profiles = {
+        "Tier One": {
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "20:30"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True},
+        },
+        "Tier Two": {
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "20:30"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True},
+        },
+    }
+    optimiser.trainer_states = {
+        "Tier One": TrainerState("Tier One", 1),
+        "Tier Two": TrainerState("Tier Two", 2),
+    }
+
+    assert optimiser._tier1_under_target_exists_for_slot(
+        "Kwality House, Kemps Corner",
+        "Monday",
+        "2026-05-04",
+        "09:00",
+        "Studio Barre 57",
+        set(),
+        exclude_trainer="Tier Two",
+    )
+
+
+def test_tier1_priority_score_dominates_lower_tier_history_edge():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.trainer_states = {
+        "Tier One": TrainerState("Tier One", 1),
+        "Tier Two": TrainerState("Tier Two", 2),
+    }
+    optimiser.trainer_states["Tier Two"].weekly_minutes = 10 * 60
+
+    assert optimiser._tier_priority_score("Tier One") > optimiser._tier_priority_score("Tier Two") + 200
 
 
 def test_schedule_config_targets_are_selected_within_min_max_range(tmp_path, monkeypatch):
@@ -694,6 +793,72 @@ def test_pipeline_command_includes_variation_and_output_suffix():
     assert "12345" in cmd
     assert "--output-suffix" in cmd
     assert "run_test" in cmd
+
+
+def test_optimiser_candidate_rows_are_indexed_by_location_and_day():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    row_kw_mon = {"location": "Kwality House, Kemps Corner", "day": 0, "class": "Studio Barre 57"}
+    row_kw_tue = {"location": "Kwality House, Kemps Corner", "day": 1, "class": "Studio Mat 57"}
+    row_sup_mon = {"location": "Supreme HQ, Bandra", "day": 0, "class": "Studio FIT"}
+    optimiser.scores_data = {"class_slot_ranking": [row_kw_mon, row_kw_tue, row_sup_mon]}
+
+    optimiser._build_score_indexes()
+
+    assert optimiser._candidate_rows("Kwality House, Kemps Corner", 0, day_filter=True) == [row_kw_mon]
+    assert optimiser._candidate_rows("Kwality House, Kemps Corner", 0, day_filter=False) == [
+        row_kw_mon,
+        row_kw_tue,
+    ]
+
+
+def test_optimiser_history_slot_lookup_uses_precomputed_nearby_aggregate():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.hist_lookup = {
+        ("Kwality House, Kemps Corner", "Studio Barre 57", "Trainer A", 0, "09:00"): {
+            "session_count": 2,
+            "avg_fill_rate": 0.50,
+            "avg_checkin": 8.0,
+            "avg_late_cancel_rate": 0.10,
+            "avg_no_show_rate": 0.20,
+        },
+        ("Kwality House, Kemps Corner", "Studio Barre 57", "Trainer B", 0, "09:15"): {
+            "session_count": 3,
+            "avg_fill_rate": 0.80,
+            "avg_checkin": 11.0,
+            "avg_late_cancel_rate": 0.00,
+            "avg_no_show_rate": 0.10,
+        },
+        ("Supreme HQ, Bandra", "Studio Barre 57", "Trainer A", 0, "09:00"): {
+            "session_count": 10,
+            "avg_fill_rate": 0.10,
+            "avg_checkin": 1.0,
+        },
+    }
+
+    optimiser._build_history_indexes()
+    hist = optimiser._get_hist_slot("Kwality House, Kemps Corner", "Studio Barre 57", 0, "09:10")
+
+    assert hist["session_count"] == 5
+    assert hist["avg_fill_rate"] == pytest.approx(0.68)
+    assert hist["avg_checkin"] == pytest.approx(9.8)
+
+
+def test_pipeline_state_marks_missing_child_process_as_failed(monkeypatch):
+    state = {
+        "running": True,
+        "status": "running",
+        "pid": 12345,
+        "started": 1.0,
+        "message": "Running",
+    }
+    monkeypatch.setattr(flask_app_module, "_pipeline_process_alive", lambda pid: False)
+
+    flask_app_module._refresh_pipeline_state(state)
+
+    assert state["running"] is False
+    assert state["status"] == "failed"
+    assert state["pid"] is None
+    assert "stopped" in state["message"].lower()
 
 
 def test_ai_fallback_generates_three_named_optimisation_iterations(tmp_path, monkeypatch):

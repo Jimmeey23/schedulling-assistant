@@ -18,6 +18,8 @@ DEFAULT_LOCATIONS = [
     "Kwality House, Kemps Corner",
     "Supreme HQ, Bandra",
     "Kenkere House",
+    "Courtside",
+    "Copper & Cloves",
 ]
 
 

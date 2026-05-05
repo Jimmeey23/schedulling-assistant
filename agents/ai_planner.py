@@ -13,6 +13,7 @@ from dataclasses import dataclass, asdict, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
+from agents.draft_retention import prune_draft_schedule_files
 from agents.io_utils import atomic_write_json
 from ai_provider import OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
 from rule_config import build_rules_catalog, get_active_format_rules, load_rules_config
@@ -695,6 +696,8 @@ class AISchedulePlanner:
             "Kwality House, Kemps Corner",
             "Supreme HQ, Bandra",
             "Kenkere House",
+            "Courtside",
+            "Copper & Cloves",
         ]
         self.overrides_path = overrides_path
         self.variation_seed = variation_seed
@@ -709,6 +712,7 @@ class AISchedulePlanner:
 
         for path in paths:
             atomic_write_json(path, output, indent=2)
+        prune_draft_schedule_files(STATE_DIR, keep_groups=5)
 
     def run(self) -> dict:
         if not OPENAI_AVAILABLE:

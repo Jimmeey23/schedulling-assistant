@@ -65,7 +65,19 @@ PERMITTED_LOCATIONS = {
     "Kwality House, Kemps Corner",
     "Supreme HQ, Bandra",
     "Kenkere House",
+    "Copper & Cloves",
 }
+
+
+def _copper_class_name(row) -> str:
+    session = str(row.get("SessionName", "") or "").lower()
+    class_name = str(row.get(COL_CLASS, "") or "")
+    source = f"{session} {class_name.lower()}"
+    if "fit" in source:
+        return "Copper + Cloves FIT"
+    if "mat 57" in source or "mat57" in source:
+        return "Copper + Cloves Mat 57"
+    return "Copper + Cloves Barre 57"
 
 
 def _parse_pct(val) -> float:
@@ -152,7 +164,16 @@ class ClassScorer:
         df = pd.read_csv(csv_file, low_memory=False)
         print(f"  Loaded {len(df):,} rows from {self.csv_path}")
 
-        # Filter to permanent locations only
+        # Copper & Cloves is scheduled as a Bengaluru extension using historic
+        # Pop-up rows whose class name identifies the Copper partnership.
+        copper_mask = (
+            df[COL_LOCATION].astype(str).str.strip().str.lower().eq("pop-up")
+            & df["SessionName"].astype(str).str.contains("copper", case=False, na=False)
+        )
+        df.loc[copper_mask, COL_LOCATION] = "Copper & Cloves"
+        df.loc[copper_mask, COL_CLASS] = df.loc[copper_mask].apply(_copper_class_name, axis=1)
+
+        # Filter to permitted scheduling locations only.
         df = df[df[COL_LOCATION].isin(PERMITTED_LOCATIONS)].copy()
         print(f"  After location filter: {len(df):,} rows")
 

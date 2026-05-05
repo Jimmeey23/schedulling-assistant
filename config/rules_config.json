@@ -16,12 +16,12 @@
       "description": "Rules specific to Kwality House, Kemps Corner \u2014 Strength Lab exclusivity, PowerCycle minimums, and peak-slot ownership."
     },
     "location_supreme": {
-      "enabled": true,
+      "enabled": false,
       "label": "Supreme HQ Rules",
       "description": "Rules specific to Supreme HQ, Bandra \u2014 daily PowerCycle requirements, Recovery placement, and class-mix guardrails."
     },
     "location_kenkere": {
-      "enabled": true,
+      "enabled": false,
       "label": "Kenkere House Rules",
       "description": "Rules specific to Kenkere House \u2014 PowerCycle ban, Barre-family minimums, and trainer ownership blocks."
     },
@@ -73,7 +73,7 @@
       "title": "UNIV-008"
     },
     "UNIV-009": {
-      "enabled": true,
+      "enabled": false,
       "description": "No trainer > 3 consecutive classes without 5 min gap",
       "title": "UNIV-009"
     },
@@ -98,7 +98,7 @@
       "title": "UNIV-013"
     },
     "UNIV-014": {
-      "enabled": true,
+      "enabled": false,
       "description": "Peak midday slot must never be empty",
       "title": "UNIV-014"
     },
@@ -113,12 +113,12 @@
       "title": "UNIV-016"
     },
     "UNIV-017": {
-      "enabled": true,
+      "enabled": false,
       "description": "Always assign Tier 1 trainer to primary peak slot",
       "title": "UNIV-017"
     },
     "UNIV-018": {
-      "enabled": true,
+      "enabled": false,
       "description": "Trainer substitution protocol hierarchy",
       "title": "UNIV-018"
     },
@@ -128,7 +128,7 @@
       "title": "UNIV-019"
     },
     "UNIV-020": {
-      "enabled": true,
+      "enabled": false,
       "description": "Never roster trainer at location with < 30 historical sessions",
       "title": "UNIV-020"
     },
@@ -288,12 +288,12 @@
       "title": "KW-001"
     },
     "KW-002": {
-      "enabled": false,
+      "enabled": true,
       "description": "Anisha Shah Mon/Tue/Wed ONLY at Kwality",
       "title": "KW-002"
     },
     "KW-003": {
-      "enabled": false,
+      "enabled": true,
       "description": "Mrigakshi Jaiswal Thu/Fri ONLY at Kwality",
       "title": "KW-003"
     },
@@ -308,17 +308,17 @@
       "title": "KW-005"
     },
     "KW-006": {
-      "enabled": false,
+      "enabled": true,
       "description": "Strength Lab: Atulan Purohit exclusively Mon/Wed evenings max 4/week",
       "title": "KW-006"
     },
     "KW-007": {
-      "enabled": false,
+      "enabled": true,
       "description": "Pre/Post Natal: Anisha Mon-Wed, Mrigakshi Thu-Fri, mornings only",
       "title": "KW-007"
     },
     "KW-008": {
-      "enabled": false,
+      "enabled": true,
       "description": "Strength Lab max 4x per week total",
       "title": "KW-008"
     },
@@ -358,7 +358,7 @@
       "title": "SU-007"
     },
     "SU-008": {
-      "enabled": true,
+      "enabled": false,
       "description": "18:00 PM slot must always have Tier 1 trainer on weekdays",
       "title": "SU-008"
     },
@@ -403,7 +403,7 @@
       "title": "KE-006"
     },
     "KE-007": {
-      "enabled": true,
+      "enabled": false,
       "description": "09:00 AM must be filled with Tier 1 trainer every day",
       "title": "KE-007"
     },

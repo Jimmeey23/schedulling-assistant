@@ -14,12 +14,14 @@ import sys
 import threading
 import time as _time
 import uuid
+from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib import error as urlerror
 from urllib import request as urlrequest
 from urllib.parse import urlparse
 
+from finalise_schedule import finalise_schedule_document
 from rule_config import build_rules_catalog, load_rules_config, update_rules_config
 
 PROJECT_ROOT = Path(__file__).parent
@@ -28,6 +30,10 @@ OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 CONFIG_PATH = PROJECT_ROOT / "config" / "rules_config.json"
 SCHEDULE_CONFIG_PATH = PROJECT_ROOT / "config" / "schedule_config.json"
 TRAINER_PROFILES_PATH = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+MUMBAI_LOCATIONS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Courtside"}
+BENGALURU_LOCATIONS = {"Kenkere House", "Copper & Cloves"}
+MAIN_STUDIOS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Kenkere House"}
+DERIVED_STUDIOS = {"Courtside", "Copper & Cloves"}
 
 
 def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
@@ -47,8 +53,389 @@ def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
 load_env_file()
 
 # Pipeline process state
-_pipeline_state = {"running": False, "pid": None, "started": None, "message": "Idle"}
+_pipeline_state = {
+    "running": False,
+    "status": "idle",
+    "pid": None,
+    "started": None,
+    "message": "Idle",
+}
 _run_counter = 0
+
+
+def _same_schedule_slot(row, slot):
+    keys = ("location", "date", "day_of_week", "time", "class_name", "room", "trainer_1")
+    return all((row.get(k) or "") == (slot.get(k) or "") for k in keys)
+
+
+def _slot_minutes(value):
+    if not value:
+        return 0
+    h, m = str(value).split(":")[:2]
+    return int(h) * 60 + int(m)
+
+
+def _slot_duration(slot):
+    return int(slot.get("duration_min") or 57)
+
+
+def _slot_overlap(a, b):
+    if (a.get("day_of_week") or "") != (b.get("day_of_week") or ""):
+        return False
+    a_start = _slot_minutes(a.get("time") or "00:00")
+    b_start = _slot_minutes(b.get("time") or "00:00")
+    return a_start < b_start + _slot_duration(b) and b_start < a_start + _slot_duration(a)
+
+
+def _location_region(location):
+    if location in MUMBAI_LOCATIONS:
+        return "mumbai"
+    if location in BENGALURU_LOCATIONS:
+        return "bengaluru"
+    return location
+
+
+def _shift_label(time_str):
+    return "AM" if _slot_minutes(time_str) < 13 * 60 else "PM"
+
+
+def _violates_location_shift_lock(slot, trainer_rows):
+    loc = slot.get("location") or ""
+    day = slot.get("day_of_week") or ""
+    shift = _shift_label(slot.get("time") or "00:00")
+    slot_min = _slot_minutes(slot.get("time") or "00:00")
+    same_shift = [
+        (_slot_minutes(r.get("time") or "00:00"), r.get("location") or "")
+        for r in trainer_rows
+        if r.get("day_of_week") == day and _shift_label(r.get("time") or "00:00") == shift
+    ]
+    if not same_shift:
+        return ""
+    if any(_location_region(existing_loc) != _location_region(loc) for _, existing_loc in same_shift):
+        return f"{slot.get('trainer_1')} already has a class in another city on {day} {shift}"
+    existing_main = {existing_loc for _, existing_loc in same_shift if existing_loc in MAIN_STUDIOS}
+    if loc in MAIN_STUDIOS:
+        if existing_main and any(existing_loc != loc for existing_loc in existing_main):
+            return f"{slot.get('trainer_1')} is already assigned to another main studio on {day} {shift}"
+        if any(existing_loc in DERIVED_STUDIOS for _, existing_loc in same_shift):
+            return f"{slot.get('trainer_1')} cannot return to a main studio after a pop-up studio on {day} {shift}"
+    elif loc in DERIVED_STUDIOS:
+        if any(existing_loc in DERIVED_STUDIOS for _, existing_loc in same_shift):
+            return f"{slot.get('trainer_1')} already has a pop-up studio assignment on {day} {shift}"
+        if any(existing_min > slot_min for existing_min, _ in same_shift):
+            return f"{slot.get('trainer_1')} can only take {loc} if it is their final stop on {day} {shift}"
+    return ""
+
+
+def _trainer_profile(name):
+    if not TRAINER_PROFILES_PATH.exists():
+        return None
+    target = " ".join(str(name or "").split()).lower()
+    profiles = json.loads(TRAINER_PROFILES_PATH.read_text())
+    return next((p for p in profiles if " ".join(str(p.get("name") or "").split()).lower() == target), None)
+
+
+def _profile_location_data(profile, loc):
+    locations = profile.get("locations") or {}
+    if loc in locations:
+        return locations[loc]
+    if loc == "Courtside":
+        candidates = [locations.get(l) for l in ("Kwality House, Kemps Corner", "Supreme HQ, Bandra") if locations.get(l)]
+    elif loc == "Copper & Cloves":
+        candidates = [locations.get(l) for l in ("Copper & Cloves", "Kenkere House") if locations.get(l)]
+    else:
+        candidates = []
+    return max(candidates, key=lambda item: item.get("session_count", 0)) if candidates else None
+
+
+def _validate_manual_slot(data, iteration, slot, original_slot=None):
+    trainer = slot.get("trainer_1") or ""
+    profile = _trainer_profile(trainer)
+    if not profile:
+        raise ValueError(f"No active trainer profile found for {trainer}")
+    if profile.get("active") is False:
+        raise ValueError(f"{trainer} is inactive")
+    loc = slot.get("location") or ""
+    loc_profile = _profile_location_data(profile, loc)
+    if not loc_profile:
+        raise ValueError(f"{trainer} is not enabled for {loc}")
+    day = slot.get("day_of_week") or ""
+    days = loc_profile.get("available_days") or []
+    if days and day not in days:
+        raise ValueError(f"{trainer} is not available on {day}")
+    tw = loc_profile.get("time_window") or {}
+    start = tw.get("start", "06:00")
+    end = tw.get("end", "22:00")
+    slot_start = _slot_minutes(slot.get("time") or "00:00")
+    if slot_start < _slot_minutes(start) or slot_start >= _slot_minutes(end):
+        raise ValueError(f"{trainer} is outside their time window {start}-{end}")
+
+    rows = []
+    if iteration == "Main":
+        for loc_rows in (data.get("locations") or {}).values():
+            rows.extend(loc_rows or [])
+    else:
+        for loc_rows in ((data.get("iterations") or {}).get(iteration) or {}).values():
+            rows.extend(loc_rows or [])
+    rows = [r for r in rows if not (original_slot and _same_schedule_slot(r, original_slot))]
+    trainer_rows = [r for r in rows if (r.get("trainer_1") or "").strip().lower() == trainer.strip().lower()]
+
+    max_day = int(loc_profile.get("max_classes_per_day") or 4)
+    same_day_loc = [r for r in trainer_rows if r.get("location") == loc and r.get("day_of_week") == day]
+    if len(same_day_loc) >= max_day:
+        raise ValueError(f"{trainer} already has {len(same_day_loc)}/{max_day} classes at {loc} on {day}")
+    if any(_slot_overlap(slot, r) for r in trainer_rows):
+        raise ValueError(f"{trainer} has an overlapping class on {day}")
+    shift = "AM" if slot_start < 13 * 60 else "PM"
+    opposite = "PM" if shift == "AM" else "AM"
+    if any((r.get("day_of_week") == day) and (("AM" if _slot_minutes(r.get("time")) < 13 * 60 else "PM") == opposite) for r in trainer_rows):
+        raise ValueError(f"{trainer} already has an {opposite} class on {day}")
+    location_shift_error = _violates_location_shift_lock(slot, trainer_rows)
+    if location_shift_error:
+        raise ValueError(location_shift_error)
+    weekly_minutes = sum(_slot_duration(r) for r in trainer_rows)
+    if weekly_minutes + _slot_duration(slot) > 15 * 60:
+        raise ValueError(f"{trainer} would exceed the 15h weekly cap")
+
+
+def _replace_trainer_in_schedule(payload):
+    slot = payload.get("slot") or {}
+    new_trainer = str(payload.get("new_trainer") or "").strip()
+    iteration = payload.get("iteration") or "Main"
+    if not new_trainer:
+        raise ValueError("Missing replacement trainer")
+    required = ("location", "day_of_week", "time", "class_name", "trainer_1")
+    missing = [k for k in required if not slot.get(k)]
+    if missing:
+        raise ValueError(f"Missing slot field(s): {', '.join(missing)}")
+
+    path = WEB_DIR / "schedule_data.json"
+    if not path.exists():
+        raise FileNotFoundError("web/schedule_data.json was not found")
+    data = json.loads(path.read_text())
+    new_slot = dict(slot)
+    new_slot["trainer_1"] = new_trainer
+    if new_slot.get("location") in (MUMBAI_LOCATIONS | BENGALURU_LOCATIONS):
+        _validate_manual_slot(data, iteration, new_slot, original_slot=slot)
+    updated = 0
+
+    def update_rows(rows):
+        nonlocal updated
+        if not isinstance(rows, list):
+            return
+        for row in rows:
+            if _same_schedule_slot(row, slot):
+                old_trainer = row.get("trainer_1") or ""
+                row["replaced_from_trainer"] = old_trainer
+                row["trainer_1"] = new_trainer
+                row["recommendation"] = "MANUAL"
+                row["scheduling_reason"] = (
+                    f"Manual trainer replacement: {old_trainer or '—'} → {new_trainer}"
+                )
+                updated += 1
+
+    if iteration == "Main":
+        update_rows((data.get("locations") or {}).get(slot.get("location")))
+    else:
+        update_rows(((data.get("iterations") or {}).get(iteration) or {}).get(slot.get("location")))
+
+    if updated == 0:
+        raise ValueError("Could not find the selected class in the active schedule")
+
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(data, indent=2))
+    os.replace(tmp, path)
+    _regenerate_index_from_template(data)
+    return updated
+
+
+def _add_class_to_schedule(payload):
+    slot = payload.get("slot") or {}
+    iteration = payload.get("iteration") or "Main"
+    required = ("location", "day_of_week", "time", "class_name", "trainer_1")
+    missing = [k for k in required if not slot.get(k)]
+    if missing:
+        raise ValueError(f"Missing slot field(s): {', '.join(missing)}")
+
+    path = WEB_DIR / "schedule_data.json"
+    if not path.exists():
+        raise FileNotFoundError("web/schedule_data.json was not found")
+    data = json.loads(path.read_text())
+    slot = dict(slot)
+    slot.setdefault("recommendation", "MANUAL")
+    slot.setdefault("manual_added", True)
+    slot.setdefault("scheduling_reason", "Manual class added from calendar")
+    _validate_manual_slot(data, iteration, slot)
+
+    loc = slot["location"]
+    if iteration == "Main":
+        data.setdefault("locations", {}).setdefault(loc, []).append(slot)
+    else:
+        data.setdefault("iterations", {}).setdefault(iteration, {}).setdefault(loc, []).append(slot)
+
+    supabase_saved = _write_schedule_data(data)
+    return {"added": 1, "supabase_saved": supabase_saved}
+
+
+def _save_schedule_to_supabase(data):
+    if not supabase_configured():
+        return {"saved": False, "error": "Supabase is not configured"}
+    try:
+        supabase_upsert("saved_schedule", data)
+        return {"saved": True, "error": ""}
+    except Exception as exc:
+        return {"saved": False, "error": str(exc)}
+
+
+def _write_schedule_data(data):
+    path = WEB_DIR / "schedule_data.json"
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(data, indent=2))
+    os.replace(tmp, path)
+    _regenerate_index_from_template(data)
+    return _save_schedule_to_supabase(data)
+
+
+def _finalise_schedule_to_supabase():
+    return finalise_schedule_document(
+        supabase_request,
+        schedule_path=WEB_DIR / "schedule_data.json",
+        outputs_dir=OUTPUTS_DIR,
+    )
+
+
+def _rows_for_iteration(data, iteration, loc):
+    if iteration == "Main":
+        return data.setdefault("locations", {}).setdefault(loc, [])
+    return data.setdefault("iterations", {}).setdefault(iteration, {}).setdefault(loc, [])
+
+
+def _clear_schedule(payload):
+    iteration = (payload or {}).get("iteration") or "Main"
+    path = WEB_DIR / "schedule_data.json"
+    data = json.loads(path.read_text())
+    if iteration == "Main":
+        for loc in list((data.get("locations") or {}).keys()):
+            data.setdefault("locations", {})[loc] = []
+    else:
+        for loc in list(((data.get("iterations") or {}).get(iteration) or {}).keys()):
+            data.setdefault("iterations", {}).setdefault(iteration, {})[loc] = []
+    supabase_saved = _write_schedule_data(data)
+    return {"cleared": True, "supabase_saved": supabase_saved}
+
+
+def _remove_class_from_schedule(payload):
+    slot = payload.get("slot") or {}
+    iteration = payload.get("iteration") or "Main"
+    path = WEB_DIR / "schedule_data.json"
+    data = json.loads(path.read_text())
+    rows = _rows_for_iteration(data, iteration, slot.get("location"))
+    idx = next((i for i, row in enumerate(rows) if _same_schedule_slot(row, slot)), -1)
+    if idx < 0:
+        raise ValueError("Could not find the selected class in the active schedule")
+    rows.pop(idx)
+    supabase_saved = _write_schedule_data(data)
+    return {"removed": 1, "supabase_saved": supabase_saved}
+
+
+def _move_class_in_schedule(payload):
+    slot = payload.get("slot") or {}
+    target = payload.get("target") or {}
+    iteration = payload.get("iteration") or "Main"
+    for key in ("location", "day_of_week", "time"):
+        if not target.get(key):
+            raise ValueError(f"Missing target field: {key}")
+    path = WEB_DIR / "schedule_data.json"
+    data = json.loads(path.read_text())
+    rows = _rows_for_iteration(data, iteration, slot.get("location"))
+    idx = next((i for i, row in enumerate(rows) if _same_schedule_slot(row, slot)), -1)
+    if idx < 0:
+        raise ValueError("Could not find the selected class in the active schedule")
+    moved = dict(rows.pop(idx))
+    moved.update({
+        "location": target["location"],
+        "date": target.get("date", moved.get("date", "")),
+        "day_of_week": target["day_of_week"],
+        "time": target["time"],
+        "recommendation": "MANUAL",
+        "manual_moved": True,
+        "scheduling_reason": (
+            f"Manual drag/drop move: {slot.get('day_of_week')} {slot.get('time')} → "
+            f"{target.get('day_of_week')} {target.get('time')}"
+        ),
+    })
+    _validate_manual_slot(data, iteration, moved, original_slot=slot)
+    _rows_for_iteration(data, iteration, target["location"]).append(moved)
+    supabase_saved = _write_schedule_data(data)
+    return {"moved": 1, "slot": moved, "supabase_saved": supabase_saved}
+
+
+def _regenerate_index_from_template(schedule_data=None):
+    from agents.reporter import OPTIMISATION_OPPORTUNITIES, _rules_panel_html
+
+    template_path = WEB_DIR / "template.html"
+    schedule_path = WEB_DIR / "schedule_data.json"
+    if not template_path.exists() or not schedule_path.exists():
+        return
+    schedule_json = schedule_path.read_text(encoding="utf-8")
+    data = schedule_data or json.loads(schedule_json)
+    all_rows = []
+    for rows in (data.get("locations") or {}).values():
+        all_rows.extend(rows or [])
+    first_date = min((r.get("date") for r in all_rows if r.get("date")), default=date.today().isoformat())
+    ws = date.fromisoformat(first_date)
+    week_start = ws - timedelta(days=ws.weekday())
+    week_end = week_start + timedelta(days=6)
+    week_label = f"{week_start.strftime('%d %b')} – {week_end.strftime('%d %b %Y')}"
+    scorecard_path = OUTPUTS_DIR / "scorecard.json"
+    scorecard = json.loads(scorecard_path.read_text(encoding="utf-8")) if scorecard_path.exists() else None
+    scorecard_json = json.dumps(scorecard, indent=2) if scorecard else "null"
+    html = (
+        template_path.read_text(encoding="utf-8")
+        .replace("/*INJECT_SCHEDULE_DATA*/", schedule_json)
+        .replace("/*INJECT_SCORECARD*/", scorecard_json)
+        .replace("/*INJECT_WEEK_LABEL*/", f'"{week_label}"')
+        .replace("/*INJECT_OPPORTUNITIES*/", json.dumps(OPTIMISATION_OPPORTUNITIES))
+    )
+    html = html.replace("</body>", _rules_panel_html() + "\n</body>", 1)
+    (WEB_DIR / "index.html").write_text(html, encoding="utf-8")
+
+
+def _pipeline_process_alive(pid) -> bool:
+    if not pid:
+        return False
+    try:
+        pid_int = int(pid)
+        os.kill(pid_int, 0)
+    except (OSError, TypeError, ValueError):
+        return False
+
+    if os.name == "posix":
+        try:
+            result = subprocess.run(
+                ["ps", "-o", "stat=", "-p", str(pid_int)],
+                capture_output=True,
+                text=True,
+                timeout=1,
+            )
+            stat = result.stdout.strip()
+            if stat and stat[0] in {"T", "Z"}:
+                return False
+        except Exception:
+            pass
+    return True
+
+
+def _refresh_pipeline_state(state=None) -> None:
+    state = state or _pipeline_state
+    if not state.get("running"):
+        return
+    if _pipeline_process_alive(state.get("pid")):
+        return
+    state["running"] = False
+    state["status"] = "failed"
+    state["pid"] = None
+    state["message"] = "Previous pipeline process stopped before completion. Generate can be run again."
 
 MIME_TYPES = {
     ".html": "text/html; charset=utf-8",
@@ -127,6 +514,8 @@ def is_output_artifact_path(path: str) -> bool:
 
 def supabase_settings() -> tuple[str, str]:
     url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    if url.endswith("/rest/v1"):
+        url = url[: -len("/rest/v1")]
     key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or ""
     return url, key
 
@@ -256,16 +645,10 @@ class RulesHandler(BaseHTTPRequestHandler):
 
         # API: pipeline status
         if path == "/api/pipeline-status":
+            _refresh_pipeline_state()
             msg = _pipeline_state["message"]
             running = _pipeline_state["running"]
-            if running:
-                status = "running"
-            elif "Complete" in msg or "complete" in msg:
-                status = "done"
-            elif "Failed" in msg or "failed" in msg or "Error" in msg:
-                status = "failed"
-            else:
-                status = "idle"
+            status = _pipeline_state.get("status", "running" if running else "idle")
             self._send_json(200, {
                 "running": running,
                 "status": status,
@@ -372,6 +755,7 @@ class RulesHandler(BaseHTTPRequestHandler):
 
         if path == "/api/run-pipeline":
             global _run_counter
+            _refresh_pipeline_state()
             if _pipeline_state["running"]:
                 self._send_json(200, {
                     "ok": True,
@@ -395,6 +779,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                     text=True,
                 )
                 _pipeline_state["running"] = True
+                _pipeline_state["status"] = "running"
                 _pipeline_state["pid"] = proc.pid
                 _pipeline_state["started"] = _time.time()
                 _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
@@ -425,8 +810,10 @@ class RulesHandler(BaseHTTPRequestHandler):
                                 break
                     p.wait()
                     if p.returncode == 0:
+                        state["status"] = "done"
                         state["message"] = "Complete — reload to see new schedule."
                     else:
+                        state["status"] = "failed"
                         detail = next((item for item in reversed(tail) if item.strip()), "")
                         state["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
                     state["running"] = False
@@ -442,6 +829,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                 })
             except Exception as e:
                 _pipeline_state["running"] = False
+                _pipeline_state["status"] = "failed"
                 self._send_json(500, {"error": str(e)})
             return
 
@@ -469,6 +857,87 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(200, {"ok": True})
             except Exception as e:
                 self._send_json(500, {"error": str(e)})
+            return
+
+        # API: one-click trainer replacement for the active generated schedule
+        if path == "/api/replace-trainer":
+            try:
+                payload = json.loads(body_raw)
+                updated = _replace_trainer_in_schedule(payload)
+                print(f"  [API] Trainer replaced in {updated} schedule row(s)")
+                self._send_json(200, {"ok": True, "updated": updated})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        # API: manually add a class to the active generated schedule
+        if path == "/api/add-class":
+            try:
+                payload = json.loads(body_raw)
+                result = _add_class_to_schedule(payload)
+                print(f"  [API] Manual class added in {result.get('added', 0)} schedule row(s)")
+                self._send_json(200, {"ok": True, **result})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        # API: remove a class from the active generated schedule
+        if path == "/api/remove-class":
+            try:
+                payload = json.loads(body_raw)
+                result = _remove_class_from_schedule(payload)
+                print(f"  [API] Manual class removed in {result.get('removed', 0)} schedule row(s)")
+                self._send_json(200, {"ok": True, **result})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        # API: drag/drop move a class in the active generated schedule
+        if path == "/api/move-class":
+            try:
+                payload = json.loads(body_raw)
+                result = _move_class_in_schedule(payload)
+                print(f"  [API] Manual class moved in {result.get('moved', 0)} schedule row(s)")
+                self._send_json(200, {"ok": True, **result})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        if path == "/api/clear-schedule":
+            try:
+                payload = json.loads(body_raw or "{}")
+                result = _clear_schedule(payload)
+                print("  [API] Schedule cleared")
+                self._send_json(200, {"ok": True, **result})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        # API: explicitly save current generated schedule to Supabase
+        if path == "/api/save-schedule-supabase":
+            try:
+                data = json.loads((WEB_DIR / "schedule_data.json").read_text())
+                self._send_json(200, {"ok": True, "supabase_saved": _save_schedule_to_supabase(data)})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        if path == "/api/finalise-schedule":
+            try:
+                result = _finalise_schedule_to_supabase()
+                self._send_json(200, {"ok": True, "finalised": result})
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
             return
 
         self._send_json(404, {"error": f"Unknown endpoint: {path}"})

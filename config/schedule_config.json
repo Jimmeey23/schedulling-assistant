@@ -110,6 +110,80 @@
         "max": 6,
         "source": "settings"
       }
+    },
+    "Courtside": {
+      "Monday": {
+        "target": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Tuesday": {
+        "target": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Wednesday": {
+        "target": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Thursday": {
+        "target": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Friday": {
+        "target": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Saturday": {
+        "target": 2,
+        "max": 2,
+        "source": "settings"
+      },
+      "Sunday": {
+        "target": 2,
+        "max": 2,
+        "source": "settings"
+      }
+    },
+    "Copper & Cloves": {
+      "Monday": {
+        "target": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Tuesday": {
+        "target": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Wednesday": {
+        "target": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Thursday": {
+        "target": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Friday": {
+        "target": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Saturday": {
+        "target": 2,
+        "max": 3,
+        "source": "settings"
+      },
+      "Sunday": {
+        "target": 2,
+        "max": 3,
+        "source": "settings"
+      }
     }
   },
   "manual_protected": [],
@@ -130,7 +204,11 @@
     "Priya Nair",
     "Ria Kapoor",
     "Saniya Jaiswal",
-    "Varun Chadha"
+    "Shruti Suresh",
+    "Sovena Shetty",
+    "Upasna Paranjpe",
+    "Varun Chadha",
+    "Veena Narasimhan"
   ],
   "class_mix": {
     "Kwality House, Kemps Corner": {
@@ -303,6 +381,75 @@
         "source": "settings",
         "max": 0
       }
+    },
+    "Courtside": {
+      "Studio Barre 57": {
+        "min": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio Barre 57 Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Mat 57": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Mat 57 Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Cardio Barre": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Cardio Barre Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio FIT": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio FIT Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio PowerCycle": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Strength Lab": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      }
+    },
+    "Copper & Cloves": {
+      "Copper + Cloves Barre 57": {
+        "min": 1,
+        "max": 6,
+        "source": "settings"
+      },
+      "Copper + Cloves Mat 57": {
+        "min": 1,
+        "max": 6,
+        "source": "settings"
+      },
+      "Copper + Cloves FIT": {
+        "min": 1,
+        "max": 6,
+        "source": "settings"
+      }
     }
   },
   "settings_options": {
@@ -323,6 +470,6 @@
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-04T10:26:02.931Z"
+    "updated_at": "2026-05-05T02:21:50.343Z"
   }
 }

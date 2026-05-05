@@ -8,7 +8,19 @@ VALID_LOCATIONS = [
     "Kwality House, Kemps Corner",
     "Supreme HQ, Bandra",
     "Kenkere House",
+    "Copper & Cloves",
 ]
+
+
+def copper_class_name(row) -> str:
+    session = str(row.get("SessionName", "") or "").lower()
+    class_name = str(row.get("Class", "") or "")
+    source = f"{session} {class_name.lower()}"
+    if "fit" in source:
+        return "Copper + Cloves FIT"
+    if "mat 57" in source or "mat57" in source:
+        return "Copper + Cloves Mat 57"
+    return "Copper + Cloves Barre 57"
 
 
 def time_band(time_str: str) -> str:
@@ -34,9 +46,6 @@ class DataIngestor:
         print("[Agent 1] Ingestor starting...")
         df = pd.read_csv(self.csv_path)
 
-        # Filter to valid locations
-        df = df[df["Location"].isin(VALID_LOCATIONS)].copy()
-
         # Parse date
         df["Date"] = pd.to_datetime(df["Date"], dayfirst=True, errors="coerce")
         df = df.dropna(subset=["Date"])
@@ -48,6 +57,18 @@ class DataIngestor:
         for col in ["Trainer", "Class", "Location"]:
             if col in df.columns:
                 df[col] = df[col].astype(str).str.replace(r"\s+", " ", regex=True).str.strip()
+
+        # Copper & Cloves is scheduled as a Bengaluru extension using historic
+        # Pop-up rows whose class name identifies the Copper partnership.
+        copper_mask = (
+            df["Location"].astype(str).str.lower().eq("pop-up")
+            & df["SessionName"].astype(str).str.contains("copper", case=False, na=False)
+        )
+        df.loc[copper_mask, "Location"] = "Copper & Cloves"
+        df.loc[copper_mask, "Class"] = df.loc[copper_mask].apply(copper_class_name, axis=1)
+
+        # Filter to valid scheduling locations after derived-location mapping.
+        df = df[df["Location"].isin(VALID_LOCATIONS)].copy()
 
         # Ensure numeric columns
         for col in ["CheckedIn", "Capacity", "Booked", "LateCancelled", "Revenue"]:

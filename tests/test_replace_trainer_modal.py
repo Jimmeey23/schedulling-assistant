@@ -1,6 +1,8 @@
 from pathlib import Path
 import subprocess
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "web" / "template.html"
@@ -39,6 +41,220 @@ def test_replace_trainer_legacy_empty_qualifications_can_use_history():
 
     assert "hasExplicitQualifications(profile)" in source
     assert "hasImplicitClassHistory(name,cn)" in source
+
+
+def test_replace_trainer_suggestions_have_one_click_apply_button():
+    source = _replace_trainer_source()
+
+    assert 'data-replace-payload' in source
+    assert 'applyTrainerReplacement(JSON.parse' in source
+    assert 'fetch("/api/replace-trainer"' in TEMPLATE.read_text()
+
+
+def test_replace_trainer_endpoint_updates_schedule_data(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text(
+        """
+{
+  "locations": {
+    "Studio A": [
+      {
+        "location": "Studio A",
+        "date": "2026-05-04",
+        "day_of_week": "Monday",
+        "time": "09:00",
+        "class_name": "Studio Mat 57",
+        "room": "Studio 1",
+        "trainer_1": "Old Trainer",
+        "recommendation": "INCLUDE"
+      }
+    ]
+  },
+  "iterations": {}
+}
+""".strip()
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+
+    updated = app._replace_trainer_in_schedule(
+        {
+            "iteration": "Main",
+            "slot": {
+                "location": "Studio A",
+                "date": "2026-05-04",
+                "day_of_week": "Monday",
+                "time": "09:00",
+                "class_name": "Studio Mat 57",
+                "room": "Studio 1",
+                "trainer_1": "Old Trainer",
+            },
+            "new_trainer": "New Trainer",
+        }
+    )
+
+    assert updated == 1
+    assert '"trainer_1": "New Trainer"' in schedule_path.read_text()
+    assert '"recommendation": "MANUAL"' in schedule_path.read_text()
+
+
+def test_calendar_empty_slots_open_manual_add_modal():
+    source = TEMPLATE.read_text()
+
+    assert "openAddClassModal({location:_loc" in source
+    assert 'fetch("/api/add-class"' in source
+    assert "Historic options for this exact studio/day/time" in source
+    assert 'id="manual-custom-class"' in source
+    assert "customClass||cls" in source
+    assert "historicSlotIntel(_loc,d,t)" in source
+    assert "sg-empty-intel" in source
+
+
+def test_add_class_endpoint_appends_manual_slot(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text('{"locations":{"Studio A":[]},"iterations":{}}')
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "_save_schedule_to_supabase", lambda data: False)
+    monkeypatch.setattr(app, "_validate_manual_slot", lambda *args, **kwargs: None)
+
+    result = app._add_class_to_schedule(
+        {
+            "iteration": "Main",
+            "slot": {
+                "location": "Studio A",
+                "date": "2026-05-04",
+                "day_of_week": "Monday",
+                "time": "10:00",
+                "class_name": "Studio Mat 57",
+                "trainer_1": "Trainer A",
+            },
+        }
+    )
+
+    assert result["added"] == 1
+    text = schedule_path.read_text()
+    assert '"class_name": "Studio Mat 57"' in text
+    assert '"recommendation": "MANUAL"' in text
+    assert '"manual_added": true' in text
+
+
+def test_calendar_classes_can_be_removed_and_dragged():
+    source = TEMPLATE.read_text()
+
+    assert "div.draggable=true" in source
+    assert 'data-action="remove"' in source
+    assert 'fetch("/api/remove-class"' in source
+    assert 'fetch("/api/move-class"' in source
+
+
+def test_move_class_endpoint_marks_manual_move(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text(
+        '{"locations":{"Studio A":[{"location":"Studio A","date":"2026-05-04","day_of_week":"Monday","time":"09:00","class_name":"Studio Mat 57","room":"Studio 1","trainer_1":"Trainer A","historical_avg_checkin":7.5,"historical_session_count":12}]},"iterations":{}}'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "_save_schedule_to_supabase", lambda data: False)
+    monkeypatch.setattr(app, "_validate_manual_slot", lambda *args, **kwargs: None)
+
+    result = app._move_class_in_schedule(
+        {
+            "iteration": "Main",
+            "slot": {
+                "location": "Studio A",
+                "date": "2026-05-04",
+                "day_of_week": "Monday",
+                "time": "09:00",
+                "class_name": "Studio Mat 57",
+                "room": "Studio 1",
+                "trainer_1": "Trainer A",
+            },
+            "target": {
+                "location": "Studio A",
+                "date": "2026-05-05",
+                "day_of_week": "Tuesday",
+                "time": "10:00",
+            },
+        }
+    )
+
+    assert result["moved"] == 1
+    assert result["slot"]["historical_avg_checkin"] == 7.5
+    text = schedule_path.read_text()
+    assert '"day_of_week": "Tuesday"' in text
+    assert '"time": "10:00"' in text
+    assert '"manual_moved": true' in text
+
+
+def test_manual_add_validates_trainer_availability(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text('{"locations":{"Studio A":[]},"iterations":{}}')
+    profiles_path = tmp_path / "profiles.json"
+    profiles_path.write_text(
+        '[{"name":"Trainer A","active":true,"locations":{"Studio A":{"available_days":["Tuesday"],"time_window":{"start":"07:00","end":"12:00"},"max_classes_per_day":3}}}]'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "TRAINER_PROFILES_PATH", profiles_path)
+
+    with pytest.raises(ValueError, match="not available"):
+        app._add_class_to_schedule(
+            {
+                "iteration": "Main",
+                "slot": {
+                    "location": "Studio A",
+                    "date": "2026-05-04",
+                    "day_of_week": "Monday",
+                    "time": "10:00",
+                    "class_name": "Studio Mat 57",
+                    "trainer_1": "Trainer A",
+                },
+            }
+        )
+
+
+def test_remove_class_endpoint_deletes_slot(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text(
+        '{"locations":{"Studio A":[{"location":"Studio A","date":"2026-05-04","day_of_week":"Monday","time":"09:00","class_name":"Studio Mat 57","room":"Studio 1","trainer_1":"Trainer A","historical_avg_checkin":7.5,"historical_session_count":12}]},"iterations":{}}'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "_save_schedule_to_supabase", lambda data: False)
+
+    result = app._remove_class_from_schedule(
+        {
+            "iteration": "Main",
+            "slot": {
+                "location": "Studio A",
+                "date": "2026-05-04",
+                "day_of_week": "Monday",
+                "time": "09:00",
+                "class_name": "Studio Mat 57",
+                "room": "Studio 1",
+                "trainer_1": "Trainer A",
+            },
+        }
+    )
+
+    assert result["removed"] == 1
+    assert "Studio Mat 57" not in schedule_path.read_text()
 
 
 def test_settings_frontend_does_not_expose_supabase_tab():

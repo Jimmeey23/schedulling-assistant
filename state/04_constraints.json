@@ -49,12 +49,6 @@
       "description": "Foundations never at 11:30 or 19:15"
     },
     {
-      "constraint_id": "UNIV-009",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "No trainer > 3 consecutive classes without 5 min gap"
-    },
-    {
       "constraint_id": "UNIV-010",
       "type": "trainer_availability",
       "location": null,
@@ -79,12 +73,6 @@
       "description": "Pre/Post Natal NEVER at ANY LOCATION"
     },
     {
-      "constraint_id": "UNIV-014",
-      "type": "slot_required",
-      "location": null,
-      "description": "Peak midday slot must never be empty"
-    },
-    {
       "constraint_id": "UNIV-015",
       "type": "always_do",
       "location": null,
@@ -97,28 +85,10 @@
       "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays"
     },
     {
-      "constraint_id": "UNIV-017",
-      "type": "always_do",
-      "location": null,
-      "description": "Always assign Tier 1 trainer to primary peak slot"
-    },
-    {
-      "constraint_id": "UNIV-018",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "Trainer substitution protocol hierarchy"
-    },
-    {
       "constraint_id": "UNIV-019",
       "type": "never_do",
       "location": null,
       "description": "Specialist classes no substitution with non-certified"
-    },
-    {
-      "constraint_id": "UNIV-020",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "Never roster trainer at location with < 30 historical sessions"
     },
     {
       "constraint_id": "UNIV-021",
@@ -157,6 +127,18 @@
       "description": "Recovery sessions must be the last class in their shift at that location"
     },
     {
+      "constraint_id": "KW-002",
+      "type": "trainer_availability",
+      "location": "Kwality House, Kemps Corner",
+      "description": "Anisha Shah Mon/Tue/Wed ONLY at Kwality"
+    },
+    {
+      "constraint_id": "KW-003",
+      "type": "trainer_availability",
+      "location": "Kwality House, Kemps Corner",
+      "description": "Mrigakshi Jaiswal Thu/Fri ONLY at Kwality"
+    },
+    {
       "constraint_id": "KW-004",
       "type": "always_do",
       "location": "Kwality House, Kemps Corner",
@@ -169,100 +151,22 @@
       "description": "Rohan Dahima owns Thursday morning 09:15/10:15"
     },
     {
-      "constraint_id": "SU-001",
+      "constraint_id": "KW-006",
       "type": "always_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "PowerCycle minimum 2 per day on weekdays"
+      "location": "Kwality House, Kemps Corner",
+      "description": "Strength Lab: Atulan Purohit exclusively Mon/Wed evenings max 4/week"
     },
     {
-      "constraint_id": "SU-002",
+      "constraint_id": "KW-007",
       "type": "always_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "Cauveri Vikrant first choice for all PowerCycle at Supreme"
+      "location": "Kwality House, Kemps Corner",
+      "description": "Pre/Post Natal: Anisha Mon-Wed, Mrigakshi Thu-Fri, mornings only"
     },
     {
-      "constraint_id": "SU-003",
-      "type": "trainer_availability",
-      "location": "Supreme HQ, Bandra",
-      "description": "Anisha Shah Thursdays ONLY at Supreme 08:00-11:00"
-    },
-    {
-      "constraint_id": "SU-004",
-      "type": "always_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "Vivaran Dhasmana owns Tue/Wed morning blocks 07:30-11:00"
-    },
-    {
-      "constraint_id": "SU-005",
-      "type": "always_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "Karan Bhatia owns Sunday 10:15 and 11:30 at Supreme"
-    },
-    {
-      "constraint_id": "SU-006",
-      "type": "always_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "Atulan Purohit owns Fri/Sat morning block 09:00-11:30"
-    },
-    {
-      "constraint_id": "SU-007",
-      "type": "trainer_availability",
-      "location": "Supreme HQ, Bandra",
-      "description": "Mrigakshi Jaiswal Mon/Tue/Wed evenings only at Supreme"
-    },
-    {
-      "constraint_id": "SU-008",
-      "type": "slot_required",
-      "location": "Supreme HQ, Bandra",
-      "description": "18:00 PM slot must always have Tier 1 trainer on weekdays"
-    },
-    {
-      "constraint_id": "SU-009",
+      "constraint_id": "KW-008",
       "type": "never_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "No Strength Lab at Supreme HQ"
-    },
-    {
-      "constraint_id": "SU-010",
-      "type": "never_do",
-      "location": "Supreme HQ, Bandra",
-      "description": "No Pre/Post Natal at Supreme HQ"
-    },
-    {
-      "constraint_id": "KE-001",
-      "type": "never_do",
-      "location": "Kenkere House",
-      "description": "PowerCycle NEVER at Kenkere"
-    },
-    {
-      "constraint_id": "KE-002",
-      "type": "always_do",
-      "location": "Kenkere House",
-      "description": "Kajol Kanchan 6-day anchor - never reduce without confirmed coverage"
-    },
-    {
-      "constraint_id": "KE-003",
-      "type": "always_do",
-      "location": "Kenkere House",
-      "description": "Pushyank Nahar owns Mon/Tue/Thu morning blocks"
-    },
-    {
-      "constraint_id": "KE-004",
-      "type": "always_do",
-      "location": "Kenkere House",
-      "description": "Shruti Kulkarni owns Thu/Fri mornings and Sunday midday"
-    },
-    {
-      "constraint_id": "KE-007",
-      "type": "slot_required",
-      "location": "Kenkere House",
-      "description": "09:00 AM must be filled with Tier 1 trainer every day"
-    },
-    {
-      "constraint_id": "KE-008",
-      "type": "always_do",
-      "location": "Kenkere House",
-      "description": "Saturday 09:00-11:00: Kajol or Pushyank ONLY"
+      "location": "Kwality House, Kemps Corner",
+      "description": "Strength Lab max 4x per week total"
     }
   ],
   "soft_constraints": [
