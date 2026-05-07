@@ -2,22 +2,22 @@
   "targets": {
     "Kwality House, Kemps Corner": {
       "Monday": {
-        "target": 12,
+        "target": 10,
         "max": 14,
         "source": "settings"
       },
       "Tuesday": {
-        "target": 11,
+        "target": 10,
         "max": 14,
         "source": "settings"
       },
       "Wednesday": {
-        "target": 11,
-        "max": 14,
+        "target": 10,
+        "max": 13,
         "source": "settings"
       },
       "Thursday": {
-        "target": 12,
+        "target": 11,
         "max": 14,
         "source": "settings"
       },
@@ -32,25 +32,25 @@
         "source": "settings"
       },
       "Sunday": {
-        "target": 4,
-        "max": 8,
+        "target": 6,
+        "max": 9,
         "source": "settings"
       }
     },
     "Supreme HQ, Bandra": {
       "Monday": {
         "target": 9,
-        "max": 12,
+        "max": 13,
         "source": "settings"
       },
       "Tuesday": {
         "target": 10,
-        "max": 12,
+        "max": 13,
         "source": "settings"
       },
       "Wednesday": {
         "target": 9,
-        "max": 12,
+        "max": 13,
         "source": "settings"
       },
       "Thursday": {
@@ -59,8 +59,8 @@
         "source": "settings"
       },
       "Friday": {
-        "target": 9,
-        "max": 12,
+        "target": 8,
+        "max": 13,
         "source": "settings"
       },
       "Saturday": {
@@ -69,45 +69,8 @@
         "source": "settings"
       },
       "Sunday": {
-        "target": 5,
-        "max": 8,
-        "source": "settings"
-      }
-    },
-    "Kenkere House": {
-      "Monday": {
-        "target": 8,
-        "max": 12,
-        "source": "settings"
-      },
-      "Tuesday": {
-        "target": 8,
-        "max": 9,
-        "source": "settings"
-      },
-      "Wednesday": {
         "target": 6,
-        "max": 12,
-        "source": "settings"
-      },
-      "Thursday": {
-        "target": 8,
         "max": 8,
-        "source": "settings"
-      },
-      "Friday": {
-        "target": 8,
-        "max": 8,
-        "source": "settings"
-      },
-      "Saturday": {
-        "target": 7,
-        "max": 11,
-        "source": "settings"
-      },
-      "Sunday": {
-        "target": 5,
-        "max": 6,
         "source": "settings"
       }
     },
@@ -145,6 +108,43 @@
       "Sunday": {
         "target": 2,
         "max": 2,
+        "source": "settings"
+      }
+    },
+    "Kenkere House": {
+      "Monday": {
+        "target": 8,
+        "max": 12,
+        "source": "settings"
+      },
+      "Tuesday": {
+        "target": 8,
+        "max": 9,
+        "source": "settings"
+      },
+      "Wednesday": {
+        "target": 6,
+        "max": 12,
+        "source": "settings"
+      },
+      "Thursday": {
+        "target": 8,
+        "max": 8,
+        "source": "settings"
+      },
+      "Friday": {
+        "target": 8,
+        "max": 8,
+        "source": "settings"
+      },
+      "Saturday": {
+        "target": 7,
+        "max": 11,
+        "source": "settings"
+      },
+      "Sunday": {
+        "target": 5,
+        "max": 6,
         "source": "settings"
       }
     },
@@ -188,7 +188,21 @@
   },
   "manual_protected": [],
   "manual_excluded": [],
-  "custom_rules": [],
+  "custom_rules": [
+    {
+      "id": "custom-rule-1778086592713",
+      "location": "",
+      "rule_type": "trainer_availability",
+      "class_name": "",
+      "trainer": "Karan Bhatia",
+      "day": "",
+      "time": "",
+      "operator": "exactly",
+      "value": 4,
+      "priority": "hard",
+      "enabled": true
+    }
+  ],
   "leave_periods": [],
   "off_days": [],
   "inactive_trainers": [
@@ -233,8 +247,8 @@
         "source": "settings"
       },
       "Studio Strength Lab": {
-        "min": 10,
-        "max": 15,
+        "min": 2,
+        "max": 4,
         "source": "settings"
       },
       "Studio Back Body Blaze": {
@@ -465,11 +479,15 @@
     "target_selection_strategy": "seeded_range",
     "weekly_hours_cap": 15,
     "max_classes_per_day_default": 3,
-    "conflict_policy": "settings_override_soft_rules"
+    "conflict_policy": "settings_override_soft_rules",
+    "ai_api_key": "",
+    "ai_provider": "openrouter",
+    "ai_model": "openai/gpt-oss-120b:free",
+    "ai_base_url": ""
   },
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-05T02:21:50.343Z"
+    "updated_at": "2026-05-06T18:31:33.621Z"
   }
 }

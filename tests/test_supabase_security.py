@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from app import supabase_settings as flask_supabase_settings
 from serve import supabase_settings as stdlib_supabase_settings
 
@@ -43,3 +45,45 @@ def test_schedule_supabase_save_failure_does_not_raise(monkeypatch):
 
     assert result["saved"] is False
     assert "bad path" in result["error"]
+
+
+@pytest.mark.parametrize("path", ["/../.env", "/%2e%2e/.env", "/images/../../.env"])
+def test_flask_static_routes_block_path_traversal(path):
+    import app
+
+    response = app.app.test_client().get(path)
+
+    assert response.status_code == 404
+    assert b"SUPABASE_SERVICE_ROLE_KEY" not in response.data
+
+
+def test_remote_unsafe_post_requires_admin_token(monkeypatch, tmp_path):
+    import app
+
+    monkeypatch.setattr(app, "SCHEDULE_CONFIG_PATH", tmp_path / "schedule_config.json")
+    monkeypatch.delenv("SCHEDULER_ADMIN_TOKEN", raising=False)
+
+    response = app.app.test_client().post(
+        "/api/save-schedule-config",
+        json={"targets": {}},
+        environ_base={"REMOTE_ADDR": "203.0.113.10"},
+    )
+
+    assert response.status_code == 401
+
+
+def test_remote_unsafe_post_accepts_admin_token(monkeypatch, tmp_path):
+    import app
+
+    monkeypatch.setenv("SCHEDULER_ADMIN_TOKEN", "test-token")
+    monkeypatch.setattr(app, "SCHEDULE_CONFIG_PATH", tmp_path / "schedule_config.json")
+
+    response = app.app.test_client().post(
+        "/api/save-schedule-config",
+        json={"targets": {}},
+        headers={"X-Scheduler-Admin-Token": "test-token"},
+        environ_base={"REMOTE_ADDR": "203.0.113.10"},
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["ok"] is True

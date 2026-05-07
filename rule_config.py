@@ -11,37 +11,25 @@ CONFIG_PATH = PROJECT_ROOT / "config" / "rules_config.json"
 CATEGORY_META = {
         "universal": {
                 "label": "Universal Constraints",
-                "description": "Global hard constraints enforced across all three locations — barre mix targets, Sunday rules, consecutive-class limits, and daily capacity caps.",
+                "description": "Limited default guardrails that apply to every schedule. Studio, trainer, and class-specific rules must be created and saved from Settings.",
                 "default_enabled": True,
-        },
-        "format_rules": {
-                "label": "Class Format Rules",
-                "description": "Per-format scheduling guidance: eligible locations, preferred days/slots, weekly min/max counts, certified-trainer requirements, and mix targets.",
-                "default_enabled": True,
-        },
-        "location_kwality": {
-                "label": "Kwality House Rules",
-                "description": "Rules specific to Kwality House, Kemps Corner — Strength Lab exclusivity, PowerCycle minimums, and peak-slot ownership.",
-                "default_enabled": True,
-        },
-        "location_supreme": {
-                "label": "Supreme HQ Rules",
-                "description": "Rules specific to Supreme HQ, Bandra — daily PowerCycle requirements, Recovery placement, and class-mix guardrails.",
-                "default_enabled": True,
-        },
-        "location_kenkere": {
-                "label": "Kenkere House Rules",
-                "description": "Rules specific to Kenkere House — PowerCycle ban, Barre-family minimums, and trainer ownership blocks.",
-                "default_enabled": True,
-        },
-        "trainer_specific": {
-                "label": "Strict Trainer Day Locks",
-                "description": "Enforce trainer availability windows as hard constraints. When OFF, availability is treated as a scheduling preference and the AI may deviate for performance reasons.",
-                "default_enabled": False,
         },
 }
 
-SOURCE_GROUPS = ["universal", "location_kwality", "location_supreme", "location_kenkere"]
+DEFAULT_UNIVERSAL_RULE_IDS = {
+        "UNIV-002",
+        "UNIV-003",
+        "UNIV-004",
+        "UNIV-009",
+        "UNIV-010",
+        "UNIV-014",
+        "UNIV-022",
+        "UNIV-023",
+        "UNIV-024",
+        "UNIV-025",
+}
+
+SOURCE_GROUPS = ["universal"]
 
 
 def _load_json(path: Path) -> dict:
@@ -147,20 +135,19 @@ def _rule_command_metadata(rule: dict, enabled: bool = True) -> dict:
 
 def _build_raw_groups() -> List[dict]:
         universal = _load_json(RULES_DIR / "universal_rules.json")
-        kwality = _load_json(RULES_DIR / "kwality_rules.json")
-        supreme = _load_json(RULES_DIR / "supreme_rules.json")
-        kenkere = _load_json(RULES_DIR / "kenkere_rules.json")
-        class_formats = _load_json(RULES_DIR / "class_formats.json")
 
         source_mapping = [
-                ("universal", universal.get("hard_constraints", []), None),
-                ("location_kwality", kwality.get("hard_constraints", []), kwality.get("location")),
-                ("location_supreme", supreme.get("hard_constraints", []), supreme.get("location")),
-                ("location_kenkere", kenkere.get("hard_constraints", []), kenkere.get("location")),
+                (
+                        "universal",
+                        [
+                                rule for rule in universal.get("hard_constraints", [])
+                                if rule.get("id") in DEFAULT_UNIVERSAL_RULE_IDS
+                        ],
+                        None,
+                ),
         ]
 
         groups: List[dict] = []
-        all_trainer_rules: List[dict] = []
         for group_id, rules, location in source_mapping:
                 group_rules = []
                 for rule in rules:
@@ -174,8 +161,6 @@ def _build_raw_groups() -> List[dict]:
                                 "check_fn_name": rule.get("check_fn_name"),
                         }
                         group_rules.append(entry)
-                        if entry["type"] == "trainer_availability":
-                                all_trainer_rules.append(deepcopy(entry))
 
                 groups.append({
                         "id": group_id,
@@ -183,31 +168,6 @@ def _build_raw_groups() -> List[dict]:
                         "description": CATEGORY_META[group_id]["description"],
                         "rules": group_rules,
                 })
-
-        format_rules = []
-        for fmt in class_formats:
-                format_rules.append({
-                        "id": make_format_rule_id(fmt.get("name", "Unknown Format")),
-                        "title": fmt.get("name", "Unknown Format"),
-                        "description": _summarise_format_rule(fmt),
-                        "type": "class_format",
-                        "location": None,
-                        "source_category": "format_rules",
-                        "format_name": fmt.get("name", "Unknown Format"),
-                })
-
-        groups.insert(1, {
-                "id": "format_rules",
-                "label": CATEGORY_META["format_rules"]["label"],
-                "description": CATEGORY_META["format_rules"]["description"],
-                "rules": format_rules,
-        })
-        groups.append({
-                "id": "trainer_specific",
-                "label": CATEGORY_META["trainer_specific"]["label"],
-                "description": CATEGORY_META["trainer_specific"]["description"],
-                "rules": all_trainer_rules,
-        })
         return groups
 
 
@@ -362,18 +322,12 @@ def get_enabled_rule_ids(config: dict | None = None) -> set[str]:
 
 
 def get_active_format_rules(config: dict | None = None) -> List[dict]:
-        catalog = build_rules_catalog(config)
-        group_map = {group["id"]: group for group in catalog["groups"]}
-        format_group = group_map.get("format_rules")
-        if not format_group or not format_group.get("enabled", False):
-                return []
-        return [rule for rule in format_group["rules"] if rule.get("enabled", True)]
+        return []
 
 
 def get_active_hard_rule_groups(config: dict | None = None) -> Dict[str, List[dict]]:
         catalog = build_rules_catalog(config)
         group_map = {group["id"]: group for group in catalog["groups"]}
-        trainer_specific_enabled = catalog["categories"]["trainer_specific"]["enabled"]
 
         active: Dict[str, List[dict]] = {}
         for group_id in SOURCE_GROUPS:
@@ -384,8 +338,6 @@ def get_active_hard_rule_groups(config: dict | None = None) -> Dict[str, List[di
                 group_rules = []
                 for rule in group.get("rules", []):
                         if not rule.get("enabled", True):
-                                continue
-                        if rule.get("type") == "trainer_availability" and not trainer_specific_enabled:
                                 continue
                         group_rules.append(rule)
                 active[group_id] = group_rules

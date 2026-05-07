@@ -101,7 +101,7 @@ def run_pipeline(
     Path("outputs").mkdir(exist_ok=True)
 
     locations = [location] if location else DEFAULT_LOCATIONS
-    perf_csv_path = perf_csv_path or csv_path
+    perf_csv_path = perf_csv_path or "Class Performance by UD1.csv"
     weights = json.loads(scoring_weights) if scoring_weights else None
 
     console.print(

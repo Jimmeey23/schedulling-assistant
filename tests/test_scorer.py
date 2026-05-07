@@ -67,6 +67,38 @@ def test_scorer_outputs_auditable_score_breakdown(tmp_path, monkeypatch):
     }
     assert all("points" in c and "weight" in c and "explanation" in c for c in components)
     assert round(sum(c["points"] for c in components), 2) == record["base_score"]
+    by_key = {c["key"]: c for c in components}
+    assert by_key["avg_attendance"]["weight"] == 0.75
+    assert by_key["avg_attendance"]["max_points"] == 75.0
+    assert by_key["capacity_fill"]["weight"] == 0.15
+    assert by_key["capacity_fill"]["max_points"] == 15.0
+    assert by_key["revenue"]["weight"] == 0.07
+    assert by_key["revenue"]["max_points"] == 7.0
+    assert by_key["sessions"]["weight"] == 0.03
+    assert by_key["sessions"]["max_points"] == 3.0
+
+
+def test_default_class_attendance_weight_can_beat_fill_revenue_and_sample_size(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    csv_path = tmp_path / "perf.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "High Attendance,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,09:00:00,10,100,1000,1,10,10.00%,1000",
+                "Lower Attendance,Studio FIT,\"Kwality House, Kemps Corner\",Monday,10:00:00,44,100,200000,30,6,44.00%,10000",
+                "Attendance Floor,Studio Mat 57,\"Kwality House, Kemps Corner\",Monday,11:00:00,1,100,1000,1,1,1.00%,1000",
+                "Attendance Ceiling,Studio Cardio Barre,\"Kwality House, Kemps Corner\",Monday,12:00:00,11,100,1000,1,11,11.00%,1000",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(csv_path)).run()
+    high = next(r for r in output["class_slot_ranking"] if r["trainer"] == "High Attendance")
+    lower = next(r for r in output["class_slot_ranking"] if r["trainer"] == "Lower Attendance")
+
+    assert high["score"] > lower["score"]
 
 
 def test_scorer_groups_primary_slots_by_unique_id_1_and_trainers_by_unique_id_2(tmp_path, monkeypatch):
@@ -92,6 +124,129 @@ def test_scorer_groups_primary_slots_by_unique_id_1_and_trainers_by_unique_id_2(
     assert slot_a["avg_attendance"] == 8.67
     assert [t["trainer"] for t in slot_a["top_trainers"]] == ["Trainer One", "Trainer Two"]
     assert all(not r["class"].lower().startswith("studio hosted") for r in output["slot_group_ranking"])
+
+
+def test_ud1_slot_ignores_attached_trainer_and_uses_trainer_csv_options(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    Path("rules").mkdir()
+    Path("rules/trainer_profiles.json").write_text(json.dumps([
+        {"name": "Inactive Placeholder", "active": False},
+        {"name": "Active Trainer", "active": True},
+    ]))
+    ud1_path = tmp_path / "Class Performance by UD1.csv"
+    ud1_path.write_text(
+        "\n".join(
+            [
+                "UniqueID1,UniqueID2,Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "SLOT_1845,PLACEHOLDER,Inactive Placeholder,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,18:45:00,950,1784,834930,119,7.98,53.25%,7016",
+            ]
+        )
+    )
+    Path("Class Performance by Trainer.csv").write_text(
+        "\n".join(
+            [
+                "UniqueID1,UniqueID2,Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "SLOT_1845,ACTIVE_TRAINER,Active Trainer,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,18:45:00,103,236,92317,11,9.36,43.64%,8392",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(ud1_path)).run()
+    slot = next(r for r in output["slot_group_ranking"] if r["unique_id_1"] == "SLOT_1845")
+    trainer = next(r for r in output["class_slot_ranking"] if r["unique_id_1"] == "SLOT_1845")
+
+    assert slot["trainer"] == "Inactive Placeholder"
+    assert [t["trainer"] for t in slot["top_trainers"]] == ["Active Trainer"]
+    assert trainer["trainer"] == "Active Trainer"
+    assert trainer["time"] == "18:45"
+
+
+def test_strength_lab_policy_protection_does_not_inflate_score_or_recommendation(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    csv_path = tmp_path / "perf.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "Atulan Purohit,Studio Strength Lab,\"Kwality House, Kemps Corner\",Monday,18:00:00,12,21,9000,3,4,57.14%,3000",
+                "Trainer Two,Studio Barre 57,\"Kwality House, Kemps Corner\",Tuesday,09:00:00,50,200,30000,10,5,25.00%,3000",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(csv_path)).run()
+    strength = next(r for r in output["slot_group_ranking"] if r["class"] == "Studio Strength Lab")
+
+    assert strength["protect_class_time"] is True
+    assert strength["score"] < PROTECT_SCORE
+    assert strength["recommendation"] != "PROTECT"
+
+
+def test_top_ranked_weak_slots_are_not_auto_promoted_to_protect(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    csv_path = tmp_path / "perf.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "Trainer One,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,09:00:00,20,100,5000,5,4,20.00%,1000",
+                "Trainer Two,Studio Mat 57,\"Kwality House, Kemps Corner\",Tuesday,09:00:00,15,100,4000,5,3,15.00%,800",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(csv_path)).run()
+
+    assert all(r["recommendation"] != "PROTECT" for r in output["slot_group_ranking"])
+    assert all(not r.get("pinned_slot") for r in output["slot_group_ranking"])
+
+
+def test_trainer_specific_score_uses_trainer_history_not_parent_slot_norms(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    csv_path = tmp_path / "perf.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "UniqueID1,UniqueID2,Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "SLOT_A,A_T1,High Evidence,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,09:00:00,200,300,120000,20,10,66.67%,6000",
+                "SLOT_A,A_T2,Low Evidence,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,09:00:00,50,75,10000,5,10,66.67%,2000",
+                "SLOT_B,B_T1,Comparison,Studio FIT,\"Kwality House, Kemps Corner\",Tuesday,11:00:00,20,100,5000,5,4,20.00%,1000",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(csv_path)).run()
+    high = next(r for r in output["class_slot_ranking"] if r["trainer"] == "High Evidence")
+    low = next(r for r in output["class_slot_ranking"] if r["trainer"] == "Low Evidence")
+
+    assert high["score"] > low["score"]
+
+
+def test_class_and_studio_averages_are_session_weighted(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("state").mkdir()
+    csv_path = tmp_path / "perf.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "UniqueID1,UniqueID2,Trainer,Class,Location,Day,Time,CheckedIn,Capacity,Revenue,Classes,ClassAvgInclEmpty,ClassAvgExclEmpty,FillRate",
+                "SLOT_A,A_T1,Trainer One,Studio Barre 57,\"Kwality House, Kemps Corner\",Monday,09:00:00,200,250,120000,20,10,80.00%,6000",
+                "SLOT_B,B_T1,Trainer Two,Studio Barre 57,\"Kwality House, Kemps Corner\",Tuesday,11:00:00,1,10,1000,1,1,10.00%,1000",
+            ]
+        )
+    )
+
+    output = ClassScorer(csv_path=str(csv_path)).run()
+    class_metric = next(r for r in output["class_metrics"] if r["class"] == "Studio Barre 57")
+    slot = next(r for r in output["slot_group_ranking"] if r["unique_id_1"] == "SLOT_A")
+
+    assert class_metric["avg_checkin"] == 9.57
+    assert class_metric["avg_fill_rate"] == 0.7667
+    assert slot["studio_avg_fill"] == 0.7667
 
 
 def test_scorer_excludes_profile_disabled_trainers(tmp_path, monkeypatch):

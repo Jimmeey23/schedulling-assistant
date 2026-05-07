@@ -79,6 +79,17 @@ class TestUniversalConstraints:
         )
         assert "UNIV-024: Blocked time window" in violations
 
+    def test_recovery_before_afternoon_window_detected(self):
+        violations = build_constraint_violations(
+            "Kwality House, Kemps Corner",
+            "Monday",
+            "11:30",
+            "Studio Recovery",
+            [make_slot(time="09:00", class_name="Studio Barre 57")],
+        )
+
+        assert "UNIV-026: Recovery in early slot (must be at or after 12:30)" in violations
+
     def test_trainer_cannot_cross_locations_same_shift(self):
         state = TrainerState("Anisha Shah", 1)
         assert state.can_add("Monday", "09:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")

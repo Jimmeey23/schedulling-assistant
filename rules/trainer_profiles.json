@@ -7,12 +7,11 @@
         "available_days": [
           "Monday",
           "Tuesday",
-          "Wednesday",
-          "Friday"
+          "Wednesday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "19:15"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 1.9,
         "max_classes_per_day": 3,
@@ -26,8 +25,8 @@
           "Thursday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "12:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.7,
         "max_classes_per_day": 4,
@@ -66,11 +65,16 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
+          "Monday",
           "Tuesday",
-          "Thursday"
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
@@ -83,11 +87,15 @@
       "Supreme HQ, Bandra": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
-          "Friday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
@@ -108,8 +116,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -136,10 +144,13 @@
           "Monday",
           "Tuesday",
           "Wednesday",
-          "Friday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 2.3,
@@ -164,12 +175,16 @@
       },
       "Supreme HQ, Bandra": {
         "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday"
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 2.5,
@@ -217,15 +232,19 @@
       "Kwality House, Kemps Corner": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
-          "Friday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
-        "max_classes_per_day": 2,
+        "max_classes_per_day": 4,
         "avg_checkin": 3.2,
         "session_count": 85,
         "owned_blocks": [],
@@ -233,15 +252,20 @@
       },
       "Supreme HQ, Bandra": {
         "available_days": [
+          "Monday",
           "Tuesday",
-          "Thursday"
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
-        "max_classes_per_day": 2,
+        "max_classes_per_day": 4,
         "avg_checkin": 3,
         "session_count": 60,
         "owned_blocks": [],
@@ -258,8 +282,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -292,21 +316,24 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       },
       "Supreme HQ, Bandra": {
         "available_days": [
           "Monday",
+          "Tuesday",
+          "Wednesday",
           "Thursday",
           "Friday",
+          "Saturday",
           "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.2,
         "max_classes_per_day": 4,
@@ -326,8 +353,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -347,20 +374,24 @@
   },
   {
     "name": "Chaitanya Nahar",
-    "tier": 2,
+    "tier": 1,
     "locations": {
       "Kenkere House": {
         "available_days": [
           "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
           "Saturday",
           "Sunday"
         ],
         "time_window": {
-          "start": "16:00",
-          "end": "19:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
-        "max_classes_per_day": 2,
+        "max_classes_per_day": 4,
         "avg_checkin": 3.5,
         "session_count": 72,
         "owned_blocks": [],
@@ -377,8 +408,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -407,11 +438,12 @@
           "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday"
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
           "start": "07:00",
-          "end": "20:30"
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.5,
         "max_classes_per_day": 4,
@@ -440,8 +472,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -474,24 +506,27 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 1
       },
       "Supreme HQ, Bandra": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
+          "Thursday",
+          "Friday",
           "Saturday",
           "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "avg_checkin": 5.2,
         "session_count": 190,
         "owned_blocks": [
@@ -516,16 +551,16 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 2
       }
     },
     "qualifications": {
       "all_barre": true,
-      "mat_57": true,
-      "powercycle": true,
+      "mat_57": false,
+      "powercycle": false,
       "strength_lab": false,
       "foundations": false,
       "pre_post_natal": false,
@@ -550,8 +585,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       },
@@ -559,13 +594,15 @@
         "available_days": [
           "Monday",
           "Tuesday",
+          "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday"
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.1,
         "max_classes_per_day": 4,
@@ -573,6 +610,22 @@
         "session_count": 260,
         "owned_blocks": [],
         "notes": "High versatility Tier 1 at Supreme."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
@@ -594,12 +647,17 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
           "Thursday",
-          "Friday"
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.1,
         "max_classes_per_day": 4,
@@ -612,18 +670,38 @@
         "available_days": [
           "Monday",
           "Tuesday",
-          "Wednesday"
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 5.1,
         "session_count": 95,
         "owned_blocks": [],
         "notes": "Mon/Tue/Wed evenings only at Supreme."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
@@ -648,11 +726,14 @@
           "Monday",
           "Tuesday",
           "Wednesday",
-          "Saturday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
         "max_classes_per_day": 4,
@@ -681,8 +762,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -716,10 +797,10 @@
         ],
         "time_window": {
           "start": "07:00",
-          "end": "19:30"
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.5,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 5.5,
         "session_count": 980,
         "owned_blocks": [
@@ -761,8 +842,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -795,19 +876,23 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       },
       "Supreme HQ, Bandra": {
         "available_days": [
+          "Monday",
           "Tuesday",
           "Wednesday",
-          "Friday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "17:00",
+          "start": "07:00",
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
@@ -828,8 +913,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -855,11 +940,15 @@
         "available_days": [
           "Monday",
           "Tuesday",
-          "Saturday"
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
         "max_classes_per_day": 4,
@@ -874,17 +963,35 @@
           "Tuesday",
           "Wednesday",
           "Thursday",
-          "Saturday"
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 6.2,
         "session_count": 220,
         "notes": "PowerCycle specialist at Supreme. Mon/Tue/Wed/Sat."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
@@ -908,13 +1015,15 @@
         "available_days": [
           "Monday",
           "Tuesday",
+          "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday"
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.2,
         "max_classes_per_day": 4,
@@ -927,16 +1036,18 @@
         "available_days": [
           "Monday",
           "Tuesday",
+          "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday"
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 5.8,
         "session_count": 91,
         "notes": "Multi-location trainer. PC qualified."
@@ -952,8 +1063,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -981,11 +1092,13 @@
           "Tuesday",
           "Wednesday",
           "Thursday",
+          "Friday",
+          "Saturday",
           "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.1,
         "max_classes_per_day": 4,
@@ -1013,8 +1126,24 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -1048,10 +1177,10 @@
         ],
         "time_window": {
           "start": "07:00",
-          "end": "19:30"
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.2,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 5.8,
         "session_count": 850,
         "owned_blocks": [
@@ -1090,8 +1219,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -1111,20 +1240,24 @@
   },
   {
     "name": "Siddhartha Kusuma",
-    "tier": 2,
+    "tier": 1,
     "locations": {
       "Kenkere House": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
-          "Friday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "19:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 4.2,
         "session_count": 110,
         "owned_blocks": [],
@@ -1141,8 +1274,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       }
@@ -1175,8 +1308,8 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "06:00",
-          "end": "22:00"
+          "start": "07:00",
+          "end": "21:00"
         },
         "max_classes_per_day": 4
       },
@@ -1185,11 +1318,14 @@
           "Monday",
           "Tuesday",
           "Wednesday",
-          "Saturday"
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
         ],
         "time_window": {
-          "start": "07:15",
-          "end": "20:30"
+          "start": "07:00",
+          "end": "21:00"
         },
         "avg_classes_per_day": 2.4,
         "max_classes_per_day": 4,

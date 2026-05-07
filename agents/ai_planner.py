@@ -15,6 +15,18 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from agents.draft_retention import prune_draft_schedule_files
 from agents.io_utils import atomic_write_json
+from agents.optimiser import (
+    HORIZONTAL_MAX_SAME_CLASS_PER_TIME,
+    HORIZONTAL_MAX_SAME_FORMAT_PER_TIME,
+    LOCATION_ROOMS,
+    MAX_TRAINER_WEEKLY_MINUTES,
+    RoomOccupancy,
+    canonical_class_key,
+    get_class_format,
+    get_class_duration,
+    slot_time_to_minutes,
+    time_windows_overlap,
+)
 from ai_provider import OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
 from rule_config import build_rules_catalog, get_active_format_rules, load_rules_config
 
@@ -35,11 +47,11 @@ def normalize_trainer_name(name: str) -> str:
 DAILY_TARGETS = {
     "Kwality House, Kemps Corner": {
         "Monday": 12, "Tuesday": 10, "Wednesday": 11,
-        "Thursday": 11, "Friday": 9, "Saturday": 10, "Sunday": 6,
+        "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 6,
     },
     "Supreme HQ, Bandra": {
-        "Monday": 11, "Tuesday": 10, "Wednesday": 9,
-        "Thursday": 11, "Friday": 10, "Saturday": 11, "Sunday": 6,
+        "Monday": 12, "Tuesday": 11, "Wednesday": 10,
+        "Thursday": 12, "Friday": 11, "Saturday": 12, "Sunday": 6,
     },
     "Kenkere House": {
         "Monday": 7, "Tuesday": 7, "Wednesday": 7,
@@ -60,7 +72,7 @@ LOCATION_SLOTS = {
                "09:15", "09:30", "09:45", "10:00", "10:15", "10:30",
                "11:00", "11:30", "12:00", "12:30"],
         "pm": ["16:30", "17:00", "17:30", "17:45", "18:00", "18:15",
-               "18:30", "19:00", "19:15", "19:30", "20:00"],
+               "18:30", "19:00", "19:15", "19:30", "20:00", "20:15"],
     },
     "Kenkere House": {
         "am": ["07:15", "08:30", "09:00", "09:15", "10:00", "10:15",
@@ -85,6 +97,7 @@ class PlannedSlot:
     predicted_fill_rate: float
     score: float
     constraint_violations: List[str]
+    duration_min: int = 57
     rationale: str = ""
 
 
@@ -95,7 +108,7 @@ class PlannedSlot:
 def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
     category_map = rules_catalog["categories"]
     group_map = {group["id"]: group for group in rules_catalog["groups"]}
-    trainer_specific_on = category_map["trainer_specific"]["enabled"]
+    trainer_specific_on = bool(category_map.get("trainer_specific", {}).get("enabled", False))
 
     trainer_lines = []
     for p in sorted(profiles, key=lambda x: (x.get("tier", 3), x["name"])):
@@ -150,15 +163,6 @@ def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
         lines.extend(f"  - {rule['id']}: {rule['description']}" for rule in rules)
         return "\n".join(lines)
 
-    location_sections = [
-        section for section in [
-            render_rule_block("location_kwality", "KWALITY HOUSE:"),
-            render_rule_block("location_supreme", "SUPREME HQ:"),
-            render_rule_block("location_kenkere", "KENKERE HOUSE:"),
-            render_rule_block("trainer_specific", "TRAINER-SPECIFIC RULES:"),
-        ] if section
-    ]
-
     if trainer_specific_on:
         trainer_day_note = "TRAINER DAYS ARE HARD RULES — schedule trainers ONLY on their listed days."
     else:
@@ -168,7 +172,7 @@ def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
     universal_block = render_rule_block("universal", "HARD CONSTRAINTS — ALL LOCATIONS:")
 
     formats_block = ""
-    if category_map["format_rules"]["enabled"] and fmt_lines:
+    if category_map.get("format_rules", {}).get("enabled", False) and fmt_lines:
         formats_block = "FORMATS:\n" + "\n".join(fmt_lines)
 
     sections = [
@@ -181,7 +185,13 @@ def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
         sections.append(formats_block)
     if universal_block:
         sections.append(universal_block)
-    sections.extend(location_sections)
+    sections.append(
+        "Use only universal defaults plus rules saved in Settings. Do not invent trainer-, studio-, or class-specific policies."
+    )
+    sections.append(
+        "Horizontal weekly mix: for each location and clock time, vary class formats across the week. "
+        "Do not fill a time column with the same class or same format every day."
+    )
     sections.append("Output ONLY raw JSON, no markdown, no extra text.")
 
     return "\n\n".join(sections)
@@ -264,7 +274,7 @@ def _build_location_prompt(location: str, week_start: str,
     # Trainer availability — with hard/soft distinction
     if profiles:
         rules_config = load_rules_config()
-        trainer_specific_on = rules_config["categories"]["trainer_specific"]["enabled"]
+        trainer_specific_on = bool(rules_config.get("categories", {}).get("trainer_specific", {}).get("enabled", False))
         avail_header = (
             "### TRAINER AVAILABILITY — HARD LOCKS (only schedule on listed days):"
             if trainer_specific_on else
@@ -316,9 +326,10 @@ def _build_location_prompt(location: str, week_start: str,
     lines += [
         "",
         "Return JSON only — no markdown, no explanation.",
-        'Schema: {"location":"...","week_start":"...","schedule":[{"day":"Monday","time":"08:30","class":"Studio Barre 57","trainer":"Anisha Shah","cover":"Mrigakshi Jaiswal"},...]}',
+        'Schema: {"location":"...","week_start":"...","schedule":[{"day":"Monday","time":"08:30","class":"Studio Barre 57","trainer":"Trainer Name","cover":"Cover Trainer"},...]}',
         "",
-        "CRITICAL: ALL 7 days. Hit exact daily targets. Use exact class/trainer names from above. Place owned blocks first. No duplicate times per day. Every slot needs a cover trainer. Barre family ≥45%.",
+        "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
+        "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Do not make 07:30 all Barre 57, all PowerCycle, or any single repeated format.",
     ]
 
     return "\n".join(lines)
@@ -378,7 +389,7 @@ def _parse_schedule_response(raw: str, location: str, week_start: str,
     errors = []
     week_date = date.fromisoformat(week_start)
     day_to_date = {d: (week_date + timedelta(days=i)).isoformat() for i, d in enumerate(DAY_NAMES)}
-    seen_times: Dict[str, set] = {d: set() for d in DAY_NAMES}
+    seen_slots: Set[Tuple[str, str, str, str]] = set()
 
     for entry in data.get("schedule", []):
         day = entry.get("day", "")
@@ -403,10 +414,11 @@ def _parse_schedule_response(raw: str, location: str, week_start: str,
         if len(time_str) == 4 and time_str[1] == ":":
             time_str = "0" + time_str
 
-        if time_str in seen_times[day]:
-            errors.append(f"Duplicate time {time_str} on {day} — keeping first")
+        slot_key = (day, time_str, class_name, normalize_trainer_name(trainer))
+        if slot_key in seen_slots:
+            errors.append(f"Duplicate slot {class_name} with {trainer} at {time_str} on {day} — keeping first")
             continue
-        seen_times[day].add(time_str)
+        seen_slots.add(slot_key)
 
         slots.append(PlannedSlot(
             location=location,
@@ -422,10 +434,42 @@ def _parse_schedule_response(raw: str, location: str, week_start: str,
             predicted_fill_rate=0.4,
             score=0.0,
             constraint_violations=[],
+            duration_min=get_class_duration(class_name),
             rationale=rationale,
         ))
 
+    _assign_rooms(slots, location)
     return slots, errors
+
+
+def _class_family_for_room(class_name: str) -> str:
+    lower = str(class_name or "").lower()
+    if "powercycle" in lower or "power cycle" in lower:
+        return "powercycle"
+    if "strength lab" in lower:
+        return "strength_lab"
+    return "barre_57"
+
+
+def _assign_rooms(slots: List[PlannedSlot], location: str) -> None:
+    rooms = LOCATION_ROOMS.get(location, {})
+    if not rooms:
+        return
+    occupancy = RoomOccupancy(rooms)
+    for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.class_name)):
+        try:
+            start_min = slot_time_to_minutes(slot.time)
+        except Exception:
+            slot.constraint_violations.append("UNIV-025: Invalid time for room assignment")
+            continue
+        family = _class_family_for_room(slot.class_name)
+        room = occupancy.find_room(slot.day_of_week, family, start_min, slot.duration_min)
+        if room is None:
+            slot.constraint_violations.append("UNIV-025: No available room for class duration")
+            continue
+        slot.room = room
+        slot.capacity = int(rooms.get(room, {}).get("capacity", slot.capacity))
+        occupancy.occupy(slot.day_of_week, room, start_min, slot.duration_min, slot.class_name, slot.trainer_1)
 
 
 # ---------------------------------------------------------------------------
@@ -448,15 +492,6 @@ def _validate_slots(slots: List[PlannedSlot], location: str,
         avail_days = loc_data.get("available_days", [])
         if avail_days and slot.day_of_week not in avail_days:
             v.append(f"UNIV-020: {slot.trainer_1} not available at {location} on {slot.day_of_week}")
-
-        if location == "Kenkere House" and "PowerCycle" in slot.class_name:
-            v.append("UNIV-011/KE-001: PowerCycle never at Kenkere House")
-
-        if "Strength Lab" in slot.class_name:
-            if location != "Kwality House, Kemps Corner":
-                v.append("UNIV-012: Strength Lab only at Kwality")
-            if slot.trainer_1 != "Atulan Purohit":
-                v.append("KW-006: Strength Lab requires Atulan Purohit exclusively")
 
         if slot.day_of_week == "Sunday":
             h, m = map(int, slot.time.split(":"))
@@ -508,21 +543,68 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
             if avail:
                 trainer_allowed_days[name] = set(avail)
 
-    kept = []
-    sl_count = 0
+    normalized_profiles = {
+        normalize_trainer_name(name): profile
+        for name, profile in (profiles_by_name or {}).items()
+    }
 
-    for slot in slots:
+    def _profile_for(trainer: str) -> dict:
+        return (profiles_by_name or {}).get(trainer) or normalized_profiles.get(normalize_trainer_name(trainer), {})
+
+    def _time_window_allows(slot: PlannedSlot, loc_data: dict) -> bool:
+        window = loc_data.get("time_window") or {}
+        start = window.get("start", "06:00")
+        end = window.get("end", "22:00")
+        start_min = slot_time_to_minutes(slot.time)
+        return slot_time_to_minutes(start) <= start_min < slot_time_to_minutes(end)
+
+    def _weekly_mix_max(class_name: str) -> Optional[int]:
+        config_path = CONFIG_DIR / "schedule_config.json"
+        if not config_path.exists():
+            return None
+        try:
+            with open(config_path) as f:
+                config = json.load(f)
+            mix = config.get("class_mix", {}).get(location, {})
+            canonical = canonical_class_key(class_name)
+            entry = mix.get(class_name) or mix.get(canonical) or {}
+            if isinstance(entry, dict) and entry.get("max") is not None:
+                return int(entry["max"])
+        except Exception:
+            return None
+        return None
+
+    kept = []
+    class_weekly_counts: Dict[str, int] = defaultdict(int)
+    time_class_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
+    time_format_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
+    trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
+    trainer_day_location_count: Dict[Tuple[str, str, str], int] = defaultdict(int)
+    trainer_weekly_minutes: Dict[str, int] = defaultdict(int)
+    trainer_worked_days: Dict[str, Set[str]] = defaultdict(set)
+
+    for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.class_name)):
         if _trainer_disabled(slot.trainer_1, profiles_by_name or {}):
             continue
-        # Strength Lab: max 2/week at Kwality, 0 elsewhere
-        if "Strength Lab" in slot.class_name:
-            if location != "Kwality House, Kemps Corner":
-                continue
-            sl_count += 1
-            if sl_count > 2:
-                continue
-        # PowerCycle: never at Kenkere
-        if location == "Kenkere House" and "PowerCycle" in slot.class_name:
+        existing_violations = slot.constraint_violations or []
+        if any(
+            marker in violation
+            for violation in existing_violations
+            for marker in ("Invalid time", "No available room")
+        ):
+            continue
+        trainer_key = normalize_trainer_name(slot.trainer_1)
+        profile = _profile_for(slot.trainer_1)
+        loc_data = (profile.get("locations") or {}).get(location, {})
+        class_key = canonical_class_key(slot.class_name)
+        weekly_mix_max = _weekly_mix_max(slot.class_name)
+        if weekly_mix_max is not None and class_weekly_counts[class_key] >= weekly_mix_max:
+            continue
+        time_class_key = (location, slot.time, canonical_class_key(slot.class_name))
+        if time_class_counts[time_class_key] >= HORIZONTAL_MAX_SAME_CLASS_PER_TIME:
+            continue
+        time_format_key = (location, slot.time, get_class_format(slot.class_name))
+        if time_format_counts[time_format_key] >= HORIZONTAL_MAX_SAME_FORMAT_PER_TIME:
             continue
         # Sunday: no evening band (17:00+), no class before 10:00
         if slot.day_of_week == "Sunday":
@@ -530,12 +612,44 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
             if h >= 17 or h < 10:
                 continue
         # Trainer must be available on that day
-        allowed = trainer_allowed_days.get(slot.trainer_1)
+        allowed = trainer_allowed_days.get(slot.trainer_1) or trainer_allowed_days.get(trainer_key)
         if allowed and slot.day_of_week not in allowed:
             continue
+        if loc_data and not _time_window_allows(slot, loc_data):
+            continue
+        max_day = int(loc_data.get("max_classes_per_day") or 4)
+        day_loc_key = (trainer_key, slot.day_of_week, location)
+        if trainer_day_location_count[day_loc_key] >= max_day:
+            continue
+        duration = int(slot.duration_min or get_class_duration(slot.class_name))
+        if trainer_weekly_minutes[trainer_key] + duration > MAX_TRAINER_WEEKLY_MINUTES:
+            continue
+        if (
+            slot.day_of_week not in trainer_worked_days[trainer_key]
+            and len(trainer_worked_days[trainer_key]) >= 6
+        ):
+            continue
+        day_key = (trainer_key, slot.day_of_week)
+        start_min = slot_time_to_minutes(slot.time)
+        if any(
+            time_windows_overlap(
+                start_min,
+                duration,
+                slot_time_to_minutes(existing.time),
+                int(existing.duration_min or get_class_duration(existing.class_name)),
+            )
+            for existing in trainer_day_slots[day_key]
+        ):
+            continue
         kept.append(slot)
+        class_weekly_counts[class_key] += 1
+        time_class_counts[time_class_key] += 1
+        time_format_counts[time_format_key] += 1
+        trainer_day_slots[day_key].append(slot)
+        trainer_day_location_count[day_loc_key] += 1
+        trainer_weekly_minutes[trainer_key] += duration
+        trainer_worked_days[trainer_key].add(slot.day_of_week)
 
-    # Recovery must be last in its shift (morning=7-12, midday=12-17, evening=17+)
     def _shift_key(time_str: str) -> int:
         h = int(time_str[:2])
         return 0 if h < 12 else (1 if h < 17 else 2)
@@ -551,10 +665,8 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
             by_shift[_shift_key(s.time)].append(s)
         for shift_slots in by_shift.values():
             shift_slots.sort(key=lambda s: s.time)
-            last_time = shift_slots[-1].time
             for s in shift_slots:
-                if "Recovery" in s.class_name and s.time != last_time:
-                    continue  # drop Recovery that isn't last
+                s.constraint_violations = []
                 final.append(s)
 
     dropped = len(slots) - len(final)
@@ -616,15 +728,23 @@ def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlo
 def _print_utilisation(slots: List[PlannedSlot], profiles_by_name: dict):
     from collections import defaultdict
     DURATIONS = {
-        "Studio Barre 57": 57, "Studio Cardio Barre": 57, "Studio Mat 57": 57,
-        "Studio PowerCycle": 45, "Studio PowerCycle Express": 30,
-        "Studio FIT": 45, "Studio Foundations": 45, "Studio Recovery": 45,
-        "Studio Strength Lab": 57, "Studio Back Body Blaze": 57,
-        "Studio Amped Up!": 57, "Studio HIIT": 45, "Studio SWEAT In 30": 30,
+        "Studio Barre 57": get_class_duration("Studio Barre 57"),
+        "Studio Cardio Barre": get_class_duration("Studio Cardio Barre"),
+        "Studio Mat 57": get_class_duration("Studio Mat 57"),
+        "Studio PowerCycle": get_class_duration("Studio PowerCycle"),
+        "Studio PowerCycle Express": get_class_duration("Studio PowerCycle Express"),
+        "Studio FIT": get_class_duration("Studio FIT"),
+        "Studio Foundations": get_class_duration("Studio Foundations"),
+        "Studio Recovery": get_class_duration("Studio Recovery"),
+        "Studio Strength Lab": get_class_duration("Studio Strength Lab"),
+        "Studio Back Body Blaze": get_class_duration("Studio Back Body Blaze"),
+        "Studio Amped Up!": get_class_duration("Studio Amped Up!"),
+        "Studio HIIT": get_class_duration("Studio HIIT"),
+        "Studio SWEAT In 30": get_class_duration("Studio SWEAT In 30"),
     }
     minutes: Dict[str, int] = defaultdict(int)
     for s in slots:
-        dur = DURATIONS.get(s.class_name, 57)
+        dur = DURATIONS.get(s.class_name, get_class_duration(s.class_name))
         minutes[s.trainer_1] += dur
 
     t1 = [(n, m) for n, m in minutes.items()
@@ -661,6 +781,63 @@ def _daily_target_errors(schedule: List[dict]) -> List[str]:
             if max_count is not None and actual > int(max_count):
                 errors.append(f"{location} {day}: actual {actual} exceeds max {int(max_count)}")
     return errors
+
+
+def _target_count_for_location(location: str) -> int:
+    targets = DAILY_TARGETS.get(location, {day: 7 for day in DAY_NAMES}).copy()
+    config_path = CONFIG_DIR / "schedule_config.json"
+    if config_path.exists():
+        try:
+            with open(config_path) as f:
+                schedule_config = json.load(f)
+            for day, limits in (schedule_config.get("targets", {}).get(location, {}) or {}).items():
+                if day in targets and isinstance(limits, dict) and limits.get("target") is not None:
+                    targets[day] = int(limits["target"])
+        except Exception:
+            pass
+    return sum(targets.values())
+
+
+def _has_enough_slots_after_enforcement(location: str, slots: List[PlannedSlot]) -> bool:
+    target = _target_count_for_location(location)
+    if target <= 0:
+        return len(slots) >= 20
+    return len(slots) >= max(20, int(target * 0.90))
+
+
+def _enforce_global_trainer_overlaps(slots: List[PlannedSlot]) -> List[PlannedSlot]:
+    """Final cross-location guard after all location plans are combined."""
+    from collections import defaultdict
+
+    kept: List[PlannedSlot] = []
+    trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
+    trainer_minutes: Dict[str, int] = defaultdict(int)
+
+    for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
+        trainer_key = normalize_trainer_name(slot.trainer_1)
+        duration = int(slot.duration_min or get_class_duration(slot.class_name))
+        if trainer_minutes[trainer_key] + duration > MAX_TRAINER_WEEKLY_MINUTES:
+            continue
+        day_key = (trainer_key, slot.day_of_week)
+        start_min = slot_time_to_minutes(slot.time)
+        if any(
+            time_windows_overlap(
+                start_min,
+                duration,
+                slot_time_to_minutes(existing.time),
+                int(existing.duration_min or get_class_duration(existing.class_name)),
+            )
+            for existing in trainer_day_slots[day_key]
+        ):
+            continue
+        kept.append(slot)
+        trainer_day_slots[day_key].append(slot)
+        trainer_minutes[trainer_key] += duration
+
+    dropped = len(slots) - len(kept)
+    if dropped:
+        print(f"    [ENFORCE] global trainer guard dropped {dropped} overlapping/cap slot(s)")
+    return kept
 
 
 def _select_primary_iteration(iterations: List[dict]) -> dict:
@@ -715,15 +892,29 @@ class AISchedulePlanner:
         prune_draft_schedule_files(STATE_DIR, keep_groups=5)
 
     def run(self) -> dict:
+        force_ai_only = os.environ.get("SCHEDULER_FORCE_AI_ONLY") == "1"
+
+        if os.environ.get("SCHEDULER_FORCE_GREEDY") == "1":
+            print("[Agent 5] Standard generation requested — using greedy optimiser")
+            return self._fallback()
+
         if not OPENAI_AVAILABLE:
-            print("[Agent 5] openai package not installed — falling back to greedy optimiser")
+            message = "[Agent 5] openai package not installed"
+            if force_ai_only:
+                raise RuntimeError(f"{message}. Install with: pip install openai")
+            print(f"{message} — falling back to greedy optimiser")
             print("[Agent 5]   Install with: pip install openai")
             return self._fallback()
 
         client, settings = create_ai_client()
         if not client or not settings:
-            print("[Agent 5] OPENROUTER_API_KEY not set — falling back to greedy optimiser")
-            print("[Agent 5]   Set OPENROUTER_API_KEY and optionally OPENROUTER_MODEL in .env or your shell")
+            message = "[Agent 5] API client not configured (key/provider/model)"
+            if force_ai_only:
+                raise RuntimeError(
+                    f"{message}. Set AI API key and runtime settings in Control Center."
+                )
+            print(f"{message} — falling back to greedy optimiser")
+            print("[Agent 5]   Set OPENROUTER_API_KEY/OPENAI_API_KEY and model settings")
             return self._fallback()
 
         model_name = settings["model"]
@@ -738,7 +929,10 @@ class AISchedulePlanner:
             with open(RULES_DIR / "trainer_profiles.json") as f:
                 profiles = json.load(f)
         except FileNotFoundError as e:
-            print(f"[Agent 5] Missing file: {e} — run agents 1-4 first")
+            message = f"[Agent 5] Missing file: {e} — run agents 1-4 first"
+            if force_ai_only:
+                raise RuntimeError(message)
+            print(message)
             return self._fallback()
 
         profiles_by_name = {p["name"]: p for p in profiles}
@@ -753,6 +947,7 @@ class AISchedulePlanner:
         system_prompt = _build_system_prompt(profiles, rules_catalog)
         all_slots: List[PlannedSlot] = []
         all_errors: List[str] = []
+        repaired_locations: List[str] = []
 
         # Build all prompts up front
         user_prompts = {
@@ -773,6 +968,10 @@ class AISchedulePlanner:
 
             slots = _validate_slots(slots, location, profiles_by_name)
             slots = _enforce_hard_limits(slots, location, profiles_by_name)
+            if not _has_enough_slots_after_enforcement(location, slots):
+                return location, None, [
+                    f"{location}: only {len(slots)} slots remained after hard-limit enforcement"
+                ]
             slots = _score_slots(slots, scores_data)
             return location, slots, errors
 
@@ -792,20 +991,27 @@ class AISchedulePlanner:
                 all_errors.extend(errors)
 
             if slots is None:
-                print(f"    [WARN] {location} — falling back to greedy")
+                print(f"    [REPAIR] {location} — AI plan invalid, repairing with optimiser")
                 slots = self._fallback_location(location, scores_data, profiles_by_name)
+                if not slots and force_ai_only:
+                    raise RuntimeError(
+                        f"[Agent 5] AI-only mode failed at {location}: could not produce a valid AI plan"
+                    )
+                repaired_locations.append(location)
 
             violations = sum(1 for s in slots if s.constraint_violations)
             pred_fill = sum(s.predicted_fill_rate for s in slots) / len(slots) if slots else 0
             print(f"    {location}: {len(slots)} slots | {violations} violations | fill≈{pred_fill:.0%}")
             all_slots.extend(slots)
 
+        all_slots = _enforce_global_trainer_overlaps(all_slots)
         _print_utilisation(all_slots, profiles_by_name)
 
         output = {
             "target_week_start": self.target_week_start,
             "schedule": [asdict(s) for s in all_slots],
             "ai_planned": True,
+            "ai_repaired_locations": repaired_locations,
             "parse_errors": all_errors,
             "variation_seed": self.variation_seed,
             "output_suffix": self.output_suffix,
@@ -901,6 +1107,7 @@ class AISchedulePlanner:
                     predicted_fill_rate=s.get("predicted_fill_rate", 0.35),
                     score=s.get("score", 30.0),
                     constraint_violations=s.get("constraint_violations", []),
+                    duration_min=int(s.get("duration_min") or get_class_duration(s.get("class_name", ""))),
                     rationale="greedy_fallback",
                 ))
             return slots

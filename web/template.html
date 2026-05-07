@@ -58,6 +58,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;box-shadow:0 8px 18px rgba(217,119,6,.12);
 }
 .week-badge::before{content:"";width:8px;height:8px;border-radius:999px;background:#F59E0B;box-shadow:0 0 0 4px rgba(245,158,11,.15)}
+.schedule-week-control{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #CBD5E1;border-radius:14px;padding:7px 10px;box-shadow:0 8px 18px rgba(15,23,42,.07)}
+.schedule-week-control span{font-size:11px;font-weight:900;color:#475569;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.schedule-week-control input{border:0;background:transparent;color:#0F172A;font-size:12px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;min-width:132px;outline:none}
 
 /* LOCATION BAR */
 .loc-bar{
@@ -573,6 +576,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   box-shadow:var(--sh-lg);animation:mIn 0.2s ease;
 }
 .modal-box.drill-modal{width:min(1440px,calc(100vw - 96px));max-height:calc(100vh - 96px);border-radius:22px;overflow:hidden;background:#F8FAFC}
+.modal-box.control-center-modal{width:min(1540px,calc(100vw - 72px));height:min(900px,calc(100vh - 72px));max-height:calc(100vh - 72px);border-radius:24px;overflow:hidden;background:#F8FAFC;display:flex;flex-direction:column}
 @keyframes mIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-hdr{
   padding:20px 24px 16px;border-bottom:1px solid var(--border);
@@ -686,6 +690,22 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .drill-session-table td.num{text-align:right;font-weight:700;color:#0F172A}.drill-session-table td.fill-low{color:#DC2626}.drill-session-table td.fill-mid{color:#D97706}.drill-session-table td.fill-high{color:#16A34A}
 .drill-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px}
 .drill-score-grid .score-component{background:#fff}
+.control-center-modal .modal-hdr{flex-shrink:0}
+.control-center-shell{display:grid;grid-template-columns:280px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+.control-center-rail{background:#fff;border-right:1px solid #E2E8F0;padding:18px;overflow-y:auto;min-height:0}
+.control-center-main{padding:18px 20px 30px;overflow-y:auto;min-height:0}
+.control-center-nav{display:flex;flex-direction:column;gap:8px}
+.control-center-nav-btn{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;width:100%;padding:11px 12px;border-radius:12px;border:1px solid #E2E8F0;background:#F8FAFC;color:#334155;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
+.control-center-nav-btn.active{background:#0F172A;color:#fff;border-color:#0F172A}
+.control-center-nav-title{font-size:12px;font-weight:900}
+.control-center-nav-desc{font-size:10px;opacity:.82;font-weight:700;line-height:1.35}
+.control-center-status{font-size:9px;font-weight:900;text-transform:uppercase;opacity:.72;white-space:nowrap}
+.control-center-intro{border:1px solid #DCE3EB;border-radius:16px;background:#fff;padding:16px 18px;margin-bottom:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
+.control-center-panel .sett-view,.control-center-panel .rules-view{max-width:none;padding:0}
+.control-center-panel .sett-view-header,.control-center-panel .sett-rail,.control-center-panel .sett-inspector,.control-center-panel .rv-header,.control-center-panel .rv-rail,.control-center-panel .rv-inspector{display:none}
+.control-center-panel .sett-command,.control-center-panel .rv-command-shell{grid-template-columns:1fr}
+.control-center-panel .sett-main,.control-center-panel .rv-main{min-width:0}
+.control-center-panel .sett-main-actions,.control-center-panel .rv-main-toolbar{margin-top:0}
 @media(max-width:1100px){.drill-layout{grid-template-columns:1fr;height:94vh}.drill-rail{max-height:none}.drill-photo{height:360px}.drill-main{border-left:0}.drill-kpi-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.modal-overlay{padding:14px}.modal-box.drill-modal{width:calc(100vw - 28px);max-height:calc(100vh - 28px)}.drill-layout{height:calc(100vh - 28px);min-height:0}.drill-main{padding:24px 18px}.drill-kpi-grid{grid-template-columns:1fr}.planner-shell{padding:12px}.sched-grid{--time-rail-x:67px;grid-template-columns:64px repeat(7,minmax(122px,1fr));padding:12px}.sched-grid::before{top:52px;bottom:12px}.sg-time{padding-right:18px}.sg-time-badge{min-width:44px;padding:0 7px;font-size:10px}}
 
@@ -699,6 +719,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 }
 .gen-btn:hover{transform:translateY(-1px);filter:saturate(1.08);box-shadow:0 16px 30px rgba(37,99,235,.3)}
 .gen-btn:disabled{background:#9CA3AF;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
+.gen-btn.ai{background:linear-gradient(135deg,#047857,#0E7490);box-shadow:0 12px 24px rgba(14,116,144,.22)}
 .finalise-btn{
   display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;
   background:#FFFFFF;color:#0F172A;border:1px solid #CBD5E1;
@@ -1074,6 +1095,35 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 @media(max-width:1280px){.sett-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sett-location-summary,.sett-option-grid{grid-template-columns:1fr}}
 @media(max-width:1160px){.sett-command{grid-template-columns:1fr}.sett-rail,.sett-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}}
 @media(max-width:720px){.sett-overview-grid{grid-template-columns:1fr}.sett-main-actions{align-items:stretch}.sett-action-group{width:100%}.sett-ghost-btn{flex:1}}
+.chat-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#1E40AF;color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 18px rgba(30,64,175,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
+.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(30,64,175,.55)}
+.chat-fab .chat-fab-badge{position:absolute;top:-3px;right:-3px;background:#EF4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:900;display:none;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif}
+.chat-fab .chat-fab-badge.show{display:flex}
+.chat-drawer{position:fixed;bottom:92px;right:28px;z-index:9998;width:380px;max-height:540px;background:#fff;border-radius:20px;box-shadow:0 12px 48px rgba(15,23,42,.18);display:flex;flex-direction:column;overflow:hidden;transform:translateY(16px) scale(0.97);opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.16,1,.3,1),opacity .2s}
+.chat-drawer.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
+.chat-hdr{background:#0F172A;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-hdr-title{font-size:13px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;flex:1}
+.chat-hdr-sub{font-size:10px;color:#94A3B8;font-weight:600}
+.chat-close{background:transparent;border:none;color:#94A3B8;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.chat-close:hover{color:#fff;background:#1E293B}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.chat-msg{display:flex;flex-direction:column;max-width:90%}
+.chat-msg.user{align-self:flex-end;align-items:flex-end}
+.chat-msg.bot{align-self:flex-start;align-items:flex-start}
+.chat-bubble{padding:10px 13px;border-radius:14px;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.chat-msg.user .chat-bubble{background:#1E40AF;color:#fff;border-bottom-right-radius:4px}
+.chat-msg.bot .chat-bubble{background:#F1F5F9;color:#0F172A;border-bottom-left-radius:4px}
+.chat-msg-time{font-size:9px;color:#94A3B8;margin-top:3px;padding:0 4px}
+.chat-typing .chat-bubble{background:#F1F5F9;color:#64748B}
+.chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px;flex-shrink:0}
+.chat-sugg{border:1px solid #E2E8F0;background:#F8FAFC;color:#334155;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.chat-sugg:hover{background:#EFF6FF;border-color:#93C5FD;color:#1D4ED8}
+.chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #E2E8F0;flex-shrink:0;background:#F8FAFC}
+.chat-input{flex:1;padding:9px 13px;border:1px solid #CBD5E1;border-radius:999px;font-size:12px;font-family:inherit;background:#fff;outline:none;color:#0F172A}
+.chat-input:focus{border-color:#93C5FD;box-shadow:0 0 0 3px rgba(147,197,253,.2)}
+.chat-send{background:#1E40AF;color:#fff;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px}
+.chat-send:hover{background:#2563EB}
+.chat-empty{text-align:center;padding:24px 16px;color:#94A3B8;font-size:12px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -1095,10 +1145,18 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <div class="week-badge" id="week-badge">Week of —</div>
+    <label class="schedule-week-control">
+      <span>Schedule Week</span>
+      <input type="date" id="schedule-week-start" onchange="persistScheduleWeekSelection()">
+    </label>
     <button class="finalise-btn" id="finalise-btn" onclick="finaliseSchedule()">Finalize PDF</button>
-    <button class="gen-btn" id="gen-btn" onclick="runPipelineFromHeader()">
+    <button class="gen-btn" id="gen-btn" onclick="runPipelineFromHeader(false)">
       <span class="gen-spinner" id="gen-spinner"></span>
       &#9654; Generate
+    </button>
+    <button class="gen-btn ai" id="gen-ai-btn" onclick="runPipelineFromHeader(true)">
+      <span class="gen-spinner"></span>
+      Generate with AI
     </button>
   </div>
 </header>
@@ -1119,9 +1177,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
     <button class="vbtn" id="vbtn-cross" onclick="setView('cross')">⊕ Multi-Location</button>
     <button class="vbtn" id="vbtn-city" onclick="setView('city')">◎ Intra-City</button>
     <button class="vbtn" id="vbtn-analytics" onclick="setView('analytics')">▦ Analytics</button>
-    <button class="vbtn" id="vbtn-rules" onclick="setView('rules')">&#9881; Rules</button>
-    <button class="vbtn" id="vbtn-history" onclick="setView('history')">&#128200; History</button>
-    <button class="vbtn" id="vbtn-settings" onclick="setView('settings')">&#9741; Settings</button>
+    <button class="vbtn" id="vbtn-control" onclick="openControlCenterModal('overview')">Control Center</button>
   </div>
   <div class="ctrl-right">
     <div id="iter-row" style="display:flex;gap:3px"></div>
@@ -1235,10 +1291,10 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 // ============================================================
 // DATA — injected by reporter.py
 // ============================================================
-const SCHEDULE_DATA = /*INJECT_SCHEDULE_DATA*/;
-const SCORECARD    = /*INJECT_SCORECARD*/;
-const WEEK_LABEL   = /*INJECT_WEEK_LABEL*/;
-const OPPORTUNITIES = /*INJECT_OPPORTUNITIES*/;
+const SCHEDULE_DATA = [/*INJECT_SCHEDULE_DATA*/][0] || {generated_for_week:"",day_dates:{},locations:{},iteration_labels:[],iterations:[]};
+const SCORECARD    = [/*INJECT_SCORECARD*/][0] || {};
+const WEEK_LABEL   = [/*INJECT_WEEK_LABEL*/][0] || SCHEDULE_DATA.generated_for_week || "";
+const OPPORTUNITIES = [/*INJECT_OPPORTUNITIES*/][0] || [];
 
 // ============================================================
 // CONSTANTS
@@ -3461,6 +3517,7 @@ function openModal(s){
             ${isPrime(s.time)?`<span class="drill-pill warn">Prime Slot</span>`:""}
             ${s.above_studio_avg?`<span class="drill-pill good">Above Studio Avg</span>`:""}
             <span class="drill-pill blue">${score}/100</span>
+            ${s.trainer_1?`<button id="drill-trainer-toggle" style="padding:4px 10px;border-radius:999px;border:1px solid #CBD5E1;background:#F8FAFC;color:#475569;font-size:10px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer" onclick="drillToggleTrainer(${JSON.stringify(s).replace(/"/g,'&quot;')})" title="Toggle between all historical data and data for ${rvEscapeAttr(s.trainer_1)} only">All data</button>`:""}
           </div>
         </div>
 
@@ -4392,8 +4449,10 @@ function openDayBreakdownModal(day,slots){
 // ============================================================
 // INIT
 // ============================================================
-function init(){
+function renderInitialUi(){
   document.getElementById("week-badge").textContent=`Week of ${WEEK_LABEL||"—"}`;
+  initScheduleWeekPicker();
+  persistScheduleWeekSelection();
   buildLocTabs();
   buildIterPills();
   buildDayChips();
@@ -4403,6 +4462,29 @@ function init(){
     populateDropdowns(getFilterScopeSlots());
     renderView();
   }
+}
+
+function hasScheduleLocations(){
+  const locs=SCHEDULE_DATA&&SCHEDULE_DATA.locations;
+  return !!(locs&&Object.keys(locs).length);
+}
+
+async function hydrateLatestScheduleIfEmpty(){
+  if(hasScheduleLocations())return;
+  try{
+    const meta=await fetch("/api/latest-schedule-file").then(r=>r.json());
+    const file=meta&&meta.file?meta.file:"schedule_data.json";
+    const latest=await fetch(`/${file}?ts=${Date.now()}`).then(r=>r.json());
+    if(latest&&latest.locations&&Object.keys(latest.locations).length){
+      Object.keys(SCHEDULE_DATA).forEach(k=>delete SCHEDULE_DATA[k]);
+      Object.assign(SCHEDULE_DATA,latest);
+    }
+  }catch(_err){}
+}
+
+async function init(){
+  await hydrateLatestScheduleIfEmpty();
+  renderInitialUi();
 }
 
 document.getElementById("modal-overlay").addEventListener("click",e=>{if(e.target===document.getElementById("modal-overlay"))closeModal()});
@@ -4443,11 +4525,53 @@ function pipelineDisplayMessage(raw,elapsedMs=0){
   return PIPELINE_MESSAGES[idx];
 }
 
-function runPipelineFromHeader(){
-  const btn=document.getElementById("gen-btn");
-  btn.disabled=true;
-  btn.classList.add("loading");
-  fetch("/api/run-pipeline",{method:"POST"})
+function setGenerateButtonsLoading(isLoading,aiMode=false){
+  const standardBtn=document.getElementById("gen-btn");
+  const aiBtn=document.getElementById("gen-ai-btn");
+  [standardBtn,aiBtn].forEach(btn=>{if(btn){btn.disabled=Boolean(isLoading);btn.classList.remove("loading");}});
+  if(isLoading){(aiMode?aiBtn:standardBtn)?.classList.add("loading");}
+}
+
+function dateToInputValue(date){
+  const y=date.getFullYear();const m=String(date.getMonth()+1).padStart(2,"0");const d=String(date.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+}
+function mondayForDateValue(value){
+  const raw=String(value||"").slice(0,10);const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return "";
+  const dt=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));if(Number.isNaN(dt.getTime()))return "";
+  const day=dt.getDay();const diff=day===0?-6:1-day;dt.setDate(dt.getDate()+diff);return dateToInputValue(dt);
+}
+function getSelectedScheduleWeekStart(){
+  const picker=document.getElementById("schedule-week-start");
+  const stored=localStorage.getItem("schedule_week_start")||"";
+  const current=(SCHEDULE_DATA&&SCHEDULE_DATA.generated_for_week)||WEEK_LABEL||"";
+  return mondayForDateValue(picker?.value)||mondayForDateValue(stored)||mondayForDateValue(current)||"";
+}
+function persistScheduleWeekSelection(){
+  const picker=document.getElementById("schedule-week-start");if(!picker)return;
+  const weekStart=mondayForDateValue(picker.value);if(!weekStart)return;
+  picker.value=weekStart;localStorage.setItem("schedule_week_start",weekStart);
+  const badge=document.getElementById("week-badge");if(badge)badge.textContent=`Week of ${weekStart}`;
+}
+function initScheduleWeekPicker(){
+  const picker=document.getElementById("schedule-week-start");if(!picker)return;
+  const weekStart=getSelectedScheduleWeekStart();if(weekStart){picker.value=weekStart;localStorage.setItem("schedule_week_start",weekStart);}
+}
+
+function runPipelineFromHeader(useAi=false){
+  const weekStart=getSelectedScheduleWeekStart();
+  if(!weekStart){showToast("Choose a valid schedule week first","warn");return;}
+  setGenerateButtonsLoading(true,useAi);
+  const aiOpts = _settSchedConfig?.settings_options||{};
+  const apiKey = String(aiOpts.ai_api_key||"").trim();
+  const payload = {week_start:weekStart,use_ai:Boolean(useAi)};
+  if(useAi){
+    if(apiKey) payload.api_key = apiKey;
+    payload.ai_provider = String(aiOpts.ai_provider||"openrouter");
+    payload.ai_model = String(aiOpts.ai_model||"openai/gpt-oss-120b:free");
+    payload.ai_base_url = String(aiOpts.ai_base_url||"");
+  }
+  fetch("/api/run-pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(r=>r.json())
     .then(res=>{
       if(res.ok){
@@ -4455,16 +4579,16 @@ function runPipelineFromHeader(){
         const msg=document.getElementById("pb-msg");
         if(bar)bar.className="visible";
         if(msg)msg.textContent=pipelineDisplayMessage(res.message,0);
-        showToast("Pipeline started — results ready in ~2 min","");
+        showToast(`${useAi?"AI generation":"Generation"} started for week of ${weekStart}`,"");
         pollPipelineStatus();
       } else {
         showToast("Error: "+(res.error||"Unknown error"),"error");
-        btn.disabled=false;btn.classList.remove("loading");
+        setGenerateButtonsLoading(false);
       }
     })
     .catch(()=>{
       showToast("Server offline — try again","warn");
-      btn.disabled=false;btn.classList.remove("loading");
+      setGenerateButtonsLoading(false);
     });
 }
 
@@ -4496,8 +4620,7 @@ function pollPipelineStatus(){
     const elapsed=Date.now()-started;
     if(elapsed>HARD_STOP_MS){
       clearInterval(_pipelinePoller);_pipelinePoller=null;
-      const btn=document.getElementById("gen-btn");
-      if(btn){btn.disabled=false;btn.classList.remove("loading");}
+      setGenerateButtonsLoading(false);
       showToast("Pipeline exceeded 30 min — check server logs","warn");
       return;
     }
@@ -4506,7 +4629,6 @@ function pollPipelineStatus(){
       .then(d=>{
         const bar=document.getElementById("pipeline-bar");
         const msg=document.getElementById("pb-msg");
-        const btn=document.getElementById("gen-btn");
         const status=(typeof d.status==="string"&&d.status)?d.status:(d.running?"running":"idle");
         if(status==="running"){
           if(!warnedLongRun&&elapsed>WARN_AFTER_MS){
@@ -4519,7 +4641,7 @@ function pollPipelineStatus(){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
           if(bar)bar.className="visible";
           if(msg)msg.textContent=d.message||"Schedule ready — reload to see new results";
-          if(btn){btn.disabled=false;btn.classList.remove("loading");}
+          setGenerateButtonsLoading(false);
           fetch(`/api/latest-schedule-file`)
             .then(r=>r.json())
             .then(meta=>fetch(`/${meta.file}?ts=${Date.now()}`))
@@ -4534,11 +4656,11 @@ function pollPipelineStatus(){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
           if(bar){bar.className="visible error";}
           if(msg)msg.textContent=d.message||"Pipeline failed. Check server logs.";
-          if(btn){btn.disabled=false;btn.classList.remove("loading");}
+          setGenerateButtonsLoading(false);
           showToast("Pipeline failed — check logs","error");
         } else {
           if(bar)bar.className="";
-          if(btn){btn.disabled=false;btn.classList.remove("loading");}
+          setGenerateButtonsLoading(false);
           clearInterval(_pipelinePoller);_pipelinePoller=null;
         }
       })
@@ -4546,6 +4668,55 @@ function pollPipelineStatus(){
   };
   tick();
   _pipelinePoller=setInterval(tick,2000);
+}
+
+// ============================================================
+// CONTROL CENTER MODAL
+// ============================================================
+const CONTROL_CENTER_SECTIONS={
+  overview:{label:"Overview",summary:"Start here",detail:"Review configuration health and the key setup sections.",panel:"settings",heading:"Overview",description:"Use one place to manage schedule setup, trainers, class mix, and rules.",activate(){settSetTab("overview");}},
+  schedule:{label:"Schedule Setup",summary:"Daily targets",detail:"Edit daily class targets for each location.",panel:"settings",heading:"Schedule Setup",description:"Adjust daily class targets and weekly shape.",activate(){settSetTab("targets");}},
+  trainers:{label:"Trainer Setup",summary:"Profiles and status",detail:"Manage trainer profiles, availability, and status.",panel:"settings",heading:"Trainer Setup",description:"Manage trainer profiles, studio access, and active status.",activate(){settSetTab("trainers");}},
+  classmix:{label:"Class Mix",summary:"Weekly format balance",detail:"Set format min/max targets per studio.",panel:"settings",heading:"Class Mix",description:"Maintain the right format mix across the week.",activate(){settSetTab("classmix");}},
+  rules:{label:"Rules and Pins",summary:"Custom instructions",detail:"Manage custom rules and pinned classes.",panel:"settings",heading:"Rules and Pinned Classes",description:"Add custom scheduling instructions and pins.",activate(){settSetTab("customrules");}},
+  advanced:{label:"Advanced",summary:"Planner behavior",detail:"Configure planner options and API key.",panel:"settings",heading:"Advanced Settings",description:"Manage planner behavior and integration options.",activate(){settSetTab("advanced");}},
+  catalog:{label:"Rule Catalog",summary:"Built-in safeguards",detail:"Review built-in scheduling rules.",panel:"rules",heading:"Rule Catalog",description:"Review enabled/disabled built-in rules.",activate(){rvSetScope("overview");}}
+};
+let _controlCenterSection="overview";
+function controlCenterNavButton(key,section){
+  return `<button class="control-center-nav-btn${_controlCenterSection===key?" active":""}" type="button" data-control-section="${key}" onclick="controlCenterSetSection('${key}')"><span><span class="control-center-nav-title">${rvEscapeHtml(section.label)}</span><br><span class="control-center-nav-desc">${rvEscapeHtml(section.detail)}</span></span><span class="control-center-status">${rvEscapeHtml(section.summary)}</span></button>`;
+}
+function renderControlCenterShell(){
+  const box=document.getElementById("modal-box"); if(!box)return;
+  box.className="modal-box control-center-modal";
+  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">Control Center</div><div class="modal-meta">Manage settings, trainer setup, and rules in one place.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="control-center-nav">${Object.entries(CONTROL_CENTER_SECTIONS).map(([k,v])=>controlCenterNavButton(k,v)).join("")}</div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Overview</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main></div>`;
+}
+function controlCenterEnsurePanel(panelName){
+  const panelId=panelName==="rules"?"control-center-rules-panel":"control-center-settings-panel";
+  const host=document.getElementById(panelId);
+  if(!host||host.dataset.loaded==="1")return;
+  if(panelName==="rules")renderRulesView(host); else renderSettingsView(host);
+  host.dataset.loaded="1";
+}
+function controlCenterSetSection(sectionKey){
+  const section=CONTROL_CENTER_SECTIONS[sectionKey]||CONTROL_CENTER_SECTIONS.overview;
+  _controlCenterSection=sectionKey in CONTROL_CENTER_SECTIONS?sectionKey:"overview";
+  const settingsPanel=document.getElementById("control-center-settings-panel");
+  const rulesPanel=document.getElementById("control-center-rules-panel");
+  const heading=document.getElementById("control-center-heading");
+  const description=document.getElementById("control-center-description");
+  document.querySelectorAll("[data-control-section]").forEach(btn=>btn.classList.toggle("active",btn.dataset.controlSection===_controlCenterSection));
+  if(heading)heading.textContent=section.heading;
+  if(description)description.textContent=section.description;
+  controlCenterEnsurePanel(section.panel);
+  if(settingsPanel)settingsPanel.hidden=section.panel!=="settings";
+  if(rulesPanel)rulesPanel.hidden=section.panel!=="rules";
+  setTimeout(()=>section.activate&&section.activate(),0);
+}
+function openControlCenterModal(sectionKey="overview"){
+  renderControlCenterShell();
+  controlCenterSetSection(sectionKey);
+  document.getElementById("modal-overlay").classList.add("open");
 }
 
 // ============================================================
@@ -4744,6 +4915,10 @@ function rvBadgeHtml(rule){
     ${rule.type?`<span class="rv-rule-chip">${rvEscapeHtml(rule.type.replace(/_/g," "))}</span>`:""}`;
 }
 
+function rvRuleHeader(rule){
+  return String(rule.title||"").trim() || String(rule.impact_area||"").trim() || "Scheduling Rule";
+}
+
 function rvRenderInspector(selectedRule){
   const conflicts=document.getElementById("rv-conflicts");
   const impact=document.getElementById("rv-impact");
@@ -4752,14 +4927,14 @@ function rvRenderInspector(selectedRule){
   const risky=rules.filter(r=>!r.enabled&&["critical","high"].includes(r.risk_level));
   const formatOff=rules.filter(r=>r.type==="class_format"&&!r.enabled);
   const items=[
-    ...risky.slice(0,4).map(r=>({type:"error",text:`${r.id}: ${r.title||r.id} is disabled but marked ${r.risk_level} risk.`})),
-    ...formatOff.slice(0,3).map(r=>({type:"warn",text:`${r.title||r.id}: class-format rule is off; Settings class mix ranges still remain canonical.`})),
+    ...risky.slice(0,4).map(r=>({type:"error",text:`${rvRuleHeader(r)} is disabled but marked ${r.risk_level} risk.`})),
+    ...formatOff.slice(0,3).map(r=>({type:"warn",text:`${rvRuleHeader(r)} is off; Settings class mix ranges still remain canonical.`})),
   ];
   conflicts.innerHTML=items.length
     ? items.map(i=>`<div class="rv-conflict-item ${i.type}">${rvEscapeHtml(i.text)}</div>`).join("")
     : `<div class="rv-conflict-item">No risky disabled rules detected. Settings overrides remain canonical for class count and mix conflicts.</div>`;
   if(selectedRule){
-    impact.innerHTML=`<strong>${rvEscapeHtml(selectedRule.title||selectedRule.id)}</strong><br>${rvEscapeHtml(selectedRule.impact_area||"Operational guardrail")} · ${rvEscapeHtml(selectedRule.risk_level||"low")} risk<br><br>${rvEscapeHtml(selectedRule.description||"")}`;
+    impact.innerHTML=`<strong>${rvEscapeHtml(rvRuleHeader(selectedRule))}</strong><br>${rvEscapeHtml(selectedRule.impact_area||"Operational guardrail")} · ${rvEscapeHtml(selectedRule.risk_level||"low")} risk<br><br>${rvEscapeHtml(selectedRule.description||"")}<br><br><span style="color:#64748B;font-size:11px">Rule code: ${rvEscapeHtml(selectedRule.id||"—")}</span>`;
   }else{
     const s=rvStats();
     impact.innerHTML=`${s.settingsOverlap} rules overlap with Settings-controlled class count or class format policy. Keep Settings as source of truth, and use rules for planner guidance, eligibility, and placement constraints.`;
@@ -4875,12 +5050,12 @@ function rvRenderCatalog(searchTerm){
       rEl.innerHTML=`
         <div class="rv-rule-card-top">
           <div>
-            <div class="rv-rule-name">${rvEscapeHtml(rule.title||rule.id)}</div>
+            <div class="rv-rule-name">${rvEscapeHtml(rvRuleHeader(rule))}</div>
             <div class="rv-rule-desc">${rvEscapeHtml(rule.description||"")}</div>
             <div class="rv-chip-row">
-              <span class="rv-rule-chip">${rvEscapeHtml(rule.id)}</span>
               ${rvBadgeHtml(rule)}
             </div>
+            <div style="margin-top:4px;font-size:10px;color:#94A3B8;font-weight:700">Rule code: ${rvEscapeHtml(rule.id||"—")}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="rv-btn" onclick="rvToggleEdit('${rule.id}')">Edit</button>
@@ -5248,6 +5423,10 @@ function settDefaultConfig(){
       weekly_hours_cap:15,
       max_classes_per_day_default:3,
       conflict_policy:"settings_override_soft_rules",
+      ai_api_key:"",
+      ai_provider:"openrouter",
+      ai_model:"openai/gpt-oss-120b:free",
+      ai_base_url:"",
     },
     source_of_truth:{
       owner:"settings-command-center",
@@ -5272,6 +5451,11 @@ function settNormalizeConfig(config){
   next.settings_options.target_cap_buffer=Number(next.settings_options.target_cap_buffer??base.settings_options.target_cap_buffer);
   next.settings_options.weekly_hours_cap=Number(next.settings_options.weekly_hours_cap??base.settings_options.weekly_hours_cap);
   next.settings_options.max_classes_per_day_default=Number(next.settings_options.max_classes_per_day_default??base.settings_options.max_classes_per_day_default);
+  next.settings_options.ai_api_key=String(next.settings_options.ai_api_key||"");
+  next.settings_options.ai_provider=String(next.settings_options.ai_provider||"openrouter").toLowerCase();
+  if(!["openrouter","openai"].includes(next.settings_options.ai_provider))next.settings_options.ai_provider="openrouter";
+  next.settings_options.ai_model=String(next.settings_options.ai_model||base.settings_options.ai_model||"openai/gpt-oss-120b:free");
+  next.settings_options.ai_base_url=String(next.settings_options.ai_base_url||"");
   next.manual_protected=Array.isArray(next.manual_protected)?next.manual_protected:[];
   next.manual_excluded=Array.isArray(next.manual_excluded)?next.manual_excluded:[];
   next.custom_rules=Array.isArray(next.custom_rules)?next.custom_rules:[];
@@ -5404,9 +5588,12 @@ function settSaveCanonicalConfig(statusId="settings",successMsg="Canonical setti
   if(!_settSchedConfig)_settSchedConfig=settDefaultConfig();
   _settSchedConfig=settNormalizeConfig(_settSchedConfig);
   _settSchedConfig.source_of_truth.updated_at=new Date().toISOString();
-  const valid=settValidateAndRender();
-  if(!valid&&_settSchedConfig.settings_options?.block_hard_conflict_saves!==false){
-    showToast("Fix blocking settings conflicts before saving","error");
+  settValidateAndRender();
+  const errors=(_settLastValidation||{}).errors||[];
+  const blockOnError=_settSchedConfig?.settings_options?.block_hard_conflict_saves!==false;
+  if(blockOnError&&errors.length){
+    showToast(`Cannot save — ${errors.length} blocking conflict${errors.length>1?"s":""} detected. Fix in Conflict Resolver.`,"error");
+    settSetTab("overview");
     return Promise.resolve({ok:false});
   }
   return fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig)})
@@ -5433,8 +5620,8 @@ function renderSettingsView(area){
   wrap.className="sett-view";
   wrap.innerHTML=`
     <div class="sett-view-header">
-      <div class="sett-view-title">Settings Command Center</div>
-      <div class="sett-view-sub">The canonical source of truth for schedule targets, class mix, trainer eligibility, availability, manual pins, and conflict resolution. Settings overrides planner defaults and soft rules; hard-invalid configurations are blocked before save.</div>
+      <div class="sett-view-title">Settings</div>
+      <div class="sett-view-sub">Configure trainers, class mix, daily targets, and system policy. Hard conflicts are blocked at save. Changes take effect on the next schedule generation.</div>
     </div>
 
     <div class="sett-command">
@@ -5447,7 +5634,7 @@ function renderSettingsView(area){
           <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">Overview <span class="sett-nav-count" id="sett-count-overview">—</span></button>
           <div class="sett-nav-group-label">People</div>
           <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">Trainers <span class="sett-nav-count" id="sett-count-trainers">—</span></button>
-          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')">Qualifications <span class="sett-nav-count" id="sett-count-qualifications">—</span></button>
+          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')" title="Class format certifications per trainer">Certifications <span class="sett-nav-count" id="sett-count-qualifications">—</span></button>
           <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">Availability <span class="sett-nav-count" id="sett-count-availability">—</span></button>
           <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days <span class="sett-nav-count" id="sett-count-leave">0</span></button>
           <div class="sett-nav-group-label">Schedule Rules</div>
@@ -5478,7 +5665,7 @@ function renderSettingsView(area){
           <div class="sett-section-label">Settings Overview</div>
           <div class="sett-section-desc">A cleaner landing view for configuration health, weekly target load, active guardrails, and quick routing into the detailed editors.</div>
         </div>
-        <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig('overview','Settings snapshot saved')">Save Snapshot</button>
+        <button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Now</button>
       </div>
       <div id="sett-overview-wrap"></div>
     </div>
@@ -5521,8 +5708,8 @@ function renderSettingsView(area){
     </div>
 
     <div class="sett-section" id="ssec-qualifications">
-      <div class="sett-section-label">Trainer Qualifications</div>
-      <div class="sett-section-desc">Check formats each trainer is certified to teach. These control what the AI planner can assign them.</div>
+      <div class="sett-section-label">Class Format Certifications</div>
+      <div class="sett-section-desc">Mark which class formats each trainer is certified to teach. The AI planner and replacement logic will only assign formats where a trainer is certified.</div>
       <div class="sett-subtabs">
         <button class="sett-subtab active" data-section="qualifications" data-subtab="matrix" onclick="settSetSub('qualifications','matrix')">Qualification Matrix</button>
         <button class="sett-subtab" data-section="qualifications" data-subtab="bulk" onclick="settSetSub('qualifications','bulk')">Bulk Edit</button>
@@ -5841,6 +6028,15 @@ function settRenderAdvancedOptions(){
   const select=(key,choices)=>`<select onchange="settSetAdvancedOption('${key}',this.value,'string')">${choices.map(([v,l])=>`<option value="${v}" ${o[key]===v?"selected":""}>${l}</option>`).join("")}</select>`;
   wrap.innerHTML=`
     <div class="sett-config-panel">
+      <div class="sett-section-kicker">AI Generation</div>
+      <div class="sett-option-grid">
+        ${settAdvancedOptionCard("field","ai_provider","AI Provider","Choose where AI schedule generation requests are sent.",`<select onchange="settSetAdvancedOption('ai_provider',this.value,'string')"><option value="openrouter" ${o.ai_provider==="openrouter"?"selected":""}>OpenRouter</option><option value="openai" ${o.ai_provider==="openai"?"selected":""}>OpenAI-Compatible</option></select>`)}
+        ${settAdvancedOptionCard("field","ai_model","AI Model","Model name to use for Generate with AI.",`<input type="text" value="${rvEscapeAttr(o.ai_model||"openai/gpt-oss-120b:free")}" placeholder="openai/gpt-oss-120b:free" autocomplete="off" onchange="settSetAdvancedOption('ai_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_base_url","AI Base URL (Optional)","Override provider base URL when needed.",`<input type="text" value="${rvEscapeAttr(o.ai_base_url||"")}" placeholder="https://openrouter.ai/api/v1" autocomplete="off" onchange="settSetAdvancedOption('ai_base_url',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_api_key","AI API Key","Saved in Control Center and used only when you click Generate with AI.",`<input type="password" value="${rvEscapeAttr(o.ai_api_key||"")}" placeholder="Paste API key" autocomplete="off" onchange="settSetAdvancedOption('ai_api_key',this.value,'string')">`)}
+      </div>
+    </div>
+    <div class="sett-config-panel">
       <div class="sett-section-kicker">Conflict Resolution</div>
       <div class="sett-option-grid">
         ${settAdvancedOptionCard("toggle","block_hard_conflict_saves","Block invalid saves","Prevent target, class-mix, and policy conflicts from becoming the saved source of truth.",toggle("block_hard_conflict_saves"))}
@@ -5972,8 +6168,6 @@ function settRenderTrainerManager(){
           }).join("")}
         </div>
         <div class="trainer-mgr-actions">
-          <button class="sett-mini-btn" onclick="settSetTab('qualifications')">Qualifications</button>
-          <button class="sett-mini-btn" onclick="settSetTab('availability')">Availability</button>
           <button class="sett-mini-btn danger" onclick="settDeleteTrainer('${String(t.name||"").replace(/'/g,"\\'")}')">Delete</button>
         </div>
       </div>`;
@@ -5995,14 +6189,15 @@ function settCollectTrainerManager(){
     card.querySelectorAll(".trainer-mgr-loc").forEach(locEl=>{
       if(!locEl.querySelector(".trainer-mgr-loc-enabled")?.checked)return;
       const loc=locEl.dataset.loc;
-      const days=[...locEl.querySelectorAll(".avail-day-chip.on")].map(ch=>ch.dataset.day);
+      const selectedDays=[...locEl.querySelectorAll(".avail-day-chip.on")].map(ch=>ch.dataset.day);
       const old=(prev.locations||{})[loc]||{};
+      const days=[...new Set(selectedDays.length?selectedDays:(old.available_days||DAYS_ALL))];
       locs[loc]={
         ...old,
         available_days:days,
         time_window:{
-          start:locEl.querySelector(".trainer-mgr-start")?.value||"06:00",
-          end:locEl.querySelector(".trainer-mgr-end")?.value||"22:00",
+          start:locEl.querySelector(".trainer-mgr-start")?.value||old.time_window?.start||"07:00",
+          end:locEl.querySelector(".trainer-mgr-end")?.value||old.time_window?.end||"21:00",
         },
         max_classes_per_day:Number(locEl.querySelector(".trainer-mgr-maxd")?.value||old.max_classes_per_day||4),
       };
@@ -6170,7 +6365,8 @@ function settRenderAvailability(){
     Object.entries(locs).forEach(([loc,ld])=>{
       const card=document.createElement("div");
       card.className="avail-card";
-      const activeDays=new Set(ld.available_days||[]);
+      const profileIsActive=trainerIsActive(t);
+      const activeDays=new Set(profileIsActive?DAYS_ALL:(ld.available_days||[]));
       const tw=ld.time_window||{};
       card.innerHTML=`
         <div class="avail-name">${t.name||""}</div>
@@ -6180,9 +6376,9 @@ function settRenderAvailability(){
         </div>
         <div class="avail-time-row">
           <label>From</label>
-          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="start" value="${tw.start||"06:00"}">
+          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="start" value="${profileIsActive?"07:00":(tw.start||"07:00")}">
           <label>To</label>
-          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="end" value="${tw.end||"22:00"}">
+          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="end" value="${profileIsActive?"21:00":(tw.end||"21:00")}">
         </div>`;
       wrap.appendChild(card);
     });
@@ -6210,10 +6406,14 @@ function settSaveAvailability(){
   });
   const updated=(_settTrainerProfiles||[]).map(t=>{
     const locs={...t.locations};
+    const profileIsActive=trainerIsActive(t);
     Object.keys(locs).forEach(loc=>{
       const k=t.name+":"+loc;
-      if(updatedMap[k]){locs[loc]={...locs[loc],available_days:updatedMap[k].days};}
-      if(timeInputs[k]){locs[loc]={...locs[loc],time_window:{...(locs[loc].time_window||{}),...timeInputs[k]}};}
+      if(updatedMap[k]){locs[loc]={...locs[loc],available_days:profileIsActive?DAYS_ALL:updatedMap[k].days};}
+      if(timeInputs[k]){
+        const normalizedWindow=profileIsActive?{start:"07:00",end:"21:00"}:timeInputs[k];
+        locs[loc]={...locs[loc],time_window:{...(locs[loc].time_window||{}),...normalizedWindow}};
+      }
     });
     return{...t,locations:locs};
   });
@@ -6258,6 +6458,60 @@ function settBulkToolbarHtml(matrix,title){
   </div>`;
 }
 
+function settClassMixAdvancedBulkHtml(classes){
+  return `<div class="sett-matrix-toolbar" style="margin-top:8px">
+    <div class="sett-bulk-field">
+      <label>Location</label>
+      <select id="classmix-adv-loc">
+        <option value="__all__">All locations</option>
+        ${LOCS_ALL.map(loc=>`<option value="${rvEscapeAttr(loc)}">${rvEscapeHtml(LOC_SHORT[loc]||loc)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="sett-bulk-field" style="min-width:220px">
+      <label>Format</label>
+      <select id="classmix-adv-cls">
+        <option value="__all__">All formats</option>
+        ${classes.map(cls=>`<option value="${rvEscapeAttr(cls)}">${rvEscapeHtml(displayClass(cls))}</option>`).join("")}
+      </select>
+    </div>
+    <div class="sett-bulk-field">
+      <label>Operation</label>
+      <select id="classmix-adv-op">
+        <option value="set-target">Set min</option>
+        <option value="inc-target">Increase min</option>
+        <option value="set-max">Set max</option>
+        <option value="max-plus">Set max = min + N</option>
+        <option value="clear-selection">Clear to zero</option>
+      </select>
+    </div>
+    <div class="sett-bulk-field"><label>Value</label><input type="number" id="classmix-adv-value" value="1"></div>
+    <button class="sett-ghost-btn" onclick="settApplyClassMixAdvancedBulk()">Apply Location + Format</button>
+  </div>`;
+}
+
+function settApplyClassMixAdvancedBulk(){
+  const loc=document.getElementById("classmix-adv-loc")?.value||"__all__";
+  const cls=document.getElementById("classmix-adv-cls")?.value||"__all__";
+  const op=document.getElementById("classmix-adv-op")?.value||"set-target";
+  const value=document.getElementById("classmix-adv-value")?.value||"1";
+  const opSel=document.getElementById("classmix-bulk-op");
+  const valueInp=document.getElementById("classmix-bulk-value");
+  const scopeSel=document.getElementById("classmix-bulk-scope");
+  if(opSel)opSel.value=op;
+  if(valueInp)valueInp.value=value;
+  if(scopeSel)scopeSel.value="selection";
+
+  settResetMatrixSelection(false);
+  const cells=[...document.querySelectorAll(`.sett-matrix-cell[data-matrix="classmix"]`)].filter(el=>{
+    const locOk=loc==="__all__"||el.dataset.loc===loc;
+    const clsOk=cls==="__all__"||el.dataset.key===cls;
+    return locOk&&clsOk;
+  });
+  cells.forEach(el=>settSelectMatrixElement(el,true));
+  settUpdateSelectionInspector();
+  settApplyBulk("classmix");
+}
+
 function settMatrixCellKey(el){return `${el.dataset.matrix}|${el.dataset.loc}|${el.dataset.key}`;}
 function settSelectMatrixElement(el,on=true){
   const key=settMatrixCellKey(el);
@@ -6273,11 +6527,15 @@ function settToggleMatrixCell(event,el){
   settUpdateSelectionInspector();
 }
 function settSelectMatrixRow(matrix,loc){
-  document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-loc="${CSS.escape(loc)}"]`).forEach(el=>settSelectMatrixElement(el,true));
+  const rowCells=[...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-loc="${CSS.escape(loc)}"]`)];
+  const allSelected=rowCells.length>0&&rowCells.every(el=>el.classList.contains("selected"));
+  rowCells.forEach(el=>settSelectMatrixElement(el,!allSelected));
   settUpdateSelectionInspector();
 }
 function settSelectMatrixColumn(matrix,key){
-  document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-key="${CSS.escape(key)}"]`).forEach(el=>settSelectMatrixElement(el,true));
+  const colCells=[...document.querySelectorAll(`.sett-matrix-cell[data-matrix="${matrix}"][data-key="${CSS.escape(key)}"]`)];
+  const allSelected=colCells.length>0&&colCells.every(el=>el.classList.contains("selected"));
+  colCells.forEach(el=>settSelectMatrixElement(el,!allSelected));
   settUpdateSelectionInspector();
 }
 function settResetMatrixSelection(update=true){
@@ -6481,11 +6739,12 @@ function settRenderClassMix(){
   const classes=[...new Set(LOCS_ALL.flatMap(loc=>Object.keys(CLASS_MIX_TARGETS[loc]||{})))];
   wrap.innerHTML=`
     ${settBulkToolbarHtml("classmix","Class mix bulk operators")}
+    ${settClassMixAdvancedBulkHtml(classes)}
     <div class="sett-matrix-wrap">
       <table class="sett-matrix" id="classmix-matrix">
         <thead><tr>
           <th>Studio / Format</th>
-          ${classes.map(cls=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(shortClass(cls))}</button></th>`).join("")}
+          ${classes.map(cls=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls))}</button></th>`).join("")}
         </tr></thead>
         <tbody>
           ${LOCS_ALL.map(loc=>`<tr>
@@ -6496,7 +6755,7 @@ function settRenderClassMix(){
               const invalid=Number(cur.min||0)>Number(cur.max||0);
               return`<td>
                 <div class="sett-matrix-cell ${invalid?"invalid":""}" data-matrix="classmix" data-loc="${rvEscapeAttr(loc)}" data-key="${rvEscapeAttr(cls)}" onclick="settToggleMatrixCell(event,this)" style="${supported?"":"opacity:.45"}">
-                  <div style="font-size:10px;font-weight:900;color:${classColor(cls)};margin-bottom:5px;white-space:nowrap" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(shortClass(cls))}</div>
+                  <div style="font-size:10px;font-weight:900;color:${classColor(cls)};margin-bottom:5px;white-space:normal;line-height:1.25" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls))}</div>
                   <div class="sett-matrix-pair">
                     <label class="sett-matrix-mini"><span>Min</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="min" value="${Number(cur.min||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
                     <label class="sett-matrix-mini"><span>Max</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="max" value="${Number(cur.max||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
@@ -6716,6 +6975,147 @@ function settSaveCustomRules(){
   settSaveCanonicalConfig("customrules","Custom rules and pinned classes saved");
 }
 
+// ── AI Chat ─────────────────────────────────────────────────────────────────
+let _chatOpen=false;
+let _chatHistory=[];
+let _chatWaiting=false;
+
+function chatToggle(){
+  _chatOpen=!_chatOpen;
+  const drawer=document.getElementById("chat-drawer");
+  const badge=document.getElementById("chat-fab-badge");
+  if(drawer)drawer.classList.toggle("open",_chatOpen);
+  if(badge)badge.classList.remove("show");
+  if(_chatOpen){
+    const input=document.getElementById("chat-input");
+    if(input)setTimeout(()=>input.focus(),220);
+  }
+}
+
+function chatSend(text){
+  const input=document.getElementById("chat-input");
+  const msg=(text||"").trim()||(input?.value||"").trim();
+  if(!msg||_chatWaiting)return;
+  if(input)input.value="";
+  _chatHistory.push({role:"user",content:msg});
+  chatAppendMsg("user",msg);
+  chatShowTyping();
+  const sugg=document.getElementById("chat-suggestions");
+  if(sugg)sugg.style.display="none";
+  _chatWaiting=true;
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:msg,history:_chatHistory.slice(-6)})
+  }).then(r=>r.json()).then(d=>{
+    chatRemoveTyping();
+    _chatWaiting=false;
+    const reply=d.reply||d.error||"No response.";
+    _chatHistory.push({role:"assistant",content:reply});
+    chatAppendMsg("bot",reply);
+  }).catch(e=>{
+    chatRemoveTyping();
+    _chatWaiting=false;
+    chatAppendMsg("bot","Connection error. Make sure the server is running.");
+  });
+}
+
+function chatAppendMsg(role,text){
+  const msgs=document.getElementById("chat-msgs");
+  if(!msgs)return;
+  const empty=msgs.querySelector(".chat-empty");
+  if(empty)empty.remove();
+  const now=new Date();
+  const time=`${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}`;
+  const div=document.createElement("div");
+  div.className=`chat-msg ${role}`;
+  div.innerHTML=`<div class="chat-bubble">${rvEscapeHtml(text)}</div><div class="chat-msg-time">${time}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function chatShowTyping(){
+  const msgs=document.getElementById("chat-msgs");
+  if(!msgs)return;
+  const div=document.createElement("div");
+  div.className="chat-msg bot chat-typing";
+  div.id="chat-typing-indicator";
+  div.innerHTML=`<div class="chat-bubble">Thinking…</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function chatRemoveTyping(){
+  const el=document.getElementById("chat-typing-indicator");
+  if(el)el.remove();
+}
+
+let _drillTrainerOnly=false;
+function drillToggleTrainer(s){
+  _drillTrainerOnly=!_drillTrainerOnly;
+  const btn=document.getElementById("drill-trainer-toggle");
+  if(btn){
+    btn.textContent=_drillTrainerOnly?`${s.trainer_1||"Trainer"} only`:"All data";
+    btn.style.background=_drillTrainerOnly?"#DBEAFE":"#F8FAFC";
+    btn.style.color=_drillTrainerOnly?"#1E40AF":"#475569";
+    btn.style.borderColor=_drillTrainerOnly?"#93C5FD":"#CBD5E1";
+  }
+  const kpiGrid=document.querySelector(".drill-kpi-grid");
+  if(!kpiGrid)return;
+  // Re-compute metrics filtered to this trainer
+  const trainerName=(s.trainer_1||"").toLowerCase().trim();
+  const allRows=drillSessionRows(s);
+  const rows=_drillTrainerOnly?allRows.filter(r=>(r.trainer||"").toLowerCase().trim()===trainerName):allRows;
+  const sessions=rows.length||0;
+  const checked=rows.reduce((a,r)=>a+Number(r.checked_in||0),0);
+  const cap=rows.reduce((a,r)=>a+Number(r.capacity||0),0);
+  const revenue=rows.reduce((a,r)=>a+Number(r.revenue||0),0);
+  const cancels=rows.reduce((a,r)=>a+Number(r.late_cancelled||0),0);
+  const booked=rows.reduce((a,r)=>a+Number(r.booked||0),0);
+  const nonEmpty=rows.filter(r=>Number(r.checked_in||0)>0).length;
+  const avgAttend=sessions?checked/sessions:0;
+  const fill=cap?checked/cap:0;
+  const cancelRate=booked?cancels/booked:0;
+  const revSeat=checked?revenue/checked:0;
+  const label=_drillTrainerOnly?`${s.trainer_1} only`:"All trainers";
+  kpiGrid.innerHTML=[
+    {label:"Sessions",value:sessions},
+    {label:"Non-Empty",value:nonEmpty,show:nonEmpty>0},
+    {label:"Checked In",value:checked},
+    {label:"Avg Attend",value:n1(avgAttend)},
+    {label:"Fill Rate",value:pct(fill,1)},
+    {label:"Cancel Rate",value:pct(cancelRate,1),show:cancelRate>0},
+    {label:"Revenue",value:inr(revenue,0),show:revenue>0},
+    {label:"Rev / Seat",value:inr(revSeat,0),show:revSeat>0},
+  ].filter(k=>k.always||k.show!==false).map(k=>`<div class="drill-kpi"><span>${k.label}</span><strong>${k.value}</strong><small style="color:#94A3B8">${label}</small></div>`).join("");
+}
 </script>
+<button class="chat-fab" id="chat-fab" onclick="chatToggle()" title="Ask AI about the schedule">
+  <span style="font-size:20px">&#x1F4AC;</span>
+  <span class="chat-fab-badge" id="chat-fab-badge">!</span>
+</button>
+<div class="chat-drawer" id="chat-drawer">
+  <div class="chat-hdr">
+    <div>
+      <div class="chat-hdr-title">Schedule AI</div>
+      <div class="chat-hdr-sub">Ask about classes, trainers, substitutions</div>
+    </div>
+    <button class="chat-close" onclick="chatToggle()">&#x2715;</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs">
+    <div class="chat-empty">Ask anything about the schedule &mdash; trainer swaps, class recommendations, fill rate analysis, peak slot suggestions, and more.</div>
+  </div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chat-sugg" onclick="chatSend('Find substitute for Wednesday 7:30 strength at Kwality. Return Best option / Avoid / Why / Next action.')">Find substitute</button>
+    <button class="chat-sugg" onclick="chatSend('Explain class Wednesday 7:30 strength at Kwality, including why it was scheduled and any conflict risk.')">Explain class</button>
+    <button class="chat-sugg" onclick="chatSend('Which classes have the lowest fill rate at Kwality and what should we fix? Return Best option / Avoid / Why / Next action.')">Low-fill fixes</button>
+    <button class="chat-sugg" onclick="chatSend('Workload check: which trainers are near or above daily session and weekly hour limits?')">Workload check</button>
+    <button class="chat-sugg" onclick="chatSend('Add class idea: recommend 3 trainer-class combos to add at 8am at Supreme HQ.')">Add class idea</button>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" type="text" placeholder="Ask about schedule, trainers, classes&hellip;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}">
+    <button class="chat-send" onclick="chatSend()">&#x279E;</button>
+  </div>
+</div>
 </body>
 </html>

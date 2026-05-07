@@ -327,23 +327,11 @@ class AISchedulingAdvisor:
 
     def _build_system_prompt(self) -> str:
         return """You are an expert fitness studio schedule optimiser with deep knowledge of:
-- Barre, PowerCycle, and functional fitness class dynamics
-- Trainer performance management in boutique studios
+- Boutique fitness scheduling
+- Trainer performance management
 - Revenue optimisation through schedule design
-- Mumbai and Bengaluru fitness market patterns
 
-You analyse weekly schedules for three Physique57 India studios:
-1. Kwality House, Kemps Corner (Mumbai) — flagship
-2. Supreme HQ, Bandra (Mumbai) — PowerCycle hub
-3. Kenkere House (Bengaluru) — Barre-focused community studio
-
-Key rules you must be aware of:
-- Barre 57 family must be ≥ 25% of total weekly classes
-- PowerCycle: never at Kenkere, ≥ 2/day at Supreme on weekdays
-- Strength Lab: Kwality only, Atulan Purohit exclusively, Mon/Wed evenings
-- No trainer > 3 consecutive classes or > 4/day
-- Peak slots: 11:00–11:30 and 19:00–19:30 must never be empty
-- Sunday: max 6 classes, nothing before 10:00, no evening band
+Default rules are intentionally limited to universal scheduling guardrails. Do not assume trainer-, studio-, or class-specific policies unless they are present in saved Settings/custom rules or supplied in the prompt.
 
 You respond ONLY with valid JSON matching the requested schema. No preamble, no explanation outside the JSON."""
 

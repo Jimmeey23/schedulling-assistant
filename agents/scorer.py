@@ -1,8 +1,9 @@
 """
 Agent 3 — Class Scorer (CSV-based, trust-weighted)
-Reads 'Class Performance by Trainer.csv' directly.
-Scores by blending slot-level stats with trainer-level aggregates (Bayesian trust).
-Uses absolute thresholds — fixes the normalization problem where 38% and 78% fill both score INCLUDE.
+Uses 'Class Performance by UD1.csv' to define slot performance and
+'Class Performance by Trainer.csv' for trainer options within those slots.
+Uses absolute thresholds — fixes the normalization problem where 38% and 78%
+fill both score INCLUDE.
 """
 import json
 import re
@@ -43,14 +44,16 @@ INCLUDE_SESSIONS = 5
 CONSIDER_SCORE = 25
 CONSIDER_SESSIONS = 3
 AUTO_PROTECT_MIN_SESSIONS = 8  # Min sessions to auto-protect above-studio-avg combos
+TOP_PERFORMER_PROTECT_FILL = 0.50
+TOP_PERFORMER_ATTENDANCE_MULTIPLE = 1.25
 
 PINNED_SCORE = 85
 PINNED_SESSIONS = 10
 SCORING_WEIGHTS = {
-    "avg_attendance": 0.25,
-    "capacity_fill": 0.55,
-    "revenue": 0.15,
-    "sessions": 0.05,
+    "avg_attendance": 0.75,
+    "capacity_fill": 0.15,
+    "revenue": 0.07,
+    "sessions": 0.03,
 }
 EXCLUDED_CLASS_KEYWORDS = (
     "hosted class",
@@ -60,6 +63,63 @@ EXCLUDED_CLASS_KEYWORDS = (
     "sweat in 30",
     "unknown class",
 )
+
+
+def _is_strength_lab_protected(class_name: str, fill_rate: float, session_count: int) -> bool:
+    return (
+        "strength lab" in str(class_name or "").lower()
+        and float(fill_rate or 0.0) > 0.50
+        and int(session_count or 0) >= CONSIDER_SESSIONS
+    )
+
+
+def _uses_fill_rate_for_protection(class_name: str) -> bool:
+    lower = str(class_name or "").lower()
+    return "powercycle" in lower or "strength" in lower
+
+
+def _attendance_group_key(class_name: str) -> str:
+    lower = str(class_name or "").lower()
+    if "powercycle" in lower or "power cycle" in lower:
+        return "powercycle"
+    if "strength lab" in lower:
+        return "strength_lab"
+    if "cardio barre" in lower:
+        return "cardio_barre"
+    if "mat 57" in lower or "mat57" in lower:
+        return "mat_57"
+    if "fit" in lower:
+        return "fit"
+    if "barre 57" in lower or "power barre" in lower or "barre fusion" in lower:
+        return "barre_57"
+    if "back body" in lower:
+        return "back_body_blaze"
+    if "amped" in lower:
+        return "amped_up"
+    if "hiit" in lower:
+        return "hiit"
+    if "recovery" in lower or "flex" in lower:
+        return "recovery"
+    return lower.strip() or "other"
+
+
+def _is_top_performer_protected(
+    class_name: str,
+    avg_attendance: float,
+    studio_avg_attendance: float,
+    fill_rate: float,
+    session_count: int,
+) -> bool:
+    if int(session_count or 0) < AUTO_PROTECT_MIN_SESSIONS:
+        return False
+    if _uses_fill_rate_for_protection(class_name):
+        return float(fill_rate or 0.0) > TOP_PERFORMER_PROTECT_FILL
+    attendance = float(avg_attendance or 0.0)
+    studio_avg = float(studio_avg_attendance or 0.0)
+    return (
+        (studio_avg > 0.0 and attendance > studio_avg and float(fill_rate or 0.0) > TOP_PERFORMER_PROTECT_FILL)
+        or (studio_avg > 0.0 and attendance >= studio_avg * TOP_PERFORMER_ATTENDANCE_MULTIPLE)
+    )
 
 PERMITTED_LOCATIONS = {
     "Kwality House, Kemps Corner",
@@ -118,10 +178,18 @@ def _recommendation(score: float, slot_sessions: int) -> str:
     return "DROP"
 
 
+def _apply_protect_score_floor(record: dict) -> None:
+    if record.get("recommendation") != "PROTECT":
+        return
+    breakdown = record.get("score_breakdown")
+    if isinstance(breakdown, dict):
+        breakdown["policy_protection"] = True
+
+
 class ClassScorer:
     def __init__(self, weights: dict = None, csv_path: str = None):
         self.weights = weights or SCORING_WEIGHTS
-        self.csv_path = csv_path or "Class Performance by Trainer.csv"
+        self.csv_path = csv_path or "Class Performance by UD1.csv"
 
     def _inactive_trainers(self) -> set:
         inactive = set()
@@ -149,10 +217,88 @@ class ClassScorer:
         return inactive
 
     def run(self) -> dict:
-        print("[Agent 3] Scorer starting (CSV trust-weighted mode)...")
+        print("[Agent 3] Scorer starting (historic UD1-first mode)...")
+
+        def _clean_time(t):
+            s = str(t).strip()
+            m = re.match(r"^(\d{1,2}):(\d{2})", s)
+            if m:
+                return f"{int(m.group(1)):02d}:{m.group(2)}"
+            return s
+
+        def _load_performance_csv(csv_file: Path, label: str) -> pd.DataFrame:
+            df = pd.read_csv(csv_file, low_memory=False)
+            print(f"  Loaded {len(df):,} rows from {label}")
+
+            session_names = df["SessionName"] if "SessionName" in df.columns else ""
+            copper_mask = (
+                df[COL_LOCATION].astype(str).str.strip().str.lower().eq("pop-up")
+                & pd.Series(session_names, index=df.index).astype(str).str.contains("copper", case=False, na=False)
+            )
+            df.loc[copper_mask, COL_LOCATION] = "Copper & Cloves"
+            df.loc[copper_mask, COL_CLASS] = df.loc[copper_mask].apply(_copper_class_name, axis=1)
+
+            df = df[df[COL_LOCATION].isin(PERMITTED_LOCATIONS)].copy()
+            print(f"  After location filter [{label}]: {len(df):,} rows")
+
+            df["time_clean"] = df[COL_TIME].apply(_clean_time)
+            df[COL_CHECKIN] = pd.to_numeric(df[COL_CHECKIN], errors="coerce").fillna(0)
+            df[COL_CAPACITY] = pd.to_numeric(df[COL_CAPACITY], errors="coerce").fillna(1).clip(lower=1)
+            df[COL_REVENUE] = pd.to_numeric(df[COL_REVENUE], errors="coerce").fillna(0)
+            df["fill_row"] = (df[COL_CHECKIN] / df[COL_CAPACITY]).clip(upper=1.0)
+
+            if COL_UID1 not in df.columns:
+                df[COL_UID1] = (
+                    df[COL_LOCATION].astype(str) + "|" + df[COL_CLASS].astype(str) + "|" +
+                    df[COL_DAY].astype(str) + "|" + df["time_clean"].astype(str)
+                )
+            else:
+                df[COL_UID1] = df[COL_UID1].astype(str)
+            if COL_UID2 not in df.columns:
+                df[COL_UID2] = df[COL_UID1].astype(str) + "|" + df[COL_TRAINER].astype(str)
+            else:
+                df[COL_UID2] = df[COL_UID2].astype(str)
+            return df
+
+        def _exclude_non_schedulable_classes(df: pd.DataFrame) -> pd.DataFrame:
+            if df.empty:
+                return df.copy()
+            class_lower = df[COL_CLASS].astype(str).str.lower()
+            excluded_mask = class_lower.apply(lambda x: any(k in x for k in EXCLUDED_CLASS_KEYWORDS))
+            return df[~excluded_mask].copy()
+
+        def _exclude_inactive_trainers(df: pd.DataFrame, inactive: set) -> pd.DataFrame:
+            if df.empty or not inactive:
+                return df.copy()
+            return df[~df[COL_TRAINER].isin(inactive)].copy()
+
+        def _prepare_scoring_metrics(df: pd.DataFrame) -> pd.DataFrame:
+            df = df.copy()
+            if df.empty:
+                df[COL_CLASSES] = pd.Series(dtype=int)
+                df[COL_AVG_CI_INCL] = pd.Series(dtype=float)
+                df["trainer_fill"] = pd.Series(dtype=float)
+                df["trainer_rev"] = pd.Series(dtype=float)
+                return df
+            raw_session_source = COL_AVG_CI_INCL not in df.columns or COL_FILL_RATE not in df.columns
+            if raw_session_source:
+                uid2_groups = df.groupby(COL_UID2, dropna=False)
+                df[COL_CLASSES] = uid2_groups[COL_CHECKIN].transform("size").astype(int)
+                df[COL_AVG_CI_INCL] = uid2_groups[COL_CHECKIN].transform("mean")
+                checked_sum = uid2_groups[COL_CHECKIN].transform("sum")
+                capacity_sum = uid2_groups[COL_CAPACITY].transform("sum").clip(lower=1)
+                revenue_mean = uid2_groups[COL_REVENUE].transform("mean")
+                df["trainer_fill"] = (checked_sum / capacity_sum).clip(upper=1.0)
+                df["trainer_rev"] = revenue_mean
+            else:
+                df[COL_CLASSES] = pd.to_numeric(df[COL_CLASSES], errors="coerce").fillna(0).astype(int)
+                df[COL_AVG_CI_INCL] = pd.to_numeric(df[COL_AVG_CI_INCL], errors="coerce").fillna(0)
+                df["trainer_fill"] = df[COL_FILL_RATE].apply(_parse_pct).clip(upper=1.0)
+                df["trainer_rev"] = pd.to_numeric(df[COL_REV_PER_SESSION], errors="coerce").fillna(0)
+            return df
 
         # -----------------------------------------------------------------
-        # 1. Load CSV
+        # 1. Load slot and trainer sources
         # -----------------------------------------------------------------
         csv_file = Path(self.csv_path)
         if not csv_file.exists():
@@ -161,69 +307,22 @@ class ClassScorer:
                 "Pass --csv or place file in project root."
             )
 
-        df = pd.read_csv(csv_file, low_memory=False)
-        print(f"  Loaded {len(df):,} rows from {self.csv_path}")
-
-        # Copper & Cloves is scheduled as a Bengaluru extension using historic
-        # Pop-up rows whose class name identifies the Copper partnership.
-        copper_mask = (
-            df[COL_LOCATION].astype(str).str.strip().str.lower().eq("pop-up")
-            & df["SessionName"].astype(str).str.contains("copper", case=False, na=False)
-        )
-        df.loc[copper_mask, COL_LOCATION] = "Copper & Cloves"
-        df.loc[copper_mask, COL_CLASS] = df.loc[copper_mask].apply(_copper_class_name, axis=1)
-
-        # Filter to permitted scheduling locations only.
-        df = df[df[COL_LOCATION].isin(PERMITTED_LOCATIONS)].copy()
-        print(f"  After location filter: {len(df):,} rows")
-
-        # Parse time to HH:MM
-        def _clean_time(t):
-            s = str(t).strip()
-            m = re.match(r"^(\d{1,2}):(\d{2})", s)
-            if m:
-                return f"{int(m.group(1)):02d}:{m.group(2)}"
-            return s
-
-        df["time_clean"] = df[COL_TIME].apply(_clean_time)
-
-        # Numeric columns
-        df[COL_CHECKIN] = pd.to_numeric(df[COL_CHECKIN], errors="coerce").fillna(0)
-        df[COL_CAPACITY] = pd.to_numeric(df[COL_CAPACITY], errors="coerce").fillna(1).clip(lower=1)
-        df[COL_REVENUE] = pd.to_numeric(df[COL_REVENUE], errors="coerce").fillna(0)
-        df["fill_row"] = (df[COL_CHECKIN] / df[COL_CAPACITY]).clip(upper=1.0)
-
-        # Exclude non-schedulable classes and inactive trainers before any ranking.
-        class_lower = df[COL_CLASS].astype(str).str.lower()
-        excluded_mask = class_lower.apply(lambda x: any(k in x for k in EXCLUDED_CLASS_KEYWORDS))
         inactive = self._inactive_trainers()
-        if inactive:
-            excluded_mask = excluded_mask | df[COL_TRAINER].isin(inactive)
-        df = df[~excluded_mask].copy()
+        slot_df = _prepare_scoring_metrics(_exclude_non_schedulable_classes(_load_performance_csv(csv_file, self.csv_path)))
 
-        if COL_UID1 not in df.columns:
-            df[COL_UID1] = (
-                df[COL_LOCATION].astype(str) + "|" + df[COL_CLASS].astype(str) + "|" +
-                df[COL_DAY].astype(str) + "|" + df["time_clean"].astype(str)
+        trainer_csv_file = Path("Class Performance by Trainer.csv")
+        trainer_source = trainer_csv_file if trainer_csv_file.exists() else csv_file
+        trainer_label = str(trainer_source)
+        trainer_df = _prepare_scoring_metrics(
+            _exclude_inactive_trainers(
+                _exclude_non_schedulable_classes(_load_performance_csv(trainer_source, trainer_label)),
+                inactive,
             )
-        if COL_UID2 not in df.columns:
-            df[COL_UID2] = df[COL_UID1].astype(str) + "|" + df[COL_TRAINER].astype(str)
+        )
 
-        raw_session_source = COL_AVG_CI_INCL not in df.columns or COL_FILL_RATE not in df.columns
-        if raw_session_source:
-            uid2_groups = df.groupby(COL_UID2, dropna=False)
-            df[COL_CLASSES] = uid2_groups[COL_CHECKIN].transform("size").astype(int)
-            df[COL_AVG_CI_INCL] = uid2_groups[COL_CHECKIN].transform("mean")
-            checked_sum = uid2_groups[COL_CHECKIN].transform("sum")
-            capacity_sum = uid2_groups[COL_CAPACITY].transform("sum").clip(lower=1)
-            revenue_mean = uid2_groups[COL_REVENUE].transform("mean")
-            df["trainer_fill"] = (checked_sum / capacity_sum).clip(upper=1.0)
-            df["trainer_rev"] = revenue_mean
-        else:
-            df[COL_CLASSES] = pd.to_numeric(df[COL_CLASSES], errors="coerce").fillna(0).astype(int)
-            df[COL_AVG_CI_INCL] = pd.to_numeric(df[COL_AVG_CI_INCL], errors="coerce").fillna(0)
-            df["trainer_fill"] = df[COL_FILL_RATE].apply(_parse_pct).clip(upper=1.0)
-            df["trainer_rev"] = pd.to_numeric(df[COL_REV_PER_SESSION], errors="coerce").fillna(0)
+        if not slot_df.empty:
+            valid_uid1 = set(slot_df[COL_UID1].astype(str))
+            trainer_df = trainer_df[trainer_df[COL_UID1].astype(str).isin(valid_uid1)].copy()
 
         # -----------------------------------------------------------------
         # New scoring model:
@@ -231,7 +330,7 @@ class ClassScorer:
         # 2) UniqueID2 ranks trainers within that class slot for assignment.
         # -----------------------------------------------------------------
         trainer_group_cols = [COL_UID2, COL_UID1, COL_LOCATION, COL_CLASS, COL_TRAINER, COL_DAY, "time_clean"]
-        trainer_agg = df.groupby(trainer_group_cols, dropna=False).agg(
+        trainer_agg = trainer_df.groupby(trainer_group_cols, dropna=False).agg(
             session_count=(COL_CLASSES, "max"),
             avg_attendance=(COL_AVG_CI_INCL, "max"),
             fill_rate=("trainer_fill", "max"),
@@ -245,47 +344,182 @@ class ClassScorer:
                 return float(group[value_col].mean()) if len(group) else 0.0
             return float(np.average(group[value_col], weights=weights))
 
+        def _weighted_records_avg(records: list, value_key: str) -> float:
+            weights = [max(0, int(r.get("session_count", 0) or 0)) for r in records]
+            values = [float(r.get(value_key, 0.0) or 0.0) for r in records]
+            total_weight = sum(weights)
+            if total_weight <= 0:
+                return sum(values) / max(len(values), 1)
+            return sum(v * w for v, w in zip(values, weights)) / total_weight
+
         group_records = []
-        for uid1, grp in trainer_agg.groupby(COL_UID1, dropna=False):
+        for uid1, grp in slot_df.groupby(COL_UID1, dropna=False):
             first = grp.iloc[0]
-            sessions = int(grp["session_count"].sum())
+            sessions = int(pd.to_numeric(grp[COL_CLASSES], errors="coerce").fillna(0).sum())
+            session_weights = pd.to_numeric(grp[COL_CLASSES], errors="coerce").fillna(0).clip(lower=0)
+            if float(session_weights.sum()) <= 0:
+                avg_attendance = float(pd.to_numeric(grp[COL_AVG_CI_INCL], errors="coerce").fillna(0).mean())
+                avg_fill_rate = float(pd.to_numeric(grp["trainer_fill"], errors="coerce").fillna(0).mean())
+                avg_revenue = float(pd.to_numeric(grp["trainer_rev"], errors="coerce").fillna(0).mean())
+            else:
+                avg_attendance = float(np.average(pd.to_numeric(grp[COL_AVG_CI_INCL], errors="coerce").fillna(0), weights=session_weights))
+                avg_fill_rate = float(np.average(pd.to_numeric(grp["trainer_fill"], errors="coerce").fillna(0), weights=session_weights))
+                avg_revenue = float(np.average(pd.to_numeric(grp["trainer_rev"], errors="coerce").fillna(0), weights=session_weights))
             group_records.append({
                 "unique_id_1": str(uid1),
                 "location": first[COL_LOCATION],
                 "class": first[COL_CLASS],
+                "trainer": first.get(COL_TRAINER, ""),
                 "day_name": str(first[COL_DAY]).strip(),
                 "time": first["time_clean"],
                 "session_count": sessions,
-                "avg_attendance": round(_weighted_avg(grp, "avg_attendance"), 2),
-                "avg_fill_rate": round(_weighted_avg(grp, "fill_rate"), 4),
-                "avg_revenue": round(_weighted_avg(grp, "revenue_per_session"), 2),
-                "total_revenue": round(float(grp["total_revenue"].sum()), 2),
+                "avg_attendance": round(avg_attendance, 2),
+                "avg_fill_rate": round(avg_fill_rate, 4),
+                "avg_revenue": round(avg_revenue, 2),
+                "total_revenue": round(float((pd.to_numeric(grp[COL_CLASSES], errors="coerce").fillna(0) * pd.to_numeric(grp["trainer_rev"], errors="coerce").fillna(0)).sum()), 2),
                 "trainer_count": int(grp[COL_TRAINER].nunique()),
             })
 
-        locations = list(df[COL_LOCATION].unique())
+        locations = list(slot_df[COL_LOCATION].unique()) if not slot_df.empty else list(trainer_df[COL_LOCATION].unique())
         _normalize_within_location(group_records, "avg_attendance", "avg_attendance_norm", locations)
         _normalize_within_location(group_records, "avg_revenue", "revenue_norm", locations)
         _normalize_within_location(group_records, "session_count", "sessions_norm", locations)
+
+        # For non-PowerCycle/non-Strength formats, attendance should be evaluated
+        # at grouped-class level (family bucket) rather than exact slot granularity.
+        group_attendance_by_loc_cls = {}
+        for loc in locations:
+            loc_recs = [r for r in group_records if r["location"] == loc]
+            if not loc_recs:
+                continue
+            by_cls = defaultdict(list)
+            for rec in loc_recs:
+                by_cls[_attendance_group_key(rec.get("class", ""))].append(rec)
+            for cls_key, cls_recs in by_cls.items():
+                total_sessions = sum(int(x.get("session_count", 0) or 0) for x in cls_recs)
+                if total_sessions <= 0:
+                    avg_attendance = sum(float(x.get("avg_attendance", 0.0) or 0.0) for x in cls_recs) / max(len(cls_recs), 1)
+                else:
+                    avg_attendance = (
+                        sum(float(x.get("avg_attendance", 0.0) or 0.0) * int(x.get("session_count", 0) or 0) for x in cls_recs)
+                        / total_sessions
+                    )
+                group_attendance_by_loc_cls[(loc, cls_key)] = float(avg_attendance)
+
+        loc_group_values = defaultdict(list)
+        for (loc, _cls), val in group_attendance_by_loc_cls.items():
+            loc_group_values[loc].append(val)
+        loc_group_min_max = {}
+        for loc, vals in loc_group_values.items():
+            if not vals:
+                continue
+            loc_group_min_max[loc] = (min(vals), max(vals))
+
+        for r in group_records:
+            cls_key = _attendance_group_key(r.get("class", ""))
+            grouped_attendance = float(group_attendance_by_loc_cls.get((r["location"], cls_key), r.get("avg_attendance", 0.0)))
+            r["grouped_avg_attendance"] = round(grouped_attendance, 2)
+            mn_mx = loc_group_min_max.get(r["location"])
+            if not mn_mx:
+                r["grouped_avg_attendance_norm"] = 0.5
+            else:
+                mn, mx = mn_mx
+                if mx == mn:
+                    r["grouped_avg_attendance_norm"] = 0.5
+                else:
+                    r["grouped_avg_attendance_norm"] = (grouped_attendance - mn) / (mx - mn)
+
+        studio_avg_attendance = {}
+        for loc in locations:
+            loc_recs = [r for r in group_records if r["location"] == loc]
+            if loc_recs:
+                studio_avg_attendance[loc] = _weighted_records_avg(loc_recs, "avg_attendance")
 
         day_name_map = {
             "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
             "Friday": 4, "Saturday": 5, "Sunday": 6,
         }
 
-        PRIME_AM = {"08:00","08:15","08:30","09:00","09:15","09:30","10:00","10:15","10:30","11:00","11:15","11:30"}
-        PRIME_PM = {"17:30","17:45","18:00","18:15","18:30","19:00","19:15","19:30"}
+        PRIME_AM = {"07:30","07:45","08:00","08:15","08:30","08:45","09:00","09:15","09:30","09:45"}
+        PRIME_MID = {"11:00","11:15","11:30","11:45","12:00"}
+        PRIME_PM = {"18:00","18:15","18:30","18:45","19:00","19:15","19:30"}
+
+        def _class_family_mode(class_name: str) -> str:
+            lower = str(class_name or "").lower()
+            if "powercycle" in lower or "power cycle" in lower:
+                return "powercycle"
+            if "strength lab" in lower or "strength" in lower:
+                return "strength"
+            return "default"
+
+        # Per-location baseline by family mode: default uses attendance, strength/family uses fill.
+        family_loc_baseline: dict = {}
+        family_loc_values: dict = defaultdict(list)
+        for _r in group_records:
+            _fam = _class_family_mode(_r.get("class", ""))
+            _loc = _r.get("location", "")
+            _metric = float(_r.get("avg_fill_rate", 0.0)) if _fam in {"strength", "powercycle"} else float(_r.get("avg_attendance", 0.0))
+            family_loc_values[(_loc, _fam)].append((_metric, int(_r.get("session_count", 0) or 0)))
+        for _k, _vals in family_loc_values.items():
+            total_weight = sum(max(0, weight) for _, weight in _vals)
+            if total_weight <= 0:
+                family_loc_baseline[_k] = (sum(value for value, _ in _vals) / len(_vals)) if _vals else 0.0
+            else:
+                family_loc_baseline[_k] = sum(value * max(0, weight) for value, weight in _vals) / total_weight
 
         def _score_record(r):
             w = self.weights
-            attendance_points = float(r.get("avg_attendance_norm", 0.0)) * w["avg_attendance"] * 100
-            fill_points = float(r.get("avg_fill_rate", 0.0)) * w["capacity_fill"] * 100
-            revenue_points = float(r.get("revenue_norm", 0.0)) * w["revenue"] * 100
-            session_points = float(r.get("sessions_norm", 0.0)) * w["sessions"] * 100
+            grouped_attendance_norm = float(r.get("grouped_avg_attendance_norm", r.get("avg_attendance_norm", 0.0)))
+            grouped_attendance_raw = float(r.get("grouped_avg_attendance", r.get("avg_attendance", 0.0)))
+            fam_mode = _class_family_mode(r.get("class", ""))
+            if fam_mode == "powercycle":
+                fill = float(r.get("avg_fill_rate", 0.0))
+                att_norm = float(r.get("avg_attendance_norm", 0.0))
+                ses_norm = float(r.get("sessions_norm", 0.0))
+                composite = (0.50 * fill) + (0.30 * att_norm) + (0.20 * ses_norm)
+                score = round(float(np.clip(composite * 100.0, 0, 100)), 2)
+                return score, {
+                    "total_score": score,
+                    "base_score": score,
+                    "recency_boost": 0.0,
+                    "formula": "PowerCycle weighted score = fill_rate*0.50 + avg_attendance_norm*0.30 + sessions_norm*0.20",
+                    "components": [
+                        {"key": "capacity_fill", "label": "Capacity Fill Rate", "weight": 0.50, "raw_value": round(fill, 4), "normalized_value": round(fill, 4), "points": round(fill * 50, 2), "max_points": 50.0},
+                        {"key": "avg_attendance_norm", "label": "Average Attendance (norm)", "weight": 0.30, "raw_value": round(float(r.get("avg_attendance", 0.0)), 2), "normalized_value": round(att_norm, 4), "points": round(att_norm * 30, 2), "max_points": 30.0},
+                        {"key": "sessions_norm", "label": "Sample Size (norm)", "weight": 0.20, "raw_value": int(r.get("session_count", 0)), "normalized_value": round(ses_norm, 4), "points": round(ses_norm * 20, 2), "max_points": 20.0},
+                    ],
+                }
+            if fam_mode == "strength":
+                # Fill-rate first for strength classes.
+                fill = float(r.get("avg_fill_rate", 0.0))
+                att_norm = float(r.get("avg_attendance_norm", 0.0))
+                ses_norm = float(r.get("sessions_norm", 0.0))
+                score = round(float(np.clip((fill * 0.70 + att_norm * 0.20 + ses_norm * 0.10) * 100.0, 0, 100)), 2)
+                return score, {
+                    "total_score": score,
+                    "base_score": score,
+                    "recency_boost": 0.0,
+                    "formula": "Strength score = fill_rate*0.70 + avg_attendance_norm*0.20 + sessions_norm*0.10",
+                    "components": [
+                        {"key": "capacity_fill", "label": "Capacity Fill Rate", "weight": 0.70, "raw_value": round(fill, 4), "normalized_value": round(fill, 4), "points": round(fill * 70, 2), "max_points": 70.0},
+                        {"key": "avg_attendance_norm", "label": "Average Attendance (norm)", "weight": 0.20, "raw_value": round(float(r.get("avg_attendance", 0.0)), 2), "normalized_value": round(att_norm, 4), "points": round(att_norm * 20, 2), "max_points": 20.0},
+                        {"key": "sessions_norm", "label": "Sample Size (norm)", "weight": 0.10, "raw_value": int(r.get("session_count", 0)), "normalized_value": round(ses_norm, 4), "points": round(ses_norm * 10, 2), "max_points": 10.0},
+                    ],
+                }
+            attendance_weight = w["avg_attendance"]
+            fill_weight = w["capacity_fill"]
+            revenue_weight = w["revenue"]
+            sessions_weight = w["sessions"]
+            attendance_norm_for_score = grouped_attendance_norm
+            attendance_raw_for_score = grouped_attendance_raw
+            attendance_points = attendance_norm_for_score * attendance_weight * 100
+            fill_points = float(r.get("avg_fill_rate", 0.0)) * fill_weight * 100
+            revenue_points = float(r.get("revenue_norm", 0.0)) * revenue_weight * 100
+            session_points = float(r.get("sessions_norm", 0.0)) * sessions_weight * 100
             base = attendance_points + fill_points + revenue_points + session_points
             # Prime slot bonus: classes at peak times get a reliability boost
             t = str(r.get("time", "")).strip()[:5]
-            prime_bonus = 7.0 if t in PRIME_AM or t in PRIME_PM else 0.0
+            prime_bonus = 8.0 if t in PRIME_AM else (6.0 if t in PRIME_MID else (7.0 if t in PRIME_PM else 0.0))
             # Volume reliability bonus: more sessions = more confident prediction (max +5)
             sc = int(r.get("session_count", 0))
             volume_bonus = min(5.0, sc / 12.0)
@@ -304,7 +538,7 @@ class ClassScorer:
                         "raw_value": t,
                         "points": round(prime_bonus, 2),
                         "max_points": 7.0,
-                        "explanation": "+7 pts for peak AM (08:00-11:30) or peak PM (17:30-19:30) slots.",
+                        "explanation": "+8 pts for peak AM (07:30-10:00), +6 for midday (11:00-12:00), +7 for peak PM (18:00-19:30) slots.",
                     },
                     {
                         "key": "volume_reliability",
@@ -324,48 +558,49 @@ class ClassScorer:
                     },
                 ],
                 "formula": (
-                    "score = avg_fill_rate*55 + avg_attendance_norm*25 + "
-                    "revenue_norm*15 + sessions_norm*5 + prime_bonus + volume_bonus + fill_abs_bonus"
+                    "Default class score = avg_attendance_norm*75 + avg_fill_rate*15 + "
+                    "revenue_norm*7 + sessions_norm*3 + prime_bonus + volume_bonus + fill_abs_bonus. "
+                    "PowerCycle and Strength use their separate fill-first formulas."
                 ),
                 "components": [
                     {
                         "key": "avg_attendance",
                         "label": "Average Attendance",
-                        "weight": w["avg_attendance"],
-                        "raw_value": round(float(r.get("avg_attendance", 0.0)), 2),
-                        "normalized_value": round(float(r.get("avg_attendance_norm", 0.0)), 4),
+                        "weight": attendance_weight,
+                        "raw_value": round(attendance_raw_for_score, 2),
+                        "normalized_value": round(attendance_norm_for_score, 4),
                         "points": round(attendance_points, 2),
-                        "max_points": round(w["avg_attendance"] * 100, 2),
-                        "explanation": "Normalized against other slots in the same studio.",
+                        "max_points": round(attendance_weight * 100, 2),
+                        "explanation": "Primary scoring signal for non-PowerCycle/non-Strength classes; uses grouped-class average attendance within the studio.",
                     },
                     {
                         "key": "capacity_fill",
                         "label": "Capacity Fill Rate",
-                        "weight": w["capacity_fill"],
+                        "weight": fill_weight,
                         "raw_value": round(float(r.get("avg_fill_rate", 0.0)), 4),
                         "normalized_value": round(float(r.get("avg_fill_rate", 0.0)), 4),
                         "points": round(fill_points, 2),
-                        "max_points": round(w["capacity_fill"] * 100, 2),
-                        "explanation": "Highest-weight component; direct average capacity fill rate.",
+                        "max_points": round(fill_weight * 100, 2),
+                        "explanation": "Primary scoring signal for PowerCycle and Strength; secondary signal for other classes.",
                     },
                     {
                         "key": "revenue",
                         "label": "Revenue Generated",
-                        "weight": w["revenue"],
+                        "weight": revenue_weight,
                         "raw_value": round(float(r.get("avg_revenue", 0.0)), 2),
                         "normalized_value": round(float(r.get("revenue_norm", 0.0)), 4),
                         "points": round(revenue_points, 2),
-                        "max_points": round(w["revenue"] * 100, 2),
+                        "max_points": round(revenue_weight * 100, 2),
                         "explanation": "Revenue per session normalized against other slots in the same studio.",
                     },
                     {
                         "key": "sessions",
                         "label": "Number of Sessions",
-                        "weight": w["sessions"],
+                        "weight": sessions_weight,
                         "raw_value": int(r.get("session_count", 0)),
                         "normalized_value": round(float(r.get("sessions_norm", 0.0)), 4),
                         "points": round(session_points, 2),
-                        "max_points": round(w["sessions"] * 100, 2),
+                        "max_points": round(sessions_weight * 100, 2),
                         "explanation": "Lowest-weight confidence/history component.",
                     },
                 ],
@@ -377,8 +612,20 @@ class ClassScorer:
             r["base_score"] = r["score_breakdown"]["base_score"]
             r["recency_boost"] = r["score_breakdown"]["recency_boost"]
             r["recommendation"] = _recommendation(r["score"], int(r["session_count"]))
-            r["pinned_slot"] = False
-            r["protect_class_time"] = False
+            if int(r["session_count"]) < CONSIDER_SESSIONS:
+                r["recommendation"] = "DROP"
+            strength_protect = _is_strength_lab_protected(r["class"], r["avg_fill_rate"], r["session_count"])
+            fam_mode = _class_family_mode(r["class"])
+            baseline = family_loc_baseline.get((r["location"], fam_mode), 0.0)
+            if fam_mode in {"strength", "powercycle"}:
+                top_performer_protect = int(r["session_count"]) >= 8 and float(r["avg_fill_rate"]) > float(baseline)
+            else:
+                top_performer_protect = int(r["session_count"]) >= 8 and float(r["avg_attendance"]) > float(baseline)
+            r["pinned_slot"] = strength_protect or top_performer_protect
+            r["protect_class_time"] = strength_protect or top_performer_protect
+            if (strength_protect or top_performer_protect) and r["recommendation"] == "PROTECT":
+                r["recommendation"] = "PROTECT"
+                _apply_protect_score_floor(r)
             r["above_studio_avg"] = r["recommendation"] == "PROTECT"
             r["studio_avg_fill"] = 0.0
 
@@ -386,23 +633,15 @@ class ClassScorer:
         for loc in locations:
             loc_recs = [r for r in group_records if r["location"] == loc]
             if loc_recs:
-                studio_avg_fill[loc] = sum(r["avg_fill_rate"] for r in loc_recs) / len(loc_recs)
-                ranked = sorted([x for x in loc_recs if int(x["session_count"]) >= 5], key=lambda x: -x["score"])
-                for rank, r in enumerate(ranked, start=1):
-                    r["studio_avg_fill"] = round(studio_avg_fill[loc], 4)
-                    if rank <= 2:
-                        r["pinned_slot"] = True
-                        r["recommendation"] = "PROTECT"
-                        r["above_studio_avg"] = True
-                    elif rank <= 10 and r["score"] >= INCLUDE_SCORE:
-                        r["protect_class_time"] = True
-                        r["recommendation"] = "PROTECT"
-                        r["above_studio_avg"] = True
+                studio_avg_fill[loc] = _weighted_records_avg(loc_recs, "avg_fill_rate")
                 for r in loc_recs:
                     r["studio_avg_fill"] = round(studio_avg_fill[loc], 4)
 
         group_by_uid1 = {r["unique_id_1"]: r for r in group_records}
         trainer_records = trainer_agg.to_dict("records")
+        _normalize_within_location(trainer_records, "avg_attendance", "avg_attendance_norm", locations)
+        _normalize_within_location(trainer_records, "revenue_per_session", "revenue_norm", locations)
+        _normalize_within_location(trainer_records, "session_count", "sessions_norm", locations)
         for tr in trainer_records:
             parent = group_by_uid1.get(str(tr[COL_UID1]), {})
             tr["location"] = tr[COL_LOCATION]
@@ -416,21 +655,35 @@ class ClassScorer:
             tr["avg_checkin"] = round(float(tr["avg_attendance"]), 2)
             tr["avg_fill_rate"] = round(float(tr["fill_rate"]), 4)
             tr["avg_revenue"] = round(float(tr["revenue_per_session"]), 2)
-            tr["avg_attendance_norm"] = parent.get("avg_attendance_norm", 0.0)
-            tr["revenue_norm"] = parent.get("revenue_norm", 0.0)
-            tr["sessions_norm"] = parent.get("sessions_norm", 0.0)
             tr["score"], tr["score_breakdown"] = _score_record({
                 **parent,
                 "avg_attendance": tr["avg_checkin"],
                 "avg_fill_rate": tr["avg_fill_rate"],
                 "avg_revenue": tr["avg_revenue"],
                 "session_count": tr["session_count"],
+                "avg_attendance_norm": tr.get("avg_attendance_norm", 0.0),
+                "grouped_avg_attendance": tr["avg_checkin"],
+                "grouped_avg_attendance_norm": tr.get("avg_attendance_norm", 0.0),
+                "revenue_norm": tr.get("revenue_norm", 0.0),
+                "sessions_norm": tr.get("sessions_norm", 0.0),
             })
             tr["base_score"] = tr["score_breakdown"]["base_score"]
             tr["recency_boost"] = tr["score_breakdown"]["recency_boost"]
             tr["recommendation"] = _recommendation(tr["score"], int(tr["session_count"]))
-            tr["protect_exact_combo"] = False
-            tr["protect_class_time"] = False
+            if int(tr["session_count"]) < CONSIDER_SESSIONS:
+                tr["recommendation"] = "DROP"
+            strength_protect = _is_strength_lab_protected(tr["class"], tr["avg_fill_rate"], tr["session_count"])
+            fam_mode = _class_family_mode(tr["class"])
+            baseline = family_loc_baseline.get((tr["location"], fam_mode), 0.0)
+            if fam_mode in {"strength", "powercycle"}:
+                top_performer_protect = int(tr["session_count"]) >= 8 and float(tr["avg_fill_rate"]) > float(baseline)
+            else:
+                top_performer_protect = int(tr["session_count"]) >= 8 and float(tr["avg_checkin"]) > float(baseline)
+            tr["protect_exact_combo"] = strength_protect or top_performer_protect
+            tr["protect_class_time"] = strength_protect or top_performer_protect
+            if (strength_protect or top_performer_protect) and tr["recommendation"] == "PROTECT":
+                tr["recommendation"] = "PROTECT"
+                _apply_protect_score_floor(tr)
             tr["slot_trust"] = min(1.0, max(0.0, (int(tr["session_count"]) - 5) / 15.0))
             tr["longevity"] = min(1.0, max(0.0, (int(tr["session_count"]) - 4) / 16.0))
             tr["blended_fill"] = tr["avg_fill_rate"]
@@ -538,6 +791,7 @@ class ClassScorer:
                 str(tr["location"]), str(tr["class"]), str(tr["day_name"]),
                 str(tr["time"]), str(tr["trainer"])
             ])
+            hist_d = historic_uid2.get(tr["unique_id_2"]) or historic_uid2.get(uid2_composite, {})
             class_slot_ranking.append({
                 "unique_id_1": tr["unique_id_1"],
                 "unique_id_2": tr["unique_id_2"],
@@ -564,9 +818,10 @@ class ClassScorer:
                 "recommendation": tr["recommendation"],
                 "studio_avg_fill": tr["studio_avg_fill"],
                 "above_studio_avg": tr["above_studio_avg"],
-                "historic_detail": historic_uid2.get(tr["unique_id_2"]) or historic_uid2.get(uid2_composite, {}),
-                "protect_exact_combo": False,
-                "protect_class_time": False,
+                "historic_detail": hist_d,
+                "empty_sessions": max(0, int(hist_d.get("session_rows", int(tr["session_count"]))) - int(sum(1 for _x in hist_d.get("individual_sessions", []) if float(_x.get("checked_in", 0)) > 0))),
+                "protect_exact_combo": bool(tr.get("protect_exact_combo")),
+                "protect_class_time": bool(tr.get("protect_class_time")),
             })
         class_slot_ranking.sort(key=lambda x: -x["score"])
 
@@ -576,6 +831,7 @@ class ClassScorer:
             uid1_composite = "|".join([
                 str(r["location"]), str(r["class"]), str(r["day_name"]), str(r["time"])
             ])
+            hist_s = historic_uid1.get(uid1) or historic_uid1.get(uid1_composite, {})
             slot_group_ranking.append({
                 **r,
                 "avg_checkin": r["avg_attendance"],
@@ -584,7 +840,8 @@ class ClassScorer:
                 "blended_checkin": r["avg_attendance"],
                 "slot_trust": min(1.0, max(0.0, (int(r["session_count"]) - 5) / 15.0)),
                 "longevity": min(1.0, max(0.0, (int(r["session_count"]) - 4) / 16.0)),
-                "historic_detail": historic_uid1.get(uid1) or historic_uid1.get(uid1_composite, {}),
+                "historic_detail": hist_s,
+                "empty_sessions": max(0, int(hist_s.get("session_rows", int(r["session_count"]))) - int(sum(1 for _x in hist_s.get("individual_sessions", []) if float(_x.get("checked_in", 0)) > 0))),
                 "top_trainers": trainers_by_uid1.get(uid1, [])[:10],
             })
         slot_group_ranking.sort(key=lambda x: -x["score"])
@@ -602,12 +859,19 @@ class ClassScorer:
 
         class_metrics = []
         for (loc, cls), grp in pd.DataFrame(group_records).groupby(["location", "class"]):
+            total_sessions = int(grp["session_count"].sum())
+            if total_sessions > 0:
+                avg_fill = float(np.average(grp["avg_fill_rate"], weights=grp["session_count"].clip(lower=0)))
+                avg_checkin = float(np.average(grp["avg_attendance"], weights=grp["session_count"].clip(lower=0)))
+            else:
+                avg_fill = float(grp["avg_fill_rate"].mean())
+                avg_checkin = float(grp["avg_attendance"].mean())
             class_metrics.append({
                 "location": loc,
                 "class": cls,
-                "avg_fill_rate": round(float(grp["avg_fill_rate"].mean()), 4),
-                "avg_checkin": round(float(grp["avg_attendance"].mean()), 2),
-                "session_count": int(grp["session_count"].sum()),
+                "avg_fill_rate": round(avg_fill, 4),
+                "avg_checkin": round(avg_checkin, 2),
+                "session_count": total_sessions,
             })
         class_metrics.sort(key=lambda x: (x["location"], -x["avg_checkin"]))
 
@@ -625,326 +889,12 @@ class ClassScorer:
         print(f"  PINNED: {pinned}  PROTECT: {protect} ({protect/total*100:.1f}%)  "
               f"INCLUDE: {include} ({include/total*100:.1f}%)  "
               f"CONSIDER: {consider} ({consider/total*100:.1f}%)  DROP: {drop} ({drop/total*100:.1f}%)")
-        print("  Formula: avg attendance 25%, fill rate 55%, revenue 15%, sessions 5%")
+        print("  Formula: default classes use attendance 75%, fill 15%, revenue 7%, sessions 3%")
 
         output = {
             "weights_used": self.weights,
-            "scoring_formula": "score = avg_fill_rate*55 + avg_attendance_norm*25 + revenue_norm*15 + sessions_norm*5",
+            "scoring_formula": "default score = avg_attendance_norm*75 + avg_fill_rate*15 + revenue_norm*7 + sessions_norm*3; PowerCycle/Strength use separate fill-first formulas",
             "slot_group_ranking": slot_group_ranking,
-            "class_slot_ranking": class_slot_ranking,
-            "trainer_ranking": trainer_metrics,
-            "trainer_metrics": trainer_metrics,
-            "class_type_ranking": class_metrics,
-            "class_metrics": class_metrics,
-        }
-
-        atomic_write_json(STATE_DIR / "03_scores.json", output)
-
-        return output
-
-        # -----------------------------------------------------------------
-        # 2. Group by (location, class, trainer, day, time) → slot-level stats
-        # -----------------------------------------------------------------
-        group_cols = [COL_LOCATION, COL_CLASS, COL_TRAINER, COL_DAY, "time_clean"]
-
-        slot_agg = df.groupby(group_cols).agg(
-            # Class Performance by Trainer.csv rows are already aggregated at
-            # class×trainer×location×day×time. "Classes" is the historical
-            # session count for this exact slot, not a row count.
-            slot_sessions=(COL_CLASSES, "first"),
-            slot_checkin=(COL_AVG_CI_INCL, "first"),
-            slot_fill=("trainer_fill", "first"),
-            slot_revenue=("trainer_rev", "first"),
-            # Kept for the existing blended-score schema; in this aggregated
-            # source these are the same exact-slot values.
-            trainer_sessions=(COL_CLASSES, "first"),
-            trainer_avg_ci=(COL_AVG_CI_INCL, "first"),
-            trainer_fill=("trainer_fill", "first"),
-            trainer_rev=("trainer_rev", "first"),
-        ).reset_index()
-
-        print(f"  {len(slot_agg):,} unique (location, class, trainer, day, time) combos")
-
-        # -----------------------------------------------------------------
-        # 3. Trust factor — Bayesian blend toward trainer average when slot is thin
-        #    Improved: trust grows from 0→1 between 5 and 20 sessions (steeper ramp)
-        # -----------------------------------------------------------------
-        slot_agg["slot_trust"] = (
-            ((slot_agg["slot_sessions"] - 5) / 15.0).clip(lower=0.0, upper=1.0)
-        )
-
-        slot_agg["blended_fill"] = (
-            slot_agg["slot_trust"] * slot_agg["slot_fill"]
-            + (1 - slot_agg["slot_trust"]) * slot_agg["trainer_fill"]
-        ).clip(upper=1.0)
-        slot_agg["blended_checkin"] = (
-            slot_agg["slot_trust"] * slot_agg["slot_checkin"]
-            + (1 - slot_agg["slot_trust"]) * slot_agg["trainer_avg_ci"]
-        )
-
-        # Revenue: blend slot revenue with trainer average
-        slot_agg["blended_rev"] = (
-            slot_agg["slot_trust"] * slot_agg["slot_revenue"]
-            + (1 - slot_agg["slot_trust"]) * slot_agg["trainer_rev"]
-        )
-
-        # -----------------------------------------------------------------
-        # 4. Longevity: 0 at ≤4 sessions, 1.0 at ≥20, linear in between
-        # -----------------------------------------------------------------
-        slot_agg["longevity"] = (
-            (slot_agg["trainer_sessions"] - 4) / 16.0
-        ).clip(lower=0.0, upper=1.0)
-
-        # -----------------------------------------------------------------
-        # 5. Normalize blended_fill, blended_checkin, blended_rev within location
-        # -----------------------------------------------------------------
-        records = slot_agg.to_dict("records")
-        locations = list(slot_agg[COL_LOCATION].unique())
-
-        _normalize_within_location(records, "blended_fill", "blended_fill_norm", locations)
-        _normalize_within_location(records, "blended_checkin", "blended_checkin_norm", locations)
-        _normalize_within_location(records, "blended_rev", "blended_rev_norm", locations)
-
-        # -----------------------------------------------------------------
-        # 5c. Studio average fill per location — basis for auto-protection
-        #     Combos whose blended_fill > studio_avg AND have enough exact
-        #     slot history are marked as above average. This is an analytical
-        #     signal only; recommendation labels remain score/confidence gated.
-        # -----------------------------------------------------------------
-        studio_avg_fill: dict = {}
-        for loc in locations:
-            loc_recs = [r for r in records if r.get(COL_LOCATION) == loc]
-            if loc_recs:
-                studio_avg_fill[loc] = sum(r["blended_fill"] for r in loc_recs) / len(loc_recs)
-
-        for r in records:
-            loc = r.get(COL_LOCATION, "")
-            avg = studio_avg_fill.get(loc, 0.0)
-            r["studio_avg_fill"] = round(avg, 4)
-            r["above_studio_avg"] = bool(
-                r["blended_fill"] > avg
-                and int(r.get("slot_sessions", 0)) >= AUTO_PROTECT_MIN_SESSIONS
-            )
-
-        # -----------------------------------------------------------------
-        # 5b. Recency boost — load raw sessions to compute recent vs all-time fill
-        #     Slots that perform better in the last 8 weeks get up to +8 points
-        # -----------------------------------------------------------------
-        recency_boost_map: dict = {}
-        historic_detail_map: dict = {}
-        try:
-            import json as _json
-            sessions_path = Path(STATE_DIR) / "01_sessions.json"
-            if sessions_path.exists():
-                with open(sessions_path) as _f:
-                    _sess = _json.load(_f)
-                import pandas as _pd2
-                sdf = _pd2.DataFrame(_sess.get("sessions", []))
-                if not sdf.empty:
-                    sdf["Date"] = _pd2.to_datetime(sdf["Date"])
-                    _max = sdf["Date"].max()
-                    _cutoff = _max - _pd2.Timedelta(weeks=8)
-                    sdf["fill_r"] = (sdf["CheckedIn"] / sdf["Capacity"].clip(lower=1)).clip(upper=1.0)
-                    sdf["is_recent"] = sdf["Date"] >= _cutoff
-
-                    def _clean_t(t):
-                        s2 = str(t).strip()
-                        import re as _re
-                        m2 = _re.match(r"^(\d{1,2}):(\d{2})", s2)
-                        return f"{int(m2.group(1)):02d}:{m2.group(2)}" if m2 else s2
-
-                    sdf["time_clean"] = sdf["Time"].apply(_clean_t)
-                    _gcols = [COL_LOCATION, COL_CLASS, COL_TRAINER, COL_DAY, "time_clean"]
-                    for _gkey, _gdf in sdf.groupby(_gcols, dropna=False):
-                        _all_fill = float(_gdf["fill_r"].mean())
-                        _rec = _gdf[_gdf["is_recent"]]
-                        if len(_rec) >= 2 and _all_fill > 0:
-                            _rec_fill = float(_rec["fill_r"].mean())
-                            _momentum = min(2.0, _rec_fill / _all_fill)
-                            recency_boost_map[_gkey] = round((_momentum - 1.0) * 8.0, 2)
-                        historic_detail_map[_gkey] = {
-                            "session_rows": int(len(_gdf)),
-                            "avg_checked_in": round(float(_gdf["CheckedIn"].mean()), 2),
-                            "avg_booked": round(float(_gdf.get("Booked", _pd2.Series([0] * len(_gdf))).mean()), 2),
-                            "avg_capacity": round(float(_gdf["Capacity"].mean()), 2),
-                            "avg_fill_rate": round(_all_fill, 4),
-                            "avg_revenue": round(float(_gdf.get("Revenue", _pd2.Series([0] * len(_gdf))).mean()), 2),
-                            "total_revenue": round(float(_gdf.get("Revenue", _pd2.Series([0] * len(_gdf))).sum()), 2),
-                            "avg_late_cancel_rate": round(float(_gdf.get("late_cancel_rate", _pd2.Series([0] * len(_gdf))).mean()), 4),
-                            "avg_no_show_rate": round(float(_gdf.get("no_show_rate", _pd2.Series([0] * len(_gdf))).mean()), 4),
-                        }
-        except Exception:
-            pass
-
-        # -----------------------------------------------------------------
-        # 6. Composite score (0–100)
-        #    blended_fill used DIRECTLY (0–1 → 0–55 pts) so a 55% fill slot
-        #    actually earns ~30 pts from fill alone — not crushed by within-
-        #    location min-max that made 50% fill look like 5 pts.
-        #    checkin / rev still normalised within-location (absolute values
-        #    are not comparable across class types).
-        # -----------------------------------------------------------------
-        w = self.weights
-        for r in records:
-            fill_points = r.get("blended_fill", 0.0) * w["blended_fill"] * 100
-            checkin_points = r.get("blended_checkin_norm", 0.0) * w["blended_checkin"] * 100
-            longevity_points = r.get("longevity", 0.0) * w["longevity"] * 100
-            revenue_points = r.get("blended_rev_norm", 0.0) * w["rev_per_session"] * 100
-            base_score = fill_points + checkin_points + longevity_points + revenue_points
-            # Apply recency boost (can be negative for declining slots)
-            _key = (r.get(COL_LOCATION), r.get(COL_CLASS), r.get(COL_TRAINER),
-                    r.get(COL_DAY), r.get("time_clean"))
-            boost = recency_boost_map.get(_key, 0.0)
-            r["recency_boost"] = boost
-            r["historic_detail"] = historic_detail_map.get(_key, {})
-            r["base_score"] = round(base_score, 2)
-            r["score"] = round(float(np.clip(base_score + boost, 0, 100)), 2)
-            r["score_breakdown"] = {
-                "total_score": r["score"],
-                "base_score": r["base_score"],
-                "recency_boost": round(float(boost), 2),
-                "components": [
-                    {
-                        "key": "blended_fill",
-                        "label": "Blended Fill",
-                        "weight": w["blended_fill"],
-                        "raw_value": round(float(r.get("blended_fill", 0.0)), 4),
-                        "normalized_value": round(float(r.get("blended_fill", 0.0)), 4),
-                        "points": round(float(fill_points), 2),
-                        "max_points": round(w["blended_fill"] * 100, 2),
-                        "explanation": "Direct fill-rate contribution; a 60% blended fill earns 60% of this component.",
-                    },
-                    {
-                        "key": "blended_checkin",
-                        "label": "Avg Check-In",
-                        "weight": w["blended_checkin"],
-                        "raw_value": round(float(r.get("blended_checkin", 0.0)), 2),
-                        "normalized_value": round(float(r.get("blended_checkin_norm", 0.0)), 4),
-                        "points": round(float(checkin_points), 2),
-                        "max_points": round(w["blended_checkin"] * 100, 2),
-                        "explanation": "Check-ins normalized against other combinations in the same studio.",
-                    },
-                    {
-                        "key": "longevity",
-                        "label": "Evidence Depth",
-                        "weight": w["longevity"],
-                        "raw_value": int(r.get("trainer_sessions", 0)),
-                        "normalized_value": round(float(r.get("longevity", 0.0)), 4),
-                        "points": round(float(longevity_points), 2),
-                        "max_points": round(w["longevity"] * 100, 2),
-                        "explanation": "Historical depth: full credit at 20+ sessions, low credit with thin history.",
-                    },
-                    {
-                        "key": "revenue",
-                        "label": "Revenue",
-                        "weight": w["rev_per_session"],
-                        "raw_value": round(float(r.get("blended_rev", 0.0)), 2),
-                        "normalized_value": round(float(r.get("blended_rev_norm", 0.0)), 4),
-                        "points": round(float(revenue_points), 2),
-                        "max_points": round(w["rev_per_session"] * 100, 2),
-                        "explanation": "Revenue per session normalized against other combinations in the same studio.",
-                    },
-                ],
-            }
-
-        # -----------------------------------------------------------------
-        # 7. Absolute recommendation thresholds
-        # -----------------------------------------------------------------
-        for r in records:
-            r["recommendation"] = _recommendation(r["score"], int(r.get("slot_sessions", 0)))
-
-        # -----------------------------------------------------------------
-        # 8. Normalise key names to match downstream schema
-        # -----------------------------------------------------------------
-        day_name_map = {
-            "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
-            "Friday": 4, "Saturday": 5, "Sunday": 6,
-        }
-
-        class_slot_ranking = []
-        for r in records:
-            day_str = str(r.get(COL_DAY, "")).strip()
-            day_int = day_name_map.get(day_str, -1)
-            class_slot_ranking.append({
-                "location": r[COL_LOCATION],
-                "class": r[COL_CLASS],
-                "trainer": r[COL_TRAINER],
-                "day": day_int,
-                "day_name": day_str,
-                "time": r["time_clean"],
-                "session_count": int(r["slot_sessions"]),
-                "avg_checkin": round(float(r["slot_checkin"]), 2),
-                "avg_fill_rate": round(float(r["slot_fill"]), 4),
-                "avg_revenue": round(float(r["slot_revenue"]), 2),
-                "blended_fill": round(float(r["blended_fill"]), 4),
-                "blended_checkin": round(float(r["blended_checkin"]), 2),
-                "trainer_total_sessions": int(r["trainer_sessions"]),
-                "trainer_avg_ci": round(float(r["trainer_avg_ci"]), 2),
-                "slot_trust": round(float(r["slot_trust"]), 3),
-                "longevity": round(float(r["longevity"]), 3),
-                "recency_boost": round(float(r.get("recency_boost", 0.0)), 2),
-                "base_score": r["base_score"],
-                "score": r["score"],
-                "score_breakdown": r["score_breakdown"],
-                "recommendation": r["recommendation"],
-                "studio_avg_fill": r.get("studio_avg_fill", 0.0),
-                "above_studio_avg": r.get("above_studio_avg", False),
-                "historic_detail": r.get("historic_detail", {}),
-            })
-
-        class_slot_ranking.sort(key=lambda x: -x["score"])
-
-        # -----------------------------------------------------------------
-        # 9. Trainer and class-type aggregates (for downstream agents)
-        # -----------------------------------------------------------------
-        trainer_metrics = []
-        for (loc, trainer), grp in slot_agg.groupby([COL_LOCATION, COL_TRAINER]):
-            trainer_metrics.append({
-                "location": loc,
-                "trainer": trainer,
-                "trainer_avg_checkin": round(float(grp["slot_checkin"].mean()), 2),
-                "trainer_fill_rate": round(float(grp["slot_fill"].mean()), 4),
-                "trainer_session_count": int(grp["slot_sessions"].sum()),
-            })
-        trainer_metrics.sort(key=lambda x: (x["location"], -x["trainer_avg_checkin"]))
-
-        class_metrics = []
-        for (loc, cls), grp in slot_agg.groupby([COL_LOCATION, COL_CLASS]):
-            class_metrics.append({
-                "location": loc,
-                "class": cls,
-                "avg_fill_rate": round(float(grp["slot_fill"].mean()), 4),
-                "avg_checkin": round(float(grp["slot_checkin"].mean()), 2),
-                "session_count": int(grp["slot_sessions"].sum()),
-            })
-        class_metrics.sort(key=lambda x: (x["location"], -x["avg_fill_rate"]))
-
-        # -----------------------------------------------------------------
-        # 10. Print distribution summary
-        # -----------------------------------------------------------------
-        protect = sum(1 for r in class_slot_ranking if r["recommendation"] == "PROTECT")
-        include = sum(1 for r in class_slot_ranking if r["recommendation"] == "INCLUDE")
-        consider = sum(1 for r in class_slot_ranking if r["recommendation"] == "CONSIDER")
-        drop = sum(1 for r in class_slot_ranking if r["recommendation"] == "DROP")
-        auto_prot = sum(1 for r in class_slot_ranking if r.get("above_studio_avg"))
-        total = len(class_slot_ranking)
-
-        for loc, avg in sorted(studio_avg_fill.items()):
-            print(f"  Studio avg fill [{loc[:25]}]: {avg:.1%}")
-
-        print(f"[Agent 3] Scorer complete — {total:,} unique combos scored")
-        print(f"  PROTECT: {protect} ({protect/total*100:.1f}%)  "
-              f"INCLUDE: {include} ({include/total*100:.1f}%)  "
-              f"CONSIDER: {consider} ({consider/total*100:.1f}%)  "
-              f"DROP: {drop} ({drop/total*100:.1f}%)")
-        print(f"  Auto-protected (above studio avg): {auto_prot}")
-        print(f"  Thresholds: PROTECT≥{PROTECT_SCORE}+{PROTECT_SESSIONS}sess  "
-              f"INCLUDE≥{INCLUDE_SCORE}+{INCLUDE_SESSIONS}sess  "
-              f"CONSIDER≥{CONSIDER_SCORE}+{CONSIDER_SESSIONS}sess")
-
-        output = {
-            "weights_used": self.weights,
-            "scoring_formula": "score = blended_fill*55 + blended_checkin_norm*20 + revenue_norm*15 + longevity*10 + recency_boost",
             "class_slot_ranking": class_slot_ranking,
             "trainer_ranking": trainer_metrics,
             "trainer_metrics": trainer_metrics,

@@ -79,6 +79,8 @@ def test_replace_trainer_endpoint_updates_schedule_data(tmp_path, monkeypatch):
 """.strip()
     )
     monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    saved = {}
+    monkeypatch.setattr(app, "_save_schedule_to_supabase", lambda data: saved.setdefault("data", data) or {"saved": True})
 
     updated = app._replace_trainer_in_schedule(
         {
@@ -98,6 +100,7 @@ def test_replace_trainer_endpoint_updates_schedule_data(tmp_path, monkeypatch):
 
     assert updated == 1
     assert '"trainer_1": "New Trainer"' in schedule_path.read_text()
+    assert saved["data"]["locations"]["Studio A"][0]["trainer_1"] == "New Trainer"
     assert '"recommendation": "MANUAL"' in schedule_path.read_text()
 
 
@@ -303,6 +306,17 @@ scripts.forEach((script,i)=>new vm.Script(script,{filename:`${process.argv[1]}#s
     assert result.returncode == 0, result.stderr
 
 
+def test_drilldown_fallback_never_uses_cross_class_nearby_rows():
+    source = TEMPLATE.read_text()
+    start = source.index("function drillFallbackRowsFromHistoricCache")
+    end = source.index("function drillSessionRows", start)
+    fn = source[start:end]
+
+    assert "variantClassKey" in fn
+    assert "slotExactAny" not in fn
+    assert "slotNearAny" not in fn
+
+
 def test_multi_location_columns_scale_to_selected_locations():
     source = TEMPLATE.read_text()
 
@@ -339,6 +353,16 @@ def test_generated_index_keeps_sleek_card_styles():
     assert ".cc-hover-tools" in source
     assert ".cc-mini{min-height:78px" in source
     assert "cc-avatar-btn" in source
+
+
+def test_stats_protected_and_experimental_cards_open_decision_modal():
+    source = TEMPLATE.read_text()
+
+    assert 'sc("Protected",protected_,"green","protected")' in source
+    assert 'sc("Experimental",experimental,"amber","experimental")' in source
+    assert "function openStatsModal(kind)" in source
+    assert "scheduling_reason" in source[source.index("function openStatsModal(kind)"):]
+    assert "decisionReasonHtml" in source
 
 
 def test_analytics_class_mix_uses_canonical_format_counts():

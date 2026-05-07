@@ -176,7 +176,7 @@
     "max_per_week": 2,
     "target_pct": 0.02,
     "certified_trainers_only": ["Atulan Purohit","Anisha Shah", "Mrigakshi Jaiswal", "Richard D'Costa", "Vivaran Dhasmana", "Cauveri Vikrant", "Karanvir Bhatia"],
-    "rules": ["kwality_only", "atulan_exclusively"]
+    "rules": ["kwality_only", "certified_strength_trainer_only"]
   },
   {
     "name": "Studio Strength Lab (Full Body)",

@@ -1,3 +1,4 @@
+import csv
 import json
 import pandas as pd
 import numpy as np
@@ -42,9 +43,33 @@ class DataIngestor:
     def __init__(self, csv_path: Path):
         self.csv_path = Path(csv_path)
 
+    def _read_sessions_file(self) -> pd.DataFrame:
+        sample = self.csv_path.read_text(encoding="utf-8", errors="replace")[:8192]
+        delimiter = "\t"
+        try:
+            dialect = csv.Sniffer().sniff(sample, delimiters=",\t;|")
+            delimiter = dialect.delimiter
+        except csv.Error:
+            first_line = sample.splitlines()[0] if sample else ""
+            if "\t" in first_line:
+                delimiter = "\t"
+            elif ";" in first_line:
+                delimiter = ";"
+            elif "|" in first_line:
+                delimiter = "|"
+            else:
+                delimiter = ","
+
+        return pd.read_csv(
+            self.csv_path,
+            sep=delimiter,
+            engine="python",
+            on_bad_lines="warn",
+        )
+
     def run(self) -> dict:
         print("[Agent 1] Ingestor starting...")
-        df = pd.read_csv(self.csv_path)
+        df = self._read_sessions_file()
 
         # Parse date
         df["Date"] = pd.to_datetime(df["Date"], dayfirst=True, errors="coerce")
@@ -60,9 +85,10 @@ class DataIngestor:
 
         # Copper & Cloves is scheduled as a Bengaluru extension using historic
         # Pop-up rows whose class name identifies the Copper partnership.
+        session_names = df["SessionName"] if "SessionName" in df.columns else ""
         copper_mask = (
             df["Location"].astype(str).str.lower().eq("pop-up")
-            & df["SessionName"].astype(str).str.contains("copper", case=False, na=False)
+            & pd.Series(session_names, index=df.index).astype(str).str.contains("copper", case=False, na=False)
         )
         df.loc[copper_mask, "Location"] = "Copper & Cloves"
         df.loc[copper_mask, "Class"] = df.loc[copper_mask].apply(copper_class_name, axis=1)

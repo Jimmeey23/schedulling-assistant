@@ -6,7 +6,7 @@
     {"id": "KW-003", "type": "trainer_availability", "description": "Mrigakshi Jaiswal Thu/Fri ONLY at Kwality", "check_fn_name": "check_kw_mrigakshi_days"},
     {"id": "KW-004", "type": "always_do", "description": "Pranjali Jain owns Saturday 10:15-12:30 block", "check_fn_name": "check_kw_pranjali_sat"},
     {"id": "KW-005", "type": "always_do", "description": "Rohan Dahima owns Thursday morning 09:15/10:15", "check_fn_name": "check_kw_rohan_thu"},
-    {"id": "KW-006", "type": "always_do", "description": "Strength Lab: Atulan Purohit exclusively Mon/Wed evenings max 4/week", "check_fn_name": "check_kw_strength_lab"},
+    {"id": "KW-006", "type": "always_do", "description": "Legacy disabled rule: Atulan Purohit owned Mon/Wed evening Strength Lab. Do not apply unless explicitly enabled in Control Center.", "check_fn_name": "check_kw_strength_lab"},
     {"id": "KW-007", "type": "always_do", "description": "Pre/Post Natal: Anisha Mon-Wed, Mrigakshi Thu-Fri, mornings only", "check_fn_name": "check_kw_prenatal"},
     {"id": "KW-008", "type": "never_do", "description": "Strength Lab max 4x per week total", "check_fn_name": "check_kw_strength_lab_max"}
   ],

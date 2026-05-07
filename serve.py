@@ -21,6 +21,7 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 from urllib.parse import urlparse
 
+from chat_assistant import build_chat_context
 from finalise_schedule import finalise_schedule_document
 from rule_config import build_rules_catalog, load_rules_config, update_rules_config
 
@@ -30,6 +31,8 @@ OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 CONFIG_PATH = PROJECT_ROOT / "config" / "rules_config.json"
 SCHEDULE_CONFIG_PATH = PROJECT_ROOT / "config" / "schedule_config.json"
 TRAINER_PROFILES_PATH = PROJECT_ROOT / "rules" / "trainer_profiles.json"
+DEFAULT_SCHEDULE_CONFIG_PATH = SCHEDULE_CONFIG_PATH
+DEFAULT_TRAINER_PROFILES_PATH = TRAINER_PROFILES_PATH
 MUMBAI_LOCATIONS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Courtside"}
 BENGALURU_LOCATIONS = {"Kenkere House", "Copper & Cloves"}
 MAIN_STUDIOS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Kenkere House"}
@@ -61,6 +64,125 @@ _pipeline_state = {
     "message": "Idle",
 }
 _run_counter = 0
+
+
+def _safe_child_path(base: Path, name: str) -> Path | None:
+    base_resolved = base.resolve()
+    candidate = (base_resolved / name).resolve()
+    try:
+        candidate.relative_to(base_resolved)
+    except ValueError:
+        return None
+    return candidate
+
+
+def _schedule_config_path() -> Path:
+    if SCHEDULE_CONFIG_PATH != DEFAULT_SCHEDULE_CONFIG_PATH:
+        return SCHEDULE_CONFIG_PATH
+    return PROJECT_ROOT / "config" / "schedule_config.json"
+
+
+def _trainer_profiles_path() -> Path:
+    if TRAINER_PROFILES_PATH != DEFAULT_TRAINER_PROFILES_PATH:
+        return TRAINER_PROFILES_PATH
+    return PROJECT_ROOT / "rules" / "trainer_profiles.json"
+
+
+def _normalize_pipeline_week(value: str | None, default_week: str) -> str:
+    raw = str(value or "").strip() or default_week
+    try:
+        selected = date.fromisoformat(raw[:10])
+    except ValueError as exc:
+        raise ValueError("Please choose a valid schedule date.") from exc
+    monday = selected - timedelta(days=selected.weekday())
+    return monday.isoformat()
+
+
+def _saved_ai_api_key() -> str:
+    try:
+        data = json.loads(_schedule_config_path().read_text())
+    except Exception:
+        return ""
+    settings = data.get("settings_options") or {}
+    return str(settings.get("ai_api_key") or "").strip()
+
+
+def _saved_ai_runtime_settings() -> dict:
+    try:
+        data = json.loads(_schedule_config_path().read_text())
+    except Exception:
+        return {}
+    settings = data.get("settings_options") or {}
+    return {
+        "provider": str(settings.get("ai_provider") or "openrouter").strip().lower(),
+        "model": str(settings.get("ai_model") or "").strip(),
+        "base_url": str(settings.get("ai_base_url") or "").strip(),
+    }
+
+
+def _inject_ai_key_env(child_env: dict, api_key: str) -> None:
+    key = str(api_key or "").strip()
+    if not key:
+        return
+    child_env["OPENROUTER_API_KEY"] = key
+    child_env["OPENAI_API_KEY"] = key
+
+
+def _inject_ai_runtime_env(child_env: dict, runtime: dict) -> None:
+    provider = str(runtime.get("provider") or "openrouter").strip().lower()
+    model = str(runtime.get("model") or "").strip()
+    base_url = str(runtime.get("base_url") or "").strip()
+    if provider == "openai":
+        if model:
+            child_env["OPENAI_MODEL"] = model
+        if base_url:
+            child_env["OPENAI_BASE_URL"] = base_url
+    else:
+        if model:
+            child_env["OPENROUTER_MODEL"] = model
+        if base_url:
+            child_env["OPENROUTER_BASE_URL"] = base_url
+
+
+def _request_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def _resolve_pipeline_request_options(payload: dict | None, default_week: str) -> dict:
+    payload = payload or {}
+    week = _normalize_pipeline_week(
+        payload.get("week_start") or payload.get("week") or payload.get("date"),
+        default_week,
+    )
+    use_ai = _request_bool(payload.get("use_ai"))
+    child_env = os.environ.copy()
+    child_env["PIPELINE_WEEK"] = week
+
+    if use_ai:
+        api_key = str(payload.get("api_key") or "").strip() or _saved_ai_api_key()
+        runtime = _saved_ai_runtime_settings()
+        payload_provider = str(payload.get("ai_provider") or "").strip().lower()
+        payload_model = str(payload.get("ai_model") or "").strip()
+        payload_base_url = str(payload.get("ai_base_url") or "").strip()
+        if payload_provider:
+            runtime["provider"] = payload_provider
+        if payload_model:
+            runtime["model"] = payload_model
+        if payload_base_url:
+            runtime["base_url"] = payload_base_url
+        child_env.pop("SCHEDULER_FORCE_GREEDY", None)
+        child_env["SCHEDULER_FORCE_AI_ONLY"] = "1"
+        _inject_ai_key_env(child_env, api_key)
+        _inject_ai_runtime_env(child_env, runtime)
+    else:
+        child_env["SCHEDULER_FORCE_GREEDY"] = "1"
+        child_env.pop("SCHEDULER_FORCE_AI_ONLY", None)
+
+    return {"week": week, "use_ai": use_ai, "child_env": child_env}
 
 
 def _same_schedule_slot(row, slot):
@@ -128,10 +250,11 @@ def _violates_location_shift_lock(slot, trainer_rows):
 
 
 def _trainer_profile(name):
-    if not TRAINER_PROFILES_PATH.exists():
+    path = _trainer_profiles_path()
+    if not path.exists():
         return None
     target = " ".join(str(name or "").split()).lower()
-    profiles = json.loads(TRAINER_PROFILES_PATH.read_text())
+    profiles = json.loads(path.read_text())
     return next((p for p in profiles if " ".join(str(p.get("name") or "").split()).lower() == target), None)
 
 
@@ -242,10 +365,7 @@ def _replace_trainer_in_schedule(payload):
     if updated == 0:
         raise ValueError("Could not find the selected class in the active schedule")
 
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, indent=2))
-    os.replace(tmp, path)
-    _regenerate_index_from_template(data)
+    _write_schedule_data(data)
     return updated
 
 
@@ -567,22 +687,14 @@ def load_json_file(path: Path, fallback):
 
 def push_supabase_config():
     schedule_config = load_json_file(
-        SCHEDULE_CONFIG_PATH,
+        _schedule_config_path(),
         {"targets": {}, "manual_protected": [], "manual_excluded": [], "custom_rules": []},
     )
-    trainer_profiles = load_json_file(TRAINER_PROFILES_PATH, [])
+    trainer_profiles = load_json_file(_trainer_profiles_path(), [])
     rules_catalog = build_rules_catalog(load_rules_config())
     supabase_upsert("schedule_config", schedule_config)
     supabase_upsert("trainer_profiles", trainer_profiles)
     supabase_upsert("rules_catalog", rules_catalog)
-    studio_groups = {
-        "rules_kwality": ["location_kwality"],
-        "rules_supreme": ["location_supreme"],
-        "rules_kenkere": ["location_kenkere"],
-    }
-    for key, group_ids in studio_groups.items():
-        groups = [g for g in rules_catalog.get("groups", []) if g.get("id") in group_ids]
-        supabase_upsert(key, {"groups": groups})
     return {"schedule_config": schedule_config, "trainer_profiles": trainer_profiles, "rules_catalog": rules_catalog}
 
 
@@ -590,10 +702,11 @@ def pull_supabase_config():
     rows = supabase_request("GET", "/studio_rules?select=config_key,data")
     pulled = {row.get("config_key"): row.get("data") for row in rows if isinstance(row, dict)}
     if pulled.get("schedule_config"):
-        SCHEDULE_CONFIG_PATH.parent.mkdir(exist_ok=True)
-        SCHEDULE_CONFIG_PATH.write_text(json.dumps(pulled["schedule_config"], indent=2))
+        path = _schedule_config_path()
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(json.dumps(pulled["schedule_config"], indent=2))
     if pulled.get("trainer_profiles"):
-        TRAINER_PROFILES_PATH.write_text(json.dumps(pulled["trainer_profiles"], indent=2))
+        _trainer_profiles_path().write_text(json.dumps(pulled["trainer_profiles"], indent=2))
     return pulled
 
 
@@ -606,16 +719,33 @@ class RulesHandler(BaseHTTPRequestHandler):
         print(f"  [{self.address_string()}] {format % args}")
 
     def _send(self, code: int, content_type: str, body: bytes):
-        self.send_response(code)
-        self.send_header("Content-Type", content_type)
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.send_response(code)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            # Browser polling/navigation can close the socket before a small
+            # status or static-file response is written. Nothing is wrong with
+            # the pipeline in that case, so keep the dev server quiet.
+            return
 
     def _send_json(self, code: int, data: dict):
         body = json.dumps(data).encode()
         self._send(code, "application/json", body)
+
+    def _is_local_client(self) -> bool:
+        host = (self.client_address[0] if self.client_address else "") or ""
+        return host in {"127.0.0.1", "::1", "localhost"}
+
+    def _authorized_for_unsafe_write(self) -> bool:
+        if self._is_local_client():
+            return True
+        token = os.environ.get("SCHEDULER_ADMIN_TOKEN", "")
+        provided = self.headers.get("X-Scheduler-Admin-Token", "")
+        return bool(token and provided == token)
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -698,12 +828,19 @@ class RulesHandler(BaseHTTPRequestHandler):
         # Serve outputs/ files (schedule CSVs, XLSXs, JSON)
         if is_output_artifact_path(path):
             filename = path.lstrip("/")
-            self._serve_file(OUTPUTS_DIR / filename)
+            output_path = _safe_child_path(OUTPUTS_DIR, filename)
+            if output_path is None:
+                self._send_json(404, {"error": f"Not found: {path}"})
+                return
+            self._serve_file(output_path)
             return
 
         # Serve web/ static assets
         rel = path.lstrip("/")
-        candidate = WEB_DIR / rel
+        candidate = _safe_child_path(WEB_DIR, rel)
+        if candidate is None:
+            self._send_json(404, {"error": f"Not found: {path}"})
+            return
         if candidate.exists() and candidate.is_file():
             self._serve_file(candidate)
             return
@@ -712,10 +849,14 @@ class RulesHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
-        path = parsed.path
+        path = parsed.path.rstrip("/") or "/"
 
         length = int(self.headers.get("Content-Length", 0))
         body_raw = self.rfile.read(length) if length else b"{}"
+
+        if not self._authorized_for_unsafe_write():
+            self._send_json(401, {"error": "Admin token required"})
+            return
 
         if path == "/api/save-rules":
             try:
@@ -763,12 +904,40 @@ class RulesHandler(BaseHTTPRequestHandler):
                     "message": "Pipeline is already running. Please wait.",
                 })
                 return
+            try:
+                payload = json.loads(body_raw or "{}")
+                options = _resolve_pipeline_request_options(payload, self.pipeline_week)
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"ok": False, "error": f"Invalid JSON: {e}"})
+                return
+            except ValueError as e:
+                self._send_json(400, {"ok": False, "error": str(e)})
+                return
+            if options["use_ai"] and not (
+                options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+            ):
+                _inject_ai_key_env(options["child_env"], _saved_ai_api_key())
+            if options["use_ai"] and not (
+                options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+            ):
+                self._send_json(400, {
+                    "ok": False,
+                    "error": "Add an AI API key in Control Center before using Generate with AI.",
+                })
+                return
             _run_counter += 1
             csv_path = self.pipeline_csv
-            week = self.pipeline_week
+            week = options["week"]
             variation_seed = int(_time.time()) % 100000 + _run_counter
             output_suffix = f"run{_run_counter}_{uuid.uuid4().hex[:6]}"
             cmd = build_pipeline_command(csv_path, week, variation_seed, output_suffix)
+            print(
+                "  [API] run-pipeline mode="
+                f"{'ai' if options['use_ai'] else 'standard'} "
+                f"openrouter_key={'yes' if bool(options['child_env'].get('OPENROUTER_API_KEY')) else 'no'} "
+                f"openai_key={'yes' if bool(options['child_env'].get('OPENAI_API_KEY')) else 'no'} "
+                f"week={week}"
+            )
             print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
             try:
                 proc = subprocess.Popen(
@@ -777,6 +946,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
+                    env=options["child_env"],
                 )
                 _pipeline_state["running"] = True
                 _pipeline_state["status"] = "running"
@@ -837,8 +1007,7 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/save-trainer-profiles":
             try:
                 payload = json.loads(body_raw)
-                profiles_path = PROJECT_ROOT / "rules" / "trainer_profiles.json"
-                with open(profiles_path, "w") as f:
+                with open(_trainer_profiles_path(), "w") as f:
                     json.dump(payload, f, indent=2)
                 print("  [API] Trainer profiles saved")
                 self._send_json(200, {"ok": True})
@@ -850,7 +1019,8 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/save-schedule-config":
             try:
                 payload = json.loads(body_raw)
-                cfg_path = PROJECT_ROOT / "config" / "schedule_config.json"
+                cfg_path = _schedule_config_path()
+                cfg_path.parent.mkdir(exist_ok=True)
                 with open(cfg_path, "w") as f:
                     json.dump(payload, f, indent=2)
                 print("  [API] Schedule config saved")
@@ -911,7 +1081,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": str(e)})
             return
 
-        if path == "/api/clear-schedule":
+        if path in {"/api/clear-schedule", "/api/clear-calendar"}:
             try:
                 payload = json.loads(body_raw or "{}")
                 result = _clear_schedule(payload)
@@ -932,12 +1102,79 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": str(e)})
             return
 
-        if path == "/api/finalise-schedule":
+        if path in {"/api/finalise-schedule", "/api/finalize-schedule"}:
             try:
                 result = _finalise_schedule_to_supabase()
                 self._send_json(200, {"ok": True, "finalised": result})
             except Exception as e:
                 self._send_json(400, {"error": str(e)})
+            return
+
+        if path == "/api/chat":
+            try:
+                payload = json.loads(body_raw)
+                user_msg = str(payload.get("message") or "").strip()
+                history = payload.get("history") or []
+                if not user_msg:
+                    self._send_json(400, {"error": "Empty message"})
+                    return
+
+                system_prompt = build_chat_context(
+                    WEB_DIR / "schedule_data.json",
+                    OUTPUTS_DIR / "scorecard.json",
+                    _trainer_profiles_path(),
+                    user_msg,
+                )
+
+                # Try AI
+                try:
+                    import sys
+                    sys.path.insert(0, str(PROJECT_ROOT))
+                    from ai_provider import create_ai_client, OPENAI_AVAILABLE
+                    if not OPENAI_AVAILABLE:
+                        self._send_json(200, {"reply": "AI client not available. Install the openai package and set OPENROUTER_API_KEY in .env to enable chat."})
+                        return
+                    client, settings = create_ai_client()
+                    if not client:
+                        # Try reading key from schedule_config
+                        cfg_path = _schedule_config_path()
+                        if cfg_path.exists():
+                            try:
+                                cfg = json.loads(cfg_path.read_text())
+                                api_key = (cfg.get("settings_options") or {}).get("ai_api_key","").strip()
+                                if api_key:
+                                    from openai import OpenAI
+                                    client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1",
+                                                   default_headers={"HTTP-Referer":"https://studio-scheduler.local","X-Title":"Studio Scheduler"})
+                                    settings = {"model": "openai/gpt-oss-120b:free"}
+                            except Exception:
+                                pass
+                    if not client:
+                        self._send_json(200, {"reply": "AI not configured. Add OPENROUTER_API_KEY to your .env file or set the API key in Settings → Advanced."})
+                        return
+
+                    messages = [{"role": "system", "content": system_prompt}]
+                    for h in (history or [])[-6:]:
+                        role = h.get("role","user")
+                        content = h.get("content","")
+                        if role in ("user","assistant") and content:
+                            messages.append({"role": role, "content": content})
+                    messages.append({"role": "user", "content": user_msg})
+
+                    resp = client.chat.completions.create(
+                        model=settings.get("model","openai/gpt-oss-120b:free"),
+                        temperature=0.4,
+                        max_tokens=800,
+                        messages=messages,
+                    )
+                    reply = resp.choices[0].message.content.strip() if resp.choices else "No response from AI."
+                    self._send_json(200, {"reply": reply})
+                except Exception as ai_err:
+                    self._send_json(200, {"reply": f"AI error: {ai_err}"})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
             return
 
         self._send_json(404, {"error": f"Unknown endpoint: {path}"})

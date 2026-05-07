@@ -10,8 +10,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import agents.reporter as reporter_module
 import app as flask_app_module
-from agents.ai_planner import AISchedulePlanner, PlannedSlot, _build_location_prompt, _enforce_hard_limits, _parse_schedule_response, _score_slots
-from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, MAX_TRAINER_WEEKLY_MINUTES, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState, get_class_duration, slot_time_to_minutes
+import serve as serve_module
+from agents.scorer import _is_top_performer_protected
+from agents.ai_planner import AISchedulePlanner, PlannedSlot, _build_location_prompt, _enforce_hard_limits, _parse_schedule_response, _score_slots, _validate_slots
+from agents.optimiser import DATA_DRIVEN_DAILY_RANGES, DAY_ORDER, MAX_TRAINER_WEEKLY_MINUTES, RoomOccupancy, ScheduleOptimiser, ScheduleSlot, TrainerState, canonical_class_key, class_difficulty_level, get_class_duration, is_protected_strength_lab_row, same_protected_class_variant, slot_time_to_minutes
 from agents.reporter import OutputReporter
 from rule_config import build_rules_catalog, load_rules_config
 from serve import build_pipeline_command, find_available_port, is_output_artifact_path
@@ -85,6 +87,519 @@ def test_class_mix_max_is_hard_generation_ceiling():
     )
 
 
+def test_custom_rule_trainer_availability_max_applies_weekly_cap():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.schedule_config = {
+        "custom_rules": [
+            {
+                "enabled": True,
+                "priority": "hard",
+                "rule_type": "trainer_availability",
+                "operator": "max",
+                "trainer": "Karan Bhatia",
+                "location": "",
+                "value": 7,
+            }
+        ]
+    }
+    optimiser.overrides = {}
+
+    assert optimiser._max_per_week("Karan Bhatia", "Kwality House, Kemps Corner") == 7
+    assert optimiser._max_per_week("Other Trainer", "Kwality House, Kemps Corner") is None
+
+
+def test_copper_class_mix_uses_copper_specific_limits_before_canonical_group():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.schedule_config = {
+        "class_mix": {
+            "Copper & Cloves": {
+                "Studio Mat 57": {"min": 0, "max": 0},
+                "Copper + Cloves Mat 57": {"min": 1, "max": 6},
+            }
+        }
+    }
+
+    assert canonical_class_key("Copper + Cloves Mat 57") == "Copper + Cloves Mat 57"
+    assert not optimiser._class_mix_hard_blocked("Copper & Cloves", "Copper + Cloves Mat 57")
+    assert optimiser._class_mix_allows_candidate("Copper & Cloves", "Copper + Cloves Mat 57", current_count=5)
+    assert not optimiser._class_mix_allows_candidate("Copper & Cloves", "Copper + Cloves Mat 57", current_count=6)
+
+
+def test_protected_class_variant_does_not_collapse_express_to_base():
+    assert same_protected_class_variant("Studio Barre 57 Express", "Studio Barre 57 Express")
+    assert not same_protected_class_variant("Studio Barre 57 Express", "Studio Barre 57")
+    assert not same_protected_class_variant("Studio Barre 57", "Studio Barre 57 Express")
+
+
+def test_class_durations_match_class_format_config():
+    with open("rules/class_formats.json") as f:
+        formats = json.load(f)
+
+    mismatches = {
+        row["name"]: (row["duration_min"], get_class_duration(row["name"]))
+        for row in formats
+        if row.get("duration_min") != get_class_duration(row["name"])
+    }
+
+    assert mismatches == {}
+
+
+def test_ai_parser_keeps_parallel_same_time_slots_and_sets_duration():
+    raw = json.dumps({
+        "schedule": [
+            {
+                "day": "Monday",
+                "time": "09:00",
+                "class": "Studio Cardio Barre Plus",
+                "trainer": "Trainer One",
+                "cover": "Cover One",
+            },
+            {
+                "day": "Monday",
+                "time": "09:00",
+                "class": "Studio Mat 57 Express",
+                "trainer": "Trainer Two",
+                "cover": "Cover Two",
+            },
+        ]
+    })
+
+    slots, errors = _parse_schedule_response(
+        raw,
+        "Kwality House, Kemps Corner",
+        "2026-05-04",
+        profiles_by_name={},
+    )
+
+    assert errors == []
+    assert len(slots) == 2
+    assert [slot.duration_min for slot in slots] == [75, 30]
+    assert {slot.room for slot in slots} == {"studio_a", "studio_b"}
+    assert [slot.capacity for slot in slots] == [22, 13]
+
+
+def test_ai_hard_limits_respect_configured_strength_lab_weekly_max(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("config").mkdir()
+    (Path("config") / "schedule_config.json").write_text(json.dumps({
+        "class_mix": {
+            "Kwality House, Kemps Corner": {
+                "Studio Strength Lab": {"min": 2, "max": 4}
+            }
+        }
+    }))
+
+    slots = [
+        PlannedSlot(
+            location="Kwality House, Kemps Corner",
+            date=f"2026-05-{4 + idx:02d}",
+            day_of_week=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][idx],
+            time="18:00",
+            class_name="Studio Strength Lab",
+            trainer_1="Atulan Purohit",
+            trainer_2="",
+            cover="",
+            room="strength_lab",
+            capacity=7,
+            duration_min=57,
+            predicted_fill_rate=0.5,
+            score=70.0,
+            constraint_violations=[],
+        )
+        for idx in range(5)
+    ]
+
+    kept = _enforce_hard_limits(slots, "Kwality House, Kemps Corner", profiles_by_name={})
+
+    assert len(kept) == 4
+
+
+def test_flask_chat_endpoint_returns_reply(monkeypatch):
+    monkeypatch.setattr(flask_app_module, "_build_chat_reply", lambda payload: "stub reply", raising=False)
+
+    response = flask_app_module.app.test_client().post(
+        "/api/chat",
+        json={"message": "What should I change at Kwality?", "history": []},
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["reply"] == "stub reply"
+
+
+def test_chat_substitution_questions_are_answered_by_llm(monkeypatch):
+    import ai_provider
+
+    calls = {}
+
+    class FakeCompletions:
+        def create(self, **kwargs):
+            calls["kwargs"] = kwargs
+
+            class Message:
+                content = "LLM substitution answer"
+
+            class Choice:
+                message = Message()
+
+            class Response:
+                choices = [Choice()]
+
+            return Response()
+
+    class FakeClient:
+        class Chat:
+            completions = FakeCompletions()
+
+        chat = Chat()
+
+    monkeypatch.setattr(ai_provider, "OPENAI_AVAILABLE", True)
+    monkeypatch.setattr(ai_provider, "create_ai_client", lambda: (FakeClient(), {"model": "test-model"}))
+    assert not hasattr(flask_app_module, "answer_substitution_request")
+
+    reply = flask_app_module._build_chat_reply({
+        "message": "substitute for Wednesday 7:30 strength at Kwality",
+        "history": [],
+    })
+
+    assert reply == "LLM substitution answer"
+    assert calls["kwargs"]["model"] == "test-model"
+    assert calls["kwargs"]["messages"][-1]["content"] == "substitute for Wednesday 7:30 strength at Kwality"
+    system_context = calls["kwargs"]["messages"][0]["content"]
+    assert "RELEVANT SCHEDULE EVIDENCE" in system_context
+    assert "Wednesday 07:30" in system_context
+    assert "Studio Strength Lab" in system_context
+    assert "Trainer same-day assignments" in system_context
+    assert "Potential trainer evidence" in system_context
+    assert "overlap_conflicts=" in system_context
+    assert "weekly_hours_if_added=" in system_context
+    assert "STRUCTURED RECOMMENDATION FORMAT" in system_context
+    assert "Best option:" in system_context
+    assert "Avoid:" in system_context
+    assert "Why:" in system_context
+    assert "Next action:" in system_context
+    assert "RANKED SUBSTITUTION CANDIDATES" in system_context
+    assert "recommendation_status=eligible" in system_context
+    assert "recommendation_status=blocked" in system_context
+
+
+def test_chat_context_includes_relevant_schedule_rows_for_specific_question():
+    from chat_assistant import build_chat_context
+
+    context = build_chat_context(
+        Path("web/schedule_data.json"),
+        Path("outputs/scorecard.json"),
+        Path("rules/trainer_profiles.json"),
+        "substitute for Wednesday 7:30 strength at Kwality",
+    )
+
+    assert "RELEVANT SCHEDULE EVIDENCE" in context
+    assert "Requested slot: Wednesday 07:30" in context
+    assert "Studio Strength Lab" in context
+    assert "Trainer same-day assignments" in context
+    assert "Potential trainer evidence" in context
+    assert "overlap_conflicts=" in context
+    assert "same_location_same_shift_nonoverlap=" in context
+    assert "sessions_if_added=" in context
+    assert "weekly_hours_if_added=" in context
+    assert "matching_track_record=" in context
+    assert "RANKED SUBSTITUTION CANDIDATES" in context
+    assert "rank=1" in context
+    assert "recommendation_status=eligible" in context
+    assert "recommendation_status=blocked" in context
+    assert "blocked_reasons=" in context
+    assert "Mrigakshi Jaiswal" in context
+    assert "Richard D'Costa" in context
+
+
+def test_chat_context_includes_structured_advisor_format_and_intent():
+    from chat_assistant import build_chat_context
+
+    context = build_chat_context(
+        Path("web/schedule_data.json"),
+        Path("outputs/scorecard.json"),
+        Path("rules/trainer_profiles.json"),
+        "Which classes have the lowest fill rate at Kwality and what should we fix?",
+    )
+
+    assert "DETECTED QUESTION INTENT: low_fill" in context
+    assert "STRUCTURED RECOMMENDATION FORMAT" in context
+    assert "Best option:" in context
+    assert "Avoid:" in context
+    assert "Why:" in context
+    assert "Next action:" in context
+    assert "LOW-FILL / IMPROVEMENT EVIDENCE" in context
+    assert "lowest_fill_classes=" in context
+
+
+def test_chat_context_includes_decision_evidence_for_explain_questions():
+    from chat_assistant import build_chat_context
+
+    context = build_chat_context(
+        Path("web/schedule_data.json"),
+        Path("outputs/scorecard.json"),
+        Path("rules/trainer_profiles.json"),
+        "Explain class Wednesday 7:30 strength at Kwality",
+    )
+
+    assert "DETECTED QUESTION INTENT: explain" in context
+    assert "DECISION EXPLANATION EVIDENCE" in context
+    assert "scheduling_reason=" in context
+    assert "recommendation=" in context
+    assert "constraint_violations=" in context
+
+
+def test_chat_ui_exposes_advanced_quick_actions():
+    template = Path("web/template.html").read_text()
+
+    assert "Find substitute" in template
+    assert "Explain class" in template
+    assert "Workload check" in template
+    assert "Add class idea" in template
+
+
+def test_ai_validation_does_not_enforce_disabled_atulan_strength_exclusivity():
+    slot = PlannedSlot(
+        location="Kwality House, Kemps Corner",
+        date="2026-05-13",
+        day_of_week="Wednesday",
+        time="07:30",
+        class_name="Studio Strength Lab (Pull)",
+        trainer_1="Mrigakshi Jaiswal",
+        trainer_2="",
+        cover="",
+        room="strength_lab",
+        capacity=7,
+        duration_min=57,
+        predicted_fill_rate=0.5,
+        score=70.0,
+        constraint_violations=[],
+    )
+
+    profiles = {
+        "Mrigakshi Jaiswal": {
+            "name": "Mrigakshi Jaiswal",
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Wednesday"],
+                    "max_classes_per_day": 4,
+                }
+            },
+        }
+    }
+
+    validated = _validate_slots([slot], "Kwality House, Kemps Corner", profiles)
+
+    assert not any("KW-006" in item for item in validated[0].constraint_violations)
+
+
+def test_ai_hard_limit_enforcer_drops_trainer_duration_overlap(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("config").mkdir()
+    Path("config/schedule_config.json").write_text(json.dumps({}))
+
+    slots = [
+        make_slot(
+            time="08:00",
+            class_name="Studio Mat 57",
+            trainer_1="Trainer A",
+            duration_min=get_class_duration("Studio Mat 57"),
+        ),
+        make_slot(
+            time="08:45",
+            class_name="Studio Barre 57",
+            trainer_1="Trainer A",
+            duration_min=get_class_duration("Studio Barre 57"),
+        ),
+        make_slot(
+            time="09:00",
+            class_name="Studio Barre 57",
+            trainer_1="Trainer B",
+            duration_min=get_class_duration("Studio Barre 57"),
+        ),
+    ]
+    profiles = {
+        "Trainer A": {
+            "name": "Trainer A",
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "12:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        },
+        "Trainer B": {
+            "name": "Trainer B",
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "12:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        },
+    }
+
+    kept = _enforce_hard_limits(slots, "Kwality House, Kemps Corner", profiles)
+
+    assert [(s.trainer_1, s.time) for s in kept] == [("Trainer A", "08:00"), ("Trainer B", "09:00")]
+
+
+def test_ai_hard_limit_enforcer_keeps_at_least_one_trainer_rest_day(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("config").mkdir()
+    Path("config/schedule_config.json").write_text(json.dumps({}))
+
+    slots = [
+        make_slot(
+            day_of_week=day,
+            date=f"2026-05-{4 + idx:02d}",
+            time="10:00",
+            trainer_1="Trainer A",
+            duration_min=57,
+        )
+        for idx, day in enumerate(DAY_ORDER)
+    ]
+    profiles = {
+        "Trainer A": {
+            "name": "Trainer A",
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": DAY_ORDER,
+                    "time_window": {"start": "07:00", "end": "12:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        }
+    }
+
+    kept = _enforce_hard_limits(slots, "Kwality House, Kemps Corner", profiles)
+
+    assert len({slot.day_of_week for slot in kept}) == 6
+
+
+def test_ai_hard_limit_enforcer_clears_stale_constraint_badges(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    Path("config").mkdir()
+    Path("config/schedule_config.json").write_text(json.dumps({}))
+
+    slot = make_slot(
+        trainer_1="Trainer A",
+        constraint_violations=["UNIV-010: stale daily limit warning"],
+    )
+    profiles = {
+        "Trainer A": {
+            "name": "Trainer A",
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "12:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        }
+    }
+
+    kept = _enforce_hard_limits([slot], "Kwality House, Kemps Corner", profiles)
+
+    assert len(kept) == 1
+    assert kept[0].constraint_violations == []
+
+
+def test_greedy_protected_slots_respect_trainer_available_days():
+    location = "Kwality House, Kemps Corner"
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-11", locations=[])
+    optimiser.trainer_profiles = {
+        "Anisha Shah": {
+            "name": "Anisha Shah",
+            "tier": 1,
+            "locations": {
+                location: {
+                    "available_days": ["Monday", "Tuesday", "Wednesday"],
+                    "time_window": {"start": "07:00", "end": "12:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True},
+        }
+    }
+    optimiser.trainer_states = {"Anisha Shah": TrainerState("Anisha Shah", 1)}
+    optimiser.class_family = {"Studio Barre 57": "barre_57"}
+    optimiser.schedule_config = {}
+    optimiser.overrides = {}
+    optimiser.protected = {
+        (location, DAY_ORDER.index("Friday")): [
+            {
+                "time": "10:00",
+                "trainer": "Anisha Shah",
+                "class": "Studio Barre 57",
+                "score": 90,
+                "score_breakdown": {},
+                "session_count": 10,
+            }
+        ]
+    }
+    optimiser.protected_class_times = {}
+    optimiser.scores_data = {"class_slot_ranking": []}
+    optimiser._build_score_indexes()
+    optimiser.hist_lookup = {}
+    optimiser._build_history_indexes()
+    optimiser._pinned_minutes_remaining = {}
+    optimiser._time_class_counts = {}
+    optimiser._time_level_counts = {}
+
+    slots = optimiser._schedule_day(
+        location,
+        "Friday",
+        "2026-05-15",
+        0,
+        [],
+        [],
+        RoomOccupancy({"studio_a": {"capacity": 22, "families": None}}),
+        {},
+    )
+
+    assert slots == []
+
+
+def test_greedy_experimental_slots_respect_trainer_available_days():
+    location = "Supreme HQ, Bandra"
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-11", locations=[])
+    optimiser.trainer_profiles = {
+        "Anisha Shah": {
+            "name": "Anisha Shah",
+            "tier": 1,
+            "locations": {
+                location: {
+                    "available_days": ["Thursday"],
+                    "time_window": {"start": "08:00", "end": "12:30"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True, "powercycle": True},
+        }
+    }
+    optimiser.trainer_states = {"Anisha Shah": TrainerState("Anisha Shah", 1)}
+    optimiser.class_family = {"Studio Barre 57": "barre_57"}
+    optimiser.schedule_config = {}
+    optimiser.overrides = {}
+    optimiser._pinned_minutes_remaining = {}
+
+    assert not optimiser._trainer_ok(
+        "Anisha Shah",
+        location,
+        "Saturday",
+        "09:00",
+        "Studio Barre 57",
+        experimental=True,
+    )
+
+
 def test_ai_scoring_uses_exact_time_before_day_level_fallback():
     slots = [
         PlannedSlot(
@@ -98,6 +613,7 @@ def test_ai_scoring_uses_exact_time_before_day_level_fallback():
             cover="",
             room="studio_a",
             capacity=15,
+            duration_min=57,
             predicted_fill_rate=0.0,
             score=0.0,
             constraint_violations=[],
@@ -145,6 +661,7 @@ def test_ai_scoring_uses_class_slot_group_when_trainer_history_missing():
             cover="",
             room="studio_a",
             capacity=15,
+            duration_min=57,
             predicted_fill_rate=0.0,
             score=0.0,
             constraint_violations=[],
@@ -255,6 +772,390 @@ def test_scorecard_class_mix_canonicalizes_class_variants():
     assert entry["format_counts"]["Studio Mat 57"] == 1
 
 
+def test_reporter_uses_canonical_slot_history_when_exact_card_metrics_are_missing(tmp_path, monkeypatch):
+    state_dir = tmp_path / "state"
+    web_dir = tmp_path / "web"
+    state_dir.mkdir()
+    web_dir.mkdir()
+    monkeypatch.setattr(reporter_module, "STATE_DIR", state_dir)
+    monkeypatch.setattr(reporter_module, "WEB_DIR", web_dir)
+    (state_dir / "03_scores.json").write_text(json.dumps({
+        "class_slot_ranking": [],
+        "slot_group_ranking": [],
+    }))
+    (state_dir / "01_sessions.json").write_text(json.dumps({
+        "sessions": [
+            {
+                "Location": "Kwality House, Kemps Corner",
+                "Class": "Studio Barre 57 Express",
+                "Trainer": "Rohan Dahima",
+                "Day": "Monday",
+                "Time": "17:45:00",
+                "Date": "2024-02-19",
+                "Capacity": 22,
+                "CheckedIn": 11,
+                "Booked": 11,
+                "Revenue": 10020.36,
+                "LateCancelled": 0,
+                "late_cancel_rate": 0,
+                "no_show_rate": 0,
+                "UniqueID1": "V4VCU8Z",
+                "UniqueID2": "93RNH2E",
+            },
+            {
+                "Location": "Kwality House, Kemps Corner",
+                "Class": "Studio Barre 57 Express",
+                "Trainer": "Janhavi Jain",
+                "Day": "Monday",
+                "Time": "17:45:00",
+                "Date": "2024-02-12",
+                "Capacity": 22,
+                "CheckedIn": 5,
+                "Booked": 5,
+                "Revenue": 4039.58,
+                "LateCancelled": 0,
+                "late_cancel_rate": 0,
+                "no_show_rate": 0,
+                "UniqueID1": "V4VCU8Z",
+                "UniqueID2": "SZN8YDJ",
+            },
+        ]
+    }))
+    slot = make_slot(
+        location="Kwality House, Kemps Corner",
+        class_name="Studio Barre 57",
+        trainer_1="Cauveri Vikrant",
+        day_of_week="Monday",
+        time="17:45",
+        historical_session_count=0,
+        historical_avg_checkin=0,
+        historical_avg_fill=0,
+    ).__dict__
+
+    OutputReporter()._write_schedule_data(
+        {"Kwality House, Kemps Corner": [slot]},
+        "2026-05-04",
+        {"trainer_metrics": []},
+    )
+
+    data = json.loads((web_dir / "schedule_data.json").read_text())
+    enriched = data["locations"]["Kwality House, Kemps Corner"][0]
+    assert enriched["metric_source"] == "canonical_class_day_time_location"
+    assert enriched["metric_session_count"] == 2
+    assert enriched["metric_avg_checkin"] == 8.0
+    assert enriched["slot_avg_checkin"] is None
+    assert enriched["slot_session_count"] is None
+    assert enriched["slot_historic_detail"]["session_rows"] == 2
+    assert len(enriched["slot_historic_detail"]["individual_sessions"]) == 2
+
+
+def test_reporter_uses_nearby_same_class_score_history_when_drilldown_would_find_rows(tmp_path, monkeypatch):
+    state_dir = tmp_path / "state"
+    web_dir = tmp_path / "web"
+    state_dir.mkdir()
+    web_dir.mkdir()
+    monkeypatch.setattr(reporter_module, "STATE_DIR", state_dir)
+    monkeypatch.setattr(reporter_module, "WEB_DIR", web_dir)
+    historic_detail = {
+        "session_rows": 3,
+        "avg_checked_in": 6.0,
+        "avg_booked": 7.0,
+        "avg_capacity": 20.0,
+        "avg_fill_rate": 0.30,
+        "avg_revenue": 1200.0,
+        "total_revenue": 3600.0,
+        "individual_sessions": [
+            {
+                "date": "2025-01-06",
+                "trainer": "Trainer A",
+                "class": "Studio Barre 57",
+                "location": "Kwality House, Kemps Corner",
+                "day": "Monday",
+                "time": "10:15",
+                "checked_in": 6,
+                "booked": 7,
+                "capacity": 20,
+                "fill_rate": 0.30,
+                "revenue": 1200,
+            }
+        ],
+    }
+    (state_dir / "03_scores.json").write_text(json.dumps({
+        "class_slot_ranking": [],
+        "slot_group_ranking": [
+            {
+                "location": "Kwality House, Kemps Corner",
+                "class": "Studio Barre 57",
+                "day_name": "Monday",
+                "time": "10:15",
+                "session_count": 3,
+                "avg_attendance": 6.0,
+                "avg_checkin": 6.0,
+                "avg_fill_rate": 0.30,
+                "avg_revenue": 1200.0,
+                "score": 67.0,
+                "historic_detail": historic_detail,
+            },
+            {
+                "location": "Kwality House, Kemps Corner",
+                "class": "Studio HIIT",
+                "day_name": "Monday",
+                "time": "09:30",
+                "session_count": 9,
+                "avg_attendance": 15.0,
+                "avg_checkin": 15.0,
+                "avg_fill_rate": 0.75,
+                "score": 95.0,
+                "historic_detail": {"session_rows": 9, "avg_checked_in": 15.0, "individual_sessions": []},
+            },
+        ],
+    }))
+    (state_dir / "01_sessions.json").write_text(json.dumps({"sessions": []}))
+    slot = make_slot(
+        location="Kwality House, Kemps Corner",
+        class_name="Studio Barre 57",
+        trainer_1="Trainer X",
+        day_of_week="Monday",
+        time="09:30",
+        historical_session_count=0,
+        historical_avg_checkin=0,
+        historical_avg_fill=0,
+    ).__dict__
+
+    OutputReporter()._write_schedule_data(
+        {"Kwality House, Kemps Corner": [slot]},
+        "2026-05-04",
+        {"trainer_metrics": []},
+    )
+
+    data = json.loads((web_dir / "schedule_data.json").read_text())
+    enriched = data["locations"]["Kwality House, Kemps Corner"][0]
+    assert enriched["metric_source"] == "nearby_class_day_time_location"
+    assert enriched["metric_session_count"] == 3
+    assert enriched["metric_avg_checkin"] == 6.0
+    assert enriched["slot_avg_checkin"] is None
+    assert enriched["slot_session_count"] is None
+    assert enriched["slot_historic_detail"]["session_rows"] == 3
+    assert enriched["slot_historic_detail"]["_fallback_source"] == "nearby_class_day_time_location"
+
+
+def test_reporter_preserves_scheduled_score_when_metric_context_uses_fallback(tmp_path, monkeypatch):
+    state_dir = tmp_path / "state"
+    web_dir = tmp_path / "web"
+    state_dir.mkdir()
+    web_dir.mkdir()
+    monkeypatch.setattr(reporter_module, "STATE_DIR", state_dir)
+    monkeypatch.setattr(reporter_module, "WEB_DIR", web_dir)
+    scheduled_breakdown = {
+        "total_score": 88.0,
+        "formula": "scheduled optimizer score",
+        "components": [
+            {"key": "scheduled", "label": "Scheduled", "points": 88.0, "max_points": 100.0}
+        ],
+    }
+    fallback_breakdown = {
+        "total_score": 40.0,
+        "formula": "fallback historical metric score",
+        "components": [
+            {"key": "fallback", "label": "Fallback", "points": 40.0, "max_points": 100.0}
+        ],
+    }
+    (state_dir / "03_scores.json").write_text(json.dumps({
+        "class_slot_ranking": [],
+        "slot_group_ranking": [
+            {
+                "location": "Kwality House, Kemps Corner",
+                "class": "Studio Barre 57",
+                "day_name": "Monday",
+                "time": "09:00",
+                "session_count": 4,
+                "avg_attendance": 8.0,
+                "avg_checkin": 8.0,
+                "avg_fill_rate": 0.40,
+                "score": 40.0,
+                "score_breakdown": fallback_breakdown,
+                "historic_detail": {"session_rows": 4, "avg_checked_in": 8.0, "individual_sessions": []},
+            }
+        ],
+    }))
+    (state_dir / "01_sessions.json").write_text(json.dumps({"sessions": []}))
+    slot = make_slot(
+        score=88.0,
+        performance_score=88.0,
+        placement_score=91.0,
+        score_breakdown=scheduled_breakdown,
+        historical_session_count=0,
+        historical_avg_checkin=0,
+        historical_avg_fill=0,
+    ).__dict__
+
+    OutputReporter()._write_schedule_data(
+        {"Kwality House, Kemps Corner": [slot]},
+        "2026-05-04",
+        {"trainer_metrics": []},
+    )
+
+    data = json.loads((web_dir / "schedule_data.json").read_text())
+    enriched = data["locations"]["Kwality House, Kemps Corner"][0]
+    assert enriched["score"] == 88.0
+    assert enriched["optimizer_score"] == 88.0
+    assert enriched["metric_score"] == 40.0
+    assert enriched["score_breakdown"] == scheduled_breakdown
+    assert enriched["metric_score_breakdown"] == fallback_breakdown
+
+
+def test_web_template_score_formula_matches_current_scorer_contract():
+    template = Path("web/template.html").read_text()
+
+    assert "normalized average attendance × 45" not in template
+    assert "45% weight" not in template
+    assert "average attendance × 75" in template
+    assert "fill × 15" in template
+    assert "revenue × 7" in template
+    assert "sessions × 3" in template
+    assert "PowerCycle: fill × 50" in template
+    assert "Strength: fill × 70" in template
+
+
+def test_web_template_labels_metric_source_in_class_cards():
+    template = Path("web/template.html").read_text()
+
+    assert "function metricSourceShortLabel" in template
+    assert "canonical" in template
+    assert "nearby" in template
+
+
+def test_web_template_does_not_cap_trainer_workload_overview_to_16_trainers():
+    template = Path("web/template.html").read_text()
+
+    assert ".slice(0,16)" not in template
+
+
+def test_web_template_uses_single_control_center_entry_in_main_tabs():
+    template = Path("web/template.html").read_text()
+
+    assert 'id="vbtn-control"' in template
+    assert "Control Center" in template
+    assert 'id="vbtn-history"' not in template
+    assert 'id="vbtn-rules"' not in template
+    assert 'id="vbtn-settings"' not in template
+
+
+def test_web_template_control_center_uses_clear_section_labels():
+    template = Path("web/template.html").read_text()
+
+    assert "Schedule Setup" in template
+    assert "Trainer Setup" in template
+    assert "Class Mix and Formats" in template
+    assert "Rules and Pinned Classes" in template
+    assert "Advanced Planner Settings" in template
+
+
+def test_pipeline_request_normalizes_selected_date_and_can_force_standard_generation(tmp_path, monkeypatch):
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    monkeypatch.setattr(flask_app_module, "SCHEDULE_CONFIG_PATH", config_dir / "schedule_config.json")
+
+    options = flask_app_module._resolve_pipeline_request_options({
+        "week_start": "2026-05-06",
+        "use_ai": False,
+    })
+
+    assert options["week"] == "2026-05-04"
+    assert options["use_ai"] is False
+    assert options["child_env"]["SCHEDULER_FORCE_GREEDY"] == "1"
+
+
+def test_pipeline_request_uses_saved_ai_key_when_ai_generation_requested(tmp_path, monkeypatch):
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    config_path = config_dir / "schedule_config.json"
+    config_path.write_text(json.dumps({
+        "settings_options": {
+            "ai_api_key": "saved-test-key",
+        }
+    }))
+    monkeypatch.setattr(flask_app_module, "SCHEDULE_CONFIG_PATH", config_path)
+
+    options = flask_app_module._resolve_pipeline_request_options({
+        "week_start": "2026-05-11",
+        "use_ai": True,
+    })
+
+    assert options["week"] == "2026-05-11"
+    assert options["use_ai"] is True
+    assert options["child_env"]["OPENROUTER_API_KEY"] == "saved-test-key"
+    assert options["child_env"]["SCHEDULER_FORCE_AI_ONLY"] == "1"
+    assert "SCHEDULER_FORCE_GREEDY" not in options["child_env"]
+
+
+def test_serve_pipeline_request_uses_saved_ai_key_when_ai_generation_requested(tmp_path, monkeypatch):
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    config_path = config_dir / "schedule_config.json"
+    config_path.write_text(json.dumps({
+        "settings_options": {
+            "ai_api_key": "saved-test-key",
+        }
+    }))
+    monkeypatch.setattr(serve_module, "SCHEDULE_CONFIG_PATH", config_path)
+
+    options = serve_module._resolve_pipeline_request_options({
+        "week_start": "2026-05-11",
+        "use_ai": True,
+    }, "2026-05-04")
+
+    assert options["week"] == "2026-05-11"
+    assert options["use_ai"] is True
+    assert options["child_env"]["OPENROUTER_API_KEY"] == "saved-test-key"
+    assert options["child_env"]["SCHEDULER_FORCE_AI_ONLY"] == "1"
+    assert "SCHEDULER_FORCE_GREEDY" not in options["child_env"]
+
+
+def test_web_template_exposes_week_picker_and_two_generate_modes():
+    template = Path("web/template.html").read_text()
+
+    assert 'id="schedule-week-start"' in template
+    assert "Generate with AI" in template
+    assert "runPipelineFromHeader(false)" in template
+    assert "runPipelineFromHeader(true)" in template
+    assert "AI API Key" in template
+
+
+def test_strength_lab_above_50_fill_is_protected():
+    assert is_protected_strength_lab_row({
+        "class": "Studio Strength Lab (Push)",
+        "avg_fill_rate": 0.51,
+        "session_count": 3,
+    })
+    assert not is_protected_strength_lab_row({
+        "class": "Studio Strength Lab (Push)",
+        "avg_fill_rate": 0.50,
+        "session_count": 3,
+    })
+    assert not is_protected_strength_lab_row({
+        "class": "Studio Barre 57",
+        "avg_fill_rate": 0.80,
+        "session_count": 3,
+    })
+
+
+def test_top_performer_above_50_fill_with_history_is_protected():
+    assert _is_top_performer_protected("Studio PowerCycle", 3.0, 8.0, 0.5524, 120)
+    assert not _is_top_performer_protected("Studio PowerCycle", 20.0, 8.0, 0.50, 120)
+    assert not _is_top_performer_protected("Studio PowerCycle", 20.0, 8.0, 0.70, 7)
+    assert _is_top_performer_protected("Studio Mat 57", 11.03, 8.0, 0.30, 120)
+    assert _is_top_performer_protected("Studio Barre 57", 7.95, 5.85, 0.6084, 60)
+    assert not _is_top_performer_protected("Studio Barre 57", 6.64, 5.85, 0.414, 25)
+    assert not _is_top_performer_protected("Studio Mat 57", 7.5, 8.0, 0.90, 120)
+
+
+def test_class_difficulty_level_groups_member_options():
+    assert class_difficulty_level("Studio Mat 57 Express") == "beginner"
+    assert class_difficulty_level("Studio Barre 57") == "intermediate"
+    assert class_difficulty_level("Studio FIT") == "advanced"
+
+
 def test_scorecard_schedule_score_uses_relative_baseline_and_floor_target():
     reporter = OutputReporter()
     slots = [
@@ -269,7 +1170,7 @@ def test_scorecard_schedule_score_uses_relative_baseline_and_floor_target():
     )
 
     assert entry["target_schedule_score"] == 80
-    assert entry["schedule_score"] == 100.0
+    assert entry["schedule_score"] == 80.0
 
 
 def test_scorecard_schedule_score_penalizes_underperforming_schedule():
@@ -286,6 +1187,54 @@ def test_scorecard_schedule_score_penalizes_underperforming_schedule():
     )
 
     assert entry["schedule_score"] < 80
+
+
+def test_reporter_weekly_cap_assertion_includes_derived_locations(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    reporter = OutputReporter()
+
+    def slot(location, trainer, idx):
+        return make_slot(
+            location=location,
+            trainer_1=trainer,
+            time="12:30" if location == "Courtside" else "09:00",
+            duration_min=57,
+        ).__dict__
+
+    by_location = {
+        "Kwality House, Kemps Corner": [
+            slot("Kwality House, Kemps Corner", "Overloaded Trainer" if i < 15 else f"KW Trainer {i}", i)
+            for i in range(60)
+        ],
+        "Supreme HQ, Bandra": [
+            slot("Supreme HQ, Bandra", f"SU Trainer {i}", i)
+            for i in range(55)
+        ],
+        "Kenkere House": [
+            slot("Kenkere House", f"KE Trainer {i}", i)
+            for i in range(45)
+        ],
+        "Courtside": [
+            slot("Courtside", "Overloaded Trainer", 0)
+        ],
+    }
+    scorecard = {
+        "locations": {
+            loc: {
+                "total_classes": len(slots),
+                "schedule_score": 100.0,
+                "format_counts": {},
+                "barre_family_pct": 0.30,
+                "barre_family_count": 20,
+            }
+            for loc, slots in by_location.items()
+        }
+    }
+
+    reporter._run_assertions(scorecard, by_location)
+    output = capsys.readouterr().out
+
+    assert "Overloaded Trainer weekly load" in output
 
 
 def test_reporter_validates_daily_target_range(tmp_path, monkeypatch):
@@ -395,14 +1344,12 @@ def test_rules_catalog_includes_command_center_metadata():
     catalog = build_rules_catalog(load_rules_config())
     all_rules = [rule for group in catalog["groups"] for rule in group["rules"]]
 
+    assert [group["id"] for group in catalog["groups"]] == ["universal"]
     assert all_rules
     assert all(rule.get("impact_area") for rule in all_rules)
     assert all(rule.get("risk_level") in {"critical", "high", "medium", "low"} for rule in all_rules)
     assert all(rule.get("status_tag") in {"Recommended", "Risky", "Disabled"} for rule in all_rules)
-
-    format_rules = [rule for rule in all_rules if rule.get("type") == "class_format"]
-    assert format_rules
-    assert all(rule["impact_area"] == "Class format policy" for rule in format_rules)
+    assert not any(rule.get("type") == "class_format" for rule in all_rules)
 
 
 def test_find_available_port_skips_occupied_port():
@@ -528,7 +1475,6 @@ def test_tier1_priority_score_dominates_lower_tier_history_edge():
     optimiser.trainer_states["Tier Two"].weekly_minutes = 10 * 60
 
     assert optimiser._tier_priority_score("Tier One") > optimiser._tier_priority_score("Tier Two") + 200
-
 
 def test_schedule_config_targets_are_selected_within_min_max_range(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
@@ -811,6 +1757,137 @@ def test_optimiser_candidate_rows_are_indexed_by_location_and_day():
     ]
 
 
+def test_kwality_protected_class_times_can_share_clock_time_when_rooms_are_free():
+    location = "Kwality House, Kemps Corner"
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.schedule_config = {"class_mix": {location: {}}, "custom_rules": []}
+    optimiser.class_family = {
+        "Studio Mat 57": "barre_57",
+        "Studio Barre 57": "barre_57",
+    }
+    optimiser.protected = {}
+    optimiser.protected_class_times = {
+        (location, 0): [
+            {
+                "location": location,
+                "day": 0,
+                "time": "10:15",
+                "class": "Studio Mat 57",
+                "score": 90.0,
+                "top_trainers": [{"trainer": "Trainer Mat"}],
+            },
+            {
+                "location": location,
+                "day": 0,
+                "time": "10:15",
+                "class": "Studio Barre 57",
+                "score": 85.0,
+                "top_trainers": [{"trainer": "Trainer Barre"}],
+            },
+        ]
+    }
+    optimiser.scores_data = {
+        "class_slot_ranking": [
+            {
+                "location": location,
+                "day": 0,
+                "time": "10:15",
+                "class": "Studio Mat 57",
+                "trainer": "Trainer Mat",
+                "score": 90.0,
+                "recommendation": "PROTECT",
+                "session_count": 12,
+            },
+            {
+                "location": location,
+                "day": 0,
+                "time": "10:15",
+                "class": "Studio Barre 57",
+                "trainer": "Trainer Barre",
+                "score": 85.0,
+                "recommendation": "PROTECT",
+                "session_count": 12,
+            },
+        ],
+        "slot_group_ranking": [],
+    }
+    optimiser._build_score_indexes()
+    optimiser.hist_lookup = {
+        (location, "Studio Mat 57", "Trainer Mat", 0, "10:15"): {
+            "session_count": 12,
+            "avg_fill_rate": 0.75,
+            "avg_checkin": 15.0,
+        },
+        (location, "Studio Barre 57", "Trainer Barre", 0, "10:15"): {
+            "session_count": 12,
+            "avg_fill_rate": 0.70,
+            "avg_checkin": 14.0,
+        },
+    }
+    optimiser._build_history_indexes()
+    optimiser.trainer_states = {
+        "Trainer Mat": TrainerState("Trainer Mat", 1),
+        "Trainer Barre": TrainerState("Trainer Barre", 1),
+    }
+    optimiser.trainer_profiles = {
+        name: {
+            "name": name,
+            "tier": 1,
+            "locations": {
+                location: {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "22:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True},
+        }
+        for name in ("Trainer Mat", "Trainer Barre")
+    }
+    optimiser.trainer_home_region = {}
+    optimiser._ai_boost = {}
+    optimiser._ai_penalty = {}
+    optimiser._ai_mix_boost = {}
+
+    slots = optimiser._schedule_day(
+        location,
+        "Monday",
+        "2026-05-04",
+        target_count=2,
+        am_slots=["10:15"],
+        pm_slots=[],
+        room_occ=RoomOccupancy({
+            "strength_lab": {"capacity": 7, "families": ["strength_lab"]},
+            "powercycle": {"capacity": 10, "families": ["powercycle"]},
+            "studio_a": {"capacity": 22, "families": None},
+            "studio_b": {"capacity": 13, "families": None},
+        }),
+        weekly_class_counts={},
+    )
+
+    same_time = [slot for slot in slots if slot.time == "10:15"]
+    assert {slot.class_name for slot in same_time} == {"Studio Mat 57", "Studio Barre 57"}
+    assert {slot.room for slot in same_time} == {"studio_a", "studio_b"}
+
+
+def test_consecutive_format_check_allows_parallel_distinct_classes_at_same_time():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    slots_today = [
+        make_slot(time="17:45", class_name="Studio Barre 57", room="studio_a")
+    ]
+
+    assert not optimiser._would_repeat_consecutive_format(
+        slots_today,
+        "17:45",
+        "Studio Barre 57 Express",
+    )
+    assert optimiser._same_class_already_at_time(
+        slots_today,
+        "17:45",
+        "Studio Barre 57",
+    )
+
+
 def test_optimiser_history_slot_lookup_uses_precomputed_nearby_aggregate():
     optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
     optimiser.hist_lookup = {
@@ -841,6 +1918,51 @@ def test_optimiser_history_slot_lookup_uses_precomputed_nearby_aggregate():
     assert hist["session_count"] == 5
     assert hist["avg_fill_rate"] == pytest.approx(0.68)
     assert hist["avg_checkin"] == pytest.approx(9.8)
+
+
+def test_optimiser_history_slot_lookup_uses_canonical_class_family_before_fallback():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.hist_lookup = {
+        ("Kwality House, Kemps Corner", "Studio Barre 57 Express", "Trainer A", 0, "17:45"): {
+            "session_count": 4,
+            "avg_fill_rate": 0.70,
+            "avg_checkin": 9.0,
+        },
+        ("Kwality House, Kemps Corner", "Studio Barre 57", "Trainer B", 0, "18:45"): {
+            "session_count": 6,
+            "avg_fill_rate": 0.80,
+            "avg_checkin": 12.0,
+        },
+        ("Kwality House, Kemps Corner", "Studio HIIT", "Trainer C", 0, "17:45"): {
+            "session_count": 10,
+            "avg_fill_rate": 0.95,
+            "avg_checkin": 15.0,
+        },
+    }
+
+    optimiser._build_history_indexes()
+    hist = optimiser._get_hist_slot("Kwality House, Kemps Corner", "Barre 57", 0, "17:45")
+
+    assert hist["session_count"] == 4
+    assert hist["avg_fill_rate"] == pytest.approx(0.70)
+    assert hist["avg_checkin"] == pytest.approx(9.0)
+    assert optimiser._evidence_adjusted_fill(hist) == pytest.approx(0.70)
+
+
+def test_optimiser_history_slot_lookup_does_not_cross_canonical_class_families():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.hist_lookup = {
+        ("Kwality House, Kemps Corner", "Studio Barre 57", "Trainer A", 0, "17:45"): {
+            "session_count": 8,
+            "avg_fill_rate": 0.70,
+            "avg_checkin": 9.0,
+        }
+    }
+
+    optimiser._build_history_indexes()
+    hist = optimiser._get_hist_slot("Kwality House, Kemps Corner", "Studio HIIT", 0, "17:45")
+
+    assert hist == {}
 
 
 def test_pipeline_state_marks_missing_child_process_as_failed(monkeypatch):
@@ -1016,6 +2138,278 @@ def test_ai_fallback_promotes_daily_target_valid_iteration(tmp_path, monkeypatch
     assert len(output["schedule"]) == 2
     assert output["selected_iteration_name"] == "Trainer Hours"
     assert output["schedule"] == output["iterations"][1]["schedule"]
+
+
+def test_ai_only_repairs_invalid_location_plan_instead_of_failing(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "state").mkdir()
+    (tmp_path / "rules").mkdir()
+    (tmp_path / "config").mkdir()
+    (tmp_path / "state" / "03_scores.json").write_text(json.dumps({
+        "class_slot_ranking": [],
+        "slot_group_ranking": [],
+    }))
+    (tmp_path / "state" / "02_metrics.json").write_text(json.dumps({
+        "trainer_metrics": [],
+        "day_band_metrics": [],
+    }))
+    (tmp_path / "rules" / "trainer_profiles.json").write_text(json.dumps([
+        {
+            "name": "Trainer A",
+            "tier": 1,
+            "active": True,
+            "qualifications": {"all_barre": True},
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "21:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        }
+    ]))
+    (tmp_path / "config" / "rules_config.json").write_text(json.dumps({
+        "categories": {"universal": {"enabled": True}},
+        "rules": {},
+    }))
+    (tmp_path / "config" / "schedule_config.json").write_text(json.dumps({}))
+
+    import agents.ai_planner as ai_planner_module
+
+    monkeypatch.setenv("SCHEDULER_FORCE_AI_ONLY", "1")
+    monkeypatch.setattr(ai_planner_module, "OPENAI_AVAILABLE", True)
+    monkeypatch.setattr(ai_planner_module, "create_ai_client", lambda: (object(), {"model": "test-model"}))
+    monkeypatch.setattr(
+        AISchedulePlanner,
+        "_call_model",
+        lambda self, client, model_name, system_prompt, user_prompt, location: '{"schedule":[]}',
+    )
+
+    repaired_slot = PlannedSlot(
+        location="Kwality House, Kemps Corner",
+        date="2026-05-04",
+        day_of_week="Monday",
+        time="09:00",
+        class_name="Studio Barre 57",
+        trainer_1="Trainer A",
+        trainer_2="",
+        cover="",
+        room="studio_a",
+        capacity=20,
+        predicted_fill_rate=0.5,
+        score=80.0,
+        constraint_violations=[],
+    )
+    monkeypatch.setattr(
+        AISchedulePlanner,
+        "_fallback_location",
+        lambda self, location, scores_data, profiles_by_name: [repaired_slot],
+    )
+
+    planner = AISchedulePlanner(
+        target_week_start="2026-05-04",
+        locations=["Kwality House, Kemps Corner"],
+    )
+
+    output = planner.run()
+
+    assert output["schedule"][0]["trainer_1"] == "Trainer A"
+    assert output["ai_planned"] is True
+    assert output["ai_repaired_locations"] == ["Kwality House, Kemps Corner"]
+    assert "only 0 slots parsed" in output["parse_errors"][0]
+
+
+def test_trainer_hours_mode_prioritizes_underloaded_trainers():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[], optimization_mode="trainer_hours")
+    opt.trainer_states = {
+        "Empty Trainer": TrainerState("Empty Trainer", 3),
+        "Part Loaded Trainer": TrainerState("Part Loaded Trainer", 2),
+        "Loaded Trainer": TrainerState("Loaded Trainer", 1),
+    }
+    opt.trainer_states["Part Loaded Trainer"].weekly_minutes = 9 * 60
+    opt.trainer_states["Loaded Trainer"].weekly_minutes = 14 * 60
+
+    assert opt._trainer_hours_bonus("Part Loaded Trainer", "Monday") > opt._trainer_hours_bonus("Empty Trainer", "Monday") + 25
+    assert opt._tier_priority_score("Loaded Trainer") > opt._tier_priority_score("Empty Trainer")
+
+
+def test_trainer_hours_mode_keeps_quality_score_material():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[], optimization_mode="trainer_hours")
+
+    proven_slot = opt._apply_optimization_mode_adjustments(
+        base_score=88.0,
+        shift_bonus=0.0,
+        diversity_adjustment=0.0,
+        hours_bonus=8.0,
+        popularity_bonus=0.0,
+        ai_delta=0.0,
+        time_penalty=0.0,
+        recommendation="INCLUDE",
+    )
+    weak_utilization_slot = opt._apply_optimization_mode_adjustments(
+        base_score=32.0,
+        shift_bonus=0.0,
+        diversity_adjustment=0.0,
+        hours_bonus=95.0,
+        popularity_bonus=0.0,
+        ai_delta=0.0,
+        time_penalty=0.0,
+        recommendation="INCLUDE",
+    )
+
+    assert proven_slot > weak_utilization_slot
+
+
+def test_public_score_uses_performance_score_not_placement_score():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    score, placement, rec, is_exp = opt._public_score_fields(
+        base_score=82.0,
+        placement_score=100.0,
+        historical_session_count=12,
+        recommendation="INCLUDE",
+        is_experimental=False,
+        manual_pin=False,
+    )
+
+    assert score == 82.0
+    assert placement == 100.0
+    assert rec == "INCLUDE"
+    assert not is_exp
+
+
+def test_zero_history_candidate_is_capped_and_marked_experimental():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    score, placement, rec, is_exp = opt._public_score_fields(
+        base_score=91.0,
+        placement_score=100.0,
+        historical_session_count=0,
+        recommendation="PROTECT",
+        is_experimental=False,
+        manual_pin=False,
+    )
+
+    assert score == 20.0
+    assert placement == 100.0
+    assert rec == "EXPERIMENTAL"
+    assert is_exp
+
+
+def test_low_history_candidate_score_caps_by_evidence_band():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+
+    assert opt._public_score_fields(91.0, 100.0, 2, "INCLUDE", False, False)[0] == 35.0
+    assert opt._public_score_fields(91.0, 100.0, 7, "INCLUDE", False, False)[0] == 50.0
+    assert opt._public_score_fields(91.0, 100.0, 8, "INCLUDE", False, False)[0] == 91.0
+
+
+def test_class_variety_mode_rewards_missing_level_at_same_time():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[], optimization_mode="class_variety")
+    opt._time_level_counts = {
+        ("Kwality House, Kemps Corner", "09:00", "beginner"): 1,
+        ("Kwality House, Kemps Corner", "09:00", "intermediate"): 1,
+    }
+
+    advanced = opt._class_level_slot_adjustment("Kwality House, Kemps Corner", "09:00", "Studio FIT")
+    beginner_repeat = opt._class_level_slot_adjustment("Kwality House, Kemps Corner", "09:00", "Studio Mat 57 Express")
+
+    assert advanced > 0
+    assert beginner_repeat < 0
+    assert advanced > beginner_repeat
+
+
+def test_horizontal_time_mix_blocks_overused_same_class_column():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    opt._time_class_counts = {
+        ("Kwality House, Kemps Corner", "07:30", "Studio Barre 57"): 4,
+    }
+    opt._time_format_counts = {
+        ("Kwality House, Kemps Corner", "07:30", "barre_family"): 4,
+    }
+
+    assert opt._horizontal_mix_allows_candidate(
+        "Kwality House, Kemps Corner",
+        "07:30",
+        "Studio Barre 57",
+    ) is False
+    assert opt._horizontal_mix_allows_candidate(
+        "Kwality House, Kemps Corner",
+        "07:30",
+        "Studio Mat 57",
+    ) is True
+
+
+def test_horizontal_time_mix_blocks_overused_same_format_column():
+    opt = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    opt._time_class_counts = {
+        ("Kwality House, Kemps Corner", "18:00", "Studio Barre 57"): 2,
+        ("Kwality House, Kemps Corner", "18:00", "Studio Cardio Barre"): 2,
+    }
+    opt._time_format_counts = {
+        ("Kwality House, Kemps Corner", "18:00", "barre_family"): 4,
+    }
+
+    assert opt._horizontal_mix_allows_candidate(
+        "Kwality House, Kemps Corner",
+        "18:00",
+        "Studio Barre 57",
+    ) is False
+    assert opt._horizontal_mix_allows_candidate(
+        "Kwality House, Kemps Corner",
+        "18:00",
+        "Studio PowerCycle",
+    ) is True
+
+
+def test_ai_hard_limits_drop_horizontal_same_time_class_overuse():
+    slots = [
+        PlannedSlot(
+            location="Kwality House, Kemps Corner",
+            date=f"2026-05-{11 + idx:02d}",
+            day_of_week=day,
+            time="07:30",
+            class_name="Studio Barre 57",
+            trainer_1=f"Trainer {idx}",
+            trainer_2="",
+            cover="",
+            room="studio_a",
+            capacity=22,
+            predicted_fill_rate=0.5,
+            score=80.0 - idx,
+            constraint_violations=[],
+        )
+        for idx, day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], start=1)
+    ]
+    profiles = {
+        f"Trainer {idx}": {
+            "active": True,
+            "locations": {
+                "Kwality House, Kemps Corner": {
+                    "available_days": DAY_ORDER,
+                    "time_window": {"start": "07:00", "end": "21:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+        }
+        for idx in range(1, 6)
+    }
+
+    kept = _enforce_hard_limits(slots, "Kwality House, Kemps Corner", profiles)
+
+    assert len(kept) == 4
+    assert [slot.day_of_week for slot in kept] == ["Monday", "Tuesday", "Wednesday", "Thursday"]
+
+
+def test_clear_schedule_api_accepts_trailing_slash(tmp_path, monkeypatch):
+    monkeypatch.setattr(flask_app_module, "WEB_DIR", tmp_path)
+    (tmp_path / "schedule_data.json").write_text(json.dumps({"locations": {"Kenkere House": [{"time": "09:00"}]}}))
+    monkeypatch.setattr(flask_app_module, "_save_schedule_to_supabase", lambda data: {"saved": True})
+
+    client = flask_app_module.app.test_client()
+    response = client.post("/api/clear-schedule/", json={})
+
+    assert response.status_code == 200
+    assert response.get_json()["ok"] is True
+    assert json.loads((tmp_path / "schedule_data.json").read_text())["locations"]["Kenkere House"] == []
 
 
 def test_reporter_iteration_names_prefer_schedule_metadata():

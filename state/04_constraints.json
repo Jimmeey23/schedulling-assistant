@@ -1,12 +1,6 @@
 {
   "hard_constraints": [
     {
-      "constraint_id": "UNIV-001",
-      "type": "always_do",
-      "location": null,
-      "description": "Barre 57 family must be >= 25% of total weekly classes at any location"
-    },
-    {
       "constraint_id": "UNIV-002",
       "type": "always_do",
       "location": null,
@@ -22,31 +16,13 @@
       "constraint_id": "UNIV-004",
       "type": "never_do",
       "location": null,
-      "description": "Sunday max 5-6 classes"
+      "description": "Sunday max 5-6 classes, no class before 10:00"
     },
     {
-      "constraint_id": "UNIV-005",
-      "type": "class_location",
+      "constraint_id": "UNIV-009",
+      "type": "trainer_availability",
       "location": null,
-      "description": "Specialist classes only certified trainers"
-    },
-    {
-      "constraint_id": "UNIV-006",
-      "type": "always_do",
-      "location": null,
-      "description": "Express class must be paired with full-length equivalent on same day"
-    },
-    {
-      "constraint_id": "UNIV-007",
-      "type": "never_do",
-      "location": null,
-      "description": "Studio Recovery must never be first class of day"
-    },
-    {
-      "constraint_id": "UNIV-008",
-      "type": "never_do",
-      "location": null,
-      "description": "Foundations never at 11:30 or 19:15"
+      "description": "No trainer > 3 consecutive classes without 5 min gap"
     },
     {
       "constraint_id": "UNIV-010",
@@ -55,46 +31,10 @@
       "description": "No trainer > 4 classes in one day"
     },
     {
-      "constraint_id": "UNIV-011",
-      "type": "class_location",
+      "constraint_id": "UNIV-014",
+      "type": "slot_required",
       "location": null,
-      "description": "PowerCycle NEVER at Kenkere House"
-    },
-    {
-      "constraint_id": "UNIV-012",
-      "type": "class_location",
-      "location": null,
-      "description": "Strength Lab ONLY at Kwality House"
-    },
-    {
-      "constraint_id": "UNIV-013",
-      "type": "class_location",
-      "location": null,
-      "description": "Pre/Post Natal NEVER at ANY LOCATION"
-    },
-    {
-      "constraint_id": "UNIV-015",
-      "type": "always_do",
-      "location": null,
-      "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day"
-    },
-    {
-      "constraint_id": "UNIV-016",
-      "type": "always_do",
-      "location": null,
-      "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays"
-    },
-    {
-      "constraint_id": "UNIV-019",
-      "type": "never_do",
-      "location": null,
-      "description": "Specialist classes no substitution with non-certified"
-    },
-    {
-      "constraint_id": "UNIV-021",
-      "type": "never_do",
-      "location": null,
-      "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations"
+      "description": "Peak midday slot must never be empty"
     },
     {
       "constraint_id": "UNIV-022",
@@ -119,54 +59,6 @@
       "type": "trainer_availability",
       "location": null,
       "description": "Every trainer must get at least 1 full day off each week; 2 is preferred"
-    },
-    {
-      "constraint_id": "UNIV-026",
-      "type": "never_do",
-      "location": null,
-      "description": "Recovery sessions must be the last class in their shift at that location"
-    },
-    {
-      "constraint_id": "KW-002",
-      "type": "trainer_availability",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Anisha Shah Mon/Tue/Wed ONLY at Kwality"
-    },
-    {
-      "constraint_id": "KW-003",
-      "type": "trainer_availability",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Mrigakshi Jaiswal Thu/Fri ONLY at Kwality"
-    },
-    {
-      "constraint_id": "KW-004",
-      "type": "always_do",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Pranjali Jain owns Saturday 10:15-12:30 block"
-    },
-    {
-      "constraint_id": "KW-005",
-      "type": "always_do",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Rohan Dahima owns Thursday morning 09:15/10:15"
-    },
-    {
-      "constraint_id": "KW-006",
-      "type": "always_do",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Strength Lab: Atulan Purohit exclusively Mon/Wed evenings max 4/week"
-    },
-    {
-      "constraint_id": "KW-007",
-      "type": "always_do",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Pre/Post Natal: Anisha Mon-Wed, Mrigakshi Thu-Fri, mornings only"
-    },
-    {
-      "constraint_id": "KW-008",
-      "type": "never_do",
-      "location": "Kwality House, Kemps Corner",
-      "description": "Strength Lab max 4x per week total"
     }
   ],
   "soft_constraints": [
