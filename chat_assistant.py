@@ -364,6 +364,12 @@ def _ranked_substitution_candidates(
     ranked = []
     for idx, (_, _, _, _, line) in enumerate(sorted(candidates)[:12], start=1):
         ranked.append(f"- rank={idx} | {line}")
+    if ranked and not any("recommendation_status=eligible" in line for line in ranked):
+        ranked.insert(
+            0,
+            "- rank=0 | recommendation_status=eligible | trainer=none | "
+            "blocked_reasons=no fully eligible trainer found for the requested slot; review blocked candidates below",
+        )
     return ranked
 
 
@@ -644,6 +650,7 @@ def build_chat_context(
     scorecard_path: Path,
     profiles_path: Path,
     user_message: str = "",
+    dashboard_context: dict | None = None,
 ) -> str:
     schedule_data = _load_json(schedule_path, {})
     scorecard = _load_json(scorecard_path, {})
@@ -669,6 +676,22 @@ def build_chat_context(
         trainer_lines.append(f"  [T{tier}] {name} | active={active} | locations: {locs} | quals: {quals}")
 
     evidence = _build_relevant_evidence(user_message, schedule_data, profiles)
+    dashboard_context = dashboard_context or {}
+    active_context = ""
+    if dashboard_context:
+        context_bits = []
+        for key in ("mode", "location", "iteration", "day", "class_name", "trainer_1", "time"):
+            value = dashboard_context.get(key)
+            if value:
+                context_bits.append(f"{key}={value}")
+        filters = dashboard_context.get("filters") or {}
+        if filters:
+            context_bits.append("filters=" + json.dumps(filters, ensure_ascii=False))
+        selected_slot = dashboard_context.get("selected_slot") or {}
+        if selected_slot:
+            context_bits.append("selected_slot=" + json.dumps(selected_slot, ensure_ascii=False))
+        if context_bits:
+            active_context = "ACTIVE DASHBOARD CONTEXT: " + "; ".join(context_bits) + "\n"
 
     return (
         "You are an expert Physique 57 India studio schedule assistant. "
@@ -685,9 +708,377 @@ def build_chat_context(
         "Why: <2-4 evidence-backed bullets or short sentences using schedule facts>\n"
         "Next action: <one concrete operational step>\n\n"
         f"CURRENT SCHEDULE: {'; '.join(location_counts) if location_counts else 'No schedule loaded'}\n"
+        + active_context
         + (f"SCORECARD: {'; '.join(score_parts)}\n" if score_parts else "")
         + (f"\n{evidence}\n" if evidence else "")
         + (f"\nTRAINERS:\n" + "\n".join(trainer_lines) + "\n" if trainer_lines else "")
         + "\nDefault rules are limited to universal scheduling guardrails. "
         "Studio, trainer, and class-specific rules must come from user-created saved rules in Settings."
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Natural Language Schedule Editor
+# ─────────────────────────────────────────────────────────────────────────────
+
+_DAY_MAP = {
+    "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3,
+    "friday": 4, "saturday": 5, "sunday": 6,
+}
+
+# Maps class name fragments → trainer qualification keys
+_CLASS_QUAL_MAP = {
+    "powercycle": "powercycle",
+    "cycle": "powercycle",
+    "strength lab": "strength_lab",
+    "strength": "strength_lab",
+    "pre/post natal": "pre_post_natal",
+    "natal": "pre_post_natal",
+    "foundations": "foundations",
+    "mat 57": "mat_57",
+    "mat57": "mat_57",
+    "recovery": "recovery",
+    "amped up": "amped_up",
+    "amped": "amped_up",
+}
+
+
+def _class_to_qual_key(class_name: str) -> str | None:
+    lower = (class_name or "").lower()
+    for fragment, key in _CLASS_QUAL_MAP.items():
+        if fragment in lower:
+            return key
+    return None  # no specific cert required
+
+
+def _find_best_fit_trainer(
+    location: str,
+    day_name: str,
+    time: str,
+    class_name: str,
+    metrics_path: Path,
+    profiles_path: Path,
+) -> list[dict]:
+    """Return top-5 trainer candidates ranked by historical fit for this slot."""
+    day_int = _DAY_MAP.get((day_name or "").lower(), -1)
+    metrics = _load_json(metrics_path, {})
+    slots = metrics.get("class_trainer_slot_metrics", [])
+    profiles: list[dict] = _load_json(profiles_path, [])
+
+    # Build trainer availability + tier + qualifications from profiles
+    trainer_meta: dict[str, dict] = {}
+    for p in profiles:
+        name = p.get("name", "")
+        if not name:
+            continue
+        loc_data = (p.get("locations") or {}).get(location, {})
+        trainer_meta[name] = {
+            "tier": p.get("tier", 3),
+            "qualifications": p.get("qualifications", {}),
+            "available_days": loc_data.get("available_days", []),
+            "has_loc": bool(loc_data),
+        }
+
+    qual_key = _class_to_qual_key(class_name)
+
+    # Candidate pool: trainers with historical data for this slot (progressively relaxed)
+    def _score_slots(candidate_slots: list[dict]) -> dict[str, dict]:
+        pool: dict[str, dict] = {}
+        for s in candidate_slots:
+            tr = s.get("trainer", "")
+            if not tr:
+                continue
+            # Qualification gate
+            meta = trainer_meta.get(tr, {})
+            quals = meta.get("qualifications", {})
+            if qual_key and not quals.get(qual_key, True):
+                continue
+            fill = s.get("avg_fill_rate", 0.0)
+            checkin = s.get("avg_checkin", 0.0)
+            sessions = s.get("session_count", 0)
+            if tr not in pool or fill > pool[tr]["avg_fill_rate"]:
+                pool[tr] = {
+                    "fill": fill,
+                    "checkin": checkin,
+                    "sessions": sessions,
+                    "meta": meta,
+                }
+        return pool
+
+    def _filter(loc_match=True, day_match=True, time_match=True, cls_match=True):
+        result = []
+        for s in slots:
+            if loc_match and s.get("location") != location:
+                continue
+            if day_match and day_int >= 0 and s.get("day") != day_int:
+                continue
+            if time_match and time and s.get("time") != time:
+                continue
+            cls_lower = (class_name or "").lower()
+            if cls_match and cls_lower and cls_lower not in s.get("class", "").lower():
+                continue
+            result.append(s)
+        return result
+
+    # Try progressively relaxed filters until we have ≥3 candidates
+    for relax in [
+        dict(loc_match=True, day_match=True, time_match=True, cls_match=True),
+        dict(loc_match=True, day_match=True, time_match=False, cls_match=True),
+        dict(loc_match=True, day_match=False, time_match=False, cls_match=True),
+        dict(loc_match=True, day_match=False, time_match=False, cls_match=False),
+    ]:
+        pool = _score_slots(_filter(**relax))
+        if len(pool) >= 2:
+            break
+
+    # Build ranked candidates
+    candidates = []
+    for tr_name, data in pool.items():
+        meta = data["meta"]
+        fill = data["fill"]
+        checkin = data["checkin"]
+        sessions = data["sessions"]
+        tier = meta.get("tier", 3)
+        available = day_name in meta.get("available_days", []) and meta.get("has_loc", False)
+
+        score = (
+            fill * 40
+            + min(checkin / 10.0, 1.0) * 30
+            + (20 if available else 0)
+            + max(0, (4 - tier)) * 3.3  # tier 1 → +10, tier 2 → +6.6, tier 3 → 0
+        )
+
+        reason_parts = [f"Tier {tier}"]
+        reason_parts.append(f"{fill*100:.0f}% fill")
+        reason_parts.append(f"{checkin:.1f} avg check-in")
+        if sessions:
+            reason_parts.append(f"{sessions} sessions")
+        if not available:
+            reason_parts.append("⚠ verify availability")
+
+        candidates.append({
+            "name": tr_name,
+            "score": round(score, 1),
+            "avg_fill_rate": round(fill * 100, 1),
+            "avg_checkin": round(checkin, 1),
+            "session_count": sessions,
+            "tier": tier,
+            "available": available,
+            "reason": ", ".join(reason_parts),
+        })
+
+    candidates.sort(key=lambda x: (-int(x["available"]), -x["score"]))
+    return candidates[:6]
+
+
+def _find_best_fit_class(
+    location: str,
+    day_name: str,
+    time: str,
+    trainer: str,
+    metrics_path: Path,
+) -> list[dict]:
+    """Return top-5 class candidates ranked by historical performance for this slot."""
+    day_int = _DAY_MAP.get((day_name or "").lower(), -1)
+    metrics = _load_json(metrics_path, {})
+    slots = metrics.get("class_trainer_slot_metrics", [])
+
+    # Filter: same location + day + time; optionally same trainer
+    pool: dict[str, list] = {}
+    for s in slots:
+        if s.get("location") != location:
+            continue
+        if day_int >= 0 and s.get("day") != day_int:
+            continue
+        if time and s.get("time") != time:
+            continue
+        tr = s.get("trainer", "")
+        if trainer and trainer.lower().split()[0] not in tr.lower():
+            continue
+        cls = s.get("class", "")
+        if cls:
+            pool.setdefault(cls, []).append(s)
+
+    # If empty, relax trainer filter
+    if not pool:
+        for s in slots:
+            if s.get("location") != location:
+                continue
+            if day_int >= 0 and s.get("day") != day_int:
+                continue
+            if time and s.get("time") != time:
+                continue
+            cls = s.get("class", "")
+            if cls:
+                pool.setdefault(cls, []).append(s)
+
+    candidates = []
+    for cls_name, records in pool.items():
+        fill = sum(r.get("avg_fill_rate", 0) for r in records) / len(records)
+        checkin = sum(r.get("avg_checkin", 0) for r in records) / len(records)
+        sessions = sum(r.get("session_count", 0) for r in records)
+        score = fill * 50 + min(checkin / 10.0, 1.0) * 30 + min(sessions / 50.0, 1.0) * 20
+        candidates.append({
+            "name": cls_name,
+            "score": round(score, 1),
+            "avg_fill_rate": round(fill * 100, 1),
+            "avg_checkin": round(checkin, 1),
+            "session_count": sessions,
+            "reason": f"{fill*100:.0f}% fill, {checkin:.1f} avg check-in, {sessions} sessions",
+        })
+
+    candidates.sort(key=lambda x: -x["score"])
+    return candidates[:6]
+
+
+_NL_EDIT_SYSTEM = """You are a precise schedule editing AI for a fitness studio chain (Plan 57).
+Parse the user's natural language instruction into structured edit operations.
+
+RESPOND ONLY WITH VALID JSON — no prose before or after.
+
+JSON schema:
+{
+  "intent": "move_class | add_class | remove_class | swap_trainers | replace_trainer | change_time | change_class | best_fit_trainer | best_fit_class | bulk_add | global_replace_trainer | global_replace_class | slot_optimize | day_optimize | bulk_move | unclear",
+  "confidence": 0.0-1.0,
+  "summary": "one sentence plain English description of what will change",
+  "scope": {
+    "location": "location name if scoped — optional",
+    "day": "day name if scoped — optional",
+    "time_from": "HH:MM — start of time range if scoped",
+    "time_to": "HH:MM — end of time range if scoped",
+    "class_name": "class name if scoped",
+    "trainer": "trainer name if scoped"
+  },
+  "edits": [
+    {
+      "action": "add" | "remove" | "modify",
+      "location": "exact location name from schedule",
+      "day": "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday",
+      "time": "HH:MM",
+      "class_name": "exact class name",
+      "trainer_1": "trainer full name",
+      "trainer_2": "",
+      "new_day": "target day — only for move",
+      "new_time": "HH:MM — only for time change",
+      "new_trainer": "trainer name OR BEST_FIT",
+      "new_class": "class name OR BEST_FIT",
+      "reason": "short reason string"
+    }
+  ],
+  "warnings": ["string — potential conflicts or issues"],
+  "constraint_checks": ["relevant rules satisfied or flagged"]
+}
+
+INTENT RULES:
+- move_class: one "remove" + one "add" edit with updated day/time
+- swap_trainers: two "modify" edits swapping trainer_1 between two slots
+- replace_trainer: one "modify" with new_trainer on a specific slot
+- global_replace_trainer: "find and replace" — modify ALL slots matching a trainer or class name; populate scope.trainer and/or scope.class_name; set edits=[] (backend will scan and generate)
+- global_replace_class: replace a class name across all matching slots; populate scope; set edits=[]
+- bulk_add: "add more X on Y at Z" — generate multiple "add" edits, one per time slot suggested; use BEST_FIT for trainer if not specified
+- slot_optimize: "optimise the HH:MM slot" or "optimise the 8-9am block" — set scope.time_from/time_to, set edits=[] (backend uses AI optimizer scoped to those slots)
+- day_optimize: "optimise the Monday/Wednesday schedule" — set scope.day, set edits=[] (backend uses AI optimizer scoped to that day)
+- best_fit_trainer: specific slot where user asks who should teach; set new_trainer=BEST_FIT
+- best_fit_class: specific slot where user asks what class fits; set new_class=BEST_FIT
+
+NAME RULES:
+- Use exact class names from the schedule (e.g. "Studio Barre 57" not "Barre")
+- Use exact trainer names from the schedule
+- morning = 07:00–09:59, midday = 10:00–12:59, afternoon = 13:00–16:59, evening = 17:00–20:30
+- BEST_FIT sentinel: use when user says "find best trainer", "best available", "who fits", "best cover", "sub", "substitute"
+- If ambiguous, pick most likely and add warning
+- Never invent names not in the schedule (except BEST_FIT)
+- confidence < 0.6 → set intent="unclear" and explain in warnings"""
+
+
+def parse_nl_schedule_edit(
+    instruction: str,
+    schedule_snapshot: dict,
+    context: dict,
+    client,
+    model: str,
+    metrics_path: Path | None = None,
+    profiles_path: Path | None = None,
+) -> dict:
+    """Parse a NL instruction into structured edits, enriched with best-fit candidates."""
+    location = context.get("location", "")
+    week = context.get("week", "")
+
+    locations_data = schedule_snapshot.get("locations", {})
+    all_slots: list[dict] = []
+    if location and location in locations_data:
+        all_slots = locations_data[location]
+    else:
+        for loc_slots in locations_data.values():
+            all_slots.extend(loc_slots)
+
+    schedule_lines = []
+    seen_trainers: set[str] = set()
+    seen_classes: set[str] = set()
+    for s in all_slots[:300]:
+        loc = s.get("location", "?")
+        day = s.get("day_of_week", "?")
+        t = s.get("time", "?")
+        cls = s.get("class_name", "?")
+        tr = s.get("trainer_1", "?")
+        schedule_lines.append(f"  {loc} | {day} {t} | {cls} | Trainer: {tr}")
+        if tr and tr != "?":
+            seen_trainers.add(tr)
+        if cls and cls != "?":
+            seen_classes.add(cls)
+
+    schedule_text = "\n".join(schedule_lines) if schedule_lines else "No schedule loaded."
+    locations_list = ", ".join(locations_data.keys()) or "Unknown"
+
+    user_prompt = (
+        f"WEEK: {week}\n"
+        f"LOCATIONS: {locations_list}\n"
+        f"ACTIVE LOCATION FILTER: {location or 'all'}\n"
+        f"TRAINERS IN SCHEDULE: {', '.join(sorted(seen_trainers)) or 'Unknown'}\n"
+        f"CLASS FORMATS IN SCHEDULE: {', '.join(sorted(seen_classes)) or 'Unknown'}\n\n"
+        f"CURRENT SCHEDULE:\n{schedule_text}\n\n"
+        f"INSTRUCTION: {instruction}"
+    )
+
+    response = client.chat.completions.create(
+        model=model,
+        temperature=0.1,
+        max_tokens=1500,
+        messages=[
+            {"role": "system", "content": _NL_EDIT_SYSTEM},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+
+    raw = (response.choices[0].message.content or "").strip()
+    json_match = re.search(r"\{[\s\S]*\}", raw)
+    result = json.loads(json_match.group() if json_match else raw)
+
+    # ── Enrich edits that requested BEST_FIT ─────────────────────
+    if metrics_path and profiles_path:
+        for edit in result.get("edits", []):
+            edit_loc = edit.get("location") or location
+            edit_day = edit.get("new_day") or edit.get("day") or ""
+            edit_time = edit.get("new_time") or edit.get("time") or ""
+            edit_class = edit.get("new_class") or edit.get("class_name") or ""
+            edit_trainer = edit.get("new_trainer") or edit.get("trainer_1") or ""
+
+            if edit.get("new_trainer") == "BEST_FIT":
+                candidates = _find_best_fit_trainer(
+                    edit_loc, edit_day, edit_time, edit_class,
+                    metrics_path, profiles_path,
+                )
+                edit["new_trainer"] = candidates[0]["name"] if candidates else ""
+                edit["best_fit_trainer_candidates"] = candidates
+                edit["best_fit_type"] = "trainer"
+
+            if edit.get("new_class") == "BEST_FIT":
+                candidates = _find_best_fit_class(
+                    edit_loc, edit_day, edit_time, edit_trainer,
+                    metrics_path,
+                )
+                edit["new_class"] = candidates[0]["name"] if candidates else ""
+                edit["best_fit_class_candidates"] = candidates
+                edit["best_fit_type"] = "class"
+
+    return result

@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Studio Schedule Planner & Optimizer</title>
+<link rel="icon" type="image/png" href="images/plan57-speed-calendar-v2.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -34,64 +35,71 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* HEADER */
 .app-header{
-  background:linear-gradient(135deg,#FFFFFF 0%,#F8FAFC 58%,#EFF6FF 100%);border-bottom:1px solid #DCE3EB;
-  padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:400;box-shadow:0 10px 28px rgba(15,23,42,.055);
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,250,252,.91));backdrop-filter:blur(20px);border-bottom:1px solid rgba(226,232,240,.9);
+  padding:0 28px;height:96px;display:flex;align-items:center;justify-content:space-between;gap:22px;
+  position:sticky;top:0;z-index:400;box-shadow:0 14px 38px rgba(15,23,42,.075);
 }
-.hdr-left{display:flex;align-items:center;gap:14px;min-width:0}
+.hdr-left{display:flex;align-items:center;gap:13px;min-width:0}
 .logo{
-  width:46px;height:46px;background:linear-gradient(135deg,#0F172A,#1D4ED8 54%,#06B6D4);border-radius:14px;
+  width:72px;height:72px;background:transparent;border:none;border-radius:18px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;
-  box-shadow:0 14px 28px rgba(30,64,175,.24);position:relative;overflow:hidden;
+  box-shadow:none;position:relative;overflow:visible;animation:brandFloat 5s ease-in-out infinite;
 }
-.logo svg{width:26px;height:26px;animation:calendarFloat 3.2s cubic-bezier(.4,0,.2,1) infinite;position:relative;z-index:2}
-.logo::before{content:"";position:absolute;inset:8px;border-radius:12px;background:rgba(255,255,255,.12);transform:rotate(8deg);animation:calendarPulse 3.2s ease-in-out infinite}
-.logo::after{content:"";position:absolute;width:28px;height:64px;background:rgba(255,255,255,.24);transform:rotate(30deg);left:-32px;top:-10px;animation:calendarShine 4.2s ease-in-out infinite}
+.logo::after{display:none}
+.logo::after{content:"";position:absolute;inset:-45%;background:linear-gradient(120deg,transparent 38%,rgba(255,255,255,.42),transparent 62%);transform:translateX(-60%) rotate(12deg);animation:brandShine 5.8s ease-in-out infinite}
+.logo-img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+.brand-wordmark{display:flex;align-items:baseline;gap:8px;font-family:'Plus Jakarta Sans',sans-serif;line-height:1}
+.brand-wordmark .brand-plan{font-size:34px;font-weight:900;color:#111820;letter-spacing:.08em;text-transform:uppercase}
+.brand-wordmark .brand-57{font-size:35px;font-weight:900;color:#D45B63;letter-spacing:.01em}
+.brand-product{font-size:11px;color:#64748B;margin-top:8px;font-weight:900;letter-spacing:.20em;text-transform:uppercase}
+.hdr-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex-wrap:wrap}
+@keyframes brandFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes brandShine{0%,48%{transform:translateX(-62%) rotate(12deg)}72%,100%{transform:translateX(62%) rotate(12deg)}}
 @keyframes calendarFloat{0%,100%{transform:translateY(0) rotate(0) scale(1)}50%{transform:translateY(-2px) rotate(-2deg) scale(1.04)}}
 @keyframes calendarPulse{0%,100%{opacity:.55;transform:rotate(8deg) scale(.96)}50%{opacity:.9;transform:rotate(8deg) scale(1.08)}}
 @keyframes calendarShine{0%,58%{left:-34px}78%,100%{left:56px}}
 .hdr-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:900;color:#0F172A;letter-spacing:-0.02em;line-height:1.05}
 .hdr-sub{font-size:12px;color:#64748B;margin-top:4px;font-weight:700;letter-spacing:.01em}
 .week-badge{
-  display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FFF7ED,#FFFFFF);color:#92400E;border:1px solid #FED7AA;
-  border-radius:14px;padding:9px 14px;font-size:12px;font-weight:900;
-  font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;box-shadow:0 8px 18px rgba(217,119,6,.12);
+  display:flex;align-items:center;gap:8px;background:#FFF7ED;color:#9A3412;border:1px solid #FED7AA;
+  border-radius:999px;padding:8px 12px;font-size:11px;font-weight:900;
+  font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;box-shadow:none;
 }
-.week-badge::before{content:"";width:8px;height:8px;border-radius:999px;background:#F59E0B;box-shadow:0 0 0 4px rgba(245,158,11,.15)}
-.schedule-week-control{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #CBD5E1;border-radius:14px;padding:7px 10px;box-shadow:0 8px 18px rgba(15,23,42,.07)}
+.week-badge::before{content:"";width:7px;height:7px;border-radius:999px;background:#EA765E;box-shadow:0 0 0 3px rgba(234,118,94,.16)}
+.schedule-week-control{display:flex;align-items:center;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:999px;padding:7px 10px;box-shadow:none}
 .schedule-week-control span{font-size:11px;font-weight:900;color:#475569;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
-.schedule-week-control input{border:0;background:transparent;color:#0F172A;font-size:12px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;min-width:132px;outline:none}
+.schedule-week-control input{border:0;background:transparent;color:#111820;font-size:12px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;min-width:126px;outline:none}
 
 /* LOCATION BAR */
 .loc-bar{
-  background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid #DCE3EB;padding:10px 28px;height:58px;
-  display:flex;align-items:center;gap:8px;position:sticky;top:72px;z-index:390;overflow-x:auto;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(226,232,240,.86);padding:10px 28px;height:58px;
+  display:flex;align-items:center;gap:6px;position:sticky;top:96px;z-index:390;overflow-x:auto;
 }
 .loc-tab{
-  min-width:190px;padding:10px 20px;border-radius:999px;font-size:12px;font-weight:900;
+  min-width:174px;padding:9px 18px;border-radius:999px;font-size:12px;font-weight:900;
   font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;
-  background:#F8FAFC;color:#475569;transition:all 0.16s;white-space:nowrap;
-  border:1px solid #E2E8F0;box-shadow:0 1px 2px rgba(15,23,42,.04);
+  background:rgba(248,250,252,.72);color:#475569;transition:all 0.16s;white-space:nowrap;
+  border:1px solid rgba(226,232,240,.9);box-shadow:none;
 }
-.loc-tab:hover{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;transform:translateY(-1px)}
-.loc-tab.active{background:#0F172A;color:#fff;border-color:#0F172A;box-shadow:0 10px 20px rgba(15,23,42,.16)}
+.loc-tab:hover{background:#fff;color:#0F172A;border-color:#CBD5E1;transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,23,42,.06)}
+.loc-tab.active{background:#111820;color:#fff;border-color:#111820;box-shadow:0 10px 24px rgba(15,23,42,.18)}
 .loc-tab.muted{opacity:.45}
 
 /* CONTROL BAR */
 .ctrl-bar{
-  background:#F8FAFC;border-bottom:1px solid #DCE3EB;padding:8px 28px;
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);border-bottom:1px solid #E2E8F0;padding:9px 28px;
   display:flex;align-items:center;justify-content:space-between;gap:8px;
-  position:sticky;top:130px;z-index:380;
+  position:sticky;top:154px;z-index:380;
 }
-.view-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#fff;border:1px solid #DCE3EB;border-radius:14px;padding:5px;box-shadow:0 4px 14px rgba(15,23,42,.04)}
+.view-group{display:flex;align-items:center;gap:4px;flex-wrap:wrap;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:16px;padding:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
 .vbtn{
-  display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:10px;
+  display:flex;align-items:center;gap:6px;padding:9px 13px;border-radius:13px;
   font-size:12px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;
   cursor:pointer;border:1px solid transparent;background:transparent;
-  color:#64748B;transition:all 0.14s;white-space:nowrap;
+  color:#64748B;transition:transform .16s,background .16s,border-color .16s,box-shadow .16s,color .16s;white-space:nowrap;
 }
-.vbtn:hover{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
-.vbtn.active{background:#0F172A;border-color:#0F172A;color:#fff;box-shadow:0 8px 18px rgba(15,23,42,.16)}
+.vbtn:hover{background:#fff;color:#0F172A;border-color:#E2E8F0;box-shadow:0 6px 14px rgba(15,23,42,.06);transform:translateY(-1px)}
+.vbtn.active{background:#111820;border-color:#111820;color:#fff;box-shadow:0 10px 22px rgba(15,23,42,.18)}
 .ctrl-right{display:flex;align-items:center;gap:6px}
 .iter-pill{
   padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;
@@ -100,11 +108,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .iter-pill.active{background:var(--prime);border-color:var(--prime);color:#fff}
 .filter-toggle-btn{
-  display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r6);
-  font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer;border:1px solid var(--border);background:var(--surface);
-  color:var(--text-muted);transition:all 0.1s;
+  display:flex;align-items:center;gap:5px;padding:8px 12px;border-radius:12px;
+  font-size:12px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;
+  cursor:pointer;border:1px solid #E2E8F0;background:#fff;
+  color:#475569;transition:all 0.14s;box-shadow:0 4px 12px rgba(15,23,42,.04);
 }
+.filter-toggle-btn:hover{border-color:#CBD5E1;color:#0F172A;transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,23,42,.08)}
 .filter-toggle-btn.active{background:var(--primary-light);border-color:var(--primary-mid);color:var(--primary)}
 .filter-toggle-btn.pinned{background:#0F172A;border-color:#0F172A;color:#fff}
 
@@ -115,7 +124,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .filter-panel{
   background:#fff;border:1px solid #DCE3EB;border-radius:18px;
   overflow:auto;max-height:calc(100vh - 166px);transition:width 0.2s ease,opacity 0.2s ease,transform 0.2s ease;
-  position:sticky;top:154px;z-index:120;box-shadow:0 12px 32px rgba(15,23,42,.06);
+  position:sticky;top:178px;z-index:120;box-shadow:0 12px 32px rgba(15,23,42,.06);
 }
 .filter-panel:not(.open){width:0;opacity:0;border:0;overflow:hidden;transform:translateX(-10px);pointer-events:none}
 .fp-inner{padding:16px;display:flex;flex-direction:column;gap:14px}
@@ -190,6 +199,8 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   background:var(--surface);border:1px solid var(--border);border-radius:var(--r8);
   padding:12px 16px;min-width:100px;flex:1;box-shadow:var(--sh-sm);
 }
+.stat-card.clickable{cursor:pointer;transition:transform .14s,box-shadow .14s,border-color .14s}
+.stat-card.clickable:hover{transform:translateY(-1px);box-shadow:var(--sh-md);border-color:var(--primary-mid)}
 .sc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px;font-family:'Plus Jakarta Sans',sans-serif}
 .sc-val{font-size:22px;font-weight:800;color:var(--text);line-height:1;font-family:'Plus Jakarta Sans',sans-serif}
 .sc-val.blue{color:var(--primary)}.sc-val.green{color:var(--green)}.sc-val.amber{color:var(--prime)}.sc-val.red{color:var(--red)}
@@ -212,69 +223,102 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 
 /* CLASS CARD */
 .cc{
-  border-radius:10px;padding:8px;cursor:pointer;
-  transition:box-shadow 0.18s cubic-bezier(.2,.8,.2,1),transform 0.18s cubic-bezier(.2,.8,.2,1),border-color 0.18s,background 0.18s;
-  border:1px solid transparent;position:relative;overflow:hidden;margin-bottom:8px;
-  min-height:96px;box-shadow:0 1px 2px rgba(15,23,42,.04);
-  display:flex;flex-direction:column;gap:5px;isolation:isolate;
+  position:relative;overflow:hidden;isolation:isolate;margin-bottom:8px;min-height:124px;
+  border:1px solid rgba(203,213,225,.86);border-radius:12px;padding:10px;cursor:grab;
+  background:linear-gradient(135deg,rgba(248,250,252,.92),rgba(239,246,255,.86));
+  box-shadow:0 1px 2px rgba(15,23,42,.05),0 8px 18px rgba(15,23,42,.045);
+  transform:translateZ(0);animation:ccCardIn .38s cubic-bezier(.16,1,.3,1) both;
+  transition:min-height .26s cubic-bezier(.16,1,.3,1),box-shadow .22s cubic-bezier(.16,1,.3,1),transform .22s cubic-bezier(.16,1,.3,1),border-color .18s,filter .18s;
 }
-.cc::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.46),rgba(255,255,255,0));opacity:0;transition:opacity .18s;pointer-events:none;z-index:0}
+.cc::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.18) 46%,rgba(15,23,42,.035));opacity:1;pointer-events:none;z-index:0;transition:opacity .22s}
+.cc::after{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--border);pointer-events:none;z-index:2;box-shadow:0 1px 8px rgba(15,23,42,.08);transition:height .18s,opacity .18s}
 .cc>*{position:relative;z-index:1}
-.cc:hover{transform:translateY(-2px) scale(1.015);box-shadow:0 20px 40px rgba(15,23,42,.16);z-index:50;border-color:#60A5FA}
-.cc:hover::before{opacity:1}
-.cc-mini{min-height:78px;padding:7px 8px;margin-bottom:5px;gap:4px;border-radius:9px}
-.cc-mini:hover{transform:translateY(-2px) scale(1.02)}
+.cc:hover{min-height:214px;transform:translateY(-3px) scale(1.012);box-shadow:0 24px 50px -18px rgba(15,23,42,.32),0 0 0 1px rgba(255,255,255,.95) inset;z-index:80;border-color:rgba(148,163,184,.95)}
+.cc:hover::before{opacity:.86}
+.cc:hover::after{height:5px}
+.cc-day-time{font-size:8px;font-weight:900;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;padding:4px 6px;background:#F3F4F6;border-radius:5px;white-space:nowrap}
+.cc-mini{min-height:84px;padding:8px;margin-bottom:6px;border-radius:10px}
+.cc-mini:hover{min-height:118px;transform:translateY(-2px) scale(1.01)}
+.cc-mini .cc-bottom{grid-template-columns:auto 1fr auto;border-radius:7px;padding:5px}
+.cc-mini .cc-score-ring{width:24px;height:24px;flex-basis:24px;font-size:10px}
+.cc-mini .cc-avatar{width:22px;height:22px;border-radius:999px;font-size:7px}
+.cc-mini:hover .cc-avatar{width:24px;height:24px;border-radius:6px}
 .cc-accent{display:none}
-.cc-barre{background:#FFF1F2;border-color:#FECACA}
-.cc-powercycle{background:#FFF1F2;border-color:#FCA5A5}
-.cc-strength_lab{background:#EFF6FF;border-color:#BFDBFE}
-.cc-recovery{background:#ECFDF5;border-color:#BBF7D0}
-.cc-foundations{background:#FFFBEB;border-color:#FDE68A}
-.cc-mat_57{background:#F8FAFC;border-color:#CBD5E1}
-.cc-hiit{background:#FFF1F2;border-color:#FCA5A5}
-.cc-default{background:#F8FAFC;border-color:#E2E8F0}
-.cc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:7px;min-height:26px}
-.cc-name{font-weight:800;font-size:12px;line-height:1.16;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.cc-score-ring{width:22px;height:22px;flex:0 0 22px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.72);border:1px solid rgba(148,163,184,.35);box-shadow:0 1px 2px rgba(15,23,42,.05)}
-.cc-trainer{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#475569;font-weight:600;min-width:0}
-.cc-avatar{width:20px;height:20px;border-radius:999px;overflow:hidden;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 1px 3px rgba(15,23,42,.12);font-size:8px;font-weight:900;color:#0F172A}
-.cc-avatar-btn{cursor:pointer;padding:0;transition:transform .14s,border-color .14s,box-shadow .14s}
-.cc-avatar-btn:hover{transform:scale(1.08);border-color:#60A5FA;box-shadow:0 4px 10px rgba(37,99,235,.2)}
+.cc-barre{background:linear-gradient(135deg,rgba(255,241,242,.92),rgba(255,228,230,.82));border-color:#FDA4AF}.cc-powercycle{background:linear-gradient(135deg,rgba(255,247,237,.94),rgba(254,215,170,.78));border-color:#FDBA74}.cc-strength_lab{background:linear-gradient(135deg,rgba(239,246,255,.96),rgba(219,234,254,.84));border-color:#93C5FD}.cc-recovery{background:linear-gradient(135deg,rgba(236,253,245,.96),rgba(209,250,229,.84));border-color:#6EE7B7}.cc-foundations{background:linear-gradient(135deg,rgba(254,252,232,.96),rgba(254,243,199,.84));border-color:#FDE68A}.cc-mat_57{background:linear-gradient(135deg,rgba(248,250,252,.96),rgba(226,232,240,.82));border-color:#CBD5E1}.cc-hiit{background:linear-gradient(135deg,rgba(254,242,242,.96),rgba(254,202,202,.8));border-color:#FCA5A5}.cc-default{background:linear-gradient(135deg,rgba(248,250,252,.96),rgba(239,246,255,.82));border-color:#CBD5E1}
+.cc-barre::after{background:#E71C45}.cc-powercycle::after{background:#D97706}.cc-strength_lab::after{background:#2563EB}.cc-recovery::after{background:#059669}.cc-foundations::after{background:#CA8A04}.cc-mat_57::after{background:#6B7280}.cc-hiit::after{background:#DC2626}.cc-default::after{background:#9CA3AF}
+.cc-top{display:grid;grid-template-columns:minmax(0,1fr)34px;align-items:start;gap:9px;min-height:38px;padding-top:3px}
+.cc-title-stack{min-width:0;display:flex;flex-direction:column;gap:2px}
+.cc-card-kicker{font-size:7px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#64748B;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.86}
+.cc-name{font-weight:900;font-size:13px;line-height:1.18;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;text-wrap:balance}
+.cc-score-ring{width:34px;height:34px;flex:0 0 34px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.76);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.88);border-radius:10px;box-shadow:0 8px 18px rgba(15,23,42,.08);transition:transform .22s cubic-bezier(.16,1,.3,1),background .2s,box-shadow .2s;font-size:12px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.cc:hover .cc-score-ring{transform:scale(1.08) rotate(4deg);box-shadow:0 14px 28px rgba(15,23,42,.14);background:#fff}
+.cc-info-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px;margin-top:6px}
+.cc-trainer{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#475569;font-weight:800;min-width:0}
+.cc-avatar{width:24px;height:24px;border-radius:999px;overflow:hidden;background:#fff;border:1.5px solid rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:0 5px 12px rgba(15,23,42,.12);font-size:8px;font-weight:900;color:#111827;position:relative}
+.cc-avatar::after{content:"";position:absolute;inset:0;border-radius:inherit;border:1px solid rgba(255,255,255,.9);pointer-events:none}
+.cc-avatar-btn{cursor:pointer;padding:0;transition:transform .16s,border-color .16s,box-shadow .16s}
+.cc:hover .cc-avatar{width:28px;height:28px;box-shadow:0 10px 22px rgba(15,23,42,.14)}
+.cc-avatar-btn:hover{transform:scale(1.08) rotate(-2deg);border-color:#60A5FA;box-shadow:0 10px 24px rgba(37,99,235,.22)}
 .trainer-filter-active .cc-avatar-btn:not(.selected){opacity:.28;filter:grayscale(1)}
 .trainer-filter-active .cc-avatar-btn.selected{border-color:#2563EB;box-shadow:0 0 0 2px #BFDBFE,0 4px 10px rgba(37,99,235,.2)}
 .cc-avatar img{width:100%;height:100%;object-fit:cover}
-.cc-tr-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-meta{display:flex;align-items:center;gap:5px;font-size:9px;color:#64748B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-bottom{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;margin-top:auto}
-.cc-fill-pct{font-size:12px;font-weight:900;min-width:32px;font-family:'Plus Jakarta Sans',sans-serif}
-.cc-bar-bg{background:#E2E8F0;border-radius:999px;height:3px;overflow:hidden}
-.cc-bar-fill{height:100%;border-radius:999px}
-.cc-avg{font-size:11px;font-weight:900;color:#059669;font-family:'Plus Jakarta Sans',sans-serif;text-align:right;line-height:1;min-width:24px}
-.cc-avg span{display:block;font-size:8px;color:#64748B;font-weight:600}
-.cc-tag-row{display:flex;align-items:center;gap:4px;min-height:15px;overflow:hidden}
-.cc-badge,.cc-chip{font-size:8px;font-weight:800;padding:2px 5px;border-radius:100px;text-transform:uppercase;letter-spacing:0.04em;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
-.cc-chip{background:rgba(255,255,255,.74);color:#64748B;border:1px solid rgba(148,163,184,.25)}
-.cc-hist{font-size:9px;color:#64748B;margin-left:auto;white-space:nowrap}
+.cc-tr-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:150px;font-size:10.5px;font-weight:800;color:#334155;letter-spacing:0}
+.cc-meta{display:flex;align-items:center;gap:3px;font-size:8px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.76);border-radius:999px;padding:3px 7px;font-weight:900;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.cc-bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin-top:8px;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.88);border-radius:10px;padding:8px;box-shadow:0 8px 18px rgba(15,23,42,.06),inset 0 1px 0 rgba(255,255,255,.95)}
+.cc-fill-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cc-fill-head{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.cc-fill-pct{font-size:13px;font-weight:900;min-width:32px;font-family:'Plus Jakarta Sans',sans-serif;line-height:1;color:#111827}
+.cc-fill-label{font-size:7px;font-weight:900;color:#64748B;text-transform:uppercase;letter-spacing:.06em}
+.cc-bar-bg{background:rgba(203,213,225,.86);border-radius:999px;height:4px;overflow:hidden;position:relative;box-shadow:inset 0 1px 1px rgba(15,23,42,.05)}
+.cc-bar-fill{height:100%;border-radius:999px;position:relative;box-shadow:0 0 10px currentColor;transition:width .48s cubic-bezier(.16,1,.3,1)}
+.cc-bar-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.68),transparent);animation:ccSweep 2.4s ease-in-out infinite}
+.cc-avg{font-size:11px;font-weight:900;color:#059669;font-family:'Plus Jakarta Sans',sans-serif;text-align:center;line-height:1;min-width:34px;width:34px;height:34px;border-radius:10px;background:rgba(236,253,245,.88);border:1px solid rgba(110,231,183,.76);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 16px rgba(5,150,105,.1);transition:transform .18s,background .18s}
+.cc:hover .cc-avg{transform:scale(1.06);background:#ECFDF5}
+.cc-avg span{display:block;font-size:6px;color:#6B7280;font-weight:800;margin-top:0.5px}
+.cc-metric-circles{display:none}
+.cc-tag-row{display:none}
 .cc-open-line{display:none}
-.cc-hover-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:0;max-height:0;opacity:0;transform:translateY(-5px);overflow:hidden;pointer-events:none;transition:max-height .18s ease,opacity .18s ease,transform .18s ease,margin-top .18s ease}
-.cc:hover .cc-hover-tools{max-height:26px;opacity:1;transform:translateY(0);pointer-events:auto;margin-top:2px}
-.cc-tool{height:20px;border-radius:6px;border:1px solid #BFDBFE;background:#2563EB;color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.cc-tool.secondary{background:#4F46E5;border-color:#C7D2FE}
-.cc-tool.danger{background:#DC2626;border-color:#FECACA}
-.cc-viol{width:15px;height:15px;background:var(--red);border-radius:100%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff}
-.cc-exp-mark{font-size:8px;font-weight:800;padding:2px 5px;border-radius:999px;background:#FDF2F8;color:#9D174D;border:1px solid #FBCFE8}
+.cc:hover .cc-metric-circles{display:none}
+.cc:hover .cc-tag-row{display:none}
+.cc:hover .cc-open-line{display:none}
+.cc-hover-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:0;opacity:0;transform:translateY(-5px);overflow:hidden;pointer-events:none;margin-top:0;border-top:0 solid rgba(226,232,240,.0);transition:max-height .24s cubic-bezier(.16,1,.3,1),opacity .2s ease,transform .2s ease,margin-top .2s ease,padding-top .2s ease,border-color .2s}
+.cc:hover .cc-hover-tools{max-height:76px;opacity:1;transform:translateY(0);pointer-events:auto;margin-top:9px;padding-top:9px;border-top:1px solid rgba(226,232,240,.9)}
+.cc-tool{height:28px;border-radius:8px;border:1px solid rgba(203,213,225,.9);background:rgba(255,255,255,.78);color:#334155;font-size:0;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;box-shadow:0 4px 10px rgba(15,23,42,.055);transition:transform .14s ease,background .14s ease,color .14s ease,border-color .14s ease,box-shadow .14s ease}
+.cc:hover .cc-tool{font-size:8.5px}
+.cc-tool:hover{transform:translateY(-2px);background:#0F172A;border-color:#0F172A;color:#FFFFFF;box-shadow:0 10px 20px rgba(15,23,42,.16)}
+.cc-tool.secondary{background:#EFF6FF;border-color:#BFDBFE;color:#2563EB}
+.cc-tool.secondary:hover{background:#2563EB;border-color:#2563EB;color:#FFFFFF}
+.cc-tool.danger{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
+.cc-tool.danger:hover{background:#DC2626;border-color:#DC2626;color:#FFFFFF}
+.cc-tool-icon{font-size:11px;line-height:1;display:inline-block;animation:ccIconFloat 2.8s ease-in-out infinite}
+.cc-tool:nth-child(2) .cc-tool-icon{animation-delay:.18s}.cc-tool:nth-child(3) .cc-tool-icon{animation-delay:.34s}.cc-tool:nth-child(4) .cc-tool-icon{animation-delay:.5s}
+.cc-viol{width:16px;height:16px;background:#DC2626;border-radius:100%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff}
+.cc-exp-mark{font-size:8px;font-weight:800;padding:2px 6px;border-radius:5px;background:#FDF2F8;color:#BE185D;border:1px solid #FBCFE8}
+@keyframes ccCardIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes ccSweep{0%,45%{transform:translateX(-100%)}75%,100%{transform:translateX(100%)}}
+@keyframes ccIconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
 /* badge colors */
 .bp{background:#FEF3C7;color:#B45309}.bpe{background:#D1FAE5;color:#065F46}.bps{background:#EDE9FE;color:#5B21B6}.bi{background:#DBEAFE;color:#1E3A8A}.bc{background:#FEF3C7;color:#78350F}.bd{background:#F1F5F9;color:#475569}
 
+/* Fill bar colors by class type */
+.cc-barre .cc-bar-fill{background:linear-gradient(90deg,#E71C45,#F43F5E)}
+.cc-powercycle .cc-bar-fill{background:linear-gradient(90deg,#D97706,#F97316)}
+.cc-strength_lab .cc-bar-fill{background:linear-gradient(90deg,#2563EB,#3B82F6)}
+.cc-recovery .cc-bar-fill{background:linear-gradient(90deg,#059669,#10B981)}
+.cc-foundations .cc-bar-fill{background:linear-gradient(90deg,#CA8A04,#EAB308)}
+.cc-mat_57 .cc-bar-fill{background:linear-gradient(90deg,#6B7280,#9CA3AF)}
+.cc-hiit .cc-bar-fill{background:linear-gradient(90deg,#DC2626,#EF4444)}
+.cc-default .cc-bar-fill{background:linear-gradient(90deg,#6B7280,#9CA3AF)}
+
 /* GRID VIEW */
-.planner-card{background:#fff;border:1px solid #DCE3EB;border-radius:18px;box-shadow:0 10px 28px rgba(15,23,42,.06);overflow:hidden;margin-bottom:20px}
+.planner-card{background:#fff;border:1px solid #DCE3EB;border-radius:18px;box-shadow:0 10px 28px rgba(15,23,42,.06);overflow:visible;margin-bottom:20px}
 .planner-card-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;border-bottom:1px solid #E2E8F0;background:linear-gradient(135deg,#FFFFFF,#F8FAFC 62%,#EFF6FF)}
 .planner-card-title{font-size:21px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.02em}
 .planner-view-pills{display:flex;align-items:center;gap:5px;flex-wrap:wrap;background:#fff;border:1px solid #DCE3EB;border-radius:14px;padding:5px;box-shadow:0 4px 14px rgba(15,23,42,.045)}
 .planner-view-pill{padding:8px 13px;border-radius:10px;border:1px solid transparent;background:transparent;color:#64748B;font-size:11px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap}
 .planner-view-pill:hover{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
 .planner-view-pill.active{background:#0F172A;color:#fff;border-color:#0F172A;box-shadow:0 8px 18px rgba(15,23,42,.16)}
-.sched-grid{--time-rail-x:81px;display:grid;grid-template-columns:72px repeat(7,minmax(134px,1fr));gap:10px;font-size:12px;align-items:start;padding:18px;overflow:auto;position:relative}
+.sched-grid{--time-rail-x:81px;display:grid;grid-template-columns:72px repeat(7,minmax(134px,1fr));gap:10px;font-size:12px;align-items:start;padding:18px 18px 112px;overflow:auto;position:relative}
 .sched-grid::before{content:"";position:absolute;left:var(--time-rail-x);top:58px;bottom:18px;width:4px;border-radius:999px;background:linear-gradient(180deg,#CBD5E1,#94A3B8 52%,#CBD5E1);z-index:0;pointer-events:none}
 .sg-corner{background:transparent;border:0;border-radius:0;position:relative;min-height:38px}
 .sg-day{background:linear-gradient(180deg,#F8FAFC,#EFF6FF);border:1px solid #DCE3EB;border-radius:10px;padding:9px 7px;text-align:center;box-shadow:0 1px 2px rgba(15,23,42,.04)}
@@ -297,7 +341,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .sg-time-badge:hover::after,.sg-time-badge:hover::before{opacity:1;visibility:visible;transform:translateY(0)}
 .sg-time-badge:hover::after{transform:translate(0,-50%)}
 .sg-time-badge:hover::before{transform:translateY(-50%)}
-.sg-cell{display:flex;flex-direction:column;min-height:96px;background:rgba(248,250,252,.58);border:1px dashed #E2E8F0;border-radius:12px;padding:4px;transition:background .14s,border-color .14s}
+.sg-cell{display:flex;flex-direction:column;min-height:96px;background:rgba(248,250,252,.58);border:1px dashed #E2E8F0;border-radius:12px;padding:5px;transition:background .14s,border-color .14s;overflow:visible;align-self:start}
 .sg-cell.addable{cursor:pointer}
 .sg-cell.addable:hover{background:#EFF6FF;border-color:#60A5FA}
 .sg-cell:empty::after{content:"+";display:flex;align-items:center;justify-content:center;min-height:72px;color:#CBD5E1;font-size:20px;font-weight:700}
@@ -692,14 +736,24 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .drill-score-grid .score-component{background:#fff}
 .control-center-modal .modal-hdr{flex-shrink:0}
 .control-center-shell{display:grid;grid-template-columns:280px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
-.control-center-rail{background:#fff;border-right:1px solid #E2E8F0;padding:18px;overflow-y:auto;min-height:0}
+.control-center-rail{background:linear-gradient(180deg,#F8FAFC 0%,#fff 100%);border-right:1px solid #E2E8F0;padding:0;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
+.cc-rail-header{padding:16px 18px 12px;border-bottom:1px solid #E2E8F0;background:rgba(255,255,255,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:2}
+.cc-rail-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-rail-nav-wrap{padding:12px;display:flex;flex-direction:column;gap:3px;flex:1}
+.cc-nav-group{margin-top:10px;margin-bottom:4px}
+.cc-nav-group-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#CBD5E1;padding:0 4px 5px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px}
+.cc-nav-group-label::after{content:"";flex:1;height:1px;background:#E2E8F0}
 .control-center-main{padding:18px 20px 30px;overflow-y:auto;min-height:0}
-.control-center-nav{display:flex;flex-direction:column;gap:8px}
-.control-center-nav-btn{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;width:100%;padding:11px 12px;border-radius:12px;border:1px solid #E2E8F0;background:#F8FAFC;color:#334155;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
-.control-center-nav-btn.active{background:#0F172A;color:#fff;border-color:#0F172A}
-.control-center-nav-title{font-size:12px;font-weight:900}
-.control-center-nav-desc{font-size:10px;opacity:.82;font-weight:700;line-height:1.35}
-.control-center-status{font-size:9px;font-weight:900;text-transform:uppercase;opacity:.72;white-space:nowrap}
+.control-center-nav{display:flex;flex-direction:column;gap:3px}
+.control-center-nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid transparent;background:transparent;color:#475569;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:background .14s,border-color .14s,box-shadow .14s,color .14s}
+.control-center-nav-btn:hover{background:#F1F5F9;border-color:#E2E8F0;color:#0F172A}
+.control-center-nav-btn.active{background:#0F172A;color:#fff;border-color:#0F172A;box-shadow:0 8px 20px rgba(15,23,42,.2)}
+.cc-nav-icon{font-size:16px;flex-shrink:0;width:22px;text-align:center;line-height:1}
+.cc-nav-text{flex:1;min-width:0}
+.control-center-nav-title{font-size:12px;font-weight:800;display:block}
+.control-center-nav-desc{font-size:10px;opacity:.75;font-weight:600;line-height:1.3;margin-top:1px;display:block}
+.control-center-status{font-size:9px;font-weight:900;text-transform:uppercase;opacity:.65;white-space:nowrap;background:rgba(0,0,0,.05);border-radius:6px;padding:2px 6px;flex-shrink:0}
+.control-center-nav-btn.active .control-center-status{background:rgba(255,255,255,.12);opacity:.85}
 .control-center-intro{border:1px solid #DCE3EB;border-radius:16px;background:#fff;padding:16px 18px;margin-bottom:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
 .control-center-panel .sett-view,.control-center-panel .rules-view{max-width:none;padding:0}
 .control-center-panel .sett-view-header,.control-center-panel .sett-rail,.control-center-panel .sett-inspector,.control-center-panel .rv-header,.control-center-panel .rv-rail,.control-center-panel .rv-inspector{display:none}
@@ -711,15 +765,16 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 
 /* GENERATE BUTTON */
 .gen-btn{
-  display:flex;align-items:center;gap:8px;padding:11px 20px;
-  background:linear-gradient(135deg,#0F172A,#2563EB);color:#fff;border:none;border-radius:14px;
+  display:flex;align-items:center;gap:8px;padding:11px 18px;
+  background:#111820;color:#fff;border:1px solid #111820;border-radius:15px;
   font-size:13px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;
-  cursor:pointer;transition:transform .14s,box-shadow .14s,filter .14s;white-space:nowrap;
-  box-shadow:0 12px 24px rgba(37,99,235,.24);
+  cursor:pointer;transition:transform .16s,box-shadow .16s,filter .16s;white-space:nowrap;
+  box-shadow:0 12px 26px rgba(15,23,42,.18);
 }
-.gen-btn:hover{transform:translateY(-1px);filter:saturate(1.08);box-shadow:0 16px 30px rgba(37,99,235,.3)}
+.gen-btn:hover{transform:translateY(-2px);filter:saturate(1.04);box-shadow:0 18px 34px rgba(15,23,42,.24)}
 .gen-btn:disabled{background:#9CA3AF;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
-.gen-btn.ai{background:linear-gradient(135deg,#047857,#0E7490);box-shadow:0 12px 24px rgba(14,116,144,.22)}
+.gen-btn.ai{background:#0F766E;border-color:#0F766E;box-shadow:0 12px 24px rgba(15,118,110,.18)}
+.gen-btn.optimize{background:#4338CA;border-color:#4338CA;box-shadow:0 12px 24px rgba(67,56,202,.18)}
 .finalise-btn{
   display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:14px;
   background:#FFFFFF;color:#0F172A;border:1px solid #CBD5E1;
@@ -935,17 +990,21 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .hist-table tr:hover{background:var(--primary-light)}
 .hist-row-action{border:1px solid var(--border);background:#fff;border-radius:var(--r6);padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;color:var(--primary)}
 .hist-row-action:hover{background:var(--primary);color:#fff}
-.hist-modal-tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);padding:0 24px;background:#fff;position:sticky;top:66px;z-index:4}
-.hist-modal-tab{border:0;background:transparent;padding:10px 8px;font-size:11px;font-weight:800;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent}
-.hist-modal-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.hist-modal-tabs{display:flex;gap:6px;border-bottom:1px solid #E2E8F0;padding:8px 24px;background:#F8FAFC;position:sticky;top:66px;z-index:4}
+.hist-modal-tab{border:1px solid transparent;background:transparent;padding:7px 11px;font-size:11px;font-weight:900;color:#64748B;cursor:pointer;border-radius:999px;transition:all .14s}
+.hist-modal-tab:hover{background:#fff;border-color:#E2E8F0;color:#0F172A}
+.hist-modal-tab.active{color:#fff;border-color:#111820;background:#111820;box-shadow:0 8px 18px rgba(15,23,42,.14)}
 .hist-tab-panel{display:none}
 .hist-tab-panel.active{display:block}
 .hist-modal-table{width:100%;border-collapse:collapse;font-size:11px}
 .hist-modal-table th,.hist-modal-table td{border:1px solid var(--border);padding:7px;text-align:left}
 .hist-modal-table th{background:var(--surface2);font-size:9px;text-transform:uppercase;color:var(--text-muted)}
+.hist-modal-table.session-rows-table{min-width:1760px}
+.hist-modal-table .num,.drill-session-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.hist-modal-table tfoot td,.drill-session-table tfoot td{background:#F8FAFC;border-top:2px solid #CBD5E1;font-weight:800;color:#0F172A}
 .hist-sessions-wrap{max-height:360px;overflow:auto;border:1px solid var(--border);border-radius:var(--r8)}
 .score-click{border:0;background:transparent;padding:0;cursor:pointer;border-radius:50%}
-.score-click.cc-score-ring{width:24px;height:24px;flex:0 0 24px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.72);border:1px solid rgba(148,163,184,.35);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.score-click.cc-score-ring{display:flex;align-items:center;justify-content:center;padding:0}
 .score-click:hover{filter:brightness(0.95)}
 .metric-def-list{display:grid;grid-template-columns:1fr;gap:8px}
 .metric-def{border:1px solid var(--border);border-radius:var(--r8);padding:9px;background:var(--surface)}
@@ -1025,7 +1084,9 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .target-input-row label{font-size:10px;color:var(--text-muted);min-width:54px}
 .target-input-row input{width:46px;border:1px solid var(--border);border-radius:var(--r4);padding:3px 6px;font-size:12px;font-weight:700;font-family:inherit;text-align:center;color:var(--text)}
 .sett-command{display:grid;grid-template-columns:228px minmax(0,1fr)292px;gap:14px;align-items:start}
-.sett-rail,.sett-inspector{position:sticky;top:108px;background:#fff;border:1px solid #DCE3EB;border-radius:16px;box-shadow:0 8px 24px rgba(15,23,42,.045);padding:14px}
+.sett-rail,.sett-inspector{position:sticky;top:108px;background:linear-gradient(180deg,#fff,#F8FAFC);border:1px solid #DCE3EB;border-radius:18px;box-shadow:0 12px 32px rgba(15,23,42,.06);padding:0;overflow:hidden}
+.sett-rail>.sett-source-card:first-child,.sett-rail>div:first-child{margin:14px 14px 0}
+.sett-nav{padding:10px 14px 14px;gap:3px;display:flex;flex-direction:column}
 .sett-source-card{border:1px solid #BBF7D0;background:#F0FDF4;border-radius:12px;padding:10px;margin-bottom:12px}
 .sett-source-card.warn{border-color:#FDE68A;background:#FFFBEB}.sett-source-card.error{border-color:#FECACA;background:#FEF2F2}
 .sett-source-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#166534;font-family:'Plus Jakarta Sans',sans-serif}
@@ -1033,7 +1094,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .sett-source-sub{font-size:11px;color:#475569;line-height:1.4;margin-top:4px}
 .sett-nav{display:flex;flex-direction:column;gap:5px}
 .sett-nav-group-label{padding:9px 4px 2px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.11em;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
-.sett-nav-btn{display:flex;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:transparent;color:#475569;font-size:12px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;cursor:pointer}
+.sett-nav-btn{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:#475569;font-size:12px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;text-align:left;cursor:pointer;letter-spacing:-.01em}
 .sett-nav-btn:hover{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
 .sett-nav-btn.active{background:#0F172A;color:#fff;border-color:#0F172A}
 .sett-nav-count{font-size:10px;font-weight:900;opacity:.75}
@@ -1095,35 +1156,145 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 @media(max-width:1280px){.sett-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sett-location-summary,.sett-option-grid{grid-template-columns:1fr}}
 @media(max-width:1160px){.sett-command{grid-template-columns:1fr}.sett-rail,.sett-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}}
 @media(max-width:720px){.sett-overview-grid{grid-template-columns:1fr}.sett-main-actions{align-items:stretch}.sett-action-group{width:100%}.sett-ghost-btn{flex:1}}
-.chat-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:52px;height:52px;border-radius:50%;background:#1E40AF;color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 18px rgba(30,64,175,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s}
-.chat-fab:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(30,64,175,.55)}
+.chat-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:78px;height:78px;border-radius:26px;background:linear-gradient(135deg,#fff,#FDF2F8);color:#111820;border:1px solid #F9A8D4;font-size:22px;cursor:pointer;box-shadow:0 24px 54px rgba(232,93,115,.28);display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;overflow:hidden;animation:agentPulse 4.8s ease-in-out infinite}
+.chat-fab:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 26px 58px rgba(15,23,42,.30)}
+.chat-fab-logo{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes agentPulse{0%,100%{box-shadow:0 20px 46px rgba(15,23,42,.24)}50%{box-shadow:0 22px 52px rgba(232,93,115,.28)}}
 .chat-fab .chat-fab-badge{position:absolute;top:-3px;right:-3px;background:#EF4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:900;display:none;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif}
 .chat-fab .chat-fab-badge.show{display:flex}
-.chat-drawer{position:fixed;bottom:92px;right:28px;z-index:9998;width:380px;max-height:540px;background:#fff;border-radius:20px;box-shadow:0 12px 48px rgba(15,23,42,.18);display:flex;flex-direction:column;overflow:hidden;transform:translateY(16px) scale(0.97);opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.16,1,.3,1),opacity .2s}
+.chat-drawer{position:fixed;bottom:112px;right:28px;z-index:9998;width:min(560px,calc(100vw - 32px));height:min(720px,calc(100vh - 142px));background:#fff;border:1px solid #E9D5FF;border-radius:28px;box-shadow:0 34px 90px rgba(15,23,42,.30);display:flex;flex-direction:column;overflow:hidden;transform:translateY(18px) scale(0.96);opacity:0;pointer-events:none;transition:transform .24s cubic-bezier(.16,1,.3,1),opacity .2s}
 .chat-drawer.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
-.chat-hdr{background:#0F172A;color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.chat-hdr-title{font-size:13px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;flex:1}
-.chat-hdr-sub{font-size:10px;color:#94A3B8;font-weight:600}
+.chat-hdr{background:radial-gradient(circle at 16% 20%,rgba(244,184,104,.38),transparent 30%),linear-gradient(135deg,#111820,#312E81 58%,#BE185D);color:#fff;padding:20px 22px 18px;display:flex;align-items:center;gap:14px;flex-shrink:0;position:relative;overflow:hidden}
+.chat-hdr::after{content:"";position:absolute;inset:auto -80px -120px auto;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.12);filter:blur(6px)}
+.chat-brand-mark{width:68px;height:68px;border-radius:22px;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,.5);background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.22);position:relative;z-index:1}
+.chat-hdr-title{font-size:20px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;flex:1;letter-spacing:-.03em;position:relative;z-index:1}
+.chat-hdr-sub{font-size:12px;color:#E0E7FF;font-weight:700;margin-top:4px;line-height:1.35;position:relative;z-index:1}
 .chat-close{background:transparent;border:none;color:#94A3B8;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
 .chat-close:hover{color:#fff;background:#1E293B}
-.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.chat-mode-tabs{display:flex;gap:7px;padding:12px 14px;border-bottom:1px solid #F1F5F9;background:#fff;flex-wrap:wrap}
+.chat-mode-tab{border:1px solid #E2E8F0;background:#F8FAFC;color:#64748B;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:all .16s}
+.chat-mode-tab:hover{background:#fff;border-color:#F9A8D4;color:#BE185D;transform:translateY(-1px)}
+.chat-mode-tab.active{background:#BE185D;border-color:#BE185D;color:#fff;box-shadow:0 10px 22px rgba(190,24,93,.22)}
+.chat-context-strip{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #E2E8F0;background:#fff;color:#64748B;font-size:11px;font-weight:700}
+.chat-context-dot{width:7px;height:7px;border-radius:50%;background:#10B981;box-shadow:0 0 0 3px #D1FAE5}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:13px;min-height:0;background:radial-gradient(circle at 14% 8%,rgba(34,211,238,.12),transparent 28%),linear-gradient(180deg,#fff,#FDF2F8 52%,#F8FAFC)}
 .chat-msg{display:flex;flex-direction:column;max-width:90%}
 .chat-msg.user{align-self:flex-end;align-items:flex-end}
 .chat-msg.bot{align-self:flex-start;align-items:flex-start}
-.chat-bubble{padding:10px 13px;border-radius:14px;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
-.chat-msg.user .chat-bubble{background:#1E40AF;color:#fff;border-bottom-right-radius:4px}
-.chat-msg.bot .chat-bubble{background:#F1F5F9;color:#0F172A;border-bottom-left-radius:4px}
+.chat-bubble{padding:12px 14px;border-radius:18px;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word;box-shadow:0 10px 26px rgba(15,23,42,.07)}
+.chat-msg.user .chat-bubble{background:#111820;color:#fff;border-bottom-right-radius:6px}
+.chat-msg.bot .chat-bubble{background:rgba(255,255,255,.9);color:#0F172A;border:1px solid #FBCFE8;border-bottom-left-radius:6px}
 .chat-msg-time{font-size:9px;color:#94A3B8;margin-top:3px;padding:0 4px}
 .chat-typing .chat-bubble{background:#F1F5F9;color:#64748B}
-.chat-suggestions{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px;flex-shrink:0}
-.chat-sugg{border:1px solid #E2E8F0;background:#F8FAFC;color:#334155;border-radius:999px;padding:5px 11px;font-size:10px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.chat-sugg:hover{background:#EFF6FF;border-color:#93C5FD;color:#1D4ED8}
-.chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid #E2E8F0;flex-shrink:0;background:#F8FAFC}
-.chat-input{flex:1;padding:9px 13px;border:1px solid #CBD5E1;border-radius:999px;font-size:12px;font-family:inherit;background:#fff;outline:none;color:#0F172A}
-.chat-input:focus{border-color:#93C5FD;box-shadow:0 0 0 3px rgba(147,197,253,.2)}
-.chat-send{background:#1E40AF;color:#fff;border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px}
-.chat-send:hover{background:#2563EB}
-.chat-empty{text-align:center;padding:24px 16px;color:#94A3B8;font-size:12px;line-height:1.6}
+.chat-suggestions{display:flex;gap:7px;flex-wrap:wrap;padding:2px 16px 12px;flex-shrink:0;background:#fff}
+.chat-sugg{border:1px solid #FBCFE8;background:#FFF7FB;color:#9D174D;border-radius:999px;padding:7px 12px;font-size:10px;font-weight:900;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all .16s}
+.chat-sugg:hover{background:#BE185D;border-color:#BE185D;color:#fff;transform:translateY(-1px)}
+.chat-input-row{display:flex;gap:10px;padding:14px 16px;border-top:1px solid #F1F5F9;flex-shrink:0;background:#fff}
+.chat-input{flex:1;padding:13px 15px;border:1px solid #E2E8F0;border-radius:16px;font-size:12px;font-family:inherit;background:#F8FAFC;outline:none;color:#0F172A}
+.chat-input:focus{border-color:#F9A8D4;background:#fff;box-shadow:0 0 0 4px rgba(249,168,212,.18)}
+.chat-send{background:#BE185D;color:#fff;border:none;border-radius:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;box-shadow:0 10px 22px rgba(190,24,93,.24)}
+.chat-send:hover{background:#9D174D;transform:translateY(-1px)}
+.chat-empty{text-align:left;padding:18px;border:1px solid #FBCFE8;border-radius:18px;background:rgba(255,255,255,.86);color:#64748B;font-size:12px;line-height:1.6;box-shadow:0 12px 30px rgba(15,23,42,.06)}
+.chat-empty strong{display:block;color:#111820;font-size:15px;margin-bottom:5px}
+@media(max-width:700px){.chat-drawer{right:12px;bottom:88px;width:calc(100vw - 24px);height:min(680px,calc(100vh - 108px))}.chat-mode-tabs{overflow-x:auto;flex-wrap:nowrap}.chat-mode-tab{white-space:nowrap}}
+/* OPTIMIZE SUMMARY MODAL */
+.opt-sum-overlay{position:fixed;inset:0;background:rgba(15,23,42,.48);backdrop-filter:blur(5px);z-index:9500;display:none;align-items:flex-end;justify-content:center;padding:0 0 28px}
+.opt-sum-overlay.open{display:flex}
+.opt-sum-box{background:#fff;border-radius:20px;width:min(820px,calc(100vw - 48px));max-height:72vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 80px rgba(15,23,42,.26)}
+.opt-sum-hdr{padding:16px 22px 12px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;flex-shrink:0;background:linear-gradient(135deg,#0F172A,#1E3A8A)}
+.opt-sum-icon{font-size:20px;flex-shrink:0}
+.opt-sum-title{font-size:14px;font-weight:900;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;flex:1}
+.opt-sum-close{background:rgba(255,255,255,.12);border:none;font-size:16px;color:#fff;cursor:pointer;padding:4px 9px;border-radius:7px;line-height:1}
+.opt-sum-close:hover{background:rgba(255,255,255,.22)}
+.opt-sum-body{padding:16px 22px;overflow-y:auto;flex:1}
+.opt-sum-ai-text{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:10px 14px;font-size:12px;color:#1E40AF;line-height:1.5;margin-bottom:14px;font-style:italic}
+.opt-sum-section{margin-bottom:14px}
+.opt-sum-section-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:#94A3B8;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px}
+.opt-sum-section-count{background:#E2E8F0;color:#475569;border-radius:100px;padding:1px 7px;font-size:9px;font-weight:900}
+.opt-sum-section-count.green{background:#D1FAE5;color:#065F46}
+.opt-sum-section-count.red{background:#FEE2E2;color:#991B1B}
+.opt-sum-change{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:9px;margin-bottom:5px;border:1px solid transparent}
+.opt-sum-change.applied{background:#F0FDF4;border-color:#BBF7D0}
+.opt-sum-change.rejected{background:#FEF2F2;border-color:#FECACA}
+.opt-sum-change-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.opt-sum-change-body{flex:1;min-width:0}
+.opt-sum-change-title{font-size:11px;font-weight:800;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.opt-sum-change-meta{font-size:10px;color:#64748B;margin-top:2px;line-height:1.35}
+.opt-sum-change-reason{font-size:10px;color:#94A3B8;margin-top:2px;font-style:italic}
+.opt-sum-arrow{font-size:10px;color:#94A3B8;margin:0 3px}
+.opt-sum-pill{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:100px;font-size:10px;font-weight:700;background:#F1F5F9;color:#334155;white-space:nowrap}
+.opt-sum-pill.trainer{background:#EDE9FE;color:#4C1D95}
+.opt-sum-pill.class-name{background:#DBEAFE;color:#1E3A8A}
+.opt-sum-pill.time{background:#FEF3C7;color:#92400E}
+.opt-sum-footer{padding:12px 22px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#F8FAFC}
+.opt-sum-footer-stat{font-size:12px;color:#64748B}
+.opt-sum-footer-stat strong{color:#0F172A;font-weight:900}
+.opt-sum-reload-btn{padding:9px 20px;background:#0F172A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .14s}
+.opt-sum-reload-btn:hover{background:#1E293B}
+/* NL EDIT MODAL */
+.nle-overlay{position:fixed;inset:0;background:rgba(15,23,42,.54);backdrop-filter:blur(6px);z-index:10000;display:none;align-items:center;justify-content:center;padding:24px}
+.nle-overlay.open{display:flex}
+.nle-box{background:#fff;border-radius:22px;width:min(760px,calc(100vw - 48px));max-height:calc(100vh - 80px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 80px rgba(15,23,42,.28)}
+.nle-hdr{padding:18px 22px 14px;border-bottom:1px solid #E2E8F0;display:flex;align-items:flex-start;gap:12px;flex-shrink:0}
+.nle-hdr-icon{font-size:22px;flex-shrink:0;line-height:1;margin-top:1px}
+.nle-hdr-main{flex:1;min-width:0}
+.nle-hdr-title{font-size:15px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2}
+.nle-hdr-sub{font-size:12px;color:#64748B;margin-top:3px;line-height:1.4}
+.nle-hdr-close{background:none;border:none;font-size:18px;color:#94A3B8;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;flex-shrink:0}
+.nle-hdr-close:hover{background:#F1F5F9;color:#0F172A}
+.nle-confidence{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:900;margin-top:6px;font-family:'Plus Jakarta Sans',sans-serif}
+.nle-confidence.high{background:#D1FAE5;color:#065F46}
+.nle-confidence.mid{background:#FEF3C7;color:#92400E}
+.nle-confidence.low{background:#FEE2E2;color:#991B1B}
+.nle-body{padding:16px 22px;overflow-y:auto;flex:1}
+.nle-section-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:#94A3B8;margin-bottom:8px;margin-top:14px;font-family:'Plus Jakarta Sans',sans-serif}
+.nle-section-label:first-child{margin-top:0}
+.nle-diff{display:flex;flex-direction:column;gap:8px}
+.nle-edit-card{border-radius:12px;padding:11px 14px;display:flex;gap:12px;align-items:flex-start;border:1px solid transparent}
+.nle-edit-card.remove{background:#FEF2F2;border-color:#FECACA}
+.nle-edit-card.add{background:#F0FDF4;border-color:#BBF7D0}
+.nle-edit-card.modify{background:#EFF6FF;border-color:#BFDBFE}
+.nle-edit-badge{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px}
+.nle-edit-card.remove .nle-edit-badge{background:#FCA5A5;color:#7F1D1D}
+.nle-edit-card.add .nle-edit-badge{background:#86EFAC;color:#14532D}
+.nle-edit-card.modify .nle-edit-badge{background:#93C5FD;color:#1E3A8A}
+.nle-edit-info{flex:1;min-width:0}
+.nle-edit-title{font-size:12px;font-weight:800;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.nle-edit-meta{font-size:11px;color:#64748B;margin-top:2px;line-height:1.4}
+.nle-edit-reason{font-size:10px;color:#94A3B8;margin-top:3px;font-style:italic}
+.nle-warnings{display:flex;flex-direction:column;gap:6px}
+.nle-warning{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:8px 12px;font-size:11px;color:#92400E;display:flex;gap:6px;align-items:flex-start}
+.nle-check{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:7px 12px;font-size:11px;color:#166534;display:flex;gap:6px;align-items:flex-start}
+.nle-footer{padding:14px 22px;border-top:1px solid #E2E8F0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;background:#F8FAFC}
+.nle-footer-left{font-size:11px;color:#64748B}
+.nle-footer-btns{display:flex;gap:8px}
+.nle-btn{padding:9px 20px;border-radius:10px;font-size:13px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;border:1px solid transparent;transition:all .14s}
+.nle-btn.cancel{background:#fff;border-color:#E2E8F0;color:#475569}
+.nle-btn.cancel:hover{background:#F1F5F9;border-color:#CBD5E1}
+.nle-btn.apply{background:#0F172A;color:#fff;border-color:#0F172A;box-shadow:0 8px 18px rgba(15,23,42,.18)}
+.nle-btn.apply:hover{background:#1E293B}
+.nle-btn.apply:disabled{opacity:.5;cursor:not-allowed}
+.nle-loading{display:flex;align-items:center;gap:10px;padding:28px 22px;color:#64748B;font-size:13px}
+.nle-dots{display:flex;gap:5px}
+.nle-dot{width:7px;height:7px;border-radius:50%;background:#CBD5E1;animation:nleDotPulse 1.2s ease-in-out infinite}
+.nle-dot:nth-child(2){animation-delay:.15s}.nle-dot:nth-child(3){animation-delay:.3s}
+@keyframes nleDotPulse{0%,100%{transform:scale(.7);opacity:.5}50%{transform:scale(1);opacity:1}}
+.chat-edit-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 11px;border-radius:8px;background:#F0FDF4;border:1px solid #86EFAC;color:#166534;font-size:11px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .14s}
+.chat-edit-btn:hover{background:#DCFCE7;border-color:#4ADE80}
+/* Best-fit candidate selector */
+.nle-edit-card.has-bestfit{align-items:flex-start;flex-direction:column}
+.nle-edit-card.has-bestfit .nle-edit-badge{display:none}
+.nle-edit-card.has-bestfit .nle-edit-info{width:100%}
+.nle-bestfit-wrap{margin-top:10px;border-top:1px solid rgba(0,0,0,.07);padding-top:10px}
+.nle-bestfit-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#7C3AED;margin-bottom:7px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:4px}
+.nle-bestfit-select{width:100%;padding:7px 10px;border:1px solid #C4B5FD;border-radius:8px;background:#F5F3FF;color:#4C1D95;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:8px;outline:none}
+.nle-bestfit-select:focus{border-color:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.nle-bestfit-cards{display:flex;flex-direction:column;gap:5px}
+.nle-cand-card{border:1px solid #E2E8F0;border-radius:8px;padding:7px 10px;cursor:pointer;background:#fff;transition:all .14s}
+.nle-cand-card:hover{border-color:#C4B5FD;background:#F5F3FF}
+.nle-cand-card.selected{border-color:#7C3AED;background:#EDE9FE;box-shadow:0 0 0 2px rgba(124,58,237,.14)}
+.nle-cand-name{font-size:12px;font-weight:800;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
+.nle-cand-meta{font-size:10px;color:#64748B;margin-top:2px}
 </style>
 </head>
 <body>
@@ -1132,18 +1303,14 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 <header class="app-header">
   <div class="hdr-left">
     <div class="logo" aria-label="Studio Schedule Planner & Optimizer">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2"/>
-        <path d="M8 3v4M16 3v4M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        <path d="M8 14h2M12 14h2M16 14h1M8 17h2M12 17h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+      <img class="logo-img" src="images/plan57-dark-badge.svg" alt="Plan 57 class schedule planner">
     </div>
     <div>
-      <div class="hdr-title jakarta">Studio Schedule Planner &amp; Optimizer</div>
-      <div class="hdr-sub">Physique 57 India</div>
+      <div class="brand-wordmark jakarta"><span class="brand-plan">Plan</span><span class="brand-57">57</span></div>
+      <div class="brand-product">Class Schedule Planner · Physique 57 India</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:10px">
+  <div class="hdr-actions">
     <div class="week-badge" id="week-badge">Week of —</div>
     <label class="schedule-week-control">
       <span>Schedule Week</span>
@@ -1157,6 +1324,10 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
     <button class="gen-btn ai" id="gen-ai-btn" onclick="runPipelineFromHeader(true)">
       <span class="gen-spinner"></span>
       Generate with AI
+    </button>
+    <button class="gen-btn optimize" id="optimize-ai-btn" onclick="optimizeScheduleWithAI()">
+      <span class="gen-spinner"></span>
+      Optimize with AI
     </button>
   </div>
 </header>
@@ -1285,6 +1456,48 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box" id="modal-box"></div>
+</div>
+
+<!-- OPTIMIZE SUMMARY MODAL -->
+<div class="opt-sum-overlay" id="opt-sum-overlay">
+  <div class="opt-sum-box">
+    <div class="opt-sum-hdr">
+      <div class="opt-sum-icon">⚡</div>
+      <div class="opt-sum-title" id="opt-sum-title">AI Optimisation Complete</div>
+      <button class="opt-sum-close" onclick="optSumClose()">✕</button>
+    </div>
+    <div class="opt-sum-body" id="opt-sum-body"></div>
+    <div class="opt-sum-footer">
+      <div class="opt-sum-footer-stat" id="opt-sum-footer-stat"></div>
+      <button class="opt-sum-reload-btn" onclick="optSumClose();location.reload()">Reload Schedule →</button>
+    </div>
+  </div>
+</div>
+<!-- NL SCHEDULE EDIT MODAL -->
+<div class="nle-overlay" id="nle-overlay">
+  <div class="nle-box" id="nle-box">
+    <div class="nle-hdr">
+      <div class="nle-hdr-icon">✏️</div>
+      <div class="nle-hdr-main">
+        <div class="nle-hdr-title" id="nle-title">Parsing instruction…</div>
+        <div class="nle-hdr-sub" id="nle-sub"></div>
+      </div>
+      <button class="nle-hdr-close" onclick="nlEditClose()">✕</button>
+    </div>
+    <div class="nle-body" id="nle-body">
+      <div class="nle-loading">
+        <div class="nle-dots"><div class="nle-dot"></div><div class="nle-dot"></div><div class="nle-dot"></div></div>
+        <span>Analyzing schedule and generating edit plan…</span>
+      </div>
+    </div>
+    <div class="nle-footer" id="nle-footer" style="display:none">
+      <div class="nle-footer-left" id="nle-footer-left"></div>
+      <div class="nle-footer-btns">
+        <button class="nle-btn cancel" onclick="nlEditClose()">Cancel</button>
+        <button class="nle-btn apply" id="nle-apply-btn" onclick="nlEditConfirm()">Apply Changes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1465,6 +1678,14 @@ function round1(v){return v==null?"—":v.toFixed(1)}
 function fillColor(v){if(v==null)return"#9CA3AF";if(v>=0.6)return"#15803D";if(v>=0.4)return"#D97706";return"#DC2626"}
 function timeBand(t){const m=tmins(t);if(m>=7*60&&m<10*60)return"morning";if(m>=10*60&&m<13*60)return"midday";return"evening"}
 function displayClass(cn){return(cn||"").replace(/^Studio /,"")}
+function metricSourceShortLabel(source){
+  const s=String(source||"").toLowerCase();
+  if(s.includes("canonical"))return"canonical";
+  if(s.includes("nearby"))return"nearby";
+  if(s.includes("trainer"))return"trainer";
+  if(s.includes("fallback"))return"fallback";
+  return s||"score";
+}
 function canonicalMixClass(cn){
   const l=String(cn||"").toLowerCase();
   if(l.includes("strength lab"))return"Studio Strength Lab";
@@ -1568,15 +1789,74 @@ function metricDefinitionsHtml(){
   return`<div class="metric-def-list">${defs.map(([k,v])=>`<div class="metric-def"><strong>${k}</strong><span>${v}</span></div>`).join("")}</div>`;
 }
 
-function sessionRowsTable(rows){
-  if(!Array.isArray(rows)||!rows.length)return`<div class="hist-empty">No individual class rows were found for this ID.</div>`;
-  return`<div class="hist-sessions-wrap"><table class="hist-modal-table">
-    <thead><tr><th>Date</th><th>Trainer</th><th>Class</th><th>Day</th><th>Time</th><th>Checked In</th><th>Booked</th><th>Capacity</th><th>Fill</th><th>Revenue</th><th>Late Cancel</th><th>No Show</th><th>UniqueID2</th></tr></thead>
-    <tbody>${rows.map(x=>`<tr>
-      <td>${x.date||"—"}</td><td>${x.trainer||"—"}</td><td>${displayClass(x.class)}</td><td>${x.day||"—"}</td><td>${x.time||"—"}</td>
-      <td>${round1(x.checked_in)}</td><td>${round1(x.booked)}</td><td>${round1(x.capacity)}</td><td>${pct(x.fill_rate,1)}</td>
-      <td>₹${Number(x.revenue||0).toLocaleString("en-IN",{maximumFractionDigits:0})}</td><td>${round1(x.late_cancelled)}</td><td>${pct(x.no_show_rate,1)}</td><td>${x.unique_id_2||"—"}</td>
-    </tr>`).join("")}</tbody></table></div>`;
+function sessionRowNumber(row,keys,fallback=0){
+  for(const key of keys){
+    const value=row?.[key];
+    if(value!==undefined&&value!==null&&value!==""){
+      const n=Number(value);
+      if(Number.isFinite(n))return n;
+    }
+  }
+  return fallback;
+}
+
+function sessionRowsTotals(rows){
+  const safeRows=Array.isArray(rows)?rows:[];
+  const totals=safeRows.reduce((acc,row)=>{
+    const checked=sessionRowNumber(row,["checked_in","CheckedIn"]);
+    const booked=sessionRowNumber(row,["booked","Booked"]);
+    const capacity=sessionRowNumber(row,["capacity","Capacity"]);
+    const cancelled=sessionRowNumber(row,["cancelled","Cancelled","cancelled_sessions","CancelledSessions"]);
+    const lateCancelled=sessionRowNumber(row,["late_cancelled","LateCancelled","late_cancelled_count","LateCancelledCount"]);
+    const revenue=sessionRowNumber(row,["revenue","Revenue"]);
+    acc.sessions+=1;
+    acc.empty+=checked>0?0:1;
+    acc.checked+=checked;
+    acc.booked+=booked;
+    acc.capacity+=capacity;
+    acc.cancelled+=cancelled;
+    acc.lateCancelled+=lateCancelled;
+    acc.revenue+=revenue;
+    return acc;
+  },{sessions:0,empty:0,checked:0,booked:0,capacity:0,cancelled:0,lateCancelled:0,revenue:0});
+  totals.nonEmpty=Math.max(0,totals.sessions-totals.empty);
+  totals.avgIncl=totals.sessions?totals.checked/totals.sessions:0;
+  totals.avgExcl=totals.nonEmpty?totals.checked/totals.nonEmpty:0;
+  totals.fillRate=totals.capacity?totals.checked/totals.capacity:0;
+  totals.revMember=totals.checked?totals.revenue/totals.checked:0;
+  return totals;
+}
+
+function sessionRowsTable(rows,opts={}){
+  const safeRows=Array.isArray(rows)?rows:[];
+  const totals=sessionRowsTotals(safeRows);
+  const tableClass=opts.tableClass||"hist-modal-table";
+  const emptyRow=!safeRows.length?`<tr><td colspan="18" class="hist-empty">No individual class rows were found for this ID.</td></tr>`:"";
+  return`<div class="hist-sessions-wrap"><table class="${tableClass} session-rows-table">
+    <thead><tr><th>Class Name</th><th>Day of Week</th><th>Time</th><th>Date</th><th>Trainer Name</th><th>Location</th><th>Capacity</th><th>Booked</th><th>Checked In</th><th>Cancelled</th><th>Late Cancelled</th><th>Total Sessions</th><th>Empty Sessions</th><th>Class Avg - Incl Empty</th><th>Class Avg - Excl Empty</th><th>Fill Rate</th><th>Revenue Generated</th><th>Rev / Member</th></tr></thead>
+    <tbody>${emptyRow}${safeRows.map(x=>{
+      const checked=sessionRowNumber(x,["checked_in","CheckedIn"]);
+      const booked=sessionRowNumber(x,["booked","Booked"]);
+      const capacity=sessionRowNumber(x,["capacity","Capacity"]);
+      const cancelled=sessionRowNumber(x,["cancelled","Cancelled","cancelled_sessions","CancelledSessions"]);
+      const lateCancelled=sessionRowNumber(x,["late_cancelled","LateCancelled","late_cancelled_count","LateCancelledCount"]);
+      const revenue=sessionRowNumber(x,["revenue","Revenue"]);
+      const rowFill=capacity?checked/capacity:sessionRowNumber(x,["fill_rate","FillRate"],0);
+      const revMember=checked?revenue/checked:0;
+      const empty=checked>0?0:1;
+      return`<tr>
+        <td>${rvEscapeHtml(displayClass(x.class||x.Class||"—"))}</td><td>${rvEscapeHtml(x.day||x.Day||"—")}</td><td>${rvEscapeHtml(x.time||x.Time||"—")}</td><td>${rvEscapeHtml(x.date||x.Date||"—")}</td>
+        <td>${rvEscapeHtml(x.trainer||x.Trainer||"—")}</td><td>${rvEscapeHtml(x.location||x.Location||"—")}</td>
+        <td class="num">${round1(capacity)}</td><td class="num">${round1(booked)}</td><td class="num">${round1(checked)}</td><td class="num">${round1(cancelled)}</td><td class="num">${round1(lateCancelled)}</td>
+        <td class="num">1</td><td class="num">${empty}</td><td class="num">${round1(checked)}</td><td class="num">${checked>0?round1(checked):"—"}</td><td class="num">${pct(rowFill,1)}</td><td class="num">${inr(revenue,0)}</td><td class="num">${checked?inr(revMember,0):"—"}</td>
+      </tr>`;
+    }).join("")}</tbody>
+    <tfoot><tr><td>Totals</td><td colspan="5">${safeRows.length} individual class rows</td><td class="num">${round1(totals.capacity)}</td><td class="num">${round1(totals.booked)}</td><td class="num">${round1(totals.checked)}</td><td class="num">${round1(totals.cancelled)}</td><td class="num">${round1(totals.lateCancelled)}</td><td class="num">${totals.sessions}</td><td class="num">${totals.empty}</td><td class="num">${round1(totals.avgIncl)}</td><td class="num">${totals.nonEmpty?round1(totals.avgExcl):"—"}</td><td class="num">${pct(totals.fillRate,1)}</td><td class="num">${inr(totals.revenue,0)}</td><td class="num">${totals.checked?inr(totals.revMember,0):"—"}</td></tr></tfoot>
+  </table></div>`;
+}
+
+function drillSessionTableHtml(rows){
+  return sessionRowsTable(rows,{tableClass:"drill-session-table"});
 }
 
 function historicDrilldownHtml(r){
@@ -1602,7 +1882,7 @@ function historicDrilldownHtml(r){
   return`<div class="hist-drill">
     <div class="hist-drill-grid">${rows.map(([label,value])=>`<div class="hist-drill-item"><div class="hist-drill-l">${label}</div><div class="hist-drill-v">${value}</div></div>`).join("")}</div>
     <div class="hist-formula">
-      Score = normalized average attendance × 45 + capacity fill rate × 30 + normalized revenue/session × 20 + normalized session count × 5.
+      Score = average attendance × 75 + fill × 15 + revenue × 7 + sessions × 3. PowerCycle: fill × 50. Strength: fill × 70.
     </div>
   </div>`;
 }
@@ -1890,13 +2170,47 @@ function renderStatsRow(area,slots){
     ${sc("Avg Fill",pct(avgFill,1),avgFill>=0.5?"green":avgFill>=0.35?"amber":"red")}
     ${sc("Avg Score",Math.round(avgScore)+"/100","blue")}
     ${sc("Trainers",trainers,"")}
-    ${sc("Protected",protected_,"green")}
+    ${sc("Protected",protected_,"green","protected")}
     ${sc("Violations",violations,violations>0?"red":"")}
-    ${sc("Experimental",experimental,"amber")}
+    ${sc("Experimental",experimental,"amber","experimental")}
   </div>`);
 }
-function sc(label,value,cls){
-  return`<div class="stat-card"><div class="sc-lbl">${label}</div><div class="sc-val${cls?" "+cls:""}">${value}</div></div>`;
+function sc(label,value,cls,kind){
+  const click=kind?` onclick="openStatsModal('${kind}')" title="Open ${rvEscapeAttr(label)} schedule decisions"`:"";
+  return`<div class="stat-card${kind?" clickable":""}"${click}><div class="sc-lbl">${label}</div><div class="sc-val${cls?" "+cls:""}">${value}</div></div>`;
+}
+
+function decisionReasonHtml(s){
+  const reasons=[
+    s.scheduling_reason,
+    s.optimization_reason,
+    s.score_reason,
+    ...(Array.isArray(s.constraint_violations)?s.constraint_violations:[])
+  ].filter(Boolean);
+  return rvEscapeHtml(reasons.join(" · ")||"No decision reason was recorded for this class.");
+}
+
+function openStatsModal(kind){
+  const slots=filterSlots(getActiveLocations().flatMap(loc=>getSlots(loc)));
+  const rows=slots.filter(s=>{
+    if(kind==="protected")return ["PINNED","PROTECT","PROTECT_EXACT","PROTECT_SLOT"].includes(s.recommendation);
+    if(kind==="experimental")return ["INCLUDE","EXPERIMENTAL"].includes(s.recommendation)||s.is_experimental;
+    return false;
+  });
+  const title=kind==="protected"?"Protected and Pinned Classes":"Experimental Classes";
+  const box=document.getElementById("modal-box");
+  box.className="modal-box";
+  box.innerHTML=`<div class="modal-hdr">
+    <div><div class="modal-class-name">${title}</div><div class="modal-meta">${rows.length} matching classes in current filters</div></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <table class="hist-modal-table">
+      <thead><tr><th>Class</th><th>Day</th><th>Time</th><th>Location</th><th>Trainer</th><th>Status</th><th>Score</th><th>Decision Reason</th></tr></thead>
+      <tbody>${rows.map(s=>`<tr><td>${rvEscapeHtml(displayClass(s.class_name))}</td><td>${rvEscapeHtml(s.day_of_week||"—")}</td><td>${rvEscapeHtml(s.time||"—")}</td><td>${rvEscapeHtml(s.location||"—")}</td><td>${rvEscapeHtml(s.trainer_1||"—")}</td><td>${rvEscapeHtml(recLabel(s.recommendation||""))}</td><td>${Math.round(s.score||0)}</td><td>${decisionReasonHtml(s)}</td></tr>`).join("")||`<tr><td colspan="8">No classes match this card in the current filters.</td></tr>`}</tbody>
+    </table>
+  </div>`;
+  document.getElementById("modal-overlay").classList.add("open");
 }
 
 function renderTrainerWorkloadOverview(area,slots){
@@ -1908,7 +2222,7 @@ function renderTrainerWorkloadOverview(area,slots){
     map[t].hours+=(Number(s.duration_min||60)/60);
     map[t].fill+=(s.predicted_fill_rate||0);
   });
-  const trainers=Object.entries(map).sort((a,b)=>b[1].hours-a[1].hours).slice(0,16);
+  const trainers=Object.entries(map).sort((a,b)=>b[1].hours-a[1].hours);
   if(!trainers.length)return;
   const html=`<div class="workload-card">
     <div class="workload-head"><div class="workload-title">👥 Trainer Workload Overview</div><span style="font-size:11px;color:#64748B;font-weight:700">${trainers.length} Trainers</span></div>
@@ -2098,18 +2412,21 @@ function makeClassCardMini(s, locOverride){
   const locColor=LOC_COLOR[loc]||"#6B7280";
   const locAbbr=LOC_ABBR[loc]||"??";
   div.innerHTML=`
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:4px">
-      <div style="font-size:11px;font-weight:800;line-height:1.2;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${displayClass(s.class_name)}</div>
-      <button class="score-click" style="flex-shrink:0;border:none;background:none;padding:0;cursor:pointer">${scoreRing(s.score,20)}</button>
+    <div class="cc-top">
+      <div class="cc-title-stack">
+        <div class="cc-card-kicker">${locOverride?rvEscapeHtml(locAbbr):"Scheduled"}</div>
+        <div class="cc-name">${rvEscapeHtml(displayClass(s.class_name))}</div>
+      </div>
+      <button class="score-click cc-score-ring" title="Show score calculation">${scoreRing(s.score,20)}</button>
     </div>
-    <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+    <div class="cc-trainer">
       <button class="cc-avatar cc-avatar-btn" type="button" title="Toggle trainer filter" data-trainer="${rvEscapeAttr(s.trainer_1||"")}">${avatar?`<img src="${avatar}" alt="${rvEscapeAttr(s.trainer_1||"Trainer")}">`:initials}</button>
-      <span style="font-size:10px;font-weight:600;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${s.trainer_1||"—"}</span>
+      <span class="cc-tr-name">${rvEscapeHtml(s.trainer_1||"—")}</span>
     </div>
-    <div style="display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:5px;margin-top:auto">
+    <div class="cc-bottom">
       <span style="font-size:11px;font-weight:900;color:${fc}">${pct(fill)}</span>
-      <div style="background:#E2E8F0;border-radius:999px;height:3px;overflow:hidden"><div style="height:100%;border-radius:999px;background:${fc};width:${Math.round(fill*100)}%"></div></div>
-      <span style="font-size:10px;font-weight:800;color:#059669">${round1(avg)}</span>
+      <div class="cc-bar-bg"><div class="cc-bar-fill" style="width:${Math.round(fill*100)}%;background:${fc}"></div></div>
+      <div class="cc-avg">${round1(avg)}<span>avg</span></div>
     </div>
     <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
       ${locOverride?`<span class="cc-badge" style="font-size:8px;background:${locColor}18;color:${locColor};border-color:${locColor}33">${locAbbr}</span>`:""}
@@ -2141,30 +2458,51 @@ function makeClassCard(s){
   // Best available check-in average: exact/slot history only; trainer aggregate is shown only in trainer views.
   const avg=classSlotAvgCheckin(s);
   const histRows=(s.slot_historic_detail&&s.slot_historic_detail.session_rows)||(s.historic_detail&&s.historic_detail.session_rows)||s.historical_session_count||0;
+  const histCount=Array.isArray(histRows)?histRows.length:Number(histRows||0);
+  const scoreVal=Math.round(s.score||0);
+  const roomName=rvEscapeHtml(s.room?String(s.room).replace(/_/g," "):"Auto room");
   const dataSource=s.slot_avg_checkin?"slot":(s.historical_avg_checkin>0?"hist":(s.trainer_overall_checkin?"trainer":"none"));
   const quality=s.score>=80?`<span class="cc-chip">80+ score</span>`:"";
   div.innerHTML=`
     <div class="cc-top">
-      <div class="cc-name">${displayClass(s.class_name)}</div>
-      <button class="score-click cc-score-ring" title="Show score calculation">${scoreRing(s.score,22)}</button>
+      <div class="cc-title-stack">
+        <div class="cc-card-kicker">${roomName}</div>
+        <div class="cc-name">${rvEscapeHtml(displayClass(s.class_name))}</div>
+      </div>
+      <button class="score-click cc-score-ring" title="Show score calculation">${scoreRing(s.score,30)}</button>
     </div>
-    <div class="cc-trainer"><button class="cc-avatar cc-avatar-btn" type="button" title="Toggle trainer filter" data-trainer="${rvEscapeAttr(s.trainer_1||"")}">${avatar?`<img src="${avatar}" alt="${rvEscapeAttr(s.trainer_1||"Trainer")}">`:initials}</button><span class="cc-tr-name">${s.trainer_1||"—"}</span></div>
-    <div class="cc-meta">◷ ${s.day_of_week||"—"} · ${s.time||"—"}</div>
+    <div class="cc-info-row">
+      <div class="cc-trainer"><button class="cc-avatar cc-avatar-btn" type="button" title="Toggle trainer filter" data-trainer="${rvEscapeAttr(s.trainer_1||"")}">${avatar?`<img src="${avatar}" alt="${rvEscapeAttr(s.trainer_1||"Trainer")}">`:initials}</button><span class="cc-tr-name">${rvEscapeHtml(s.trainer_1||"—")}</span></div>
+      <div class="cc-meta">◷ ${rvEscapeHtml(s.day_of_week||"—")} · ${rvEscapeHtml(s.time||"—")}</div>
+    </div>
     <div class="cc-bottom">
-      <span class="cc-fill-pct" style="color:${fc}">${pct(fill)}</span>
-      <div class="cc-bar-bg"><div class="cc-bar-fill" style="width:${Math.round(fill*100)}%;background:${fc}"></div></div>
+      <div class="cc-fill-main">
+        <div class="cc-fill-head"><span class="cc-fill-pct" style="color:${fc}">${pct(fill)}</span><span class="cc-fill-label">Projected fill</span></div>
+        <div class="cc-bar-bg"><div class="cc-bar-fill" style="width:${Math.round(fill*100)}%;background:${fc};color:${fc}"></div></div>
+      </div>
       <div class="cc-avg">${round1(avg)}<span>${dataSource==="trainer"?"trainer":"avg"}</span></div>
+    </div>
+    <div class="cc-metric-circles">
+      <div class="cc-metric-circle"><strong style="color:${fc}">${pct(fill)}</strong><span>Fill</span></div>
+      <div class="cc-metric-circle"><strong>${scoreVal}</strong><span>Score</span></div>
+      <div class="cc-metric-circle"><strong>${histCount}</strong><span>History</span></div>
     </div>
     <div class="cc-tag-row">
       <span class="cc-badge ${badgeCls}">${recLabel(s.recommendation)}</span>
       ${quality}${exp}${viols}
-      <span class="cc-hist">${histRows} hist</span>
+      <span class="cc-metric-pill">${histCount} hist</span>
+    </div>
+    <div class="cc-open-line">
+      <div class="cc-detail-pill">Room: ${roomName}</div>
+      <div class="cc-detail-pill">Source: ${dataSource}</div>
+      <div class="cc-detail-pill">Format: ${rvEscapeHtml(timelineGroupLabel(timelineGroup(s.class_name)))}</div>
+      <div class="cc-detail-pill">Rec: ${rvEscapeHtml(recLabel(s.recommendation))}</div>
     </div>
     <div class="cc-hover-tools">
-      <button class="cc-tool" type="button" data-action="similar">≈ Similar</button>
-      <button class="cc-tool secondary" type="button" data-action="replace">↕ Trainer</button>
-      <button class="cc-tool secondary" type="button" data-action="copy">Copy</button>
-      <button class="cc-tool danger" type="button" data-action="remove">Remove</button>
+      <button class="cc-tool" type="button" data-action="similar"><span class="cc-tool-icon">≈</span> Similar</button>
+      <button class="cc-tool secondary" type="button" data-action="replace"><span class="cc-tool-icon">↕</span> Trainer</button>
+      <button class="cc-tool secondary" type="button" data-action="copy"><span class="cc-tool-icon">⧉</span> Copy</button>
+      <button class="cc-tool danger" type="button" data-action="remove"><span class="cc-tool-icon">×</span> Remove</button>
     </div>`;
   div.ondragstart=(e)=>{
     e.stopPropagation();
@@ -3298,10 +3636,30 @@ function classSlotFill(s){
   );
 }
 
+function variantClassKey(name){
+  return String(name||"").toLowerCase().replace(/^studio\s+/,"").replace(/\s+/g," ").trim();
+}
+
+function drillFallbackRowsFromHistoricCache(s){
+  const targetClass=variantClassKey(s?.class_name||s?.class||"");
+  const targetLocation=String(s?.location||"").trim();
+  const targetDay=String(s?.day_of_week||s?.day||"").trim();
+  const targetTime=String(s?.time||"").slice(0,5);
+  const rankings=Array.isArray(_historicSlotsCache?.class_slot_ranking)?_historicSlotsCache.class_slot_ranking:[];
+  const match=rankings.find(r=>
+    variantClassKey(r.class||r.class_name)===targetClass &&
+    String(r.location||"").trim()===targetLocation &&
+    String(r.day_name||r.day||"").trim()===targetDay &&
+    String(r.time||"").slice(0,5)===targetTime
+  );
+  return ((match||{}).historic_detail||{}).individual_sessions||[];
+}
+
 function drillSessionRows(s){
   const slotRows=((s.slot_historic_detail||{}).individual_sessions)||[];
   const exactRows=((s.historic_detail||{}).individual_sessions)||[];
-  const rows=(slotRows.length?slotRows:exactRows);
+  const fallbackRows=drillFallbackRowsFromHistoricCache(s);
+  const rows=(slotRows.length?slotRows:(exactRows.length?exactRows:fallbackRows));
   return rows.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
 }
 
@@ -3369,10 +3727,10 @@ async function ensureReplacementConfigLoaded(){
 
 function scoreFallbackHtml(s,m){
   const components=[
-    ["Average Attendance",n1(m.avgAttend),"45% weight · grouped attendance context"],
-    ["Capacity Fill Rate",pct(m.fill,1),"30% weight · checked-in divided by capacity"],
-    ["Revenue / Session",inr(m.sessions?m.revenue/m.sessions:0,0),"20% weight · normalized within studio scoring"],
-    ["Historical Sessions",m.sessions,"5% weight · sample-depth context"]
+    ["Average Attendance",n1(m.avgAttend),"75 point component · grouped attendance context"],
+    ["Capacity Fill Rate",pct(m.fill,1),"15 point component · checked-in divided by capacity"],
+    ["Revenue / Session",inr(m.sessions?m.revenue/m.sessions:0,0),"7 point component · normalized within studio scoring"],
+    ["Historical Sessions",m.sessions,"3 point component · sample-depth context"]
   ];
   return`<div class="score-component-grid drill-score-grid">
     ${components.map(([label,value,meta])=>`<div class="score-component">
@@ -3558,16 +3916,9 @@ function openModal(s){
         </section>
 
         <section class="drill-table-card">
-          <div class="drill-table-head"><h3>Same Class · Same Day/Time/Location Sessions</h3><span class="drill-session-count">${rows.length} rows across trainers</span></div>
+          <div class="drill-table-head"><h3>Individual Class Sessions</h3><span class="drill-session-count">${rows.length} rows across trainers · totals always shown</span></div>
           <div class="drill-session-wrap">
-            ${rows.length?`<table class="drill-session-table">
-              <thead><tr><th>Date</th><th>Time</th><th>Trainer</th><th>Location</th><th>Booked</th><th>In</th><th>Cap</th><th>Fill</th><th>Cancel</th><th>No Show</th><th>Revenue</th></tr></thead>
-              <tbody>${rows.map(r=>{
-                const f=Number(r.fill_rate||0);
-                const fillCls=f>=.75?"fill-high":f>=.5?"fill-mid":"fill-low";
-                return`<tr><td>${rvEscapeHtml(r.date||"—")}</td><td>${rvEscapeHtml(r.time||"—")}</td><td>${rvEscapeHtml(r.trainer||"—")}</td><td>${rvEscapeHtml(r.location||"—")}</td><td class="num">${round1(r.booked)}</td><td class="num">${round1(r.checked_in)}</td><td class="num">${round1(r.capacity)}</td><td class="num ${fillCls}">${pct(f,0)}</td><td class="num">${round1(r.late_cancelled)}</td><td class="num">${pct(r.no_show_rate,0)}</td><td class="num">${inr(r.revenue,0)}</td></tr>`;
-              }).join("")}</tbody>
-            </table>`:`<div style="padding:24px;color:#64748B">No individual historical sessions found for this class card.</div>`}
+            ${drillSessionTableHtml(rows)}
           </div>
         </section>
       </main>
@@ -4190,7 +4541,7 @@ function openScoreModal(s){
             <div class="modal-score-ring-wrap">${scoreRing(totalScore,48)}</div>
             <div class="modal-score-details">
               <div class="modal-score-label">Score Formula</div>
-              <div class="hist-formula">Score = normalized average attendance × 45 + capacity fill rate × 30 + normalized revenue/session × 20 + normalized session count × 5.</div>
+              <div class="hist-formula">Score = average attendance × 75 + fill × 15 + revenue × 7 + sessions × 3. PowerCycle: fill × 50. Strength: fill × 70.</div>
             </div>
           </div>
           ${scoreDetails}
@@ -4528,8 +4879,17 @@ function pipelineDisplayMessage(raw,elapsedMs=0){
 function setGenerateButtonsLoading(isLoading,aiMode=false){
   const standardBtn=document.getElementById("gen-btn");
   const aiBtn=document.getElementById("gen-ai-btn");
-  [standardBtn,aiBtn].forEach(btn=>{if(btn){btn.disabled=Boolean(isLoading);btn.classList.remove("loading");}});
+  const optimizeBtn=document.getElementById("optimize-ai-btn");
+  [standardBtn,aiBtn,optimizeBtn].forEach(btn=>{if(btn){btn.disabled=Boolean(isLoading);btn.classList.remove("loading");}});
   if(isLoading){(aiMode?aiBtn:standardBtn)?.classList.add("loading");}
+}
+
+function setOptimizeButtonLoading(isLoading){
+  const btn=document.getElementById("optimize-ai-btn");
+  const standardBtn=document.getElementById("gen-btn");
+  const aiBtn=document.getElementById("gen-ai-btn");
+  [standardBtn,aiBtn,btn].forEach(el=>{if(el)el.disabled=Boolean(isLoading);});
+  if(btn)btn.classList.toggle("loading",Boolean(isLoading));
 }
 
 function dateToInputValue(date){
@@ -4590,6 +4950,135 @@ function runPipelineFromHeader(useAi=false){
       showToast("Server offline — try again","warn");
       setGenerateButtonsLoading(false);
     });
+}
+
+function optimizeScheduleWithAI(){
+  const aiOpts = _settSchedConfig?.settings_options||{};
+  const apiKey = String(aiOpts.ai_api_key||"").trim();
+  const payload = {
+    iteration:_iter||"Main",
+    location:_loc||"",
+    view:_view||"grid",
+    dashboard_context:chatDashboardContext()
+  };
+  if(apiKey) payload.api_key=apiKey;
+  setOptimizeButtonLoading(true);
+  const bar=document.getElementById("pipeline-bar");
+  const msg=document.getElementById("pb-msg");
+  if(bar)bar.className="visible";
+  if(msg)msg.textContent="AI is reviewing the active schedule and validating proposed changes…";
+  fetch("/api/optimize-schedule",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  }).then(r=>r.json().then(j=>({ok:r.ok,json:j}))).then(({ok,json})=>{
+    if(!ok||json.error)throw new Error(json.error||"AI optimization failed");
+    const applied=Number(json.applied_count||0);
+    const rejected=Number(json.rejected_count||0);
+    if(bar)bar.className="";
+    setOptimizeButtonLoading(false);
+    optSumShow(json);
+    showToast(`AI optimisation: ${applied} change${applied===1?"":"s"} applied${rejected?`, ${rejected} skipped`:""}`, applied>0?"":"info", 4200);
+  }).catch(err=>{
+    if(bar)bar.className="visible error";
+    if(msg)msg.textContent=err.message||"AI optimization failed";
+    showToast(err.message||"AI optimization failed","error",5200);
+    setOptimizeButtonLoading(false);
+  });
+}
+
+// ── Optimize Summary Modal ────────────────────────────────────
+function optSumShow(json) {
+  const overlay = document.getElementById("opt-sum-overlay");
+  const body = document.getElementById("opt-sum-body");
+  const title = document.getElementById("opt-sum-title");
+  const stat = document.getElementById("opt-sum-footer-stat");
+  if (!overlay || !body) return;
+
+  const applied = json.applied || [];
+  const rejected = json.rejected || [];
+  const summary = json.summary || "";
+
+  title.textContent = `AI Optimisation — ${applied.length} change${applied.length!==1?"s":""} applied`;
+
+  const typeLabels = {
+    swap_trainer:"Trainer Swap", add_class:"Class Added", remove_class:"Class Removed",
+    move_class:"Class Moved", change_class:"Class Changed"
+  };
+
+  function opIcon(type) {
+    return {swap_trainer:"↔",add_class:"+",remove_class:"−",move_class:"→",change_class:"~"}[type]||"·";
+  }
+
+  function slotMeta(s) {
+    if (!s) return "";
+    const parts = [];
+    if (s.location) parts.push(s.location.replace("House, Kemps Corner","KW").replace("HQ, Bandra","SU").replace(" House","KE"));
+    if (s.day_of_week) parts.push(s.day_of_week.slice(0,3));
+    if (s.time) parts.push(s.time);
+    return parts.join(" · ");
+  }
+
+  function changeHtml(item, type) {
+    const b = item.before || {};
+    const a = item.after || {};
+    const opType = item.type || "";
+    let changeDesc = "";
+    if (opType === "swap_trainer") {
+      changeDesc = `<span class="opt-sum-pill trainer">${rvEscapeHtml(b.trainer_1||"?")}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill trainer">${rvEscapeHtml(a.trainer_1||"?")}</span>`;
+    } else if (opType === "move_class") {
+      changeDesc = `<span class="opt-sum-pill time">${rvEscapeHtml(slotMeta(b))}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill time">${rvEscapeHtml(slotMeta(a))}</span>`;
+    } else if (opType === "change_class") {
+      changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(b.class_name||"?")}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill class-name">${rvEscapeHtml(a.class_name||"?")}</span>`;
+    } else if (opType === "add_class") {
+      changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(a.class_name||"?")}</span> with <span class="opt-sum-pill trainer">${rvEscapeHtml(a.trainer_1||"?")}</span>`;
+    } else if (opType === "remove_class") {
+      changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(b.class_name||"?")}</span> with <span class="opt-sum-pill trainer">${rvEscapeHtml(b.trainer_1||"?")}</span>`;
+    }
+    const meta = slotMeta(b) || slotMeta(a);
+    return `<div class="opt-sum-change ${type}">
+      <div class="opt-sum-change-icon">${opIcon(opType)}</div>
+      <div class="opt-sum-change-body">
+        <div class="opt-sum-change-title">${rvEscapeHtml(typeLabels[opType]||opType)}</div>
+        <div class="opt-sum-change-meta">${changeDesc}${meta?`<span style="color:#CBD5E1;margin:0 5px">·</span><span style="color:#94A3B8;font-size:9px">${rvEscapeHtml(meta)}</span>`:""}
+        </div>
+        ${item.reason ? `<div class="opt-sum-change-reason">${rvEscapeHtml(item.reason)}</div>` : ""}
+      </div>
+    </div>`;
+  }
+
+  let html = "";
+  if (summary) html += `<div class="opt-sum-ai-text">"${rvEscapeHtml(summary)}"</div>`;
+
+  if (applied.length) {
+    html += `<div class="opt-sum-section"><div class="opt-sum-section-label">Applied changes <span class="opt-sum-section-count green">${applied.length}</span></div>`;
+    applied.forEach(item => { html += changeHtml(item, "applied"); });
+    html += "</div>";
+  }
+
+  if (rejected.length) {
+    html += `<div class="opt-sum-section"><div class="opt-sum-section-label">Rejected / skipped <span class="opt-sum-section-count red">${rejected.length}</span></div>`;
+    rejected.forEach(item => {
+      html += `<div class="opt-sum-change rejected"><div class="opt-sum-change-icon">✗</div><div class="opt-sum-change-body">
+        <div class="opt-sum-change-title">${rvEscapeHtml(typeLabels[item.type||""]||item.type||"?")} — ${rvEscapeHtml(item.message||"")}</div>
+        ${item.reason ? `<div class="opt-sum-change-reason">${rvEscapeHtml(item.reason)}</div>` : ""}
+      </div></div>`;
+    });
+    html += "</div>";
+  }
+
+  if (!applied.length && !rejected.length) {
+    html = `<div style="padding:24px 0;text-align:center;color:#64748B;font-size:13px">No changes were produced. The schedule may already be optimised for the active filters.</div>`;
+  }
+
+  body.innerHTML = html;
+  if (stat) stat.innerHTML = `<strong>${applied.length}</strong> applied &nbsp;·&nbsp; <strong>${rejected.length}</strong> skipped`;
+  overlay.classList.add("open");
+}
+
+function optSumClose() {
+  const overlay = document.getElementById("opt-sum-overlay");
+  if (overlay) overlay.classList.remove("open");
 }
 
 function finaliseSchedule(){
@@ -4674,22 +5163,46 @@ function pollPipelineStatus(){
 // CONTROL CENTER MODAL
 // ============================================================
 const CONTROL_CENTER_SECTIONS={
-  overview:{label:"Overview",summary:"Start here",detail:"Review configuration health and the key setup sections.",panel:"settings",heading:"Overview",description:"Use one place to manage schedule setup, trainers, class mix, and rules.",activate(){settSetTab("overview");}},
-  schedule:{label:"Schedule Setup",summary:"Daily targets",detail:"Edit daily class targets for each location.",panel:"settings",heading:"Schedule Setup",description:"Adjust daily class targets and weekly shape.",activate(){settSetTab("targets");}},
-  trainers:{label:"Trainer Setup",summary:"Profiles and status",detail:"Manage trainer profiles, availability, and status.",panel:"settings",heading:"Trainer Setup",description:"Manage trainer profiles, studio access, and active status.",activate(){settSetTab("trainers");}},
-  classmix:{label:"Class Mix",summary:"Weekly format balance",detail:"Set format min/max targets per studio.",panel:"settings",heading:"Class Mix",description:"Maintain the right format mix across the week.",activate(){settSetTab("classmix");}},
-  rules:{label:"Rules and Pins",summary:"Custom instructions",detail:"Manage custom rules and pinned classes.",panel:"settings",heading:"Rules and Pinned Classes",description:"Add custom scheduling instructions and pins.",activate(){settSetTab("customrules");}},
-  advanced:{label:"Advanced",summary:"Planner behavior",detail:"Configure planner options and API key.",panel:"settings",heading:"Advanced Settings",description:"Manage planner behavior and integration options.",activate(){settSetTab("advanced");}},
-  catalog:{label:"Rule Catalog",summary:"Built-in safeguards",detail:"Review built-in scheduling rules.",panel:"rules",heading:"Rule Catalog",description:"Review enabled/disabled built-in rules.",activate(){rvSetScope("overview");}}
+  overview:{label:"Overview",icon:"🏠",group:"core",summary:"Start here",detail:"Review configuration health and the key setup sections.",panel:"settings",heading:"Overview",description:"Use one place to manage schedule setup, trainers, class mix, and rules.",activate(){settSetTab("overview");}},
+  schedule:{label:"Schedule Setup",icon:"📅",group:"schedule",summary:"Daily targets",detail:"Edit daily class targets for each location.",panel:"settings",heading:"Schedule Setup",description:"Adjust daily class targets and weekly shape.",activate(){settSetTab("targets");}},
+  classmix:{label:"Class Mix & Formats",icon:"🎯",group:"schedule",summary:"Format balance",detail:"Set format min/max targets per studio.",panel:"settings",heading:"Class Mix and Formats",description:"Maintain the right format mix across the week.",activate(){settSetTab("classmix");}},
+  rules:{label:"Rules & Pinned Classes",icon:"📌",group:"schedule",summary:"Custom rules",detail:"Manage custom rules and pinned classes.",panel:"settings",heading:"Rules and Pinned Classes",description:"Add custom scheduling instructions and pins.",activate(){settSetTab("customrules");}},
+  trainers:{label:"Trainer Profiles",icon:"👥",group:"people",summary:"Profiles & status",detail:"Manage trainer profiles, availability, and status.",panel:"settings",heading:"Trainer Setup",description:"Manage trainer profiles, studio access, and active status.",activate(){settSetTab("trainers");}},
+  qualifications:{label:"Certifications",icon:"🏅",group:"people",summary:"Class access",detail:"Class format certifications per trainer.",panel:"settings",heading:"Certifications",description:"Manage which trainers are certified to teach each class format.",activate(){settSetTab("qualifications");}},
+  availability:{label:"Availability",icon:"🗓",group:"people",summary:"Days & windows",detail:"Set trainer days and time windows per location.",panel:"settings",heading:"Availability",description:"Manage trainer availability schedules.",activate(){settSetTab("availability");}},
+  leave:{label:"Leave & Off Days",icon:"🌴",group:"people",summary:"Absences",detail:"Log trainer leave and off days.",panel:"settings",heading:"Leave & Off Days",description:"Mark trainer leave so the planner routes around it.",activate(){settSetTab("leave");}},
+  ai:{label:"AI Intelligence",icon:"✨",group:"ai",summary:"Model & prompts",detail:"Configure AI model, scoring weights, and context strategy.",panel:"settings",heading:"AI Intelligence",description:"Tune how the AI planner reasons about your schedule.",activate(){settSetTab("ai");}},
+  advanced:{label:"Advanced Settings",icon:"⚙️",group:"system",summary:"Planner behavior",detail:"Configure planner options and API key.",panel:"settings",heading:"Advanced Planner Settings",description:"Manage planner behavior and integration options.",activate(){settSetTab("advanced");}},
+  catalog:{label:"Rule Catalog",icon:"📋",group:"system",summary:"Built-in safeguards",detail:"Review built-in scheduling rules.",panel:"rules",heading:"Rule Catalog",description:"Review enabled/disabled built-in rules.",activate(){rvSetScope("overview");}}
+};
+const CC_GROUPS={
+  core:{label:""},
+  schedule:{label:"Schedule"},
+  people:{label:"People"},
+  ai:{label:"AI & Intelligence"},
+  system:{label:"System"}
 };
 let _controlCenterSection="overview";
 function controlCenterNavButton(key,section){
-  return `<button class="control-center-nav-btn${_controlCenterSection===key?" active":""}" type="button" data-control-section="${key}" onclick="controlCenterSetSection('${key}')"><span><span class="control-center-nav-title">${rvEscapeHtml(section.label)}</span><br><span class="control-center-nav-desc">${rvEscapeHtml(section.detail)}</span></span><span class="control-center-status">${rvEscapeHtml(section.summary)}</span></button>`;
+  return `<button class="control-center-nav-btn${_controlCenterSection===key?" active":""}" type="button" data-control-section="${key}" onclick="controlCenterSetSection('${key}')"><span class="cc-nav-icon">${section.icon||"·"}</span><span class="cc-nav-text"><span class="control-center-nav-title">${rvEscapeHtml(section.label)}</span><span class="control-center-nav-desc">${rvEscapeHtml(section.detail)}</span></span><span class="control-center-status">${rvEscapeHtml(section.summary)}</span></button>`;
+}
+function renderControlCenterNav(){
+  const sections=Object.entries(CONTROL_CENTER_SECTIONS);
+  let html='';let lastGroup=null;
+  sections.forEach(([k,v])=>{
+    if(v.group!==lastGroup){
+      const g=CC_GROUPS[v.group]||{};
+      if(g.label) html+=`<div class="cc-nav-group"><div class="cc-nav-group-label">${rvEscapeHtml(g.label)}</div></div>`;
+      lastGroup=v.group;
+    }
+    html+=controlCenterNavButton(k,v);
+  });
+  return html;
 }
 function renderControlCenterShell(){
   const box=document.getElementById("modal-box"); if(!box)return;
   box.className="modal-box control-center-modal";
-  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">Control Center</div><div class="modal-meta">Manage settings, trainer setup, and rules in one place.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="control-center-nav">${Object.entries(CONTROL_CENTER_SECTIONS).map(([k,v])=>controlCenterNavButton(k,v)).join("")}</div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Overview</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main></div>`;
+  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">⚡ Control Center</div><div class="modal-meta">Manage settings, trainer setup, rules, and AI configuration.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="cc-rail-header"><div class="cc-rail-title">Navigation</div></div><div class="cc-rail-nav-wrap"><div class="control-center-nav">${renderControlCenterNav()}</div></div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Overview</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main></div>`;
 }
 function controlCenterEnsurePanel(panelName){
   const panelId=panelName==="rules"?"control-center-rules-panel":"control-center-settings-panel";
@@ -4781,6 +5294,7 @@ function renderRulesView(area){
           <div class="rv-bulk-row">
             <button class="rv-bulk-btn" onclick="rvValidateRules()">Validate Config</button>
             <button class="rv-bulk-btn" onclick="rvSetScope('overview')">Overview</button>
+            <button class="rv-bulk-btn" onclick="rvOpenCustomRuleBuilder()">Create Custom Rule</button>
           </div>
           <div class="rv-bulk-row">
             <button class="rv-bulk-btn" onclick="rvGlobalBulk(true)">Enable Visible</button>
@@ -4945,6 +5459,15 @@ function rvSetScope(scope){
   _rulesScope=scope||"all";
   rvRenderRail();
   rvRenderCatalog(document.getElementById("rv-search")?.value||"");
+}
+
+function rvOpenCustomRuleBuilder(){
+  openControlCenterModal("customrules");
+  setTimeout(()=>{
+    settSetTab("customrules");
+    document.getElementById("cr-type")?.focus();
+    document.getElementById("customrules-builder")?.scrollIntoView({block:"center",behavior:"smooth"});
+  },120);
 }
 
 function rvApplyDefaults(){
@@ -5326,7 +5849,7 @@ function openHistoricModal(index){
         ${sessionRowsTable((h.individual_sessions||[]))}
       </div>
       <div class="hist-tab-panel" id="hist-panel-scoring">
-        <div class="hist-formula">Score = normalized average attendance × 45 + capacity fill rate × 30 + normalized revenue/session × 20 + normalized session count × 5.</div>
+        <div class="hist-formula">Score = average attendance × 75 + fill × 15 + revenue × 7 + sessions × 3. PowerCycle: fill × 50. Strength: fill × 70.</div>
         ${scoreBreakdownHtml(r.score_breakdown)}
       </div>
       <div class="hist-tab-panel" id="hist-panel-definitions">
@@ -5631,18 +6154,20 @@ function renderSettingsView(area){
           <div class="sett-source-sub" id="sett-source-sub">Loading canonical configuration…</div>
         </div>
         <div class="sett-nav">
-          <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">Overview <span class="sett-nav-count" id="sett-count-overview">—</span></button>
+          <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">🏠 Overview <span class="sett-nav-count" id="sett-count-overview">—</span></button>
           <div class="sett-nav-group-label">People</div>
-          <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">Trainers <span class="sett-nav-count" id="sett-count-trainers">—</span></button>
-          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')" title="Class format certifications per trainer">Certifications <span class="sett-nav-count" id="sett-count-qualifications">—</span></button>
-          <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">Availability <span class="sett-nav-count" id="sett-count-availability">—</span></button>
-          <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days <span class="sett-nav-count" id="sett-count-leave">0</span></button>
+          <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">👥 Trainers <span class="sett-nav-count" id="sett-count-trainers">—</span></button>
+          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')" title="Class format certifications per trainer">🏅 Certifications <span class="sett-nav-count" id="sett-count-qualifications">—</span></button>
+          <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">🗓 Availability <span class="sett-nav-count" id="sett-count-availability">—</span></button>
+          <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">🌴 Leave & Off Days <span class="sett-nav-count" id="sett-count-leave">0</span></button>
           <div class="sett-nav-group-label">Schedule Rules</div>
-          <button class="sett-nav-btn" id="stab-targets" onclick="settSetTab('targets')">Daily Targets <span class="sett-nav-count" id="sett-count-targets">21</span></button>
-          <button class="sett-nav-btn" id="stab-classmix" onclick="settSetTab('classmix')">Class Mix <span class="sett-nav-count" id="sett-count-classmix">—</span></button>
-          <button class="sett-nav-btn" id="stab-customrules" onclick="settSetTab('customrules')">Rules & Pins <span class="sett-nav-count" id="sett-count-customrules">0</span></button>
+          <button class="sett-nav-btn" id="stab-targets" onclick="settSetTab('targets')">📅 Daily Targets <span class="sett-nav-count" id="sett-count-targets">21</span></button>
+          <button class="sett-nav-btn" id="stab-classmix" onclick="settSetTab('classmix')">🎯 Class Mix & Formats <span class="sett-nav-count" id="sett-count-classmix">—</span></button>
+          <button class="sett-nav-btn" id="stab-customrules" onclick="settSetTab('customrules')">📌 Rules & Pinned Classes <span class="sett-nav-count" id="sett-count-customrules">0</span></button>
+          <div class="sett-nav-group-label">AI & Intelligence</div>
+          <button class="sett-nav-btn" id="stab-ai" onclick="settSetTab('ai')">✨ AI Intelligence <span class="sett-nav-count" id="sett-count-ai">—</span></button>
           <div class="sett-nav-group-label">System</div>
-          <button class="sett-nav-btn" id="stab-advanced" onclick="settSetTab('advanced')">Advanced <span class="sett-nav-count" id="sett-count-advanced">—</span></button>
+          <button class="sett-nav-btn" id="stab-advanced" onclick="settSetTab('advanced')">⚙️ Advanced Planner Settings <span class="sett-nav-count" id="sett-count-advanced">—</span></button>
         </div>
       </aside>
 
@@ -5812,7 +6337,7 @@ function renderSettingsView(area){
     </div>
 
     <div class="sett-section" id="ssec-classmix">
-      <div class="sett-section-label">Class Mix Rules</div>
+      <div class="sett-section-label">Class Mix and Formats</div>
       <div class="sett-section-desc">Set minimum and maximum classes per format per week at each location. The planner must keep generated format counts inside these ranges.</div>
       <div id="classmix-wrap"></div>
       <div class="sett-save-bar">
@@ -5849,6 +6374,63 @@ function renderSettingsView(area){
       <div class="sett-save-bar">
         <button class="sett-save-btn" onclick="settSaveCustomRules()">Save Custom Rules & Pins</button>
         <span class="sett-save-status" id="customrules-save-status"></span>
+      </div>
+    </div>
+
+    <div class="sett-section" id="ssec-ai">
+      <div class="sett-section-head">
+        <div>
+          <div class="sett-section-kicker">AI Intelligence</div>
+          <div class="sett-section-label">✨ AI Planner Configuration</div>
+          <div class="sett-section-desc">Control how the AI reasons about your schedule — model selection, scoring weight tuning, conflict explanation verbosity, and context strategy.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px">
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">AI Model</div><div class="sett-option-desc">Claude model used for schedule reasoning and chat.</div></div></div>
+          <select id="ai-model-select" style="height:34px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:800;padding:0 9px;font-family:inherit;width:100%">
+            <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (default)</option>
+            <option value="claude-opus-4-7">Claude Opus 4.7 (highest quality)</option>
+            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (fastest)</option>
+          </select>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">AI Verbosity</div><div class="sett-option-desc">How detailed the AI explains constraint violations.</div></div></div>
+          <select id="ai-verbosity-select" style="height:34px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:800;padding:0 9px;font-family:inherit;width:100%">
+            <option value="concise">Concise — one-line flags</option>
+            <option value="standard" selected>Standard — brief explanations</option>
+            <option value="detailed">Detailed — full reasoning chain</option>
+          </select>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">Conflict Resolution Mode</div><div class="sett-option-desc">How aggressively the AI resolves hard constraint conflicts.</div></div><label class="sett-switch"><input type="checkbox" id="ai-aggressive-resolve" checked><span class="sett-slider"></span></label></div>
+          <div class="sett-option-desc">When ON, AI backtracks up to 3× per slot. When OFF, flags violations without auto-fixing.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">Fill Rate Prediction</div><div class="sett-option-desc">Use historical trend data to predict slot attendance.</div></div><label class="sett-switch"><input type="checkbox" id="ai-fill-predict" checked><span class="sett-slider"></span></label></div>
+          <div class="sett-option-desc">Enables trend-weighted scoring. Slots with improving fill rate get a bonus.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">Smart Substitution</div><div class="sett-option-desc">AI selects best available sub when primary trainer is out.</div></div><label class="sett-switch"><input type="checkbox" id="ai-smart-sub" checked><span class="sett-slider"></span></label></div>
+          <div class="sett-option-desc">Uses tier hierarchy + historical attendance at that location to rank subs.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><div><div class="sett-option-title">Anomaly Detection</div><div class="sett-option-desc">Flag unusual drops in trainer or class performance.</div></div><label class="sett-switch"><input type="checkbox" id="ai-anomaly" checked><span class="sett-slider"></span></label></div>
+          <div class="sett-option-desc">Surfaces slots where fill rate dropped &gt;15% vs. prior 4-week average.</div>
+        </div>
+      </div>
+      <div style="border:1px solid #DCE3EB;border-radius:14px;background:#F8FAFC;padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:900;color:#0F172A;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif">Scoring Weights</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+          ${[["fill_rate","Fill Rate","35"],["revenue","Revenue","25"],["avg_checkin","Avg Check-in","20"],["session_frequency","Session Frequency","10"],["trend","Trend Signal","10"]].map(([id,label,def])=>`
+          <div><label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#64748B;display:block;margin-bottom:4px">${label}</label>
+          <div class="fp-score"><span style="font-size:10px;color:#94A3B8;min-width:14px">0</span><input type="range" min="0" max="50" value="${def}" id="sw-${id}" style="accent-color:#1E40AF"><span style="font-weight:700;min-width:24px;font-size:12px" id="sw-${id}-val">${def}%</span></div></div>`).join("")}
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:#94A3B8">Weights are normalised automatically. Changes apply on next schedule generation.</div>
+      </div>
+      <div class="sett-save-bar">
+        <button class="sett-save-btn" onclick="settSaveAiSettings&&settSaveAiSettings()">Save AI Settings</button>
+        <span class="sett-save-status" id="ai-save-status"></span>
       </div>
     </div>
 
@@ -5904,6 +6486,13 @@ function settSetTab(tab){
   settResetMatrixSelection(false);
   if(tab==="overview")settRenderOverview();
   if(tab==="advanced")settRenderAdvancedOptions();
+  if(tab==="ai"){
+    ["fill_rate","revenue","avg_checkin","session_frequency","trend"].forEach(id=>{
+      const sl=document.getElementById("sw-"+id);
+      const vl=document.getElementById("sw-"+id+"-val");
+      if(sl&&vl){sl.oninput=()=>{vl.textContent=sl.value+"%";};}
+    });
+  }
   settValidateAndRender();
 }
 
@@ -6813,6 +7402,63 @@ function settTrainerOptions(){
   return (_settTrainerProfiles||[]).map(t=>t.name).filter(Boolean).sort((a,b)=>a.localeCompare(b));
 }
 
+const CUSTOM_RULE_TEMPLATES={
+  daily_target:{
+    label:"Set daily class count",
+    helper:"Choose a studio and day, then set exactly, minimum, or maximum classes.",
+    operators:[["exactly","Exactly"],["min","Minimum"],["max","Maximum"]],
+    fields:["location","day","operator","value","priority"],
+  },
+  weekly_class_mix:{
+    label:"Set weekly class mix",
+    helper:"Choose a studio and class format, then set the weekly minimum or maximum.",
+    operators:[["min","Minimum per week"],["max","Maximum per week"],["exactly","Exactly per week"]],
+    fields:["location","class","operator","value","priority"],
+  },
+  trainer_availability:{
+    label:"Limit trainer availability",
+    helper:"Choose an instructor and optionally narrow by studio, day, or time.",
+    operators:[["never","Never schedule"],["only","Only schedule"],["max","Maximum classes per week"]],
+    fields:["location","trainer","day","time","operator","value","priority"],
+  },
+  class_time_restriction:{
+    label:"Control class time",
+    helper:"Choose a class and time. Use never to block it, or only to force that class into that time.",
+    operators:[["never","Never at this time"],["only","Only at this time"],["prefer","Prefer this time"]],
+    fields:["location","class","day","time","operator","priority"],
+  },
+  class_location_restriction:{
+    label:"Control class studio",
+    helper:"Choose a class and studio. Use never to block it there, or only to keep it there.",
+    operators:[["never","Never at this studio"],["only","Only at this studio"],["prefer","Prefer this studio"]],
+    fields:["location","class","operator","priority"],
+  },
+  trainer_load_limit:{
+    label:"Limit instructor workload",
+    helper:"Set max classes or minutes for an instructor by day, week, studio, or time window.",
+    operators:[["max_classes","Max classes"],["max_minutes","Max minutes"],["min_classes","Minimum classes"],["avoid_consecutive","Avoid back-to-back"]],
+    fields:["location","trainer","day","time","time_end","operator","value","condition","priority"],
+  },
+  room_capacity_rule:{
+    label:"Control room or capacity",
+    helper:"Target a room, capacity threshold, or class format so high-demand sessions land in the right space.",
+    operators:[["require_room","Require room"],["avoid_room","Avoid room"],["min_capacity","Minimum capacity"],["max_capacity","Maximum capacity"]],
+    fields:["location","class","room","operator","value","condition","priority"],
+  },
+  sequence_spacing_rule:{
+    label:"Space similar classes",
+    helper:"Prevent repetitive class patterns by spacing a format or instructor across nearby times.",
+    operators:[["min_gap","Minimum gap"],["not_consecutive","Not consecutive"],["max_same_window","Max in time window"]],
+    fields:["location","class","trainer","day","time","time_end","operator","value","condition","priority"],
+  },
+  time_window_rule:{
+    label:"Optimize time window",
+    helper:"Create advanced rules for morning, evening, or custom time windows such as 08:00-09:00.",
+    operators:[["at_least","At least"],["at_most","At most"],["prefer_mix","Prefer mixed formats"],["block_window","Block window"]],
+    fields:["location","class","day","time","time_end","operator","value","condition","priority"],
+  },
+};
+
 function settRoomOptions(){
   return [
     ["","Auto room"],
@@ -6862,40 +7508,109 @@ function settRenderCustomRuleBuilder(){
   if(!wrap)return;
   const classes=settAllClassOptions();
   const trainers=settTrainerOptions();
-  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;align-items:end">
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Studio</label><select class="sett-select" id="cr-location" style="width:100%"><option value="">All Studios</option>${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Rule Type</label><select class="sett-select" id="cr-type" style="width:100%">
-      <option value="daily_target">Daily target</option>
-      <option value="weekly_class_mix">Weekly class mix</option>
-      <option value="trainer_availability">Trainer availability</option>
-      <option value="class_time_restriction">Class-time restriction</option>
-      <option value="class_location_restriction">Class-location restriction</option>
-    </select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Class</label><select class="sett-select" id="cr-class" style="width:100%"><option value="">Any Class</option>${classes.map(c=>`<option value="${rvEscapeAttr(c)}">${rvEscapeHtml(displayClass(c))}</option>`).join("")}</select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Trainer</label><select class="sett-select" id="cr-trainer" style="width:100%"><option value="">Any Trainer</option>${trainers.map(t=>`<option value="${rvEscapeAttr(t)}">${rvEscapeHtml(t)}</option>`).join("")}</select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Day</label><select class="sett-select" id="cr-day" style="width:100%"><option value="">Any Day</option>${DAYS_ALL.map(d=>`<option value="${d}">${d}</option>`).join("")}</select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Time</label><input class="sett-input" id="cr-time" type="time" style="width:100%;min-width:0"></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Operator</label><select class="sett-select" id="cr-operator" style="width:100%"><option value="exactly">Exactly</option><option value="min">Minimum</option><option value="max">Maximum</option><option value="never">Never</option><option value="only">Only</option><option value="prefer">Prefer</option></select></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Value</label><input class="sett-input" id="cr-value" type="number" min="0" max="40" value="1" style="width:100%;min-width:0"></div>
-    <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Priority</label><select class="sett-select" id="cr-priority" style="width:100%"><option value="hard">Hard</option><option value="soft">Soft</option></select></div>
-    <button class="sett-save-btn" onclick="settAddCustomRule()">Add Rule</button>
+  wrap.innerHTML=`<div class="advanced-rule-builder" style="border:1px solid #DCE3EB;border-radius:18px;background:linear-gradient(135deg,#FFFFFF,#F8FAFC);box-shadow:0 14px 32px rgba(15,23,42,.06);overflow:hidden">
+    <div style="display:grid;grid-template-columns:minmax(220px,.75fr) minmax(0,1.25fr);gap:0">
+      <aside style="padding:16px;border-right:1px solid #E2E8F0;background:#fff">
+        <div style="font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:8px">Guided Rule Builder</div>
+        <div style="font-size:18px;font-weight:900;color:#111820;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.15">Build complex scheduling logic without writing code.</div>
+        <div id="cr-helper" style="font-size:12px;color:#64748B;line-height:1.5;margin-top:10px"></div>
+        <div id="cr-preview" style="font-size:12px;font-weight:900;color:#111820;border:1px solid #DCE3EB;background:#F8FAFC;border-radius:12px;padding:11px 12px;margin-top:14px">Rule preview</div>
+      </aside>
+      <main style="padding:16px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end">
+      <div data-cr-field="type"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Rule goal</label><select class="sett-select" id="cr-type" style="width:100%" onchange="settUpdateCustomRuleBuilder()">
+        ${Object.entries(CUSTOM_RULE_TEMPLATES).map(([id,t])=>`<option value="${id}">${rvEscapeHtml(t.label)}</option>`).join("")}
+      </select></div>
+      <div data-cr-field="location"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Studio</label><select class="sett-select" id="cr-location" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="">All Studios</option>${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
+      <div data-cr-field="class"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Class</label><select class="sett-select" id="cr-class" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="">Choose Class</option>${classes.map(c=>`<option value="${rvEscapeAttr(c)}">${rvEscapeHtml(displayClass(c))}</option>`).join("")}</select></div>
+      <div data-cr-field="trainer"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Instructor</label><select class="sett-select" id="cr-trainer" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="">Choose Instructor</option>${trainers.map(t=>`<option value="${rvEscapeAttr(t)}">${rvEscapeHtml(t)}</option>`).join("")}</select></div>
+      <div data-cr-field="day"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Day</label><select class="sett-select" id="cr-day" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="">Any Day</option>${DAYS_ALL.map(d=>`<option value="${d}">${d}</option>`).join("")}</select></div>
+      <div data-cr-field="time"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Start Time</label><input class="sett-input" id="cr-time" type="time" style="width:100%;min-width:0" onchange="settUpdateCustomRuleBuilder()"></div>
+      <div data-cr-field="time_end"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">End Time</label><input class="sett-input" id="cr-time-end" type="time" style="width:100%;min-width:0" onchange="settUpdateCustomRuleBuilder()"></div>
+      <div data-cr-field="room"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Room</label><select class="sett-select" id="cr-room" style="width:100%" onchange="settUpdateCustomRuleBuilder()">${settRoomOptions().map(([v,l])=>`<option value="${rvEscapeAttr(v)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
+      <div data-cr-field="operator"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Operator</label><select class="sett-select" id="cr-operator" style="width:100%" onchange="settUpdateCustomRuleBuilder()"></select></div>
+      <div data-cr-field="value"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Number</label><input class="sett-input" id="cr-value" type="number" min="0" max="40" value="1" style="width:100%;min-width:0" oninput="settUpdateCustomRuleBuilder()"></div>
+      <div data-cr-field="condition"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">When</label><select class="sett-select" id="cr-condition" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="">Always</option><option value="prime_time">Prime time only</option><option value="low_fill">If fill risk is low</option><option value="high_demand">If demand is high</option><option value="same_day">Within same day</option></select></div>
+      <div data-cr-field="priority"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Strength</label><select class="sett-select" id="cr-priority" style="width:100%" onchange="settUpdateCustomRuleBuilder()"><option value="hard">Hard block</option><option value="soft">Soft guidance</option></select></div>
+      <button class="sett-save-btn" style="min-height:39px" onclick="settAddCustomRule()">Add Rule</button>
+        </div>
+      </main>
+    </div>
   </div>`;
+  settUpdateCustomRuleBuilder();
+}
+
+function settVisibleCustomRuleFields(type){
+  return new Set(["type",...(CUSTOM_RULE_TEMPLATES[type]?.fields||[])]);
+}
+
+function settCustomRuleFormValue(id){
+  return document.getElementById(id)?.value||"";
+}
+
+function settBuildCustomRuleFromForm(){
+  const type=settCustomRuleFormValue("cr-type")||"daily_target";
+  const rule={
+    id:"custom-rule-"+Date.now(),
+    rule_type:type,
+    location:settCustomRuleFormValue("cr-location"),
+    class_name:settCustomRuleFormValue("cr-class"),
+    trainer:settCustomRuleFormValue("cr-trainer"),
+    day:settCustomRuleFormValue("cr-day"),
+    time:settCustomRuleFormValue("cr-time"),
+    time_end:settCustomRuleFormValue("cr-time-end"),
+    room:settCustomRuleFormValue("cr-room"),
+    operator:settCustomRuleFormValue("cr-operator")||"exactly",
+    value:Number(settCustomRuleFormValue("cr-value")||0),
+    condition:settCustomRuleFormValue("cr-condition"),
+    priority:settCustomRuleFormValue("cr-priority")||"hard",
+    enabled:true,
+  };
+  return rule;
+}
+
+function settCustomRuleValidation(rule){
+  const missing=[];
+  if(["daily_target","weekly_class_mix","class_location_restriction"].includes(rule.rule_type)&&!rule.location)missing.push("studio");
+  if(["daily_target"].includes(rule.rule_type)&&!rule.day)missing.push("day");
+  if(["weekly_class_mix","class_time_restriction","class_location_restriction"].includes(rule.rule_type)&&!rule.class_name)missing.push("class");
+  if(rule.rule_type==="trainer_availability"&&!rule.trainer)missing.push("instructor");
+  if(rule.rule_type==="trainer_load_limit"&&!rule.trainer)missing.push("instructor");
+  if(rule.rule_type==="room_capacity_rule"&&!rule.room&&["require_room","avoid_room"].includes(rule.operator))missing.push("room");
+  if(["sequence_spacing_rule","time_window_rule"].includes(rule.rule_type)&&!rule.time)missing.push("start time");
+  if(["sequence_spacing_rule","time_window_rule","trainer_load_limit"].includes(rule.rule_type)&&rule.time&&!rule.time_end)missing.push("end time");
+  if(rule.rule_type==="class_time_restriction"&&!rule.time)missing.push("time");
+  if(["daily_target","weekly_class_mix","trainer_load_limit","room_capacity_rule","sequence_spacing_rule","time_window_rule"].includes(rule.rule_type)&&!(rule.value>=0))missing.push("number");
+  return missing;
+}
+
+function settUpdateCustomRuleBuilder(){
+  const type=settCustomRuleFormValue("cr-type")||"daily_target";
+  const tmpl=CUSTOM_RULE_TEMPLATES[type]||CUSTOM_RULE_TEMPLATES.daily_target;
+  const visible=settVisibleCustomRuleFields(type);
+  document.querySelectorAll("[data-cr-field]").forEach(el=>{
+    el.style.display=visible.has(el.dataset.crField)?"":"none";
+  });
+  const op=document.getElementById("cr-operator");
+  if(op){
+    const current=op.value;
+    op.innerHTML=(tmpl.operators||[]).map(([value,label])=>`<option value="${value}">${rvEscapeHtml(label)}</option>`).join("");
+    if((tmpl.operators||[]).some(([value])=>value===current))op.value=current;
+  }
+  const helper=document.getElementById("cr-helper");
+  if(helper)helper.textContent=tmpl.helper||"";
+  const preview=document.getElementById("cr-preview");
+  if(preview){
+    const rule=settBuildCustomRuleFromForm();
+    const missing=settCustomRuleValidation(rule);
+    preview.textContent=missing.length?`Rule preview: choose ${missing.join(", ")}`:`Rule preview: ${settRuleSummary(rule)}`;
+  }
 }
 
 function settAddCustomRule(){
-  const rule={
-    id:"custom-rule-"+Date.now(),
-    location:document.getElementById("cr-location")?.value||"",
-    rule_type:document.getElementById("cr-type")?.value||"daily_target",
-    class_name:document.getElementById("cr-class")?.value||"",
-    trainer:document.getElementById("cr-trainer")?.value||"",
-    day:document.getElementById("cr-day")?.value||"",
-    time:document.getElementById("cr-time")?.value||"",
-    operator:document.getElementById("cr-operator")?.value||"exactly",
-    value:Number(document.getElementById("cr-value")?.value||0),
-    priority:document.getElementById("cr-priority")?.value||"hard",
-    enabled:true,
-  };
+  const rule=settBuildCustomRuleFromForm();
+  const missing=settCustomRuleValidation(rule);
+  if(missing.length){showToast(`Choose ${missing.join(", ")} before adding this rule`,"error");return;}
   if(!_settSchedConfig)_settSchedConfig={};
   if(!_settSchedConfig.custom_rules)_settSchedConfig.custom_rules=[];
   _settSchedConfig.custom_rules.push(rule);
@@ -6979,6 +7694,7 @@ function settSaveCustomRules(){
 let _chatOpen=false;
 let _chatHistory=[];
 let _chatWaiting=false;
+let _chatMode="Ask";
 
 function chatToggle(){
   _chatOpen=!_chatOpen;
@@ -6992,11 +7708,60 @@ function chatToggle(){
   }
 }
 
+function chatSetMode(mode){
+  _chatMode=mode||"Ask";
+  document.querySelectorAll(".chat-mode-tab").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.chatMode===_chatMode);
+  });
+  const input=document.getElementById("chat-input");
+  if(input){
+    const placeholders={
+      Ask:"Ask about schedule, trainers, classes...",
+      Analyze:"Ask for evidence-backed schedule analysis...",
+      "Optimize Ideas":"Ask for validated optimization ideas...",
+      Substitution:"Ask for a safe trainer replacement..."
+    };
+    input.placeholder=placeholders[_chatMode]||placeholders.Ask;
+  }
+  const strip=document.getElementById("chat-context-label");
+  if(strip)strip.textContent=`${_chatMode} · ${_loc||"All studios"} · ${_iter||"Main"}`;
+}
+
+function chatDashboardContext(){
+  return {
+    mode:_chatMode,
+    location:_loc||"",
+    iteration:_iter||"Main",
+    view:_view||"grid",
+    filters:{
+      days:[..._activeDays],
+      bands:[..._activeBands],
+      recommendations:[..._activeRecs],
+      class:_classFilter||"",
+      trainer:_trainerFilter||"",
+      room:_roomFilter||"",
+      min_score:_minScore||0,
+      violations_only:Boolean(_violOnly),
+      experimental_only:Boolean(_expOnly)
+    }
+  };
+}
+
 function chatSend(text){
   const input=document.getElementById("chat-input");
   const msg=(text||"").trim()||(input?.value||"").trim();
   if(!msg||_chatWaiting)return;
   if(input)input.value="";
+  // NL schedule edit detection
+  if(typeof nlEditDetect==="function"&&nlEditDetect(msg)){
+    _chatHistory.push({role:"user",content:msg});
+    chatAppendMsg("user",msg);
+    const sugg=document.getElementById("chat-suggestions");
+    if(sugg)sugg.style.display="none";
+    chatAppendMsg("bot","🔍 Detected a schedule edit request — opening edit planner…");
+    nlEditOpen(msg);
+    return;
+  }
   _chatHistory.push({role:"user",content:msg});
   chatAppendMsg("user",msg);
   chatShowTyping();
@@ -7006,7 +7771,7 @@ function chatSend(text){
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({message:msg,history:_chatHistory.slice(-6)})
+    body:JSON.stringify({message:msg,history:_chatHistory.slice(-8),dashboard_context:chatDashboardContext()})
   }).then(r=>r.json()).then(d=>{
     chatRemoveTyping();
     _chatWaiting=false;
@@ -7089,31 +7854,368 @@ function drillToggleTrainer(s){
     {label:"Rev / Seat",value:inr(revSeat,0),show:revSeat>0},
   ].filter(k=>k.always||k.show!==false).map(k=>`<div class="drill-kpi"><span>${k.label}</span><strong>${k.value}</strong><small style="color:#94A3B8">${label}</small></div>`).join("");
 }
+
+// ═══════════════════════════════════════════════════════════════
+// NATURAL LANGUAGE SCHEDULE EDITOR
+// ═══════════════════════════════════════════════════════════════
+
+const NL_EDIT_KEYWORDS = /\b(move|swap|shift|replace|reassign|change|add|remove|delete|cancel|reschedule|put|assign|drop|take off|give|book|schedule|unschedule|rename|swap out|rotate|insert)\b/i;
+const NL_TRAINER_WORDS = /\b(trainer|instructor|coach)\b/i;
+const NL_SCHEDULE_WORDS = /\b(class|session|slot|block|morning|evening|midday|monday|tuesday|wednesday|thursday|friday|saturday|sunday|am|pm|week|day)\b/i;
+
+let _nleResult = null;
+
+function nlEditDetect(msg) {
+  if (!msg || msg.length < 8) return false;
+  const hasVerb = NL_EDIT_KEYWORDS.test(msg);
+  const hasContext = NL_SCHEDULE_WORDS.test(msg) || NL_TRAINER_WORDS.test(msg);
+  return hasVerb && hasContext;
+}
+
+function nlEditOpen(instruction) {
+  const overlay = document.getElementById("nle-overlay");
+  const body = document.getElementById("nle-body");
+  const footer = document.getElementById("nle-footer");
+  const title = document.getElementById("nle-title");
+  const sub = document.getElementById("nle-sub");
+  _nleResult = null;
+  title.textContent = "Analyzing your instruction…";
+  sub.textContent = `"${instruction.length > 80 ? instruction.slice(0,80)+"…" : instruction}"`;
+  body.innerHTML = `<div class="nle-loading"><div class="nle-dots"><div class="nle-dot"></div><div class="nle-dot"></div><div class="nle-dot"></div></div><span>Parsing schedule edits — this takes a few seconds…</span></div>`;
+  if (footer) footer.style.display = "none";
+  overlay.classList.add("open");
+  nlEditRequest(instruction);
+}
+
+function nlEditClose() {
+  const overlay = document.getElementById("nle-overlay");
+  if (overlay) overlay.classList.remove("open");
+  _nleResult = null;
+}
+
+function nlEditRequest(instruction) {
+  const ctx = chatDashboardContext ? chatDashboardContext() : {};
+  const scheduleSnapshot = {
+    locations: (typeof SCHEDULE_DATA !== "undefined" && SCHEDULE_DATA) ? (SCHEDULE_DATA.locations || {}) : {},
+    generated_for_week: (typeof SCHEDULE_DATA !== "undefined" && SCHEDULE_DATA) ? (SCHEDULE_DATA.generated_for_week || "") : "",
+  };
+  fetch("/api/nl-edit", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      instruction,
+      schedule_snapshot: scheduleSnapshot,
+      context: {location: ctx.location || "", week: scheduleSnapshot.generated_for_week},
+    }),
+  })
+  .then(r => r.json())
+  .then(result => nlEditRender(result, instruction))
+  .catch(err => nlEditRenderError(String(err)));
+}
+
+function nlEditRender(result, instruction) {
+  const body = document.getElementById("nle-body");
+  const footer = document.getElementById("nle-footer");
+  const footerLeft = document.getElementById("nle-footer-left");
+  const title = document.getElementById("nle-title");
+  const sub = document.getElementById("nle-sub");
+  const applyBtn = document.getElementById("nle-apply-btn");
+
+  if (result.error) {
+    nlEditRenderError(result.error);
+    return;
+  }
+  // Slot/day optimize — route to AI optimizer with scope
+  if (result.route_to_optimizer) {
+    nlEditClose();
+    const scope = result.optimizer_scope || {};
+    const payload = {
+      iteration: (typeof _iter !== "undefined" && _iter) ? _iter : "Main",
+      location: scope.location || (typeof _loc !== "undefined" ? _loc : ""),
+      nl_scope: scope,
+      dashboard_context: chatDashboardContext ? chatDashboardContext() : {},
+    };
+    setOptimizeButtonLoading && setOptimizeButtonLoading(true);
+    chatAppendMsg("bot", `🔄 Routing to AI optimizer scoped to ${scope.day || scope.time_from || "active view"}…`);
+    fetch("/api/optimize-schedule", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+      .then(r=>r.json())
+      .then(json => { setOptimizeButtonLoading && setOptimizeButtonLoading(false); optSumShow(json); })
+      .catch(err => { setOptimizeButtonLoading && setOptimizeButtonLoading(false); chatAppendMsg("bot","❌ Optimizer error: "+err); });
+    return;
+  }
+
+  _nleResult = result;
+  const edits = result.edits || [];
+  const warnings = result.warnings || [];
+  const checks = result.constraint_checks || [];
+  const conf = parseFloat(result.confidence || 0);
+  const confLabel = conf >= 0.8 ? "high" : conf >= 0.55 ? "mid" : "low";
+  const confText = conf >= 0.8 ? `High confidence (${Math.round(conf*100)}%)` : conf >= 0.55 ? `Medium confidence (${Math.round(conf*100)}%)` : `Low confidence (${Math.round(conf*100)}%) — review carefully`;
+
+  title.textContent = result.summary || "Schedule edit plan";
+  sub.innerHTML = `<span class="nle-confidence ${confLabel}">${confText}</span>`;
+
+  let html = "";
+
+  if (edits.length === 0 && result.intent !== "unclear") {
+    html = `<div style="padding:20px 0;color:#64748B;font-size:13px;text-align:center">No specific edits could be identified. Try being more specific about the class name, day, time, or trainer.</div>`;
+  } else if (result.intent === "unclear" || conf < 0.4) {
+    html = `<div style="padding:14px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;color:#92400E;font-size:12px;line-height:1.5">
+      <strong>Couldn't parse this as a clear edit instruction.</strong><br>${(warnings[0] || "Please be more specific — e.g. 'Move Studio Barre 57 with Kajol on Thursday 09:00 to Friday 09:00 at Kenkere House.'")}
+    </div>`;
+  } else {
+    html += `<div class="nle-section-label">${edits.length} edit${edits.length!==1?"s":""} planned</div><div class="nle-diff">`;
+    edits.forEach((edit, editIdx) => {
+      const icon = edit.action==="remove" ? "−" : edit.action==="add" ? "+" : "~";
+      const loc = edit.location || "?";
+      const day = edit.new_day && edit.action==="add" ? edit.new_day : (edit.day || "?");
+      const time = edit.new_time && edit.action==="add" ? edit.new_time : (edit.time || "?");
+      const cls = edit.new_class || edit.class_name || "?";
+      const trainer = edit.new_trainer || edit.trainer_1 || "?";
+      const fromStr = (edit.action==="add" && (edit.new_day||edit.new_time)) ? ` (from ${edit.day||"?"} ${edit.time||"?"})` : "";
+
+      const trCandidates = edit.best_fit_trainer_candidates || [];
+      const clsCandidates = edit.best_fit_class_candidates || [];
+      const hasBestFit = trCandidates.length > 0 || clsCandidates.length > 0;
+
+      let bestFitHtml = "";
+      if (trCandidates.length > 0) {
+        bestFitHtml += `<div class="nle-bestfit-wrap">
+          <div class="nle-bestfit-label">✨ Best-fit trainer — AI-ranked by fill rate, check-in & availability</div>
+          <select class="nle-bestfit-select" id="nle-tr-select-${editIdx}" onchange="nlEditSelectTrainer(${editIdx}, this.value)">
+            ${trCandidates.map((c,i) => `<option value="${rvEscapeHtml(c.name)}" ${i===0?"selected":""}>${rvEscapeHtml(c.name)} — ${c.avg_fill_rate}% fill · ${c.avg_checkin} avg · Tier ${c.tier}${c.available?"":" ⚠"}</option>`).join("")}
+          </select>
+          <div class="nle-bestfit-cards">${trCandidates.map((c,i) => `
+            <div class="nle-cand-card ${i===0?"selected":""}" id="nle-tr-cand-${editIdx}-${i}" onclick="nlEditPickTrainer(${editIdx},${i})">
+              <div class="nle-cand-name">${rvEscapeHtml(c.name)}</div>
+              <div class="nle-cand-meta">${c.avg_fill_rate}% fill · ${c.avg_checkin} check-in · ${c.session_count} sessions · Tier ${c.tier}${c.available?" ✓":" ⚠ avail?"}</div>
+            </div>`).join("")}
+          </div>
+        </div>`;
+      }
+      if (clsCandidates.length > 0) {
+        bestFitHtml += `<div class="nle-bestfit-wrap">
+          <div class="nle-bestfit-label">✨ Best-fit class — AI-ranked by historical performance for this slot</div>
+          <select class="nle-bestfit-select" id="nle-cls-select-${editIdx}" onchange="nlEditSelectClass(${editIdx}, this.value)">
+            ${clsCandidates.map((c,i) => `<option value="${rvEscapeHtml(c.name)}" ${i===0?"selected":""}>${rvEscapeHtml(c.name)} — ${c.avg_fill_rate}% fill · ${c.avg_checkin} avg</option>`).join("")}
+          </select>
+          <div class="nle-bestfit-cards">${clsCandidates.map((c,i) => `
+            <div class="nle-cand-card ${i===0?"selected":""}" id="nle-cls-cand-${editIdx}-${i}" onclick="nlEditPickClass(${editIdx},${i})">
+              <div class="nle-cand-name">${rvEscapeHtml(c.name)}</div>
+              <div class="nle-cand-meta">${c.avg_fill_rate}% fill · ${c.avg_checkin} check-in · ${c.session_count} sessions</div>
+            </div>`).join("")}
+          </div>
+        </div>`;
+      }
+
+      html += `<div class="nle-edit-card ${edit.action}${hasBestFit?" has-bestfit":""}">
+        <div class="nle-edit-badge">${icon}</div>
+        <div class="nle-edit-info">
+          <div class="nle-edit-title">${rvEscapeHtml(cls)} — ${rvEscapeHtml(trainer)}</div>
+          <div class="nle-edit-meta">${rvEscapeHtml(loc)} · ${rvEscapeHtml(day)} at ${rvEscapeHtml(time)}${rvEscapeHtml(fromStr)}</div>
+          ${edit.reason ? `<div class="nle-edit-reason">${rvEscapeHtml(edit.reason)}</div>` : ""}
+          ${bestFitHtml}
+        </div>
+      </div>`;
+    });
+    html += "</div>";
+  }
+
+  if (warnings.length) {
+    html += `<div class="nle-section-label" style="margin-top:14px">Warnings</div><div class="nle-warnings">`;
+    warnings.forEach(w => { html += `<div class="nle-warning"><span>⚠</span><span>${rvEscapeHtml(w)}</span></div>`; });
+    html += "</div>";
+  }
+
+  if (checks.length) {
+    html += `<div class="nle-section-label">Constraint checks</div><div style="display:flex;flex-direction:column;gap:5px">`;
+    checks.forEach(c => { html += `<div class="nle-check"><span>✓</span><span>${rvEscapeHtml(c)}</span></div>`; });
+    html += "</div>";
+  }
+
+  body.innerHTML = html;
+  if (footer) footer.style.display = "flex";
+  if (footerLeft) footerLeft.textContent = `${edits.length} change${edits.length!==1?"s":""} · ${warnings.length} warning${warnings.length!==1?"s":""}`;
+  if (applyBtn) applyBtn.disabled = edits.length === 0 || result.intent === "unclear";
+}
+
+function nlEditRenderError(msg) {
+  const body = document.getElementById("nle-body");
+  const footer = document.getElementById("nle-footer");
+  const title = document.getElementById("nle-title");
+  title.textContent = "Could not parse instruction";
+  body.innerHTML = `<div style="padding:14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;color:#991B1B;font-size:12px">${rvEscapeHtml(msg)}</div>`;
+  if (footer) footer.style.display = "flex";
+  const applyBtn = document.getElementById("nle-apply-btn");
+  if (applyBtn) applyBtn.disabled = true;
+}
+
+// ── Best-fit candidate selection helpers ───────────────────────
+function nlEditPickTrainer(editIdx, candIdx) {
+  if (!_nleResult) return;
+  const edit = (_nleResult.edits||[])[editIdx];
+  if (!edit) return;
+  const cands = edit.best_fit_trainer_candidates || [];
+  const chosen = cands[candIdx];
+  if (!chosen) return;
+  edit.new_trainer = chosen.name;
+  // Update select
+  const sel = document.getElementById(`nle-tr-select-${editIdx}`);
+  if (sel) sel.value = chosen.name;
+  // Update card highlights
+  cands.forEach((_, i) => {
+    const card = document.getElementById(`nle-tr-cand-${editIdx}-${i}`);
+    if (card) card.classList.toggle("selected", i === candIdx);
+  });
+}
+
+function nlEditPickClass(editIdx, candIdx) {
+  if (!_nleResult) return;
+  const edit = (_nleResult.edits||[])[editIdx];
+  if (!edit) return;
+  const cands = edit.best_fit_class_candidates || [];
+  const chosen = cands[candIdx];
+  if (!chosen) return;
+  edit.new_class = chosen.name;
+  const sel = document.getElementById(`nle-cls-select-${editIdx}`);
+  if (sel) sel.value = chosen.name;
+  cands.forEach((_, i) => {
+    const card = document.getElementById(`nle-cls-cand-${editIdx}-${i}`);
+    if (card) card.classList.toggle("selected", i === candIdx);
+  });
+}
+
+function nlEditSelectTrainer(editIdx, value) {
+  if (!_nleResult) return;
+  const edit = (_nleResult.edits||[])[editIdx];
+  if (!edit) return;
+  edit.new_trainer = value;
+  const cands = edit.best_fit_trainer_candidates || [];
+  cands.forEach((c, i) => {
+    const card = document.getElementById(`nle-tr-cand-${editIdx}-${i}`);
+    if (card) card.classList.toggle("selected", c.name === value);
+  });
+}
+
+function nlEditSelectClass(editIdx, value) {
+  if (!_nleResult) return;
+  const edit = (_nleResult.edits||[])[editIdx];
+  if (!edit) return;
+  edit.new_class = value;
+  const cands = edit.best_fit_class_candidates || [];
+  cands.forEach((c, i) => {
+    const card = document.getElementById(`nle-cls-cand-${editIdx}-${i}`);
+    if (card) card.classList.toggle("selected", c.name === value);
+  });
+}
+
+function nlEditConfirm() {
+  if (!_nleResult) return;
+  const edits = _nleResult.edits || [];
+  if (!edits.length) { nlEditClose(); return; }
+
+  // Bake in dropdown selections
+  edits.forEach((edit, idx) => {
+    const trSel = document.getElementById(`nle-tr-select-${idx}`);
+    if (trSel && trSel.value) edit.new_trainer = trSel.value;
+    const clsSel = document.getElementById(`nle-cls-select-${idx}`);
+    if (clsSel && clsSel.value) edit.new_class = clsSel.value;
+  });
+
+  // Disable apply button + show loading
+  const applyBtn = document.getElementById("nle-apply-btn");
+  const footerLeft = document.getElementById("nle-footer-left");
+  if (applyBtn) { applyBtn.disabled = true; applyBtn.textContent = "Applying…"; }
+
+  const iteration = (typeof _iter !== "undefined" && _iter) ? _iter : "Main";
+
+  fetch("/api/nl-edit-apply", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({edits, iteration}),
+  })
+  .then(r => r.json())
+  .then(result => {
+    nlEditClose();
+    const applied = result.applied || 0;
+    const errs = result.errors || [];
+    const summary = _nleResult ? (_nleResult.summary || "edits applied") : "edits applied";
+    if (applied > 0) {
+      chatAppendMsg("bot", `✅ Applied ${applied} change${applied!==1?"s":""}: ${summary}${errs.length ? ` (${errs.length} skipped)` : ""}`);
+    } else {
+      const errMsg = errs.map(e => e.error).join("; ");
+      chatAppendMsg("bot", `⚠️ Could not apply edits — ${errMsg || "slots not found in schedule. Try being more specific about location, day, time, class, and trainer."}`);
+    }
+    // Reload schedule data from server so UI reflects the saved changes
+    nlEditReloadSchedule();
+  })
+  .catch(err => {
+    nlEditClose();
+    chatAppendMsg("bot", `❌ Apply failed: ${err}`);
+  });
+}
+
+function nlEditReloadSchedule() {
+  fetch("/schedule_data.json")
+    .then(r => r.json())
+    .then(fresh => {
+      if (typeof SCHEDULE_DATA !== "undefined" && fresh) {
+        Object.assign(SCHEDULE_DATA, fresh);
+        if (typeof renderView === "function") renderView();
+      }
+    })
+    .catch(() => {
+      // Fallback: just re-render with current data
+      if (typeof renderView === "function") renderView();
+    });
+}
+
+function nlEditApply(_edits) {
+  // No-op: apply is now handled by nlEditConfirm → /api/nl-edit-apply
+  return 0;
+}
+
 </script>
 <button class="chat-fab" id="chat-fab" onclick="chatToggle()" title="Ask AI about the schedule">
-  <span style="font-size:20px">&#x1F4AC;</span>
+  <img class="chat-fab-logo" src="images/plan57-ai-agent-v2.png" alt="Plan 57 AI assistant">
   <span class="chat-fab-badge" id="chat-fab-badge">!</span>
 </button>
 <div class="chat-drawer" id="chat-drawer">
   <div class="chat-hdr">
+    <img class="chat-brand-mark" src="images/plan57-ai-agent-v2.png" alt="Plan 57 AI assistant">
     <div>
-      <div class="chat-hdr-title">Schedule AI</div>
-      <div class="chat-hdr-sub">Ask about classes, trainers, substitutions</div>
+      <div class="chat-hdr-title">Schedule Intelligence</div>
+      <div class="chat-hdr-sub">Evidence-backed analysis, optimization, and substitutions</div>
     </div>
     <button class="chat-close" onclick="chatToggle()">&#x2715;</button>
   </div>
+  <div class="chat-mode-tabs">
+    <button class="chat-mode-tab active" data-chat-mode="Ask" onclick="chatSetMode('Ask')">Ask</button>
+    <button class="chat-mode-tab" data-chat-mode="Analyze" onclick="chatSetMode('Analyze')">Analyze</button>
+    <button class="chat-mode-tab" data-chat-mode="Optimize Ideas" onclick="chatSetMode('Optimize Ideas')">Optimize Ideas</button>
+    <button class="chat-mode-tab" data-chat-mode="Substitution" onclick="chatSetMode('Substitution')">Substitution</button>
+  </div>
+  <div class="chat-context-strip">
+    <span class="chat-context-dot"></span>
+    <span id="chat-context-label">Ask · All studios · Main</span>
+  </div>
   <div class="chat-msgs" id="chat-msgs">
-    <div class="chat-empty">Ask anything about the schedule &mdash; trainer swaps, class recommendations, fill rate analysis, peak slot suggestions, and more.</div>
+    <div class="chat-empty"><strong>Ask with dashboard context.</strong>The assistant sees the active studio, iteration, filters, schedule rows, scorecard, and trainer constraints. Use it for trainer swaps, low-fill fixes, class mix gaps, and peak slot opportunities.</div>
   </div>
   <div class="chat-suggestions" id="chat-suggestions">
-    <button class="chat-sugg" onclick="chatSend('Find substitute for Wednesday 7:30 strength at Kwality. Return Best option / Avoid / Why / Next action.')">Find substitute</button>
-    <button class="chat-sugg" onclick="chatSend('Explain class Wednesday 7:30 strength at Kwality, including why it was scheduled and any conflict risk.')">Explain class</button>
-    <button class="chat-sugg" onclick="chatSend('Which classes have the lowest fill rate at Kwality and what should we fix? Return Best option / Avoid / Why / Next action.')">Low-fill fixes</button>
-    <button class="chat-sugg" onclick="chatSend('Workload check: which trainers are near or above daily session and weekly hour limits?')">Workload check</button>
-    <button class="chat-sugg" onclick="chatSend('Add class idea: recommend 3 trainer-class combos to add at 8am at Supreme HQ.')">Add class idea</button>
+    <button class="chat-sugg" onclick="nlEditOpen('Move all Studio Barre 57 classes on Thursday morning to Friday morning at Kenkere House')">✏️ Edit schedule</button>
+    <button class="chat-sugg" onclick="nlEditOpen('Add more PowerCycle classes on Monday evening at Supreme HQ')">➕ Add classes</button>
+    <button class="chat-sugg" onclick="nlEditOpen('Optimise the 8am to 9am slot at Supreme HQ')">🎯 Slot optimize</button>
+    <button class="chat-sugg" onclick="nlEditOpen('Find and replace Rohan Dahima with best available trainer across all Monday classes at Kwality House')">🔄 Global replace</button>
+    <button class="chat-sugg" onclick="chatSetMode('Optimize Ideas');chatSend('Analyze the active schedule and list the top 5 validated optimization ideas. Include add, remove, trainer swap, class change, and time move ideas only if evidence supports them.')">Add class idea</button>
+    <button class="chat-sugg" onclick="chatSetMode('Analyze');chatSend('Explain the selected or described class decision using score, fill, constraints, trainer fit, and schedule context.')">Explain class</button>
+    <button class="chat-sugg" onclick="chatSetMode('Analyze');chatSend('Find low-fill or low-score classes in the active dashboard context and explain the most useful fixes.')">Low-fill fixes</button>
+    <button class="chat-sugg" onclick="chatSetMode('Analyze');chatSend('Review Supreme HQ 8-9am slots and recommend whether 08:30 or 08:45 should be used more.')">Supreme 8-9am</button>
+    <button class="chat-sugg" onclick="chatSetMode('Substitution');chatSend('Find the safest compliant substitute for the selected or described class. Return Best option / Avoid / Why / Next action.')">Find substitute</button>
+    <button class="chat-sugg" onclick="chatSetMode('Analyze');chatSend('Workload check: identify trainers near daily or weekly limits and any risky overlaps.')">Workload check</button>
   </div>
   <div class="chat-input-row">
-    <input class="chat-input" id="chat-input" type="text" placeholder="Ask about schedule, trainers, classes&hellip;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}">
+    <input class="chat-input" id="chat-input" type="text" placeholder="Ask about schedule, trainers, classes..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSend()}">
     <button class="chat-send" onclick="chatSend()">&#x279E;</button>
   </div>
 </div>

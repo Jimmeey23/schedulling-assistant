@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Plan 57 AI scheduling agent</title>
+  <desc id="desc">Friendly AI scheduling assistant with calendar and planning panels.</desc>
+  <defs>
+    <linearGradient id="panel" x1="122" y1="214" x2="397" y2="406" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#58B8D5"/>
+      <stop offset=".46" stop-color="#F4B868"/>
+      <stop offset=".75" stop-color="#F09DBE"/>
+      <stop offset="1" stop-color="#E85D73"/>
+    </linearGradient>
+    <linearGradient id="faceShell" x1="192" y1="132" x2="322" y2="278" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FCFF"/>
+      <stop offset="1" stop-color="#9CCBE5"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="322" y1="142" x2="421" y2="238" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#45C4D8"/>
+      <stop offset="1" stop-color="#7D80C9"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <g stroke="#050505" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="111" y="128" width="121" height="86" rx="20" fill="#FFFFFF"/>
+    <rect x="302" y="128" width="119" height="96" rx="20" fill="url(#blue)"/>
+    <path d="M132 151h8M158 154h36M132 172h28M176 172h28M132 195h9M158 198h44M333 147h51M396 147h15M346 165h20M378 165h42M355 182h62M379 202h33" fill="none"/>
+    <rect x="126" y="209" width="274" height="190" rx="34" fill="url(#panel)"/>
+    <path d="M400 275v93c0 17-14 31-31 31H244" fill="none"/>
+    <rect x="120" y="285" width="126" height="113" rx="19" fill="#FFFFFF"/>
+    <path d="M120 311h126" fill="none"/>
+    <path d="M137 278v28M155 278v28M173 278v28M191 278v28M209 278v28M227 278v28" fill="none"/>
+    <g fill="#C9E2EF" stroke="none">
+      <circle cx="139" cy="328" r="6"/><circle cx="155" cy="328" r="6"/><circle cx="172" cy="328" r="6"/><circle cx="189" cy="328" r="6"/><circle cx="206" cy="328" r="6"/><circle cx="223" cy="328" r="6"/>
+      <circle cx="139" cy="346" r="6"/><circle cx="155" cy="346" r="6"/><circle cx="172" cy="346" r="6"/><circle cx="189" cy="346" r="6"/><circle cx="206" cy="346" r="6"/><circle cx="223" cy="346" r="6"/>
+      <circle cx="139" cy="364" r="6"/><circle cx="155" cy="364" r="6"/><circle cx="172" cy="364" r="6"/><circle cx="189" cy="364" r="6"/><circle cx="206" cy="364" r="6"/>
+    </g>
+    <rect x="209" y="358" width="24" height="24" rx="5" fill="#EF7482" stroke="none"/>
+    <circle cx="206" cy="364" r="6" fill="#EF7482" stroke="none"/>
+    <path d="M302 300h66M377 300h8M305 322h48M306 348h74M306 374h61" fill="none"/>
+    <path d="M306 335h45M306 386h55" stroke="#98D6EA"/>
+    <path d="M245 120v-39M237 81a8 8 0 1 0 16 0a8 8 0 0 0-16 0Z" fill="#FF8E6E"/>
+    <circle cx="256" cy="190" r="76" fill="url(#faceShell)"/>
+    <rect x="188" y="161" width="136" height="60" rx="30" fill="#050505"/>
+    <circle cx="220" cy="191" r="11" fill="#FFFFFF"/>
+    <circle cx="291" cy="191" r="11" fill="#FFFFFF"/>
+    <path d="M245 201c7 10 18 10 25 0" stroke="#FFFFFF"/>
+    <path d="M180 184c-14 2-23 13-23 28s10 26 23 28M332 184c14 2 23 13 23 28s-10 26-23 28" fill="#8BD9EA"/>
+    <path d="M222 267v22h68v-22" fill="#050505"/>
+    <path d="M224 289c11 22 53 22 64 0" fill="#FFFFFF"/>
+  </g>
+</svg>

@@ -253,7 +253,7 @@
       },
       "Studio Back Body Blaze": {
         "min": 0,
-        "max": 4,
+        "max": 2,
         "source": "settings"
       },
       "Studio FIT": {
@@ -280,6 +280,41 @@
         "min": 1,
         "max": 2,
         "source": "settings"
+      },
+      "Studio Barre 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 2
+      },
+      "Studio Mat 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 2
+      },
+      "Studio Cardio Barre Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 2
+      },
+      "Studio FIT Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves Barre 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves Mat 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves FIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
       }
     },
     "Supreme HQ, Bandra": {
@@ -334,6 +369,133 @@
         "max": 0
       },
       "Studio HIIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Barre 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 2
+      },
+      "Studio Mat 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Cardio Barre Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 2
+      },
+      "Studio FIT Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves Barre 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves Mat 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves FIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      }
+    },
+    "Courtside": {
+      "Studio Barre 57": {
+        "min": 1,
+        "max": 2,
+        "source": "settings"
+      },
+      "Studio Cardio Barre": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Mat 57": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio PowerCycle": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Strength Lab": {
+        "min": 0,
+        "max": 0,
+        "source": "settings"
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio FIT": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Recovery": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Amped Up!": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio HIIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Barre 57 Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Mat 57 Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio Cardio Barre Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Studio FIT Express": {
+        "min": 0,
+        "max": 1,
+        "source": "settings"
+      },
+      "Copper + Cloves Barre 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves Mat 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves FIT": {
         "min": 0,
         "source": "settings",
         "max": 0
@@ -394,61 +556,119 @@
         "min": 0,
         "source": "settings",
         "max": 0
-      }
-    },
-    "Courtside": {
-      "Studio Barre 57": {
-        "min": 1,
-        "max": 2,
-        "source": "settings"
       },
       "Studio Barre 57 Express": {
         "min": 0,
-        "max": 1,
-        "source": "settings"
-      },
-      "Studio Mat 57": {
-        "min": 0,
-        "max": 1,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
       },
       "Studio Mat 57 Express": {
         "min": 0,
-        "max": 1,
-        "source": "settings"
-      },
-      "Studio Cardio Barre": {
-        "min": 0,
-        "max": 1,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
       },
       "Studio Cardio Barre Express": {
         "min": 0,
-        "max": 1,
-        "source": "settings"
-      },
-      "Studio FIT": {
-        "min": 0,
-        "max": 1,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
       },
       "Studio FIT Express": {
         "min": 0,
-        "max": 1,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
       },
-      "Studio PowerCycle": {
+      "Copper + Cloves Barre 57": {
         "min": 0,
-        "max": 0,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
       },
-      "Studio Strength Lab": {
+      "Copper + Cloves Mat 57": {
         "min": 0,
-        "max": 0,
-        "source": "settings"
+        "source": "settings",
+        "max": 0
+      },
+      "Copper + Cloves FIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
       }
     },
     "Copper & Cloves": {
+      "Studio Barre 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Cardio Barre": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Mat 57": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio PowerCycle": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Strength Lab": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Back Body Blaze": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio FIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Recovery": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Foundations": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Amped Up!": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio HIIT": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Barre 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Mat 57 Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio Cardio Barre Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
+      "Studio FIT Express": {
+        "min": 0,
+        "source": "settings",
+        "max": 0
+      },
       "Copper + Cloves Barre 57": {
         "min": 1,
         "max": 6,
@@ -488,6 +708,6 @@
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-06T18:31:33.621Z"
+    "updated_at": "2026-05-07T06:00:13.620Z"
   }
 }

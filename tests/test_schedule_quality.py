@@ -125,6 +125,54 @@ def test_copper_class_mix_uses_copper_specific_limits_before_canonical_group():
     assert not optimiser._class_mix_allows_candidate("Copper & Cloves", "Copper + Cloves Mat 57", current_count=6)
 
 
+def test_supreme_eight_to_nine_window_prioritizes_sub_hour_slots():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.slot_availability = {
+        "Supreme HQ, Bandra": [
+            {"time": "08:00", "viable": True},
+            {"time": "08:30", "viable": True},
+            {"time": "08:45", "viable": True},
+            {"time": "09:00", "viable": True},
+            {"time": "09:30", "viable": True},
+            {"time": "18:00", "viable": True},
+        ]
+    }
+
+    am_slots, _ = optimiser._get_viable_slots("Supreme HQ, Bandra")
+
+    assert am_slots.index("08:30") < am_slots.index("09:00")
+    assert am_slots.index("08:45") < am_slots.index("09:00")
+
+
+def test_supreme_eight_to_nine_window_adds_missing_0830_bridge_slot():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.slot_availability = {
+        "Supreme HQ, Bandra": [
+            {"time": "08:00", "viable": True},
+            {"time": "08:45", "viable": True},
+            {"time": "09:00", "viable": True},
+            {"time": "18:00", "viable": True},
+        ]
+    }
+
+    am_slots, _ = optimiser._get_viable_slots("Supreme HQ, Bandra")
+
+    assert "08:30" in am_slots
+    assert am_slots.index("08:30") < am_slots.index("09:00")
+
+
+def test_horizontal_mix_blocks_third_same_class_at_same_time():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    key = ("Supreme HQ, Bandra", "09:00", "Studio Barre 57")
+    optimiser._time_class_counts[key] = 2
+
+    assert not optimiser._horizontal_mix_allows_candidate(
+        "Supreme HQ, Bandra",
+        "09:00",
+        "Studio Barre 57",
+    )
+
+
 def test_protected_class_variant_does_not_collapse_express_to_base():
     assert same_protected_class_variant("Studio Barre 57 Express", "Studio Barre 57 Express")
     assert not same_protected_class_variant("Studio Barre 57 Express", "Studio Barre 57")
@@ -194,7 +242,7 @@ def test_ai_hard_limits_respect_configured_strength_lab_weekly_max(tmp_path, mon
             location="Kwality House, Kemps Corner",
             date=f"2026-05-{4 + idx:02d}",
             day_of_week=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][idx],
-            time="18:00",
+            time=["18:00", "18:15", "18:30", "18:45", "19:00"][idx],
             class_name="Studio Strength Lab",
             trainer_1="Atulan Purohit",
             trainer_2="",
@@ -280,6 +328,143 @@ def test_chat_substitution_questions_are_answered_by_llm(monkeypatch):
     assert "RANKED SUBSTITUTION CANDIDATES" in system_context
     assert "recommendation_status=eligible" in system_context
     assert "recommendation_status=blocked" in system_context
+
+
+def test_optimize_schedule_applies_validated_ai_patch(tmp_path, monkeypatch):
+    monkeypatch.setattr(flask_app_module, "WEB_DIR", tmp_path)
+    schedule_path = tmp_path / "schedule_data.json"
+    schedule_path.write_text(json.dumps({
+        "locations": {
+            "Supreme HQ, Bandra": [
+                {
+                    "location": "Supreme HQ, Bandra",
+                    "date": "2026-05-04",
+                    "day_of_week": "Monday",
+                    "time": "09:00",
+                    "class_name": "Studio Barre 57",
+                    "trainer_1": "Trainer A",
+                    "trainer_2": "",
+                    "cover": "",
+                    "room": "studio_a",
+                    "capacity": 14,
+                    "duration_min": 57,
+                    "score": 20,
+                    "predicted_fill_rate": 0.2,
+                }
+            ]
+        }
+    }))
+    monkeypatch.setattr(flask_app_module, "_call_schedule_optimizer_ai", lambda payload: {
+        "summary": "Improve Supreme morning quality.",
+        "operations": [
+            {
+                "type": "swap_trainer",
+                "reason": "Trainer B has stronger history.",
+                "slot": {
+                    "location": "Supreme HQ, Bandra",
+                    "day_of_week": "Monday",
+                    "time": "09:00",
+                    "class_name": "Studio Barre 57",
+                    "trainer_1": "Trainer A",
+                },
+                "new_trainer": "Trainer B",
+            }
+        ],
+    }, raising=False)
+    monkeypatch.setattr(flask_app_module, "_validate_manual_slot", lambda data, iteration, slot, original_slot=None: None)
+    monkeypatch.setattr(flask_app_module, "_save_schedule_to_supabase", lambda data: {"saved": False})
+    monkeypatch.setattr(flask_app_module, "_regenerate_index_from_template", lambda data=None: None)
+
+    response = flask_app_module.app.test_client().post("/api/optimize-schedule", json={"iteration": "Main"})
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["ok"] is True
+    assert payload["applied_count"] == 1
+    assert payload["rejected_count"] == 0
+    updated = json.loads(schedule_path.read_text())
+    slot = updated["locations"]["Supreme HQ, Bandra"][0]
+    assert slot["trainer_1"] == "Trainer B"
+    assert slot["ai_optimized"] is True
+
+
+def test_optimizer_prompt_requires_json_patch_and_validation_language(monkeypatch):
+    monkeypatch.setattr(flask_app_module, "_latest_schedule_payload", lambda: {
+        "locations": {
+            "Supreme HQ, Bandra": [
+                {
+                    "location": "Supreme HQ, Bandra",
+                    "day_of_week": "Monday",
+                    "time": "09:00",
+                    "class_name": "Studio Barre 57",
+                    "trainer_1": "Trainer A",
+                }
+            ]
+        }
+    })
+
+    prompt = flask_app_module._build_schedule_optimizer_prompt({"iteration": "Main", "location": "Supreme HQ, Bandra"})
+
+    assert "Return JSON only" in prompt
+    assert "swap_trainer" in prompt
+    assert "remove_class" in prompt
+    assert "move_class" in prompt
+    assert "add_class" in prompt
+    assert "change_class" in prompt
+    assert "Every operation will be server-validated" in prompt
+    assert "Supreme HQ, Bandra" in prompt
+
+
+def test_chat_context_includes_active_dashboard_context(tmp_path):
+    from chat_assistant import build_chat_context
+
+    schedule = tmp_path / "schedule_data.json"
+    scorecard = tmp_path / "scorecard.json"
+    profiles = tmp_path / "profiles.json"
+    schedule.write_text(json.dumps({
+        "locations": {
+            "Supreme HQ, Bandra": [
+                {
+                    "day_of_week": "Monday",
+                    "time": "09:00",
+                    "class_name": "Studio Barre 57",
+                    "trainer_1": "Trainer A",
+                }
+            ]
+        }
+    }))
+    scorecard.write_text(json.dumps({}))
+    profiles.write_text(json.dumps([]))
+
+    context = build_chat_context(
+        schedule,
+        scorecard,
+        profiles,
+        "optimize supreme",
+        dashboard_context={"location": "Supreme HQ, Bandra", "mode": "Analyze", "iteration": "Main"},
+    )
+
+    assert "ACTIVE DASHBOARD CONTEXT" in context
+    assert "Supreme HQ, Bandra" in context
+    assert "Analyze" in context
+
+
+def test_dashboard_has_ai_optimize_button_and_client_handler():
+    template = Path("web/template.html").read_text()
+
+    assert 'id="optimize-ai-btn"' in template
+    assert "function optimizeScheduleWithAI" in template
+    assert 'fetch("/api/optimize-schedule"' in template
+
+
+def test_chat_ui_has_advanced_modes_and_context_payload():
+    template = Path("web/template.html").read_text()
+
+    assert "chat-mode-tabs" in template
+    assert "data-chat-mode" in template
+    assert "dashboard_context" in template
+    assert "Analyze" in template
+    assert "Optimize Ideas" in template
 
 
 def test_chat_context_includes_relevant_schedule_rows_for_specific_question():
@@ -457,7 +642,7 @@ def test_ai_hard_limit_enforcer_keeps_at_least_one_trainer_rest_day(tmp_path, mo
         make_slot(
             day_of_week=day,
             date=f"2026-05-{4 + idx:02d}",
-            time="10:00",
+            time=["10:00", "10:15", "10:30", "10:45", "11:00", "11:15", "11:30"][idx],
             trainer_1="Trainer A",
             duration_min=57,
         )
@@ -1017,6 +1202,42 @@ def test_web_template_score_formula_matches_current_scorer_contract():
     assert "Strength: fill × 70" in template
 
 
+def test_drilldown_session_table_has_required_columns_and_totals_row():
+    template = Path("web/template.html").read_text()
+    start = template.index("function sessionRowsTable")
+    end = template.index("function historicDrilldownHtml", start)
+    source = template[start:end]
+
+    required_headers = [
+        "Class Name",
+        "Day of Week",
+        "Time",
+        "Date",
+        "Trainer Name",
+        "Location",
+        "Capacity",
+        "Booked",
+        "Checked In",
+        "Cancelled",
+        "Late Cancelled",
+        "Total Sessions",
+        "Empty Sessions",
+        "Class Avg - Incl Empty",
+        "Class Avg - Excl Empty",
+        "Fill Rate",
+        "Revenue Generated",
+        "Rev / Member",
+    ]
+    for header in required_headers:
+        assert f"<th>{header}</th>" in source
+
+    assert "<tfoot>" in source
+    assert "Totals" in source
+    assert "sessionRowsTotals" in source
+    assert "revMember" in source
+    assert "drillSessionTableHtml(rows)" in template
+
+
 def test_web_template_labels_metric_source_in_class_cards():
     template = Path("web/template.html").read_text()
 
@@ -1048,7 +1269,64 @@ def test_web_template_control_center_uses_clear_section_labels():
     assert "Trainer Setup" in template
     assert "Class Mix and Formats" in template
     assert "Rules and Pinned Classes" in template
+
+
+def test_web_template_uses_single_speed_calendar_logo():
+    template = Path("web/template.html").read_text()
+
+    assert template.count("images/plan57-speed-calendar-v2.png") == 2
+    assert "images/plan57-speed-calendar.png" not in template
+    assert "images/plan57-calendar-gold.png" not in template
+    assert "images/plan57-calendar-red.png" not in template
+    assert "images/plan57-dark-badge.png" not in template
+    assert 'src="/images/plan57' not in template
+    assert 'href="/images/plan57' not in template
+    assert 'class="logo-img"' in template
+    assert "brand-wordmark" in template
+    assert 'class="chat-brand-mark"' in template
+    assert 'class="chat-fab-logo"' in template
+
+
+def test_web_template_uses_dedicated_ai_agent_logo_and_advanced_rule_builder():
+    template = Path("web/template.html").read_text()
+
+    assert template.count("images/plan57-ai-agent-v2.png") == 2
+    assert "images/plan57-ai-agent.png" not in template
+    assert 'class="chat-fab-logo" src="images/plan57-ai-agent-v2.png"' in template
+    assert 'class="chat-brand-mark" src="images/plan57-ai-agent-v2.png"' in template
+    assert "trainer_load_limit" in template
+    assert "room_capacity_rule" in template
+    assert "sequence_spacing_rule" in template
+    assert "time_window_rule" in template
+    assert "data-cr-field=\"time_end\"" in template
+    assert "data-cr-field=\"room\"" in template
+    assert "data-cr-field=\"condition\"" in template
+    assert "advanced-rule-builder" in template
+
+
+def test_class_cards_use_modern_sleek_card_styles():
+    template = Path("web/template.html").read_text()
+
+    assert "class-card-modern-surface" in template
+    assert ".cc::after" in template
+    assert "backdrop-filter:blur" in template
+    assert "cubic-bezier(.16,1,.3,1)" in template
+    assert "cc-card-kicker" in template
+    assert "cc-metric-pill" in template
+    assert "cc-tool-icon" in template
     assert "Advanced Planner Settings" in template
+
+
+def test_rule_catalog_links_to_guided_custom_rule_builder():
+    template = Path("web/template.html").read_text()
+
+    assert "Create Custom Rule" in template
+    assert "function rvOpenCustomRuleBuilder" in template
+    assert "settSetTab(\"customrules\")" in template
+    assert "CUSTOM_RULE_TEMPLATES" in template
+    assert "function settUpdateCustomRuleBuilder" in template
+    assert "data-cr-field" in template
+    assert "Rule preview" in template
 
 
 def test_pipeline_request_normalizes_selected_date_and_can_force_standard_generation(tmp_path, monkeypatch):
@@ -1110,6 +1388,74 @@ def test_serve_pipeline_request_uses_saved_ai_key_when_ai_generation_requested(t
     assert options["child_env"]["OPENROUTER_API_KEY"] == "saved-test-key"
     assert options["child_env"]["SCHEDULER_FORCE_AI_ONLY"] == "1"
     assert "SCHEDULER_FORCE_GREEDY" not in options["child_env"]
+
+
+def test_serve_optimize_schedule_endpoint_is_registered(monkeypatch):
+    from http.server import HTTPServer
+    import threading
+    from urllib import request as urlrequest
+
+    monkeypatch.setattr(
+        serve_module,
+        "_optimize_schedule_request",
+        lambda payload: {"ok": True, "summary": "test patch", "applied_count": 0, "rejected_count": 0},
+        raising=False,
+    )
+    server = HTTPServer(("127.0.0.1", 0), serve_module.RulesHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        req = urlrequest.Request(
+            f"http://127.0.0.1:{server.server_port}/api/optimize-schedule",
+            data=b'{"iteration":"Main"}',
+            method="POST",
+            headers={"Content-Type": "application/json"},
+        )
+        with urlrequest.urlopen(req, timeout=5) as resp:
+            body = json.loads(resp.read().decode())
+        assert resp.status == 200
+        assert body["ok"] is True
+        assert body["summary"] == "test patch"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_serve_accepts_british_optimise_schedule_alias(monkeypatch):
+    from http.server import HTTPServer
+    import threading
+    from urllib import request as urlrequest
+
+    monkeypatch.setattr(
+        serve_module,
+        "_optimize_schedule_request",
+        lambda payload: {"ok": True, "summary": "alias patch", "applied_count": 0, "rejected_count": 0},
+        raising=False,
+    )
+    server = HTTPServer(("127.0.0.1", 0), serve_module.RulesHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        req = urlrequest.Request(
+            f"http://127.0.0.1:{server.server_port}/api/optimise-schedule",
+            data=b'{"iteration":"Main"}',
+            method="POST",
+            headers={"Content-Type": "application/json"},
+        )
+        with urlrequest.urlopen(req, timeout=5) as resp:
+            body = json.loads(resp.read().decode())
+        assert resp.status == 200
+        assert body["ok"] is True
+        assert body["summary"] == "alias patch"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_serve_static_svg_uses_image_mime_type():
+    assert serve_module.MIME_TYPES[".svg"] == "image/svg+xml"
 
 
 def test_web_template_exposes_week_picker_and_two_generate_modes():
@@ -1475,6 +1821,126 @@ def test_tier1_priority_score_dominates_lower_tier_history_edge():
     optimiser.trainer_states["Tier Two"].weekly_minutes = 10 * 60
 
     assert optimiser._tier_priority_score("Tier One") > optimiser._tier_priority_score("Tier Two") + 200
+
+
+def test_mumbai_tier1_supreme_band_reserves_substantial_bandra_load():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.trainer_profiles = {
+        "Tier One": {
+            "name": "Tier One",
+            "locations": {
+                "Supreme HQ, Bandra": {
+                    "available_days": DAY_ORDER,
+                    "max_classes_per_day": 4,
+                },
+                "Kwality House, Kemps Corner": {
+                    "available_days": DAY_ORDER,
+                    "max_classes_per_day": 4,
+                },
+            },
+        }
+    }
+    optimiser.trainer_home_region = {"Tier One": "mumbai"}
+    optimiser.trainer_states = {"Tier One": TrainerState("Tier One", 1)}
+
+    min_supreme, max_supreme = optimiser._mumbai_tier1_supreme_band("Tier One")
+
+    assert min_supreme >= 6 * get_class_duration("Studio Barre 57")
+    assert max_supreme >= 8 * get_class_duration("Studio Barre 57")
+    assert optimiser._location_tier_priority_score("Tier One", "Supreme HQ, Bandra") > 300
+    assert optimiser._location_tier_priority_score("Tier One", "Kwality House, Kemps Corner") < -250
+
+
+def test_limited_supreme_availability_caps_tier1_bandra_reservation():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.trainer_profiles = {
+        "Thursday Tier One": {
+            "name": "Thursday Tier One",
+            "locations": {
+                "Supreme HQ, Bandra": {
+                    "available_days": ["Thursday"],
+                    "max_classes_per_day": 4,
+                },
+                "Kwality House, Kemps Corner": {
+                    "available_days": DAY_ORDER,
+                    "max_classes_per_day": 4,
+                },
+            },
+        }
+    }
+    optimiser.trainer_home_region = {"Thursday Tier One": "mumbai"}
+    optimiser.trainer_states = {"Thursday Tier One": TrainerState("Thursday Tier One", 1)}
+
+    min_supreme, max_supreme = optimiser._mumbai_tier1_supreme_band("Thursday Tier One")
+
+    assert min_supreme == 4 * get_class_duration("Studio Barre 57")
+    assert max_supreme == 4 * get_class_duration("Studio Barre 57")
+
+
+def test_available_tier1_trainers_for_supreme_slot_excludes_busy_and_unqualified():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.trainer_profiles = {
+        "Tier One": {
+            "name": "Tier One",
+            "locations": {
+                "Supreme HQ, Bandra": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "21:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True, "powercycle": True},
+        },
+        "Busy Tier One": {
+            "name": "Busy Tier One",
+            "locations": {
+                "Supreme HQ, Bandra": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "21:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True, "powercycle": True},
+        },
+        "Unqualified Tier One": {
+            "name": "Unqualified Tier One",
+            "locations": {
+                "Supreme HQ, Bandra": {
+                    "available_days": ["Monday"],
+                    "time_window": {"start": "07:00", "end": "21:00"},
+                    "max_classes_per_day": 4,
+                }
+            },
+            "qualifications": {"all_barre": True, "powercycle": False},
+        },
+    }
+    optimiser.trainer_states = {
+        "Tier One": TrainerState("Tier One", 1),
+        "Busy Tier One": TrainerState("Busy Tier One", 1),
+        "Unqualified Tier One": TrainerState("Unqualified Tier One", 1),
+    }
+    optimiser.trainer_states["Busy Tier One"].add("Monday", "09:00", "Supreme HQ, Bandra", "Studio Barre 57")
+
+    assert optimiser._available_tier1_trainers_for_slot(
+        "Supreme HQ, Bandra",
+        "Monday",
+        "2026-05-04",
+        "09:00",
+        "Studio PowerCycle",
+        {"Busy Tier One"},
+    ) == ["Tier One"]
+
+
+def test_location_planning_order_reserves_bandra_before_kwality():
+    optimiser = ScheduleOptimiser(
+        target_week_start="2026-05-04",
+        locations=["Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Kenkere House"],
+    )
+
+    assert optimiser._location_planning_order()[:2] == [
+        "Supreme HQ, Bandra",
+        "Kwality House, Kemps Corner",
+    ]
 
 def test_schedule_config_targets_are_selected_within_min_max_range(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
@@ -2395,8 +2861,8 @@ def test_ai_hard_limits_drop_horizontal_same_time_class_overuse():
 
     kept = _enforce_hard_limits(slots, "Kwality House, Kemps Corner", profiles)
 
-    assert len(kept) == 4
-    assert [slot.day_of_week for slot in kept] == ["Monday", "Tuesday", "Wednesday", "Thursday"]
+    assert len(kept) == 2
+    assert [slot.day_of_week for slot in kept] == ["Monday", "Tuesday"]
 
 
 def test_clear_schedule_api_accepts_trailing_slash(tmp_path, monkeypatch):

@@ -1294,8 +1294,20 @@
     "active": true
   },
   {
-    "name": "Vivaran Dhasmana",
-    "tier": 1,
+    "name": "Simonelle De Vitre",
+    "tier": 2,
+    "active": true,
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    },
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -1304,14 +1316,14 @@
           "Wednesday",
           "Thursday",
           "Friday",
-          "Saturday",
-          "Sunday"
+          "Saturday"
         ],
         "time_window": {
-          "start": "07:00",
-          "end": "21:00"
+          "start": "06:00",
+          "end": "22:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "session_count": 0
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -1324,11 +1336,64 @@
           "Sunday"
         ],
         "time_window": {
-          "start": "07:00",
-          "end": "21:00"
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
+      }
+    }
+  },
+  {
+    "name": "Simran Dutt",
+    "tier": 2,
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 2
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
         },
         "avg_classes_per_day": 2.4,
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "avg_checkin": 5.7,
         "session_count": 280,
         "owned_blocks": [
@@ -1352,6 +1417,22 @@
           }
         ],
         "notes": "Owns Tue/Wed morning blocks at Supreme."
+      },
+      "Courtside": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "06:00",
+          "end": "22:00"
+        },
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
@@ -1366,5 +1447,56 @@
       "recovery": false
     },
     "active": true
+  },
+  {
+    "name": "Vivaran Dhasmana",
+    "tier": 1,
+    "active": true,
+    "qualifications": {
+      "all_barre": true,
+      "mat_57": false,
+      "powercycle": false,
+      "strength_lab": false,
+      "foundations": false,
+      "pre_post_natal": false,
+      "amped_up": false,
+      "hiit": false,
+      "recovery": false
+    },
+    "locations": {
+      "Kwality House, Kemps Corner": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4,
+        "session_count": 0
+      },
+      "Supreme HQ, Bandra": {
+        "available_days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "time_window": {
+          "start": "07:00",
+          "end": "21:00"
+        },
+        "max_classes_per_day": 4
+      }
+    }
   }
 ]

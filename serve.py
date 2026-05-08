@@ -444,6 +444,193 @@ def _clear_schedule(payload):
     return {"cleared": True, "supabase_saved": supabase_saved}
 
 
+def _expand_nl_edit_scope(result: dict, schedule_path: Path) -> dict:
+    """Expand scope-based intents (global_replace, slot_optimize, day_optimize) into concrete edits."""
+    intent = result.get("intent", "")
+    scope = result.get("scope") or {}
+    if not schedule_path.exists():
+        return result
+
+    try:
+        data = json.loads(schedule_path.read_text())
+    except Exception:
+        return result
+
+    all_slots = []
+    for loc_slots in (data.get("locations") or {}).values():
+        all_slots.extend(loc_slots or [])
+
+    def _norm(s):
+        return " ".join(str(s or "").lower().split())
+
+    if intent == "global_replace_trainer":
+        scope_trainer = _norm(scope.get("trainer", ""))
+        scope_class = _norm(scope.get("class_name", ""))
+        new_trainer = scope.get("new_trainer", "BEST_FIT")
+        edits = []
+        for slot in all_slots:
+            tr = _norm(slot.get("trainer_1", ""))
+            cls = _norm(slot.get("class_name", ""))
+            tr_match = scope_trainer and (scope_trainer.split()[0] in tr or tr in scope_trainer)
+            if tr_match and (not scope_class or scope_class.split()[0] in cls):
+                edits.append({
+                    "action": "modify",
+                    "location": slot.get("location", ""),
+                    "day": slot.get("day_of_week", ""),
+                    "time": slot.get("time", ""),
+                    "class_name": slot.get("class_name", ""),
+                    "trainer_1": slot.get("trainer_1", ""),
+                    "new_trainer": new_trainer,
+                    "reason": f"Global replace: {slot.get('trainer_1','')} → {new_trainer}",
+                })
+        result["edits"] = edits
+        result["summary"] = f"Replace {scope.get('trainer','?')} across {len(edits)} slot(s)"
+
+    elif intent == "global_replace_class":
+        scope_class = _norm(scope.get("class_name", ""))
+        new_class = scope.get("new_class", "BEST_FIT")
+        edits = []
+        for slot in all_slots:
+            cls = _norm(slot.get("class_name", ""))
+            loc = _norm(slot.get("location", ""))
+            scope_loc = _norm(scope.get("location", ""))
+            if scope_class and scope_class.split()[0] in cls:
+                if not scope_loc or scope_loc.split()[0] in loc:
+                    edits.append({
+                        "action": "modify",
+                        "location": slot.get("location", ""),
+                        "day": slot.get("day_of_week", ""),
+                        "time": slot.get("time", ""),
+                        "class_name": slot.get("class_name", ""),
+                        "trainer_1": slot.get("trainer_1", ""),
+                        "new_class": new_class,
+                        "reason": f"Global replace class: {slot.get('class_name','')} → {new_class}",
+                    })
+        result["edits"] = edits
+        result["summary"] = f"Replace class across {len(edits)} slot(s)"
+
+    elif intent in ("slot_optimize", "day_optimize"):
+        # Flag for frontend: route to /api/optimize-schedule with scope
+        result["route_to_optimizer"] = True
+        result["optimizer_scope"] = scope
+
+    return result
+
+
+def _fuzzy_find_slot(rows, edit):
+    """Find best matching slot in rows using progressive fuzzy matching."""
+    def _norm(s):
+        return " ".join(str(s or "").lower().split())
+
+    loc = _norm(edit.get("location", ""))
+    day = _norm(edit.get("day", ""))
+    time = str(edit.get("time") or "").strip()
+    cls = _norm(edit.get("class_name", ""))
+    trainer = _norm(edit.get("trainer_1", ""))
+
+    def score(row):
+        s = 0
+        if loc and _norm(row.get("location", "")) == loc:
+            s += 40
+        if day and _norm(row.get("day_of_week", "")) == day:
+            s += 30
+        if time and (row.get("time") or "").strip() == time:
+            s += 20
+        row_cls = _norm(row.get("class_name", ""))
+        if cls and (cls in row_cls or row_cls in cls or cls.split()[0] in row_cls):
+            s += 15
+        row_tr = _norm(row.get("trainer_1", ""))
+        if trainer:
+            tr_first = trainer.split()[0]
+            if trainer in row_tr or tr_first in row_tr:
+                s += 10
+        return s
+
+    scored = [(score(r), r) for r in rows]
+    scored.sort(key=lambda x: -x[0])
+    best_score, best_row = scored[0] if scored else (0, None)
+    # Require at least location + day match (score ≥ 70)
+    return best_row if best_score >= 70 else None
+
+
+def _apply_nl_edits(edits, iteration="Main"):
+    """Apply a list of structured NL edits. Returns list of {action, result, error}."""
+    path = WEB_DIR / "schedule_data.json"
+    if not path.exists():
+        raise FileNotFoundError("schedule_data.json not found")
+
+    data = json.loads(path.read_text())
+    results = []
+    dirty = False
+
+    for edit in edits:
+        action = edit.get("action")
+        loc = edit.get("location", "")
+        try:
+            rows = _rows_for_iteration(data, iteration, loc)
+
+            if action == "remove":
+                found = _fuzzy_find_slot(rows, edit)
+                if not found:
+                    results.append({"action": action, "error": f"Could not find slot: {edit}"})
+                    continue
+                rows.remove(found)
+                dirty = True
+                results.append({"action": action, "ok": True, "slot": found})
+
+            elif action == "add":
+                new_slot = {
+                    "location": loc,
+                    "day_of_week": edit.get("new_day") or edit.get("day", ""),
+                    "time": edit.get("new_time") or edit.get("time", ""),
+                    "class_name": edit.get("new_class") or edit.get("class_name", ""),
+                    "trainer_1": edit.get("new_trainer") or edit.get("trainer_1", ""),
+                    "trainer_2": edit.get("trainer_2", ""),
+                    "recommendation": "MANUAL",
+                    "manual_added": True,
+                    "scheduling_reason": edit.get("reason") or "Added via NL edit",
+                    "constraint_violations": [],
+                }
+                rows.append(new_slot)
+                dirty = True
+                results.append({"action": action, "ok": True, "slot": new_slot})
+
+            elif action == "modify":
+                found = _fuzzy_find_slot(rows, edit)
+                if not found:
+                    results.append({"action": action, "error": f"Could not find slot: {edit}"})
+                    continue
+                old_trainer = found.get("trainer_1", "")
+                old_class = found.get("class_name", "")
+                if edit.get("new_trainer"):
+                    found["replaced_from_trainer"] = old_trainer
+                    found["trainer_1"] = edit["new_trainer"]
+                if edit.get("new_class"):
+                    found["class_name"] = edit["new_class"]
+                if edit.get("new_day"):
+                    found["day_of_week"] = edit["new_day"]
+                if edit.get("new_time"):
+                    found["time"] = edit["new_time"]
+                found["recommendation"] = "MANUAL"
+                found["manual_moved"] = True
+                found["scheduling_reason"] = edit.get("reason") or (
+                    f"NL edit: {old_trainer} → {found['trainer_1']}" if edit.get("new_trainer")
+                    else f"NL edit: {old_class} → {found.get('class_name','?')}"
+                )
+                dirty = True
+                results.append({"action": action, "ok": True, "slot": found})
+
+        except Exception as e:
+            results.append({"action": action, "error": str(e)})
+
+    if dirty:
+        _write_schedule_data(data)
+
+    applied = sum(1 for r in results if r.get("ok"))
+    errors = [r for r in results if r.get("error")]
+    return {"applied": applied, "errors": errors, "results": results}
+
+
 def _remove_class_from_schedule(payload):
     slot = payload.get("slot") or {}
     iteration = payload.get("iteration") or "Main"
@@ -488,6 +675,34 @@ def _move_class_in_schedule(payload):
     _rows_for_iteration(data, iteration, target["location"]).append(moved)
     supabase_saved = _write_schedule_data(data)
     return {"moved": 1, "slot": moved, "supabase_saved": supabase_saved}
+
+
+def _optimize_schedule_request(payload):
+    import app as flask_app
+
+    path = WEB_DIR / "schedule_data.json"
+    if not path.exists():
+        raise FileNotFoundError("web/schedule_data.json was not found")
+
+    data = json.loads(path.read_text())
+    iteration = (payload or {}).get("iteration") or "Main"
+    ai_plan = flask_app._call_schedule_optimizer_ai(payload or {})
+    operations = ai_plan.get("operations") or []
+    result = flask_app._apply_ai_schedule_operations(data, iteration, operations)
+    applied = result.get("applied") or []
+    rejected = result.get("rejected") or []
+    supabase_saved = {"saved": False, "error": ""}
+    if applied:
+        supabase_saved = flask_app._write_schedule_data(data)
+    return {
+        "ok": True,
+        "summary": ai_plan.get("summary") or "AI optimizer completed.",
+        "applied": applied,
+        "rejected": rejected,
+        "applied_count": len(applied),
+        "rejected_count": len(rejected),
+        "supabase_saved": supabase_saved,
+    }
 
 
 def _regenerate_index_from_template(schedule_data=None):
@@ -565,6 +780,7 @@ MIME_TYPES = {
     ".csv": "text/csv",
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ".png": "image/png",
+    ".svg": "image/svg+xml",
     ".ico": "image/x-icon",
 }
 
@@ -1081,6 +1297,22 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": str(e)})
             return
 
+        if path in {"/api/optimize-schedule", "/api/optimise-schedule"}:
+            try:
+                payload = json.loads(body_raw or "{}")
+                result = _optimize_schedule_request(payload)
+                print(
+                    "  [API] AI schedule optimization applied "
+                    f"{result.get('applied_count', 0)} change(s), "
+                    f"rejected {result.get('rejected_count', 0)}"
+                )
+                self._send_json(200, result)
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+
         if path in {"/api/clear-schedule", "/api/clear-calendar"}:
             try:
                 payload = json.loads(body_raw or "{}")
@@ -1108,6 +1340,74 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(200, {"ok": True, "finalised": result})
             except Exception as e:
                 self._send_json(400, {"error": str(e)})
+            return
+
+        if path == "/api/nl-edit":
+            try:
+                payload = json.loads(body_raw)
+                instruction = str(payload.get("instruction") or "").strip()
+                schedule_snapshot = payload.get("schedule_snapshot") or {}
+                context = payload.get("context") or {}
+                if not instruction:
+                    self._send_json(400, {"error": "Empty instruction"})
+                    return
+                try:
+                    import sys as _sys
+                    _sys.path.insert(0, str(PROJECT_ROOT))
+                    from ai_provider import create_ai_client, OPENAI_AVAILABLE
+                    client, settings = (None, {})
+                    if OPENAI_AVAILABLE:
+                        client, settings = create_ai_client()
+                    if not client:
+                        cfg_path = _schedule_config_path()
+                        if cfg_path.exists():
+                            cfg = json.loads(cfg_path.read_text())
+                            api_key = (cfg.get("settings_options") or {}).get("ai_api_key", "").strip()
+                            if api_key:
+                                from openai import OpenAI
+                                client = OpenAI(
+                                    api_key=api_key,
+                                    base_url="https://openrouter.ai/api/v1",
+                                    default_headers={"HTTP-Referer": "https://studio-scheduler.local", "X-Title": "Studio Scheduler"},
+                                )
+                                settings = {"model": "openai/gpt-oss-120b:free"}
+                    if not client:
+                        self._send_json(200, {"error": "AI not configured. Add OPENROUTER_API_KEY or set API key in Settings."})
+                        return
+                    from chat_assistant import parse_nl_schedule_edit
+                    result = parse_nl_schedule_edit(
+                        instruction, schedule_snapshot, context,
+                        client, settings.get("model", "openai/gpt-oss-120b:free"),
+                        metrics_path=PROJECT_ROOT / "state" / "02_metrics.json",
+                        profiles_path=_trainer_profiles_path(),
+                    )
+                    # Expand scope-based intents into concrete edits
+                    result = _expand_nl_edit_scope(result, WEB_DIR / "schedule_data.json")
+                    print(f"  [API] NL edit parsed: intent={result.get('intent')} edits={len(result.get('edits', []))}")
+                    self._send_json(200, result)
+                except Exception as ai_err:
+                    self._send_json(200, {"error": f"AI error: {ai_err}"})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+
+        if path == "/api/nl-edit-apply":
+            try:
+                payload = json.loads(body_raw)
+                edits = payload.get("edits") or []
+                iteration = payload.get("iteration") or "Main"
+                if not edits:
+                    self._send_json(400, {"error": "No edits provided"})
+                    return
+                result = _apply_nl_edits(edits, iteration)
+                print(f"  [API] NL edits applied: {result['applied']} ok, {len(result['errors'])} error(s)")
+                self._send_json(200, result)
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
             return
 
         if path == "/api/chat":

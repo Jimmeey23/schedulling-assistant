@@ -9,7 +9,7 @@
   "rules": {
     "UNIV-002": {
       "enabled": true,
-      "description": "All 3 time bands must have >= 1 class every weekday",
+      "description": "All 3 time bands must have >= 2 class every weekday",
       "title": "UNIV-002"
     },
     "UNIV-003": {
@@ -19,12 +19,12 @@
     },
     "UNIV-004": {
       "enabled": true,
-      "description": "Sunday max 5-6 classes, no class before 10:00",
+      "description": "Sunday max 5-6 classes, no class before 9:00",
       "title": "UNIV-004"
     },
     "UNIV-009": {
-      "enabled": true,
-      "description": "No trainer > 3 consecutive classes without 5 min gap",
+      "enabled": false,
+      "description": "No trainer > 4 consecutive classes without 5 min gap",
       "title": "UNIV-009"
     },
     "UNIV-010": {

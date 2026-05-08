@@ -1,12 +1,12 @@
 ,11-May,,,,,,,,,,12-May,,,,,,,,,,13-May,,,,,,,,,,14-May,,,,,,,,,,15-May,,,,,,,,,,16-May,,,,,,,,,,17-May,,,,,,,,,
 ,Monday,,,,,,,,,,Tuesday,,,,,,,,,,Wednesday,,,,,,,,,,Thursday,,,,,,,,,,Friday,,,,,,,,,,Saturday,,,,,,,,,,Sunday,,,,,,,,,
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
-07:00,Copper + Cloves Mat 57,Shruti Kulkarni,Studio 1,14,12%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+07:00,Copper + Cloves Mat 57,Shruti Kulkarni,Studio 1,14,12%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves FIT,Pushyank Nahar,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
 07:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Chaitanya Nahar,Studio 1,14,17%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,
 08:15,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Mat 57,Siddhartha Kusuma,Studio 1,14,18%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-09:00,Copper + Cloves Barre 57,Kajol Kanchan,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves Mat 57,Pushyank Nahar,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Mat 57,Pushyank Nahar,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves Mat 57,Pushyank Nahar,Studio 1,14,46%,0,0%,0.0,,,,,,,,,,,,
-11:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves FIT,Siddhartha Kusuma,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
-11:30,Copper + Cloves FIT,Siddhartha Kusuma,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves FIT,Kajol Kanchan,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves FIT,Kajol Kanchan,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves FIT,Siddhartha Kusuma,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+09:00,Copper + Cloves Barre 57,Siddhartha Kusuma,Studio 1,14,20%,0,0%,0.0,,,Copper + Cloves Mat 57,Pushyank Nahar,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Mat 57,Pushyank Nahar,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,
+11:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves FIT,Siddhartha Kusuma,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves FIT,Kajol Kanchan,Studio 1,14,10%,0,0%,0.0,,
+11:30,Copper + Cloves FIT,Kajol Kanchan,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Mat 57,Chaitanya Nahar,Studio 1,14,100%,0,0%,0.0,,,,,,,,,,,,
 17:15,,,,,,,,,,,Copper + Cloves Barre 57,Chaitanya Nahar,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,,Copper + Cloves Mat 57,Shruti Kulkarni,Studio 1,14,28%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 18:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Siddhartha Kusuma,Studio 1,14,17%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,
 19:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Kajol Kanchan,Studio 1,14,15%,0,0%,0.0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -16,26 +16,26 @@ Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Clas
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Chaitanya Nahar,2,1.9,18%,Copper + Cloves Barre 57
-Kajol Kanchan,4,3.8,19%,Copper + Cloves Barre 57
-Pushyank Nahar,3,2.8,29%,Copper + Cloves Mat 57
+Chaitanya Nahar,3,2.8,45%,Copper + Cloves Barre 57
+Kajol Kanchan,3,2.8,15%,Copper + Cloves FIT
+Pushyank Nahar,3,2.8,20%,Copper + Cloves Mat 57
 Shruti Kulkarni,2,1.9,20%,Copper + Cloves Mat 57
-Siddhartha Kusuma,5,4.8,19%,Copper + Cloves FIT
+Siddhartha Kusuma,4,3.8,19%,Copper + Cloves Barre 57
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
 Copper + Cloves Barre 57,5,17%,4
-Copper + Cloves FIT,5,20%,5
-Copper + Cloves Mat 57,6,24%,6
+Copper + Cloves FIT,4,18%,4
+Copper + Cloves Mat 57,6,33%,6
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
-07:00,Copper + Cloves Mat 57,-,-,-,-,-,-,1
+07:00,Copper + Cloves Mat 57,-,-,-,-,Copper + Cloves FIT,-,2
 07:30,-,-,-,-,Copper + Cloves Barre 57,-,-,1
 08:15,-,-,Copper + Cloves Mat 57,-,-,-,-,1
-09:00,Copper + Cloves Barre 57,Copper + Cloves Mat 57,-,-,Copper + Cloves Mat 57,Copper + Cloves Mat 57,-,4
-11:00,-,-,-,-,-,Copper + Cloves FIT,-,1
-11:30,Copper + Cloves FIT,Copper + Cloves FIT,Copper + Cloves FIT,Copper + Cloves FIT,-,-,-,4
+09:00,Copper + Cloves Barre 57,Copper + Cloves Mat 57,-,-,Copper + Cloves Mat 57,-,-,3
+11:00,-,-,-,Copper + Cloves FIT,-,-,Copper + Cloves FIT,2
+11:30,Copper + Cloves FIT,-,-,-,-,Copper + Cloves Mat 57,-,2
 17:15,-,Copper + Cloves Barre 57,-,Copper + Cloves Mat 57,-,-,-,2
 18:15,-,-,-,-,Copper + Cloves Barre 57,-,-,1
 19:45,-,-,-,Copper + Cloves Barre 57,-,-,-,1

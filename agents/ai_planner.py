@@ -190,6 +190,7 @@ def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
     )
     sections.append(
         "Horizontal weekly mix: for each location and clock time, vary class formats across the week. "
+        "Use no more than 2 exact same classes and no more than 3 same-format classes at any one clock time. "
         "Do not fill a time column with the same class or same format every day."
     )
     sections.append("Output ONLY raw JSON, no markdown, no extra text.")
@@ -329,7 +330,8 @@ def _build_location_prompt(location: str, week_start: str,
         'Schema: {"location":"...","week_start":"...","schedule":[{"day":"Monday","time":"08:30","class":"Studio Barre 57","trainer":"Trainer Name","cover":"Cover Trainer"},...]}',
         "",
         "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
-        "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Do not make 07:30 all Barre 57, all PowerCycle, or any single repeated format.",
+        "SUPREME 08:00-09:00 FOCUS: for Supreme HQ, do not collapse the 8-9am demand window into only 09:00. Use the available 08:30 and 08:45 starts where trainer/room constraints allow.",
+        "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Keep each exact class to 2 or fewer uses per clock time, each broad format to 3 or fewer uses per clock time, and do not make 07:30/08:30/09:00 all Barre 57, all PowerCycle, or any single repeated format.",
     ]
 
     return "\n".join(lines)

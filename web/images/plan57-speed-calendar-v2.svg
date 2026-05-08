@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Plan 57 speed calendar logo</title>
+  <desc id="desc">A modern calendar icon with a large 57 mark and speed lines.</desc>
+  <defs>
+    <linearGradient id="header" x1="126" y1="150" x2="386" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F6B75E"/>
+      <stop offset=".5" stop-color="#EB815F"/>
+      <stop offset="1" stop-color="#C94D63"/>
+    </linearGradient>
+    <linearGradient id="streak" x1="145" y1="305" x2="220" y2="337" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8BA65"/>
+      <stop offset=".72" stop-color="#EF865E"/>
+      <stop offset="1" stop-color="#D65B64"/>
+    </linearGradient>
+    <filter id="shadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#111820" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#F3F2F1"/>
+  <g filter="url(#shadow)">
+    <path d="M126 191c0-33 27-60 60-60h140c33 0 60 27 60 60v11H126v-11Z" fill="url(#header)"/>
+    <path d="M126 202h260v129c0 33-27 60-60 60H186c-33 0-60-27-60-60V202Z" fill="#111820"/>
+    <path d="M126 202h260v12H126z" fill="#F7F7F5"/>
+    <path d="M126 214h130l-73 177c-32-2-57-28-57-60V214Z" fill="#F7F7F5"/>
+    <rect x="180" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <rect x="241" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <rect x="302" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <path d="M211 132h115c33 0 60 27 60 60v10H126v-10c0-33 27-60 60-60h25Z" fill="url(#header)" opacity=".92"/>
+    <rect x="180" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <rect x="241" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <rect x="302" y="109" width="31" height="56" rx="16" fill="#111820"/>
+    <g stroke="#111820" stroke-width="7" stroke-linecap="round">
+      <path d="M126 224h48"/>
+      <path d="M126 238h45"/>
+      <path d="M126 252h42"/>
+      <path d="M126 266h39"/>
+      <path d="M126 280h36"/>
+      <path d="M126 294h33"/>
+      <path d="M126 308h30"/>
+      <path d="M126 322h27"/>
+      <path d="M126 336h23"/>
+      <path d="M126 350h20"/>
+    </g>
+    <g stroke="url(#streak)" stroke-width="6" stroke-linecap="round">
+      <path d="M159 294h39"/>
+      <path d="M150 309h56"/>
+      <path d="M146 324h48"/>
+      <path d="M151 339h34"/>
+    </g>
+    <path d="M201 232h136L264 391h-56c36-12 58-40 56-74-1-30-22-51-52-51-18 0-36 5-54 15l20-49h23Z" fill="#F7F7F5"/>
+    <path d="M270 214h116L307 391h-61l68-158h-52l8-19Z" fill="#F7F7F5"/>
+    <path d="M188 276c40-12 77 11 77 57 0 39-29 63-70 63-22 0-43-7-61-20l20-42c12 10 26 15 40 15 18 0 30-11 30-29s-12-29-31-29c-12 0-24 3-35 9l30-24Z" fill="#111820"/>
+  </g>
+</svg>

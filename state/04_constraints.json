@@ -4,7 +4,7 @@
       "constraint_id": "UNIV-002",
       "type": "always_do",
       "location": null,
-      "description": "All 3 time bands must have >= 1 class every weekday"
+      "description": "All 3 time bands must have >= 2 class every weekday"
     },
     {
       "constraint_id": "UNIV-003",
@@ -16,13 +16,7 @@
       "constraint_id": "UNIV-004",
       "type": "never_do",
       "location": null,
-      "description": "Sunday max 5-6 classes, no class before 10:00"
-    },
-    {
-      "constraint_id": "UNIV-009",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "No trainer > 3 consecutive classes without 5 min gap"
+      "description": "Sunday max 5-6 classes, no class before 9:00"
     },
     {
       "constraint_id": "UNIV-010",

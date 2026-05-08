@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Plan 57 speed calendar logo</title>
+  <desc id="desc">Minimal calendar logo with speed lines and large 57 numerals.</desc>
+  <defs>
+    <linearGradient id="top" x1="138" y1="148" x2="374" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5B458"/>
+      <stop offset=".55" stop-color="#EA765E"/>
+      <stop offset="1" stop-color="#C94762"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="150" y1="288" x2="234" y2="344" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5B458"/>
+      <stop offset=".7" stop-color="#EB765B"/>
+      <stop offset="1" stop-color="#C94762"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#111820" flood-opacity=".1"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#F3F2F1"/>
+  <g filter="url(#soft)">
+    <path d="M132 188c0-31 25-56 56-56h136c31 0 56 25 56 56v10H132v-10Z" fill="url(#top)"/>
+    <path d="M132 198h248v134c0 31-25 56-56 56H188c-31 0-56-25-56-56V198Z" fill="#111820"/>
+    <path d="M132 198h248v12H132z" fill="#F7F7F5"/>
+    <path d="M132 210h130l-74 176c-32 0-56-24-56-56V210Z" fill="#F7F7F5"/>
+    <rect x="180" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <rect x="241" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <rect x="302" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <path d="M184 132h140c31 0 56 25 56 56v10H132v-10c0-31 25-56 56-56h-4Z" fill="url(#top)" opacity=".92"/>
+    <rect x="180" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <rect x="241" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <rect x="302" y="108" width="31" height="58" rx="16" fill="#111820"/>
+    <g stroke="#111820" stroke-width="7" stroke-linecap="round">
+      <path d="M132 218h47"/>
+      <path d="M132 231h43"/>
+      <path d="M132 245h40"/>
+      <path d="M132 259h37"/>
+      <path d="M132 273h35"/>
+      <path d="M132 287h31"/>
+      <path d="M132 301h28"/>
+      <path d="M132 315h26"/>
+      <path d="M132 329h22"/>
+      <path d="M132 343h18"/>
+    </g>
+    <g stroke="url(#accent)" stroke-width="6" stroke-linecap="round">
+      <path d="M159 290h38"/>
+      <path d="M153 305h52"/>
+      <path d="M150 320h47"/>
+      <path d="M154 335h33"/>
+    </g>
+    <path d="M198 232h135L260 388H203c36-11 58-39 56-73-1-29-22-50-51-50-18 0-35 5-52 14l20-47h22Z" fill="#F7F7F5"/>
+    <path d="M269 210h111L306 388h-60l67-156h-52l8-22Z" fill="#F7F7F5"/>
+    <path d="M188 274c38-11 74 11 74 56 0 39-28 63-68 63-21 0-42-7-59-19l20-43c12 11 25 16 39 16 18 0 30-11 30-29 0-17-12-28-31-28-12 0-23 3-34 9l29-25Z" fill="#111820"/>
+  </g>
+</svg>
