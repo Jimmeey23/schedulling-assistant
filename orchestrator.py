@@ -8,9 +8,6 @@ import json
 import traceback
 from pathlib import Path
 
-from dotenv import load_dotenv
-load_dotenv(Path(__file__).parent / ".env", override=False)
-
 import click
 from rich.console import Console
 
@@ -34,13 +31,10 @@ def state_exists(filename: str) -> bool:
 @click.option(
     "--csv",
     "csv_path",
-    default=None,
+    default="Sessions Performance Data.csv",
     show_default=True,
-    help="Path to sessions CSV (omit to fetch from Google Sheets)",
+    help="Path to sessions CSV",
 )
-@click.option("--client-id", "gsheets_client_id", default=None, envvar="GSHEETS_CLIENT_ID", help="Google OAuth2 client ID")
-@click.option("--client-secret", "gsheets_client_secret", default=None, envvar="GSHEETS_CLIENT_SECRET", help="Google OAuth2 client secret")
-@click.option("--refresh-token", "gsheets_refresh_token", default=None, envvar="GSHEETS_REFRESH_TOKEN", help="Google OAuth2 refresh token")
 @click.option(
     "--template",
     "template_path",
@@ -100,8 +94,7 @@ def state_exists(filename: str) -> bool:
     help="Optional suffix for output artifacts",
 )
 def run_pipeline(
-    csv_path, template_path, target_week, location, resume, debug, scoring_weights, overrides_path, perf_csv_path, variation_seed, output_suffix,
-    gsheets_client_id, gsheets_client_secret, gsheets_refresh_token,
+    csv_path, template_path, target_week, location, resume, debug, scoring_weights, overrides_path, perf_csv_path, variation_seed, output_suffix
 ):
     """Run the full 6-agent studio schedule optimisation pipeline."""
     STATE_DIR.mkdir(exist_ok=True)
@@ -128,12 +121,7 @@ def run_pipeline(
         try:
             from agents.ingestor import DataIngestor
 
-            ingestor = DataIngestor(
-                csv_path=Path(csv_path) if csv_path else None,
-                client_id=gsheets_client_id,
-                client_secret=gsheets_client_secret,
-                refresh_token=gsheets_refresh_token,
-            )
+            ingestor = DataIngestor(csv_path=Path(csv_path))
             ingestor.run()
         except Exception as e:
             console.print(f"[red][Agent 1] FAILED: {e}[/red]")
