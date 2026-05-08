@@ -101,8 +101,12 @@ def _require_admin_for_unsafe_request():
     if _is_local_request():
         return None
     token = os.environ.get("SCHEDULER_ADMIN_TOKEN", "")
+    # If no token is configured, allow all requests (open access mode).
+    # If a token IS configured, require the caller to supply the correct one.
+    if not token:
+        return None
     provided = request.headers.get("X-Scheduler-Admin-Token", "")
-    if token and provided == token:
+    if provided == token:
         return None
     return _json({"error": "Admin token required"}, 401)
 
