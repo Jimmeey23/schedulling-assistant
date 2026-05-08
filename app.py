@@ -776,7 +776,15 @@ def pull_supabase_config():
 
 @app.route("/")
 def index():
-    return _file(WEB_DIR / "index.html")
+    index_path = WEB_DIR / "index.html"
+    if index_path.exists():
+        return _file(index_path)
+    # On a fresh deploy the generated index.html isn't bundled;
+    # fall back to the template so the UI still loads.
+    template_path = WEB_DIR / "template.html"
+    if template_path.exists():
+        return _file(template_path)
+    return _json({"error": "Schedule UI not yet generated. Run the pipeline first."}, 404)
 
 
 @app.route("/api/rules-config")
