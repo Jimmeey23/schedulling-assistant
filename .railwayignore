@@ -1,12 +1,6 @@
 # Large generated/data files — excluded to keep deployment bundle small
 # The app reads schedule data from Supabase or regenerates from template at runtime.
 
-# Raw CSV performance data (used only by local pipeline runs)
-Sessions Performance Data.csv
-Class Performance by Trainer.csv
-Class Performance by UD1.csv
-Schedule Views - Schedule (6).csv
-
 # Large generated web assets (regenerated at runtime from web/template.html)
 web/index.html
 web/schedule_data.json
