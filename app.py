@@ -1357,14 +1357,20 @@ def run_pipeline():
     output_suffix = f"run{_run_counter}_{uuid.uuid4().hex[:6]}"
     csv_path = PIPELINE_CSV
     week = options["week"]
+    use_sheets = bool(
+        options["child_env"].get("GSHEETS_CLIENT_ID")
+        and options["child_env"].get("GSHEETS_CLIENT_SECRET")
+        and options["child_env"].get("GSHEETS_REFRESH_TOKEN")
+    )
     cmd = [
         sys.executable, str(PROJECT_ROOT / "orchestrator.py"),
-        "--csv", csv_path,
         "--week", week,
         "--debug",
         "--variation-seed", str(variation_seed),
         "--output-suffix", output_suffix,
     ]
+    if not use_sheets:
+        cmd += ["--csv", csv_path]
     print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
     try:
         global _latest_schedule_file
@@ -1626,8 +1632,116 @@ def finalise_schedule():
         return _json({"error": str(e)}, 400)
 
 
+def _update_env_key(key: str, value: str, env_path: Path = PROJECT_ROOT / ".env") -> None:
+    """Write or replace a key=value line in .env and update os.environ."""
+    text = env_path.read_text() if env_path.exists() else ""
+    lines = text.splitlines()
+    replaced = False
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith(f"{key}=") or stripped.startswith(f"{key} ="):
+            lines[i] = f"{key}={value}"
+            replaced = True
+            break
+    if not replaced:
+        lines.append(f"{key}={value}")
+    env_path.write_text("\n".join(lines) + "\n")
+    os.environ[key] = value
+
+
+_GSHEETS_OAUTH_STATE = {}   # simple in-memory state token → {}
+
+
+@app.route("/auth/google")
+def google_auth_start():
+    import secrets
+    client_id = os.environ.get("GSHEETS_CLIENT_ID", "")
+    if not client_id:
+        return "GSHEETS_CLIENT_ID not set in .env", 400
+    state = secrets.token_urlsafe(16)
+    _GSHEETS_OAUTH_STATE[state] = True
+    redirect_uri = request.host_url.rstrip("/") + "/auth/google/callback"
+    params = {
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "access_type": "offline",
+        "prompt": "consent",
+        "state": state,
+    }
+    from urllib.parse import urlencode
+    return Response(
+        status=302,
+        headers={"Location": "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(params)},
+    )
+
+
+@app.route("/auth/google/callback")
+def google_auth_callback():
+    from urllib.parse import urlencode
+    state = request.args.get("state", "")
+    if state not in _GSHEETS_OAUTH_STATE:
+        return "Invalid state — restart auth flow at /auth/google", 400
+    _GSHEETS_OAUTH_STATE.pop(state, None)
+
+    code = request.args.get("code")
+    error = request.args.get("error")
+    if error or not code:
+        return f"OAuth error: {error or 'no code returned'}", 400
+
+    client_id = os.environ.get("GSHEETS_CLIENT_ID", "")
+    client_secret = os.environ.get("GSHEETS_CLIENT_SECRET", "")
+    redirect_uri = request.host_url.rstrip("/") + "/auth/google/callback"
+
+    import urllib.request as _urlreq, urllib.parse as _urlparse
+    body = _urlparse.urlencode({
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": redirect_uri,
+        "grant_type": "authorization_code",
+    }).encode()
+    req = _urlreq.Request(
+        "https://oauth2.googleapis.com/token",
+        data=body,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    try:
+        with _urlreq.urlopen(req) as resp:
+            token_data = json.loads(resp.read())
+    except Exception as exc:
+        return f"Token exchange failed: {exc}", 500
+
+    refresh_token = token_data.get("refresh_token")
+    if not refresh_token:
+        return "No refresh_token in response — ensure 'prompt=consent' was honoured.", 400
+
+    _update_env_key("GSHEETS_REFRESH_TOKEN", refresh_token)
+    return (
+        "<html><body style='font-family:sans-serif;padding:40px'>"
+        "<h2 style='color:#16a34a'>Google Sheets authorised</h2>"
+        "<p>Refresh token saved to <code>.env</code>. You can close this tab.</p>"
+        "<script>setTimeout(()=>window.close(),3000)</script>"
+        "</body></html>"
+    )
+
+
+def _find_free_port(preferred: int = 5000) -> int:
+    import socket
+    for p in [preferred] + list(range(8080, 8100)) + list(range(3000, 3020)):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("", p))
+                return p
+            except OSError:
+                continue
+    raise RuntimeError("No free port found in checked ranges")
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 0)) or _find_free_port()
+    print(f"  [app] Starting on http://localhost:{port}")
     app.run(host="0.0.0.0", port=port)
 def _resolve_latest_schedule_file_name() -> str:
     candidates = sorted(WEB_DIR.glob("schedule_data*.json"), key=lambda p: p.stat().st_mtime, reverse=True)

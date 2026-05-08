@@ -55,6 +55,24 @@ def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
 
 load_env_file()
 
+
+def _update_env_key(key: str, value: str, env_path: Path = PROJECT_ROOT / ".env") -> None:
+    """Write or replace a key=value line in .env and update os.environ."""
+    text = env_path.read_text() if env_path.exists() else ""
+    lines = text.splitlines()
+    replaced = False
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith(f"{key}=") or stripped.startswith(f"{key} ="):
+            lines[i] = f"{key}={value}"
+            replaced = True
+            break
+    if not replaced:
+        lines.append(f"{key}={value}")
+    env_path.write_text("\n".join(lines) + "\n")
+    os.environ[key] = value
+
+
 # Pipeline process state
 _pipeline_state = {
     "running": False,
@@ -963,6 +981,93 @@ class RulesHandler(BaseHTTPRequestHandler):
         provided = self.headers.get("X-Scheduler-Admin-Token", "")
         return bool(token and provided == token)
 
+    # ── Google OAuth helpers ─────────────────────────────────────────
+
+    _oauth_states: dict = {}
+
+    def _handle_google_auth_start(self):
+        import secrets
+        from urllib.parse import urlencode
+        client_id = os.environ.get("GSHEETS_CLIENT_ID", "")
+        if not client_id:
+            self._send_html(400, "<h2>GSHEETS_CLIENT_ID not set in .env</h2>")
+            return
+        state = secrets.token_urlsafe(16)
+        RulesHandler._oauth_states[state] = True
+        host = self.headers.get("Host", "localhost:8080")
+        redirect_uri = f"http://{host}/auth/google/callback"
+        params = urlencode({
+            "client_id": client_id,
+            "redirect_uri": redirect_uri,
+            "response_type": "code",
+            "scope": "https://www.googleapis.com/auth/spreadsheets.readonly",
+            "access_type": "offline",
+            "prompt": "consent",
+            "state": state,
+        })
+        self.send_response(302)
+        self.send_header("Location", f"https://accounts.google.com/o/oauth2/v2/auth?{params}")
+        self.end_headers()
+
+    def _handle_google_auth_callback(self, parsed):
+        from urllib.parse import parse_qs, urlencode
+        import urllib.request as _urlreq
+        qs = parse_qs(parsed.query)
+        state = qs.get("state", [""])[0]
+        if state not in RulesHandler._oauth_states:
+            self._send_html(400, "<h2>Invalid state — restart at /auth/google</h2>")
+            return
+        RulesHandler._oauth_states.pop(state, None)
+        error = qs.get("error", [""])[0]
+        code = qs.get("code", [""])[0]
+        if error or not code:
+            self._send_html(400, f"<h2>OAuth error: {error or 'no code'}</h2>")
+            return
+        client_id = os.environ.get("GSHEETS_CLIENT_ID", "")
+        client_secret = os.environ.get("GSHEETS_CLIENT_SECRET", "")
+        host = self.headers.get("Host", "localhost:8080")
+        redirect_uri = f"http://{host}/auth/google/callback"
+        body = urlencode({
+            "code": code,
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        }).encode()
+        req = _urlreq.Request(
+            "https://oauth2.googleapis.com/token",
+            data=body,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        try:
+            with _urlreq.urlopen(req) as resp:
+                token_data = json.loads(resp.read())
+        except Exception as exc:
+            self._send_html(500, f"<h2>Token exchange failed: {exc}</h2>")
+            return
+        refresh_token = token_data.get("refresh_token")
+        if not refresh_token:
+            self._send_html(400, "<h2>No refresh_token returned — ensure prompt=consent was accepted.</h2>")
+            return
+        _update_env_key("GSHEETS_REFRESH_TOKEN", refresh_token)
+        self._send_html(200, (
+            "<html><body style='font-family:sans-serif;padding:40px'>"
+            "<h2 style='color:#16a34a'>Google Sheets authorised</h2>"
+            "<p>Refresh token saved to <code>.env</code>. You can close this tab and run the pipeline.</p>"
+            "<script>setTimeout(()=>window.close(),3000)</script>"
+            "</body></html>"
+        ))
+
+    def _send_html(self, code: int, html: str):
+        body = html.encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    # ── End Google OAuth helpers ─────────────────────────────────────
+
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -1037,6 +1142,14 @@ class RulesHandler(BaseHTTPRequestHandler):
             return
 
         # Serve root → web/index.html
+        if path == "/auth/google":
+            self._handle_google_auth_start()
+            return
+
+        if path == "/auth/google/callback":
+            self._handle_google_auth_callback(parsed)
+            return
+
         if path == "/":
             self._serve_file(WEB_DIR / "index.html")
             return

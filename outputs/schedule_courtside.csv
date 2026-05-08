@@ -1,31 +1,34 @@
 ,11-May,,,,,,,,,,12-May,,,,,,,,,,13-May,,,,,,,,,,14-May,,,,,,,,,,15-May,,,,,,,,,,16-May,,,,,,,,,,17-May,,,,,,,,,
 ,Monday,,,,,,,,,,Tuesday,,,,,,,,,,Wednesday,,,,,,,,,,Thursday,,,,,,,,,,Friday,,,,,,,,,,Saturday,,,,,,,,,,Sunday,,,,,,,,,
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
-08:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Reshma Sharma,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
-17:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Atulan Purohit,Studio 1,14,33%,0,0%,0.0,,,,,,,,,,,,
-19:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Mrigakshi Jaiswal,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
-20:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre Express,Karanvir Bhatia,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
+08:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Raunak Khemuka,Studio 1,14,25%,1,25%,5.0,Top trainer rejected: Anisha S,,,,,,,,,,,
+12:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Atulan Purohit,Studio 1,14,20%,0,0%,0.0,Coverage: best available train,
+17:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Bret Saldanha,Studio 1,14,20%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,
+19:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Rohan Dahima,Studio 1,14,20%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
+20:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57 Express,Mrigakshi Jaiswal,Studio 1,14,20%,0,0%,0.0,Coverage: best available train,,,,,,,,,,,
 
 
 === WEEKLY BREAKDOWN ===
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Atulan Purohit,1,0.9,33%,Studio Barre 57
-Karanvir Bhatia,1,0.5,20%,Studio Cardio Barre Express
-Mrigakshi Jaiswal,1,0.9,20%,Studio FIT
-Reshma Sharma,1,0.9,20%,Studio Mat 57
+Atulan Purohit,1,0.9,20%,Studio Barre 57
+Bret Saldanha,1,0.9,20%,Studio FIT
+Mrigakshi Jaiswal,1,0.8,20%,Studio Mat 57 Express
+Raunak Khemuka,1,0.9,25%,Studio Cardio Barre
+Rohan Dahima,1,0.9,20%,Studio Barre 57
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
-Studio Barre 57,1,33%,1
-Studio Cardio Barre Express,1,20%,1
+Studio Barre 57,2,20%,2
+Studio Cardio Barre,1,25%,1
 Studio FIT,1,20%,1
-Studio Mat 57,1,20%,1
+Studio Mat 57 Express,1,20%,1
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
-08:30,-,-,-,-,-,Studio Mat 57,-,1
-17:45,-,-,-,-,-,Studio Barre 57,-,1
-19:00,-,-,-,-,-,Studio FIT,-,1
-20:00,-,-,-,-,-,Studio Cardio Barre Express,-,1
+08:30,-,-,-,-,-,Studio Cardio Barre,-,1
+12:00,-,-,-,-,-,-,Studio Barre 57,1
+17:45,-,-,-,-,-,Studio FIT,-,1
+19:00,-,-,-,-,-,Studio Barre 57,-,1
+20:00,-,-,-,-,-,Studio Mat 57 Express,-,1

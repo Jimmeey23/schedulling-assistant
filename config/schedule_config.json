@@ -700,7 +700,7 @@
     "weekly_hours_cap": 15,
     "max_classes_per_day_default": 3,
     "conflict_policy": "settings_override_soft_rules",
-    "ai_api_key": "",
+    "ai_api_key": "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",
     "ai_provider": "openrouter",
     "ai_model": "openai/gpt-oss-120b:free",
     "ai_base_url": ""
@@ -708,6 +708,6 @@
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-07T06:00:13.620Z"
+    "updated_at": "2026-05-08T06:25:57.370Z"
   }
 }

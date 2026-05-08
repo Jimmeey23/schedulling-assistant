@@ -1,8 +1,12 @@
 import csv
 import json
+import os
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent / ".env", override=False)
 
 STATE_DIR = Path("state")
 VALID_LOCATIONS = [
@@ -40,10 +44,28 @@ def time_band(time_str: str) -> str:
 
 
 class DataIngestor:
-    def __init__(self, csv_path: Path):
-        self.csv_path = Path(csv_path)
+    def __init__(
+        self,
+        csv_path: Path = None,
+        *,
+        client_id: str = None,
+        client_secret: str = None,
+        refresh_token: str = None,
+    ):
+        self.csv_path = Path(csv_path) if csv_path else None
+        self.client_id = client_id or os.environ.get("GSHEETS_CLIENT_ID")
+        self.client_secret = client_secret or os.environ.get("GSHEETS_CLIENT_SECRET")
+        self.refresh_token = refresh_token or os.environ.get("GSHEETS_REFRESH_TOKEN")
+
+    def _use_sheets(self) -> bool:
+        return bool(self.client_id and self.client_secret and self.refresh_token)
 
     def _read_sessions_file(self) -> pd.DataFrame:
+        if self._use_sheets():
+            from utils.google_sheets import read_sheet
+            print("[Agent 1] Fetching data from Google Sheets (Sessions)...")
+            return read_sheet("Sessions", self.client_id, self.client_secret, self.refresh_token)
+
         sample = self.csv_path.read_text(encoding="utf-8", errors="replace")[:8192]
         delimiter = "\t"
         try:
