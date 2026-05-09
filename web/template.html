@@ -6751,11 +6751,34 @@ function renderSettingsView(area){
     </div>
 
     <div class="sett-section" id="ssec-customrules">
-      <div class="sett-section-label">Custom Rules & Pinned Classes</div>
-      <div class="sett-section-desc">Use dropdown-guided controls to build custom scheduling rules and pin classes that should be placed before optimiser-generated slots.</div>
+      <div class="sett-section-label">Custom Rules &amp; Pinned Classes</div>
+      <div class="sett-section-desc">Build custom scheduling constraints with the guided form below. Universal rules are always enforced regardless of custom rules — they are shown in the panel below for reference.</div>
+
+      <!-- UNIVERSAL RULES READ-ONLY PANEL -->
+      <div style="border:1px solid #E0E7FF;border-radius:var(--r12);background:linear-gradient(135deg,#EEF2FF,#F5F3FF);margin-bottom:16px;overflow:hidden">
+        <button onclick="this.parentElement.querySelector('.univ-body').classList.toggle('hidden');this.querySelector('.univ-chev').textContent=this.querySelector('.univ-body').classList.contains('hidden')?'›':'⌄';"
+          style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:none;border:none;cursor:pointer;font-family:inherit">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">🔒</span>
+            <div style="text-align:left">
+              <div style="font-size:12px;font-weight:900;color:#3730A3">Universal Rules — Always Active</div>
+              <div style="font-size:11px;color:#6366F1;margin-top:1px">These constraints are enforced on every generation and cannot be disabled</div>
+            </div>
+          </div>
+          <span class="univ-chev" style="font-size:20px;color:#6366F1;line-height:1">⌄</span>
+        </button>
+        <div class="univ-body" style="padding:0 14px 14px">
+          <div id="universal-rules-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">
+            <div style="color:#6366F1;font-size:12px;padding:8px">Loading universal rules…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOM RULES BUILDER -->
       <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px">
         <div style="border:1px solid var(--border);border-radius:var(--r12);padding:14px;background:var(--surface)">
-          <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">Custom Rule Builder</div>
+          <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:6px">Custom Rule Builder</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Use the form below to add custom scheduling rules on top of the universal guardrails.</div>
           <div id="customrules-list"></div>
           <div id="customrules-builder" style="margin-top:12px"></div>
         </div>
@@ -6766,7 +6789,7 @@ function renderSettingsView(area){
         </div>
       </div>
       <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveCustomRules()">Save Custom Rules & Pins</button>
+        <button class="sett-save-btn" onclick="settSaveCustomRules()">Save Custom Rules &amp; Pins</button>
         <span class="sett-save-status" id="customrules-save-status"></span>
       </div>
     </div>
@@ -6880,6 +6903,15 @@ function settSetTab(tab){
   settResetMatrixSelection(false);
   if(tab==="overview")settRenderOverview();
   if(tab==="advanced")settRenderAdvancedOptions();
+  if(tab==="customrules"){
+    // Always refresh rule builder when tab is opened so it renders even if data arrived late
+    if(!_settTrainerProfiles||!_settSchedConfig){
+      settLoadData();
+    } else {
+      settRenderCustomRules();
+    }
+    settRenderUniversalRulesPanel();
+  }
   if(tab==="ai"){
     ["fill_rate","revenue","avg_checkin","session_frequency","trend"].forEach(id=>{
       const sl=document.getElementById("sw-"+id);
@@ -7861,6 +7893,57 @@ function settRoomOptions(){
     ["powercycle","PowerCycle Studio"],
     ["strength_lab","Strength Lab"],
   ];
+}
+
+// Universal Rules panel — read-only display of always-enforced constraints
+const UNIV_TYPE_BADGE={
+  always_do:{label:"ALWAYS",bg:"#D1FAE5",fg:"#065F46"},
+  never_do:{label:"NEVER",bg:"#FEE2E2",fg:"#991B1B"},
+  class_location:{label:"LOC",fg:"#B45309",bg:"#FEF3C7"},
+  hard:{label:"HARD",bg:"#FEE2E2",fg:"#991B1B"},
+  slot_required:{label:"SLOT",bg:"#DBEAFE",fg:"#1D4ED8"},
+  trainer_availability:{label:"TRAINER",bg:"#EDE9FE",fg:"#5B21B6"},
+};
+function settRenderUniversalRulesPanel(){
+  const host=document.getElementById("universal-rules-list");
+  if(!host)return;
+  // Use cached catalog if already loaded by rules view
+  if(_rulesCatalog&&_rulesCatalog.groups){
+    const allRules=(_rulesCatalog.groups||[]).flatMap(g=>g.rules||[]);
+    _settRenderUnivCards(host,allRules);
+    return;
+  }
+  fetch("/api/rules-config")
+    .then(r=>r.ok?r.json():{})
+    .then(data=>{
+      // data may be the catalog (groups) or the raw universal_rules shape
+      let rules=[];
+      if(Array.isArray(data?.groups)){
+        rules=data.groups.flatMap(g=>g.rules||[]);
+        if(!_rulesCatalog)_rulesCatalog=data;
+      } else if(Array.isArray(data?.hard_constraints)){
+        rules=data.hard_constraints;
+      }
+      _settRenderUnivCards(host,rules);
+    })
+    .catch(()=>{host.innerHTML='<div style="color:#EF4444;font-size:12px;padding:8px">Could not load universal rules — check API.</div>';});
+}
+function _settRenderUnivCards(host,rules){
+  if(!rules.length){
+    host.innerHTML='<div style="color:#6366F1;font-size:12px;padding:8px">No universal rules found.</div>';
+    return;
+  }
+  host.innerHTML=rules.map(r=>{
+    const b=UNIV_TYPE_BADGE[r.type]||{label:(r.type||"RULE").toUpperCase().slice(0,6),bg:"#F1F5F9",fg:"#334155"};
+    return `<div style="background:#fff;border:1px solid #E0E7FF;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-size:10px;font-weight:900;padding:2px 6px;border-radius:5px;background:${b.bg};color:${b.fg};letter-spacing:.06em">${b.label}</span>
+        <span style="font-size:10px;font-weight:800;color:#6366F1;font-family:'Plus Jakarta Sans',sans-serif">${rvEscapeHtml(r.id||"")}</span>
+      </div>
+      <div style="font-size:11px;color:#0F172A;font-weight:600;line-height:1.4">${rvEscapeHtml(r.label||r.description||"")}</div>
+      ${r.description&&r.label?`<div style="font-size:10px;color:#64748B;line-height:1.4">${rvEscapeHtml(r.description)}</div>`:""}
+    </div>`;
+  }).join("");
 }
 
 function settRenderCustomRules(){
