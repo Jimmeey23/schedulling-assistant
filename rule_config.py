@@ -17,16 +17,7 @@ CATEGORY_META = {
 }
 
 DEFAULT_UNIVERSAL_RULE_IDS = {
-        "UNIV-002",
-        "UNIV-003",
-        "UNIV-004",
-        "UNIV-009",
-        "UNIV-010",
-        "UNIV-014",
-        "UNIV-022",
-        "UNIV-023",
-        "UNIV-024",
-        "UNIV-025",
+        f"UNIV-{i:03d}" for i in range(1, 27)
 }
 
 SOURCE_GROUPS = ["universal"]

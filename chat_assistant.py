@@ -84,7 +84,7 @@ def _detect_intent(message: str) -> str:
         return "workload"
     if any(term in lower for term in ("add class", "add a class", "new class", "recommend class", "class idea")):
         return "add_class"
-    if any(term in lower for term in ("why", "explain", "constraint", "issue", "badge")):
+    if any(term in lower for term in ("why", "explain", "constraint", "issue", "badge", "conflict", "violation", "error", "warning")):
         return "explain"
     return "general"
 
@@ -690,6 +690,9 @@ def build_chat_context(
         selected_slot = dashboard_context.get("selected_slot") or {}
         if selected_slot:
             context_bits.append("selected_slot=" + json.dumps(selected_slot, ensure_ascii=False))
+        conflicts = dashboard_context.get("conflicts") or {}
+        if conflicts.get("errors") or conflicts.get("warnings"):
+            context_bits.append("CURRENT_CONFIG_CONFLICTS=" + json.dumps(conflicts, ensure_ascii=False))
         if context_bits:
             active_context = "ACTIVE DASHBOARD CONTEXT: " + "; ".join(context_bits) + "\n"
 

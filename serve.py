@@ -1102,6 +1102,16 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": str(e)})
             return
 
+        if path == "/api/update-rules-config":
+            try:
+                payload = json.loads(body_raw)
+                config = update_rules_config(payload)
+                print(f"  [API] Rules config updated: {len(payload.get('rules', {}))} rule(s)")
+                self._send_json(200, {"ok": True, "config": config})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+
         if path in {"/api/finalise-schedule", "/api/finalize-schedule"}:
             try:
                 result = _finalise_schedule_to_supabase()
