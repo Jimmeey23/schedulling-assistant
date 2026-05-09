@@ -12,6 +12,7 @@ WEB_DIR = PROJECT_ROOT / "web"
 OUTPUTS_DIR = PROJECT_ROOT / "outputs"
 
 
+
 def _pdf_escape(value: str) -> str:
     return str(value or "").replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
