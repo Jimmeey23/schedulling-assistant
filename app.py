@@ -919,6 +919,21 @@ def supabase_pull():
         return _json({"ok": False, "error": str(e)}, 500)
 
 
+@app.route("/api/optimize-schedule", methods=["POST"])
+def optimize_schedule():
+    try:
+        payload = request.get_json(force=True)
+        # Placeholder for full synchronous AI optimization planner
+        return _json({
+            "ok": True,
+            "applied_count": 0,
+            "rejected_count": 0,
+            "summary": "AI schedule optimization is not yet implemented synchronously. Please run the full AI Pipeline.",
+            "operations": []
+        })
+    except Exception as e:
+        return _json({"error": str(e)}, 500)
+
 @app.route("/api/run-pipeline", methods=["POST"])
 def run_pipeline():
     global _run_counter
@@ -1150,9 +1165,26 @@ def finalise_schedule():
         return _json({"error": str(e)}, 400)
 
 
+@app.errorhandler(404)
+def resource_not_found(e):
+    return _json({"error": "Resource not found"}, 404)
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return _json({"error": "Method not allowed"}, 405)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # Pass through HTTP errors
+    if hasattr(e, 'code') and isinstance(e.code, int):
+        return _json({"error": str(e)}, e.code)
+    # Log and return 500 for unhandled exceptions
+    print(f"Unhandled exception: {e}", file=sys.stderr)
+    return _json({"error": "Internal server error"}, 500)
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=True)
 def _resolve_latest_schedule_file_name() -> str:
     candidates = sorted(WEB_DIR.glob("schedule_data*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
     if candidates:

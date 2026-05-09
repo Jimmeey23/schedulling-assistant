@@ -14,7 +14,7 @@
           "end": "21:00"
         },
         "avg_classes_per_day": 1.9,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 7.7,
         "session_count": 280,
         "owned_blocks": [],
@@ -493,7 +493,7 @@
   },
   {
     "name": "Karan Bhatia",
-    "tier": 3,
+    "tier": 1,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -509,7 +509,7 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 1
+        "max_classes_per_day": 4
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -526,7 +526,7 @@
           "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 3,
+        "max_classes_per_day": 4,
         "avg_checkin": 5.2,
         "session_count": 190,
         "owned_blocks": [
@@ -554,7 +554,7 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 2
+        "max_classes_per_day": 4
       }
     },
     "qualifications": {
@@ -1009,7 +1009,7 @@
   },
   {
     "name": "Richard D'Costa",
-    "tier": 2,
+    "tier": 1,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
