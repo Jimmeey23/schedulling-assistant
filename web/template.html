@@ -67,20 +67,100 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hdr-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:900;color:#0F172A;letter-spacing:-0.02em;line-height:1.05}
 .hdr-sub{font-size:12px;color:#64748B;margin-top:4px;font-weight:700;letter-spacing:.01em}
 
-/* GLOBAL LOADER */
+/* GLOBAL LOADER — premium dark edition */
 #initial-loader {
-  position: fixed; inset: 0; z-index: 9999;
-  background: #F8FAFC; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 20px;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  position: fixed; inset: 0; z-index: 99999;
+  background: linear-gradient(135deg, #0B0F1A 0%, #0F1729 40%, #111827 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0;
+  transition: opacity 0.2s ease;
+  overflow: hidden;
 }
-#initial-loader.hidden { opacity: 0; visibility: hidden; }
-.spinner {
-  width: 40px; height: 40px; border: 4px solid #E2E8F0;
-  border-top-color: #3B82F6; border-radius: 50%;
-  animation: spin 1s linear infinite;
+#initial-loader.hidden { opacity: 0; pointer-events: none; }
+
+/* ambient orbs */
+#initial-loader .ld-orb1 {
+  position: absolute; width: 480px; height: 480px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,.22) 0%, transparent 70%);
+  top: -120px; left: -100px;
+  animation: ldOrb 7s ease-in-out infinite alternate;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+#initial-loader .ld-orb2 {
+  position: absolute; width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(249,115,22,.18) 0%, transparent 70%);
+  bottom: -80px; right: -60px;
+  animation: ldOrb 9s ease-in-out infinite alternate-reverse;
+}
+@keyframes ldOrb { 0%{transform:scale(1) translate(0,0)} 100%{transform:scale(1.15) translate(20px,20px)} }
+
+/* card */
+#initial-loader .ld-card {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  background: rgba(255,255,255,.035);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 28px; padding: 40px 48px 36px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.55);
+  animation: ldCardIn .45s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes ldCardIn { from{opacity:0;transform:translateY(18px) scale(.97)} to{opacity:1;transform:none} }
+
+/* logo row */
+#initial-loader .ld-logo-row {
+  display: flex; align-items: center; gap: 14px;
+}
+#initial-loader .ld-logo-img {
+  width: 48px; height: 48px; border-radius: 14px;
+  filter: drop-shadow(0 0 12px rgba(99,102,241,.5));
+  animation: ldLogoPulse 2.4s ease-in-out infinite;
+}
+@keyframes ldLogoPulse { 0%,100%{filter:drop-shadow(0 0 10px rgba(99,102,241,.4))} 50%{filter:drop-shadow(0 0 22px rgba(99,102,241,.75))} }
+#initial-loader .ld-brand {
+  display: flex; flex-direction: column;
+}
+#initial-loader .ld-brand-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 28px; font-weight: 900; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,.55));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+#initial-loader .ld-brand-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.35);
+  letter-spacing: .08em; text-transform: uppercase; margin-top: 3px;
+}
+
+/* divider */
+#initial-loader .ld-divider {
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+}
+
+/* progress track */
+#initial-loader .ld-progress-track {
+  width: 220px; height: 3px; background: rgba(255,255,255,.08);
+  border-radius: 99px; overflow: hidden;
+}
+#initial-loader .ld-progress-bar {
+  height: 100%; width: 40%;
+  background: linear-gradient(90deg, #6366F1, #F97316, #6366F1);
+  background-size: 200%;
+  border-radius: 99px;
+  animation: ldShimmer 1.6s linear infinite, ldGrow 2s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes ldShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+@keyframes ldGrow { from{width:8%} to{width:92%} }
+
+/* status text */
+#initial-loader .ld-status {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.38);
+  letter-spacing: .02em; min-height: 16px;
+  animation: ldFadeIn .4s ease;
+}
+@keyframes ldFadeIn { from{opacity:0} to{opacity:1} }
 
 @media(max-width:760px){
   .app-header{height:auto;min-height:72px;padding:8px 14px;align-items:center;flex-direction:row;gap:8px}
@@ -1435,15 +1515,25 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .nle-cand-card.selected{border-color:#7C3AED;background:#EDE9FE;box-shadow:0 0 0 2px rgba(124,58,237,.14)}
 .nle-cand-name{font-size:12px;font-weight:800;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
 .nle-cand-meta{font-size:10px;color:#64748B;margin-top:2px}
-#initial-loader{position:fixed;inset:0;background:#fff;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.spinner{width:40px;height:40px;border:4px solid #F1F5F9;border-top:4px solid #111820;border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+/* loader inline overrides already handled in <head> */
 </style>
 </head>
 <body class="theme-light">
 <div id="initial-loader">
-  <div class="spinner"></div>
-  <div style="font-size:14px;font-weight:800;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;">Loading Studio Data...</div>
+  <div class="ld-orb1"></div>
+  <div class="ld-orb2"></div>
+  <div class="ld-card">
+    <div class="ld-logo-row">
+      <img class="ld-logo-img" src="images/plan57-speed-calendar-v2.png" alt="Plan57">
+      <div class="ld-brand">
+        <div class="ld-brand-name">Plan<span style="color:#F97316">57</span></div>
+        <div class="ld-brand-sub">Class Schedule Planner</div>
+      </div>
+    </div>
+    <div class="ld-divider"></div>
+    <div class="ld-progress-track"><div class="ld-progress-bar"></div></div>
+    <div class="ld-status" id="ld-status">Loading studio data&hellip;</div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -5108,15 +5198,25 @@ function hasScheduleLocations(){
   return !!(locs&&Object.keys(locs).length);
 }
 
+function _setLdStatus(msg){
+  const el=document.getElementById("ld-status");
+  if(el){el.textContent=msg;}
+}
+
 async function hydrateLatestScheduleIfEmpty(){
   if(hasScheduleLocations())return;
   try{
-    const meta=await fetch("/api/latest-schedule-file").then(r=>r.json());
+    _setLdStatus("Fetching latest schedule…");
+    // Kick off both requests in parallel — resolve file name then fetch data
+    const metaP=fetch("/api/latest-schedule-file").then(r=>r.ok?r.json():{});
+    const meta=await metaP;
     const file=meta&&meta.file?meta.file:"schedule_data.json";
+    _setLdStatus("Reading schedule data…");
     const latest=await fetch(`/${file}?ts=${Date.now()}`).then(r=>r.json());
     if(latest&&latest.locations&&Object.keys(latest.locations).length){
       Object.keys(SCHEDULE_DATA).forEach(k=>delete SCHEDULE_DATA[k]);
       Object.assign(SCHEDULE_DATA,latest);
+      _setLdStatus("Rendering schedule…");
     }
   }catch(_err){}
 }
@@ -5124,10 +5224,11 @@ async function hydrateLatestScheduleIfEmpty(){
 async function init(){
   await hydrateLatestScheduleIfEmpty();
   renderInitialUi();
-  const loader = document.getElementById("initial-loader");
-  if(loader) {
-    loader.style.opacity = "0";
-    setTimeout(() => loader.style.display = "none", 400);
+  const loader=document.getElementById("initial-loader");
+  if(loader){
+    loader.style.transition="opacity 0.2s ease";
+    loader.style.opacity="0";
+    setTimeout(()=>loader.style.display="none",220);
   }
 }
 
