@@ -79,3 +79,57 @@ def create_chat_completion(client: OpenAI, system_prompt: str, user_prompt: str,
             {"role": "user", "content": user_prompt},
         ],
     )
+
+# ---------------------------------------------------------------------------
+# Fallback chat implementation – tries primary model first, then GLM‑4.5‑air, then Owl‑Alpha
+# ---------------------------------------------------------------------------
+import json
+
+GLM_MODEL = "z-ai/glm-4.5-air:free"
+OWL_MODEL = "openrouter/owl-alpha"
+
+def _make_client(key: str):
+    """Create an OpenAI-compatible client for a given API key."""
+    return OpenAI(api_key=key, base_url="https://openrouter.ai/api/v1")
+
+def _call_model(client: OpenAI, system_prompt: str, user_prompt: str, model: str, max_tokens: int = 1024):
+    """Low‑level call that returns the assistant reply or raises.
+    This mirrors the signature used elsewhere in the app.
+    """
+    resp = client.chat.completions.create(
+        model=model,
+        temperature=0,
+        max_tokens=max_tokens,
+        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+    )
+    return resp.choices[0].message.content
+
+def get_chat_reply(system_prompt: str, user_prompt: str) -> str:
+    """Try the primary configured AI, then GLM‑4.5‑air, then Owl‑Alpha.
+    Returns the first successful reply. Raises RuntimeError if none work.
+    """
+    # Primary – use whatever key/model the app already configured via ai_provider.get_ai_settings()
+    primary_settings = get_ai_settings()
+    if primary_settings:
+        try:
+            client = _make_client(primary_settings["api_key"])
+            return _call_model(client, system_prompt, user_prompt, primary_settings["model"])
+        except Exception as e:
+            print(f"[AI] Primary model failed ({primary_settings['model']}): {e}")
+    # GLM fallback – expects GLM_API_KEY in env
+    glm_key = os.getenv("GLM_API_KEY")
+    if glm_key:
+        try:
+            client = _make_client(glm_key)
+            return _call_model(client, system_prompt, user_prompt, GLM_MODEL)
+        except Exception as e:
+            print(f"[AI] GLM fallback failed: {e}")
+    # Owl fallback – expects OWL_API_KEY in env
+    owl_key = os.getenv("OWL_API_KEY")
+    if owl_key:
+        try:
+            client = _make_client(owl_key)
+            return _call_model(client, system_prompt, user_prompt, OWL_MODEL)
+        except Exception as e:
+            print(f"[AI] Owl fallback failed: {e}")
+    raise RuntimeError("All AI providers failed – configure at least one API key.")
