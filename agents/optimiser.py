@@ -1736,7 +1736,7 @@ class ScheduleOptimiser:
             return 0.0
         if recommendation in ("PINNED", "PROTECT_EXACT"):
             return self._rng.gauss(0, 3.0)
-        return self._rng.gauss(0, 13.0)
+        return self._rng.gauss(0, 45.0)
 
     def _evidence_adjusted_fill(self, hist: dict, fallback: float = 0.20) -> float:
         """Return a conservative fill estimate for scheduled output.
