@@ -627,6 +627,9 @@ class TrainerState:
         # day -> [(time_str, location, class_name)]
         self._schedule: Dict[str, List[Tuple[str, str, str]]] = {}
 
+    def day_schedule(self, day: str) -> List[Tuple[str, str, str]]:
+        return self._schedule.get(day, [])
+
     @property
     def max_weekly_minutes(self) -> int:
         if self.tier == 1: return MAX_TRAINER_WEEKLY_MINUTES_T1
