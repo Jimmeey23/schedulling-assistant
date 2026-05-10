@@ -833,6 +833,7 @@ class ScheduleOptimiser:
         self._time_class_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
         self._time_format_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
         self._time_level_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
+        self.trainer_priority: Dict[str, int] = self.schedule_config.get("trainer_priority", {})
 
     # ------------------------------------------------------------------ #
     #  Overrides
@@ -3326,6 +3327,7 @@ class ScheduleOptimiser:
                 + self._trainer_hours_bonus(trainer, day_name)
                 + self._tier_priority_score(trainer)
                 + self._location_tier_priority_score(trainer, location)
+                + (float(self.trainer_priority.get(trainer, 50)) - 50.0) * 0.6
                 + ai_delta
                 + horizontal_bonus
                 + level_bonus
@@ -3506,6 +3508,12 @@ class ScheduleOptimiser:
                 return False
             loc_data = max(loc_candidates, key=lambda item: item.get("session_count", 0))
         avail_days = self._available_days(trainer, location, loc_data.get("available_days", []))
+        
+        # Mandatory Weekend Off for specific trainers
+        if trainer in ["Anisha Shah", "Vivaran Dhasmana", "Mrigakshi Jaiswal", "Pushyank Nahar"]:
+            if day_name in ["Saturday", "Sunday"]:
+                return False
+
         if day_name not in avail_days:
             return False
         tw = loc_data.get("time_window", {})
@@ -3515,7 +3523,7 @@ class ScheduleOptimiser:
         state = self.trainer_states.get(trainer)
         if state is None:
             return False
-        if day_name not in state.worked_days() and state.worked_days_count() >= 6:
+        if day_name not in state.worked_days() and state.worked_days_count() >= 5:
             return False
         reserved_pinned = getattr(self, "_pinned_minutes_remaining", {}).get(trainer, 0)
         if state.weekly_minutes + get_class_duration(class_name) + reserved_pinned > state.max_weekly_minutes:

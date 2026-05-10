@@ -1376,12 +1376,15 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .sett-matrix td{border-bottom:1px solid #EEF2F7;border-right:1px solid #EEF2F7;padding:7px;vertical-align:middle;text-align:center;background:#fff}
 .sett-matrix tr:hover td{background:#FAFCFF}.sett-matrix tr:hover td:first-child{background:#EFF6FF}
 .sett-matrix-rowhead{font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;min-width:140px}
-.sett-matrix-cell{border:1px solid #E2E8F0;border-radius:8px;background:#F8FAFC;padding:6px;cursor:pointer;transition:all .12s;min-width:96px}
-.sett-matrix-cell:hover{border-color:#93C5FD;background:#EFF6FF}.sett-matrix-cell.selected{border-color:#1E40AF;background:#DBEAFE;box-shadow:0 0 0 2px rgba(30,64,175,.12)}
-.sett-matrix-cell.invalid{border-color:#F87171;background:#FEF2F2}
-.sett-matrix-pair{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:center}
-.sett-matrix-mini{display:flex;flex-direction:column;gap:2px}.sett-matrix-mini span{font-size:9px;font-weight:900;color:#64748B;text-transform:uppercase}
-.sett-matrix-mini input{width:100%;height:28px;text-align:center;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-weight:900;color:#0F172A;background:#fff;font-family:inherit}
+.sett-matrix-cell{border:1px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.03);padding:10px;cursor:pointer;transition:all .18s cubic-bezier(.16,1,.3,1);min-width:110px;text-align:left}
+.sett-matrix-cell:hover{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.08);transform:scale(1.02)}
+.sett-matrix-cell.selected{border-color:#3B82F6;background:rgba(59,130,246,0.15);box-shadow:0 0 0 3px rgba(59,130,246,0.2)}
+.sett-matrix-cell.invalid{border-color:#EF4444;background:rgba(239,68,68,0.1)}
+.sett-matrix-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.sett-matrix-mini{display:flex;flex-direction:column;gap:4px}
+.sett-matrix-mini span{font-size:8px;font-weight:900;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em}
+.sett-matrix-mini input{width:100%;height:32px;text-align:center;border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;font-weight:800;color:#F8FAFC;background:rgba(0,0,0,0.2);font-family:inherit;transition:all .14s}
+.sett-matrix-mini input:focus{border-color:#3B82F6;background:rgba(0,0,0,0.4);outline:none}
 .sett-subtabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #E2E8F0;padding-bottom:8px}
 .sett-subtab{background:none;border:none;padding:6px 12px;font-size:12px;font-weight:700;color:#64748B;cursor:pointer;border-radius:6px;transition:all .2s}
 .sett-subtab:hover{background:#F1F5F9;color:#0F172A}
@@ -5349,7 +5352,10 @@ function initScheduleWeekPicker(){
 function runPipelineFromHeader(useAi=false){
   const weekStart=getSelectedScheduleWeekStart();
   if(!weekStart){showToast("Choose a valid schedule week first","warn");return;}
+  const buttons=[document.getElementById("gen-btn"),document.getElementById("gen-ai-btn"),document.getElementById("optimize-ai-btn")];
+  buttons.forEach(b=>{if(b)b.disabled=true;});
   setGenerateButtonsLoading(true,useAi);
+  
   const aiOpts = _settSchedConfig?.settings_options||{};
   const apiKey = String(aiOpts.ai_api_key||"").trim();
   const payload = {week_start:weekStart,use_ai:Boolean(useAi)};
@@ -5559,16 +5565,10 @@ function pollPipelineStatus(){
           if(bar)bar.className="visible";
           if(msg)msg.textContent=d.message||"Schedule ready — reload to see new results";
           setGenerateButtonsLoading(false);
-          fetch(`/api/latest-schedule-file`)
-            .then(r=>r.json())
-            .then(meta=>fetch(`/${meta.file}?ts=${Date.now()}`))
-            .then(r=>r.json())
-            .then(data=>{
-              window.SCHEDULE_DATA=data;
-              window.location.href = window.location.pathname + '?ts=' + Date.now();
-            })
-            .catch(()=>window.location.href = window.location.pathname + '?ts=' + Date.now());
-          showToast("Schedule updated — reload to see results","");
+          showToast("Schedule updated — reloading…","");
+          setTimeout(()=>{
+            window.location.href = window.location.pathname + '?ts=' + Date.now();
+          }, 800);
         } else if(status==="failed"){
           clearInterval(_pipelinePoller);_pipelinePoller=null;
           if(bar){bar.className="visible error";}
@@ -5599,6 +5599,7 @@ const CONTROL_CENTER_SECTIONS={
   qualifications:{label:"Certifications",icon:"🏅",group:"people",summary:"Class access",detail:"Class format certifications per trainer.",panel:"settings",heading:"Certifications",description:"Manage which trainers are certified to teach each class format.",activate(){settSetTab("qualifications");}},
   availability:{label:"Availability",icon:"🗓",group:"people",summary:"Days & windows",detail:"Set trainer days and time windows per location.",panel:"settings",heading:"Availability",description:"Manage trainer availability schedules.",activate(){settSetTab("availability");}},
   leave:{label:"Leave & Off Days",icon:"🌴",group:"people",summary:"Absences",detail:"Log trainer leave and off days.",panel:"settings",heading:"Leave & Off Days",description:"Mark trainer leave so the planner routes around it.",activate(){settSetTab("leave");}},
+  priority:{label:"Trainer Priority",icon:"🎯",group:"people",summary:"Global ranking",detail:"Define assignment priority matrix for trainers.",panel:"settings",heading:"Trainer Priority Assignment",description:"Set global priority weights for trainers to influence AI assignments.",activate(){settSetTab("priority");}},
   ai:{label:"AI Intelligence",icon:"✨",group:"ai",summary:"Model & prompts",detail:"Configure AI model, scoring weights, and context strategy.",panel:"settings",heading:"AI Intelligence",description:"Tune how the AI planner reasons about your schedule.",activate(){settSetTab("ai");}},
   advanced:{label:"Advanced Settings",icon:"⚙️",group:"system",summary:"Planner behavior",detail:"Configure planner options and API key.",panel:"settings",heading:"Advanced Planner Settings",description:"Manage planner behavior and integration options.",activate(){settSetTab("advanced");}},
   catalog:{label:"Rule Catalog",icon:"📋",group:"system",summary:"Built-in safeguards",detail:"Review built-in scheduling rules.",panel:"rules",heading:"Rule Catalog",description:"Review enabled/disabled built-in rules.",activate(){rvSetScope("overview");}}
@@ -6316,8 +6317,8 @@ let _trainerMgmtLocFilter="";
 let _settMatrixSelection=new Set();
 let _settLastValidation={errors:[],warnings:[],info:[]};
 
-const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery"];
-const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery"};
+const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery","special"];
+const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery","special":"Special Format"};
 const DAYS_ALL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const LOCS_ALL=["Kwality House, Kemps Corner","Supreme HQ, Bandra","Courtside","Kenkere House","Copper & Cloves"];
 const CLASS_MIX_TARGETS={
@@ -7400,31 +7401,51 @@ function settRenderQualifications(){
   const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
   const q=(_qualSearch||"").toLowerCase();
   const sorted=[...trainers].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).filter(t=>!q||(t.name||"").toLowerCase().includes(q));
-  wrap.innerHTML=`<div class="qual-wrap"><table class="qual-table" id="qual-table">
+  wrap.innerHTML=`<div class="qual-wrap" style="background:#0F172A;border-color:rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,0.4)">
+    <table class="qual-table" id="qual-table" style="background:transparent">
     <thead><tr>
-      <th>Trainer</th>
-      <th>Tier</th>
-      ${QUAL_KEYS.map(k=>`<th title="${k}"><div class="qual-col-head"><span>${QUAL_LABELS[k]||k}</span><div class="qual-col-actions"><button class="qual-col-btn" title="Enable ${rvEscapeAttr(QUAL_LABELS[k]||k)} for visible trainers" onclick="settQualColumn('${k}',true);event.stopPropagation()">+</button><button class="qual-col-btn" title="Disable ${rvEscapeAttr(QUAL_LABELS[k]||k)} for visible trainers" onclick="settQualColumn('${k}',false);event.stopPropagation()">−</button></div></div></th>`).join("")}
+      <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Trainer</th>
+      <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Tier</th>
+      ${QUAL_KEYS.map(k=>`<th title="${k}" style="background:#1E293B;border-color:rgba(255,255,255,0.1)"><div class="qual-col-head">
+        <span style="font-size:8px;font-weight:900;color:#F8FAFC">${QUAL_LABELS[k]||k}</span>
+        <div class="qual-col-actions">
+          <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#3B82F6" title="Enable All" onclick="settQualColumn('${k}',true);event.stopPropagation()">+</button>
+          <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#EF4444" title="Disable All" onclick="settQualColumn('${k}',false);event.stopPropagation()">−</button>
+        </div>
+      </div></th>`).join("")}
     </tr></thead>
     <tbody>
-      ${sorted.map(t=>`<tr class="qual-row" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}">
-        <td style="font-weight:700">
+      ${sorted.map(t=>`<tr class="qual-row" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" style="border-color:rgba(255,255,255,0.05)">
+        <td style="font-weight:700;color:#F8FAFC;background:rgba(30,41,59,0.5);border-color:rgba(255,255,255,0.1)">
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="trainer-mgr-avatar" style="width:28px;height:28px;box-shadow:none;border:1px solid #E2E8F0">${trainerImage(t.name)?`<img src="${trainerImage(t.name)}" alt="${rvEscapeAttr(t.name||"Trainer")}">`:trainerInitials(t.name||"")}</span>
-            <span>${rvEscapeHtml(t.name||"")}</span>
+            <span class="trainer-mgr-avatar" style="width:24px;height:24px;background:#0F172A;border-color:rgba(255,255,255,0.1)">${trainerImage(t.name)?`<img src="${trainerImage(t.name)}">`:trainerInitials(t.name||"")}</span>
+            <span style="font-size:11px">${rvEscapeHtml(t.name||"")}</span>
           </div>
         </td>
-        <td><span class="qual-tier">${t.tier||"?"}</span></td>
-        ${QUAL_KEYS.map(k=>`<td><input type="checkbox" class="qual-cb" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" data-key="${k}" ${(t.qualifications||{})[k]?"checked":""}></td>`).join("")}
+        <td style="background:rgba(30,41,59,0.3);border-color:rgba(255,255,255,0.1)"><span class="qual-tier" style="background:#3B82F6;color:#fff">${t.tier||"?"}</span></td>
+        ${QUAL_KEYS.map(k=>`<td style="background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.05)"><input type="checkbox" class="qual-cb" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" data-key="${k}" ${(t.qualifications||{})[k]?"checked":""} onchange="settCollectQualsFromDom()"></td>`).join("")}
       </tr>`).join("")}
     </tbody>
   </table></div>`;
 }
 
+function settCollectQualsFromDom(){
+  if(!_settTrainerProfiles)return;
+  document.querySelectorAll(".qual-cb").forEach(cb=>{
+    const trainer=cb.dataset.trainer;
+    const key=cb.dataset.key;
+    const profile=_settTrainerProfiles.find(t=>t.name===trainer);
+    if(profile){
+      if(!profile.qualifications)profile.qualifications={};
+      profile.qualifications[key]=cb.checked;
+    }
+  });
+}
+
 function settQualBulk(on){
   document.querySelectorAll(".qual-cb").forEach(cb=>{cb.checked=on;});
-  showToast(`${on?"Checked":"Unchecked"} visible qualifications — saving…`,"");
-  settSaveQualifications();
+  settCollectQualsFromDom();
+  showToast(`${on?"Checked":"Unchecked"} visible qualifications`,"");
 }
 
 function settQualColumn(key,on){
@@ -7433,8 +7454,8 @@ function settQualColumn(key,on){
     return row&&row.style.display!=="none";
   });
   cbs.forEach(cb=>{cb.checked=on;});
-  showToast(`${on?"Enabled":"Disabled"} ${QUAL_LABELS[key]||key} for ${cbs.length} visible trainer${cbs.length===1?"":"s"} — saving…`,"");
-  settSaveQualifications();
+  settCollectQualsFromDom();
+  showToast(`${on?"Enabled":"Disabled"} ${QUAL_LABELS[key]||key} for visible trainers`,"");
 }
 
 function settFilterAvail(q){
@@ -7854,24 +7875,26 @@ function settRenderClassMix(){
   const cfg=_settSchedConfig.class_mix||{};
   const classes=[...new Set(LOCS_ALL.flatMap(loc=>Object.keys(CLASS_MIX_TARGETS[loc]||{})))];
   wrap.innerHTML=`
-    ${settBulkToolbarHtml("classmix","Class mix bulk operators")}
-    ${settClassMixAdvancedBulkHtml(classes)}
-    <div class="sett-matrix-wrap">
+    <div class="sett-matrix-toolbar" style="margin-top:8px;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);backdrop-filter:blur(8px)">
+      ${settBulkToolbarHtml("classmix","Class Mix Operations")}
+      ${settClassMixAdvancedBulkHtml(classes)}
+    </div>
+    <div class="sett-matrix-wrap" style="background:#0F172A;border-color:rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,0.4)">
       <table class="sett-matrix" id="classmix-matrix">
         <thead><tr>
-          <th>Studio / Format</th>
-          ${classes.map(cls=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls))}</button></th>`).join("")}
+          <th style="background:#1E293B;color:#94A3B8">Studio / Format</th>
+          ${classes.map(cls=>`<th style="background:#1E293B"><button class="sett-mini-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#F8FAFC" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls).slice(0,10))}${displayClass(cls).length>10?"…":""}</button></th>`).join("")}
         </tr></thead>
         <tbody>
-          ${LOCS_ALL.map(loc=>`<tr>
-            <td class="sett-matrix-rowhead"><button class="sett-mini-btn" onclick="settSelectMatrixRow('classmix','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button><div style="font-size:10px;color:#64748B;margin-top:3px">${rvEscapeHtml(loc)}</div></td>
+          ${LOCS_ALL.map(loc=>`<tr style="border-color:rgba(255,255,255,0.05)">
+            <td class="sett-matrix-rowhead" style="background:#1E293B;border-right:1px solid rgba(255,255,255,0.1)"><button class="sett-mini-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#F8FAFC" onclick="settSelectMatrixRow('classmix','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button></td>
             ${classes.map(cls=>{
               const supported=(CLASS_MIX_TARGETS[loc]||{})[cls];
               const cur=(cfg[loc]||{})[cls]||supported||{min:0,max:0};
               const invalid=Number(cur.min||0)>Number(cur.max||0);
               return`<td>
-                <div class="sett-matrix-cell ${invalid?"invalid":""}" data-matrix="classmix" data-loc="${rvEscapeAttr(loc)}" data-key="${rvEscapeAttr(cls)}" onclick="settToggleMatrixCell(event,this)" style="${supported?"":"opacity:.45"}">
-                  <div style="font-size:10px;font-weight:900;color:${classColor(cls)};margin-bottom:5px;white-space:normal;line-height:1.25" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls))}</div>
+                <div class="sett-matrix-cell ${invalid?"invalid":""}" data-matrix="classmix" data-loc="${rvEscapeAttr(loc)}" data-key="${rvEscapeAttr(cls)}" onclick="settToggleMatrixCell(event,this)" style="${supported?"":"opacity:.35;pointer-events:none"}">
+                  <div style="font-size:9px;font-weight:900;color:${classColor(cls)};margin-bottom:6px;letter-spacing:0.02em" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls))}</div>
                   <div class="sett-matrix-pair">
                     <label class="sett-matrix-mini"><span>Min</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="min" value="${Number(cur.min||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
                     <label class="sett-matrix-mini"><span>Max</span><input type="number" min="0" max="40" data-loc="${rvEscapeAttr(loc)}" data-cls="${rvEscapeAttr(cls)}" data-field="max" value="${Number(cur.max||0)}" class="classmix-inp" onclick="event.stopPropagation()" oninput="settClassMixChanged()"></label>
@@ -7915,6 +7938,85 @@ function settClassMixChanged(){
     cell.classList.toggle("invalid",Number(cur.min||0)>Number(cur.max||0));
   });
   settValidateAndRender();
+}
+
+function settRenderPriority(){
+  const wrap=document.getElementById("priority-wrap");
+  if(!wrap||!_settTrainerProfiles)return;
+  const cfg=_settSchedConfig.trainer_priority||{};
+  const trainers=[..._settTrainerProfiles].sort((a,b)=>a.name.localeCompare(b.name));
+  
+  wrap.innerHTML=`
+    <div class="sett-matrix-toolbar" style="margin-bottom:16px;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)">
+      <div class="sett-bulk-field"><label>Bulk Priority (0-100)</label><input type="number" id="priority-bulk-val" value="50" min="0" max="100"></div>
+      <button class="sett-ghost-btn" onclick="settApplyPriorityBulk()">Set All to Value</button>
+      <button class="sett-ghost-btn" onclick="settApplyPriorityByTier()">Auto-Weight by Tier</button>
+    </div>
+    <div class="trainer-mgr-grid">
+      ${trainers.map(t=>{
+        const val=cfg[t.name]!==undefined?cfg[t.name]:50;
+        return `
+          <div class="trainer-mgr-card" style="background:#1E293B;border-color:rgba(255,255,255,0.1);color:#F8FAFC">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="trainer-mgr-avatar" style="width:32px;height:32px;background:#0F172A;border-color:rgba(255,255,255,0.1)">
+                  ${trainerImage(t.name)?`<img src="${trainerImage(t.name)}">`:trainerInitials(t.name)}
+                </span>
+                <div>
+                  <div style="font-size:13px;font-weight:800">${rvEscapeHtml(t.name)}</div>
+                  <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;font-weight:900">Tier ${t.tier}</div>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <label style="font-size:8px;font-weight:900;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:4px">Weight</label>
+                <input type="number" class="priority-inp" data-trainer="${rvEscapeAttr(t.name)}" value="${val}" min="0" max="100" 
+                       style="width:54px;text-align:center;background:#0F172A;border-color:rgba(255,255,255,0.2);color:#3B82F6;font-weight:900"
+                       oninput="settCollectPriorityFromDom()">
+              </div>
+            </div>
+            <div style="margin-top:12px;height:4px;background:rgba(0,0,0,0.3);border-radius:999px;overflow:hidden">
+              <div style="height:100%;width:${val}%;background:linear-gradient(90deg,#3B82F6,#60A5FA);transition:width 0.2s"></div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function settCollectPriorityFromDom(){
+  const prio={};
+  document.querySelectorAll(".priority-inp").forEach(inp=>{
+    prio[inp.dataset.trainer]=parseInt(inp.value)||0;
+    // Update progress bar
+    const bar=inp.closest(".trainer-mgr-card").querySelector("div[style*='width'] > div");
+    if(bar)bar.style.width=`${inp.value}%`;
+  });
+  _settSchedConfig.trainer_priority=prio;
+}
+
+function settApplyPriorityBulk(){
+  const val=document.getElementById("priority-bulk-val")?.value||"50";
+  document.querySelectorAll(".priority-inp").forEach(inp=>{inp.value=val;});
+  settCollectPriorityFromDom();
+}
+
+function settApplyPriorityByTier(){
+  document.querySelectorAll(".priority-inp").forEach(inp=>{
+    const trainer=inp.dataset.trainer;
+    const profile=_settTrainerProfiles.find(t=>t.name===trainer);
+    if(profile){
+      if(profile.tier===1)inp.value=90;
+      else if(profile.tier===2)inp.value=60;
+      else inp.value=30;
+    }
+  });
+  settCollectPriorityFromDom();
+}
+
+function settSavePriority(){
+  settCollectPriorityFromDom();
+  settSaveCanonicalConfig("priority","Trainer priorities saved");
 }
 
 // ---------- Custom Rules & Manual Pins ----------
