@@ -74,14 +74,34 @@ def _next_monday() -> str:
 PIPELINE_CSV = os.environ.get("PIPELINE_CSV", "Sessions Performance Data.csv")
 PIPELINE_WEEK = os.environ.get("PIPELINE_WEEK") or _next_monday()
 
-# In-memory pipeline state (per worker process)
-_pipeline_state = {
-    "running": False,
-    "status": "idle",
-    "pid": None,
-    "started": None,
-    "message": "Idle",
-}
+# Pipeline state (synced to disk for multi-worker environments)
+STATE_DIR = PROJECT_ROOT / "state"
+PIPELINE_STATE_FILE = STATE_DIR / "pipeline_status.json"
+
+def _read_pipeline_state() -> dict:
+    default_state = {
+        "running": False,
+        "status": "idle",
+        "pid": None,
+        "started": None,
+        "message": "Idle",
+    }
+    try:
+        if PIPELINE_STATE_FILE.exists():
+            with open(PIPELINE_STATE_FILE) as f:
+                data = json.load(f)
+                return {**default_state, **data}
+    except Exception:
+        pass
+    return default_state
+
+def _write_pipeline_state(state: dict) -> None:
+    try:
+        PIPELINE_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(PIPELINE_STATE_FILE, "w") as f:
+            json.dump(state, f)
+    except Exception:
+        pass
 _run_counter = 0
 _latest_schedule_file = "schedule_data.json"
 
@@ -334,8 +354,8 @@ def _pipeline_process_alive(pid) -> bool:
     return True
 
 
-def _refresh_pipeline_state(state=None) -> None:
-    state = state or _pipeline_state
+def _refresh_pipeline_state() -> None:
+    state = _read_pipeline_state()
     if not state.get("running"):
         return
     if _pipeline_process_alive(state.get("pid")):
@@ -344,6 +364,7 @@ def _refresh_pipeline_state(state=None) -> None:
     state["status"] = "failed"
     state["pid"] = None
     state["message"] = "Previous pipeline process stopped before completion. Generate can be run again."
+    _write_pipeline_state(state)
 
 
 def _json(data, status=200):
@@ -811,14 +832,15 @@ def supabase_status():
 @app.route("/api/pipeline-status")
 def pipeline_status():
     _refresh_pipeline_state()
-    msg = _pipeline_state["message"]
-    running = _pipeline_state["running"]
-    status = _pipeline_state.get("status", "running" if running else "idle")
+    state = _read_pipeline_state()
+    msg = state.get("message", "Idle")
+    running = state.get("running", False)
+    status = state.get("status", "running" if running else "idle")
     return _json({
         "running": running,
         "status": status,
-        "pid": _pipeline_state["pid"],
-        "started": _pipeline_state["started"],
+        "pid": state.get("pid"),
+        "started": state.get("started"),
         "message": msg,
     })
 
@@ -938,7 +960,8 @@ def optimize_schedule():
 def run_pipeline():
     global _run_counter
     _refresh_pipeline_state()
-    if _pipeline_state["running"]:
+    state = _read_pipeline_state()
+    if state.get("running"):
         return _json({
             "ok": True,
             "already_running": True,
@@ -997,14 +1020,16 @@ def run_pipeline():
             text=True,
             env=options["child_env"],
         )
-        _pipeline_state["running"] = True
-        _pipeline_state["status"] = "running"
-        _pipeline_state["pid"] = proc.pid
-        _pipeline_state["started"] = _time.time()
+        state = _read_pipeline_state()
+        state["running"] = True
+        state["status"] = "running"
+        state["pid"] = proc.pid
+        state["started"] = _time.time()
         mode_label = "AI planner" if options["use_ai"] else "standard optimiser"
-        _pipeline_state["message"] = f"Running {mode_label} — Agent 1: Ingesting data..."
+        state["message"] = f"Running {mode_label} — Agent 1: Ingesting data..."
+        _write_pipeline_state(state)
 
-        def _monitor(p, state):
+        def _monitor(p):
             stage_prefixes = [
                 ("Agent 1", "Ingesting session data"),
                 ("Agent 2", "Analysing performance history"),
@@ -1021,31 +1046,36 @@ def run_pipeline():
                 tail.append(clean)
                 tail = tail[-30:]
                 # Agent 5 — show per-location/day progress verbatim
+                s = _read_pipeline_state()
                 if "[Agent 5]" in clean:
                     inner = clean.split("[Agent 5]", 1)[-1].strip()
-                    state["message"] = f"Optimising schedule — {inner}"
+                    s["message"] = f"Optimising schedule — {inner}"
+                    _write_pipeline_state(s)
                     continue
                 for marker, label in stage_prefixes:
                     if marker in clean:
-                        state["message"] = f"Running — {label}..."
+                        s["message"] = f"Running — {label}..."
+                        _write_pipeline_state(s)
                         break
             p.wait()
+            s = _read_pipeline_state()
             if p.returncode == 0:
-                state["status"] = "done"
-                state["message"] = "Complete — reload to see new schedule."
+                s["status"] = "done"
+                s["message"] = "Complete — reload to see new schedule."
                 try:
                     global _latest_schedule_file
                     _latest_schedule_file = _resolve_latest_schedule_file_name()
                 except Exception:
                     pass
             else:
-                state["status"] = "failed"
+                s["status"] = "failed"
                 detail = next((item for item in reversed(tail) if item.strip()), "")
-                state["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
-            state["running"] = False
-            state["pid"] = None
+                s["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
+            s["running"] = False
+            s["pid"] = None
+            _write_pipeline_state(s)
 
-        t = threading.Thread(target=_monitor, args=(proc, _pipeline_state), daemon=True)
+        t = threading.Thread(target=_monitor, args=(proc,), daemon=True)
         t.start()
 
         return _json({
@@ -1056,8 +1086,10 @@ def run_pipeline():
             "message": "Pipeline started. Results ready in ~2 minutes.",
         })
     except Exception as e:
-        _pipeline_state["running"] = False
-        _pipeline_state["status"] = "failed"
+        s = _read_pipeline_state()
+        s["running"] = False
+        s["status"] = "failed"
+        _write_pipeline_state(s)
         return _json({"error": str(e)}, 500)
 
 

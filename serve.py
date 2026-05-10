@@ -58,6 +58,7 @@ load_env_file()
 # Global mutable state (now synced to disk for multi-worker environments)
 _run_counter = 0
 
+STATE_DIR = PROJECT_ROOT / "state"
 PIPELINE_STATE_FILE = STATE_DIR / "pipeline_status.json"
 
 def _read_pipeline_state() -> dict:
