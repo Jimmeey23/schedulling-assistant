@@ -3525,6 +3525,10 @@ class ScheduleOptimiser:
             if day_name in ["Saturday", "Sunday"]:
                 return False
 
+        state = self.trainer_states.get(trainer)
+        if state is None:
+            return False
+
         # Monday KH Shift Restriction
         if day_name == "Monday":
             kh = "Kwality House, Kemps Corner"
@@ -3562,9 +3566,6 @@ class ScheduleOptimiser:
         win_s, win_e = self._time_window(trainer, location,
                                          tw.get("start", "06:00"), tw.get("end", "22:00"))
         max_d = self._max_per_day(trainer, location, loc_data.get("max_classes_per_day", 4))
-        state = self.trainer_states.get(trainer)
-        if state is None:
-            return False
         if day_name not in state.worked_days() and state.worked_days_count() >= 5:
             return False
         reserved_pinned = getattr(self, "_pinned_minutes_remaining", {}).get(trainer, 0)
