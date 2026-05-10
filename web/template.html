@@ -425,8 +425,8 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .trainer-filter-active .cc-avatar-btn:not(.selected){opacity:.3;filter:grayscale(1)}
 .trainer-filter-active .cc-avatar-btn.selected{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.2),0 6px 14px rgba(37,99,235,.25)}
 .cc-avatar img{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:cover;display:block;flex-shrink:0}
-.cc-tr-name{font-size:10.5px;font-weight:700;color:#334155;line-height:1.2;white-space:normal;word-break:break-word}
-.cc-meta{display:flex;align-items:center;gap:4px;font-size:10px;color:#0F172A;white-space:nowrap;font-weight:900;background:#E2E8F0;padding:2px 6px;border-radius:4px}
+.cc-tr-name{font-size:10.5px;font-weight:700;color:#334155;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.cc-meta{display:flex;align-items:center;gap:3px;font-size:9px;font-weight:900;color:#64748B;background:rgba(0,0,0,0.05);padding:2px 6px;border-radius:4px;white-space:nowrap;margin-left:4px}
 .cc-bottom{display:flex;align-items:center;gap:8px;margin-top:7px;background:rgba(248,250,252,.9);border:1px solid rgba(226,232,240,.8);border-radius:10px;padding:6px 8px;box-shadow:0 1px 4px rgba(15,23,42,.04),inset 0 1px 0 rgba(255,255,255,.9);transition:box-shadow .25s}
 .cc-fill-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
 .cc-fill-head{display:flex;align-items:center;justify-content:space-between;gap:4px}
@@ -2798,8 +2798,8 @@ function makeClassCard(s){
     <div class="cc-info-row">
       <div class="cc-trainer">
         <button class="cc-avatar cc-avatar-btn" type="button" title="Toggle trainer filter" data-trainer="${rvEscapeAttr(s.trainer_1||"")}" style="width:28px;height:28px;overflow:hidden;flex-shrink:0">${avatar?`<img src="${avatar}" alt="${rvEscapeAttr(s.trainer_1||"Trainer")}" style="width:28px;height:28px;object-fit:cover;display:block">`:initials}</button>
-        <span class="cc-tr-name">${rvEscapeHtml(s.trainer_1||"—")}</span>
-        <span class="cc-meta" style="margin-left:auto">◷ ${rvEscapeHtml(s.time||"—")}</span>
+        <span class="cc-tr-name" title="${rvEscapeAttr(s.trainer_1||"—")}">${rvEscapeHtml(s.trainer_1||"—")}</span>
+        <span class="cc-meta"><span>◷</span> ${rvEscapeHtml(s.time||"—")}</span>
       </div>
     </div>
     <div class="cc-bottom">
@@ -5592,9 +5592,9 @@ function pollPipelineStatus(){
 // ============================================================
 const CONTROL_CENTER_SECTIONS={
   overview:{label:"Overview",icon:"🏠",group:"core",summary:"Start here",detail:"Review configuration health and the key setup sections.",panel:"settings",heading:"Overview",description:"Use one place to manage schedule setup, trainers, class mix, and rules.",activate(){settSetTab("overview");}},
-  schedule:{label:"Schedule Setup",icon:"📅",group:"schedule",summary:"Daily targets",detail:"Edit daily class targets for each location.",panel:"settings",heading:"Schedule Setup",description:"Adjust daily class targets and weekly shape.",activate(){settSetTab("targets");}},
-  classmix:{label:"Class Mix & Formats",icon:"🎯",group:"schedule",summary:"Format balance",detail:"Set format min/max targets per studio.",panel:"settings",heading:"Class Mix and Formats",description:"Maintain the right format mix across the week.",activate(){settSetTab("classmix");}},
-  rules:{label:"Rules & Pinned Classes",icon:"📌",group:"schedule",summary:"Custom rules",detail:"Manage custom rules and pinned classes.",panel:"settings",heading:"Rules and Pinned Classes",description:"Add custom scheduling instructions and pins.",activate(){settSetTab("customrules");}},
+  schedule:{label:"Schedule Setup",icon:"📅",group:"schedule",summary:"Daily targets",detail:"Edit daily class targets for each location.",panel:"settings",heading:"Schedule Setup",description:"Adjust daily class targets and weekly shape.",activate(){settSetTab("rules");settSetSub("rules","targets");}},
+  classmix:{label:"Class Mix & Formats",icon:"🎯",group:"schedule",summary:"Format balance",detail:"Set format min/max targets per studio.",panel:"settings",heading:"Class Mix and Formats",description:"Maintain the right format mix across the week.",activate(){settSetTab("rules");settSetSub("rules","classmix");}},
+  rules:{label:"Rules & Pinned Classes",icon:"📌",group:"schedule",summary:"Custom rules",detail:"Manage custom rules and pinned classes.",panel:"settings",heading:"Rules and Pinned Classes",description:"Add custom scheduling instructions and pins.",activate(){settSetTab("rules");settSetSub("rules","custom");}},
   trainers:{label:"Trainer Profiles",icon:"👥",group:"people",summary:"Profiles & status",detail:"Manage trainer profiles, availability, and status.",panel:"settings",heading:"Trainer Setup",description:"Manage trainer profiles, studio access, and active status.",activate(){settSetTab("trainers");}},
   qualifications:{label:"Certifications",icon:"🏅",group:"people",summary:"Class access",detail:"Class format certifications per trainer.",panel:"settings",heading:"Certifications",description:"Manage which trainers are certified to teach each class format.",activate(){settSetTab("qualifications");}},
   availability:{label:"Availability",icon:"🗓",group:"people",summary:"Days & windows",detail:"Set trainer days and time windows per location.",panel:"settings",heading:"Availability",description:"Manage trainer availability schedules.",activate(){settSetTab("availability");}},
@@ -5890,9 +5890,10 @@ function rvSetScope(scope){
 }
 
 function rvOpenCustomRuleBuilder(){
-  openControlCenterModal("customrules");
+  openControlCenterModal("rules");
   setTimeout(()=>{
-    settSetTab("customrules");
+    settSetTab("rules");
+    settSetSub("rules","custom");
     document.getElementById("cr-type")?.focus();
     document.getElementById("customrules-builder")?.scrollIntoView({block:"center",behavior:"smooth"});
   },120);
@@ -6830,41 +6831,19 @@ function renderSettingsView(area){
       </div>
 
       <div class="sett-subpanel" data-section="rules" data-subpanel="custom">
-        <div class="rule-builder-wrap" style="margin-top:10px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(0,0,0,0.2);padding:16px">
+        <div id="customrules-builder"></div>
+        <div class="rule-builder-wrap" style="margin-top:20px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(0,0,0,0.2);padding:16px">
           <div class="rule-builder-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-size:14px;font-weight:800;color:#F8FAFC">Advanced Logic Rules</div>
-            <button class="sett-ghost-btn primary">+ Add New Logic Rule</button>
+            <div style="font-size:14px;font-weight:800;color:#F8FAFC">Active Logic Rules</div>
           </div>
-          <div class="rule-list" style="display:flex;flex-direction:column;gap:12px">
-            <div class="rule-item" style="background:#1E293B;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px">
-              <div class="rule-item-top" style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <div class="rule-badge active" style="font-size:9px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:#16A34A;color:#DCFCE7">Active</div>
-                <div class="rule-name" style="font-size:14px;font-weight:800;color:#F8FAFC">Tier 1 Morning Priority</div>
-              </div>
-              <div class="rule-condition" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#94A3B8;background:rgba(0,0,0,0.2);padding:8px 12px;border-radius:6px;margin-bottom:6px">
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">IF</span> Location <select class="sett-select" style="padding:2px 6px;height:auto"><option>Bandra</option><option>Any</option></select>
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">AND</span> Time Band is <select class="sett-select" style="padding:2px 6px;height:auto"><option>Morning (AM)</option></select>
-              </div>
-              <div class="rule-action" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#94A3B8;background:rgba(0,0,0,0.2);padding:8px 12px;border-radius:6px;margin-bottom:6px">
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">THEN</span> Require Trainer Tier <select class="sett-select" style="padding:2px 6px;height:auto"><option>Tier 1 (T1)</option></select>
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">ELSE</span> Apply Penalty <input type="number" class="sett-input" value="20" style="width:60px;padding:2px 6px;height:auto">
-              </div>
-            </div>
-            
-            <div class="rule-item" style="background:#1E293B;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px">
-              <div class="rule-item-top" style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <div class="rule-badge active" style="font-size:9px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:#16A34A;color:#DCFCE7">Active</div>
-                <div class="rule-name" style="font-size:14px;font-weight:800;color:#F8FAFC">Prevent Consecutive PowerCycle</div>
-              </div>
-              <div class="rule-condition" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#94A3B8;background:rgba(0,0,0,0.2);padding:8px 12px;border-radius:6px;margin-bottom:6px">
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">IF</span> Class Format is <select class="sett-select" style="padding:2px 6px;height:auto"><option>PowerCycle</option></select>
-              </div>
-              <div class="rule-action" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#94A3B8;background:rgba(0,0,0,0.2);padding:8px 12px;border-radius:6px;margin-bottom:6px">
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">THEN</span> Max Occurrences Per Day <input type="number" class="sett-input" value="2" style="width:60px;padding:2px 6px;height:auto">
-                <span class="rule-keyword" style="font-weight:900;color:#3B82F6">AND</span> Min Gap Between Sessions <input type="number" class="sett-input" value="2" style="width:60px;padding:2px 6px;height:auto"> hours
-              </div>
-            </div>
+          <div id="customrules-list" class="rule-list" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+        <div class="rule-builder-wrap" style="margin-top:20px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(0,0,0,0.2);padding:16px">
+          <div class="rule-builder-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-size:14px;font-weight:800;color:#F8FAFC">Manual Protected Pins</div>
           </div>
+          <div id="manualpins-builder"></div>
+          <div id="manualpins-list" class="rule-list" style="display:flex;flex-direction:column;gap:12px;margin-top:16px"></div>
         </div>
       </div>
 
@@ -6980,24 +6959,31 @@ function renderSettingsView(area){
 }
 
 function settSetTab(tab){
-  _settSection=tab;
+  let mainTab=tab;
+  if(["targets","classmix","custom","customrules","universal"].includes(tab)) mainTab="rules";
+  _settSection=mainTab;
   document.querySelectorAll(".sett-tab,.sett-nav-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".sett-section").forEach(s=>s.classList.remove("active"));
-  const btn=document.getElementById("stab-"+tab);
+  const btn=document.getElementById("stab-"+mainTab);
   if(btn)btn.classList.add("active");
-  const sec=document.getElementById("ssec-"+tab);
+  const sec=document.getElementById("ssec-"+mainTab);
   if(sec)sec.classList.add("active");
-  if(tab==="rules"){
+  if(mainTab==="rules"){
     settRenderTargets();
     settRenderClassMix();
     settRenderCustomRules();
     settRenderUniversalRulesPanel();
+    if(["targets","classmix","custom","customrules","universal"].includes(tab)){
+      settSetSub("rules", tab==="customrules"?"custom":tab);
+    } else {
+      settSetSub("rules", "targets");
+    }
   }
-  if(tab==="conflicts")settValidateAndRender();
+  if(mainTab==="conflicts")settValidateAndRender();
   settResetMatrixSelection(false);
-  if(tab==="overview")settRenderOverview();
-  if(tab==="advanced")settRenderAdvancedOptions();
-  if(tab==="ai"){
+  if(mainTab==="overview")settRenderOverview();
+  if(mainTab==="advanced")settRenderAdvancedOptions();
+  if(mainTab==="ai"){
     ["fill_rate","revenue","avg_checkin","session_frequency","trend"].forEach(id=>{
       const sl=document.getElementById("sw-"+id);
       const vl=document.getElementById("sw-"+id+"-val");

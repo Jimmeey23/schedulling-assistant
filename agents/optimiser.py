@@ -17,10 +17,12 @@ DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 DOW_MAP = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"}
 DOW_REVERSE = {v: k for k, v in DOW_MAP.items()}
 
-MAX_TRAINER_WEEKLY_MINUTES = 15 * 60   # Hard cap — no trainer exceeds 15 hrs
-TIER1_WEEKLY_TARGET_MIN = 13 * 60      # T1 target: ≥13 hrs (was MAX)
-TIER2_WEEKLY_TARGET_MIN =  9 * 60      # T2 target: ≥9 hrs
-TIER3_WEEKLY_TARGET_MAX =  6 * 60      # T3 soft ceiling: ≤6 hrs
+MAX_TRAINER_WEEKLY_MINUTES_T1 = 25 * 60
+MAX_TRAINER_WEEKLY_MINUTES_T2 = 15 * 60
+MAX_TRAINER_WEEKLY_MINUTES_T3 = 12 * 60
+TIER1_WEEKLY_TARGET_MIN = 18 * 60
+TIER2_WEEKLY_TARGET_MIN = 10 * 60
+TIER3_WEEKLY_TARGET_MAX = 6 * 60
 SUPREME_LOCATION = "Supreme HQ, Bandra"
 KWALITY_LOCATION = "Kwality House, Kemps Corner"
 LOCATION_WEEKLY_CLASS_BOUNDS = {
@@ -710,8 +712,9 @@ class TrainerState:
         if len(today_loc) >= max_per_day:
             return False
 
-        # Hard weekly cap: no trainer may exceed 15 scheduled hours.
-        if self.weekly_minutes + new_dur > MAX_TRAINER_WEEKLY_MINUTES:
+        # Tier-based hard weekly caps
+        max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if self.tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if self.tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
+        if self.weekly_minutes + new_dur > max_mins:
             return False
 
         # Duration-based overlap check against ALL classes today (any location)
@@ -3737,26 +3740,20 @@ class ScheduleOptimiser:
 
         if state.tier == 1:
             remaining = max(0, TIER1_WEEKLY_TARGET_MIN - state.weekly_minutes)
-            # Strong pull toward target; tapering bonus once near cap
-            return 180.0 + remaining / 60 * 10.0
+            # Extremely strong pull toward target for Tier 1
+            return 500.0 + remaining / 60 * 25.0
 
         if state.tier == 2:
             if not t1_satisfied:
                 # Block T2 from taking hours while any T1 is under target
-                remaining_t1 = max(
-                    0,
-                    TIER1_WEEKLY_TARGET_MIN - min(
-                        (s.weekly_minutes for s in self.trainer_states.values() if s.tier == 1),
-                        default=0,
-                    ),
-                )
-                return -60.0 - remaining_t1 / 60 * 5.0
+                remaining_t1 = sum(max(0, TIER1_WEEKLY_TARGET_MIN - s.weekly_minutes) for s in self.trainer_states.values() if s.tier == 1)
+                return -200.0 - remaining_t1 / 60 * 10.0
             remaining = max(0, TIER2_WEEKLY_TARGET_MIN - state.weekly_minutes)
             return 40.0 + remaining / 60 * 6.0
 
         # Tier 3
         if not t1_satisfied or not t2_satisfied:
-            return -120.0 - state.weekly_minutes / 60 * 6.0
+            return -500.0 - state.weekly_minutes / 60 * 15.0
         # Only give T3 classes once T1 and T2 targets are met
         remaining = max(0, TIER3_WEEKLY_TARGET_MAX - state.weekly_minutes)
         return -10.0 + remaining / 60 * 3.0

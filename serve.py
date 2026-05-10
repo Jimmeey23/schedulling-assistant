@@ -573,10 +573,14 @@ def _refresh_pipeline_state() -> None:
         return
     if _pipeline_process_alive(state.get("pid")):
         return
+    
+    # Process is no longer alive, but running was still True.
+    # We only set it to failed if it wasn't already marked as done or failed.
     state["running"] = False
-    state["status"] = "failed"
+    if state.get("status") == "running":
+        state["status"] = "failed"
+        state["message"] = "Previous pipeline process stopped unexpectedly. Generate can be run again."
     state["pid"] = None
-    state["message"] = "Previous pipeline process stopped before completion. Generate can be run again."
     _write_pipeline_state(state)
 
 MIME_TYPES = {
@@ -1012,6 +1016,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                                 
                     p.wait()
                     s = _read_pipeline_state()
+                    s["running"] = False
                     if p.returncode == 0:
                         s["status"] = "done"
                         s["message"] = "Complete — reload to see new schedule."
