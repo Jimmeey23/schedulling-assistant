@@ -6471,6 +6471,43 @@ function settValidateConfig(config){
       }
     }
   });
+  // ── Tier hour ordering check ──────────────────────────────────────────
+  // For each location, verify T1 trainers have ≥ T2, T2 ≥ T3.
+  // Uses trainer profiles from _settTrainerProfiles and the live schedule (if available).
+  if(Array.isArray(_settTrainerProfiles)&&_settTrainerProfiles.length){
+    const tierOf={};
+    _settTrainerProfiles.forEach(p=>{
+      const t=Number((cfg.tier_overrides||[]).find(o=>o.trainer===p.name)?.tier||p.tier||3);
+      tierOf[p.name]=t;
+    });
+    const locTierHours={};
+    // Aggregate from live schedule if accessible
+    const liveSlots=typeof _schedule!=="undefined"?_schedule:[];
+    liveSlots.forEach(s=>{
+      const loc=s.location;const tr=s.trainer_1;
+      if(!loc||!tr)return;
+      if(!locTierHours[loc])locTierHours[loc]={1:[],2:[],3:[]};
+      const tier=tierOf[tr]||3;
+      const dur=Number(s.duration_min||57);
+      const existing=locTierHours[loc][tier]?.find(x=>x.name===tr);
+      if(existing)existing.mins+=dur;
+      else locTierHours[loc][tier]?.push({name:tr,mins:dur});
+    });
+    Object.entries(locTierHours).forEach(([loc,byTier])=>{
+      const avgMins=tier=>{
+        const arr=byTier[tier]||[];
+        return arr.length?arr.reduce((s,x)=>s+x.mins,0)/arr.length:null;
+      };
+      const t1=avgMins(1),t2=avgMins(2),t3=avgMins(3);
+      const locShort=LOC_SHORT[loc]||loc;
+      if(t1!=null&&t2!=null&&t2>t1+15)
+        warnings.push(`${locShort}: Tier 2 trainers average more hours than Tier 1 (${Math.round(t2/60*10)/10}h vs ${Math.round(t1/60*10)/10}h). Run Optimise to rebalance.`);
+      if(t2!=null&&t3!=null&&t3>t2+15)
+        warnings.push(`${locShort}: Tier 3 trainers average more hours than Tier 2 (${Math.round(t3/60*10)/10}h vs ${Math.round(t2/60*10)/10}h). Run Optimise to rebalance.`);
+      if(t1!=null&&t3!=null&&t3>t1+15)
+        warnings.push(`${locShort}: Tier 3 trainers average more hours than Tier 1 (${Math.round(t3/60*10)/10}h vs ${Math.round(t1/60*10)/10}h). Run Optimise to rebalance.`);
+    });
+  }
   if(Number(cfg.settings_options?.weekly_hours_cap||0)<=0)errors.push("Advanced: weekly trainer hours cap must be greater than zero.");
   if(Number(cfg.settings_options?.max_classes_per_day_default||0)<=0)errors.push("Advanced: default classes per day cap must be greater than zero.");
   if(cfg.settings_options?.block_hard_conflict_saves===false)warnings.push("Advanced: invalid saves are allowed; Settings will still be treated as canonical.");

@@ -17,8 +17,10 @@ DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 DOW_MAP = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"}
 DOW_REVERSE = {v: k for k, v in DOW_MAP.items()}
 
-MAX_TRAINER_WEEKLY_MINUTES = 15 * 60
-TIER1_WEEKLY_TARGET_MIN = MAX_TRAINER_WEEKLY_MINUTES
+MAX_TRAINER_WEEKLY_MINUTES = 15 * 60   # Hard cap — no trainer exceeds 15 hrs
+TIER1_WEEKLY_TARGET_MIN = 13 * 60      # T1 target: ≥13 hrs (was MAX)
+TIER2_WEEKLY_TARGET_MIN =  9 * 60      # T2 target: ≥9 hrs
+TIER3_WEEKLY_TARGET_MAX =  6 * 60      # T3 soft ceiling: ≤6 hrs
 SUPREME_LOCATION = "Supreme HQ, Bandra"
 KWALITY_LOCATION = "Kwality House, Kemps Corner"
 LOCATION_WEEKLY_CLASS_BOUNDS = {
@@ -736,7 +738,11 @@ class TrainerState:
         self.weekly_minutes += get_class_duration(class_name)
 
     def at_weekly_target(self) -> bool:
-        return self.tier == 1 and self.weekly_minutes >= TIER1_WEEKLY_TARGET_MIN
+        if self.tier == 1:
+            return self.weekly_minutes >= TIER1_WEEKLY_TARGET_MIN
+        if self.tier == 2:
+            return self.weekly_minutes >= TIER2_WEEKLY_TARGET_MIN
+        return self.weekly_minutes >= TIER3_WEEKLY_TARGET_MAX
 
 
 class RoomOccupancy:
@@ -3696,9 +3702,19 @@ class ScheduleOptimiser:
         return False
 
     def _tier_priority_score(self, trainer: str) -> float:
+        """Score bonus/penalty that enforces T1 > T2 > T3 weekly hours.
+
+        In default mode:
+          - T1 gets a large positive bonus that shrinks as they approach their
+            target, ensuring they absorb classes first.
+          - T2 gets a moderate negative until T1 is satisfied; once T1 is
+            at target, T2 gets a small positive to reach their own target.
+          - T3 is penalised unless both T1 and T2 are satisfied.
+        """
         state = self.trainer_states.get(trainer)
         if not state:
             return 0.0
+
         if self._optimization_mode == "trainer_hours":
             worked_hours = state.weekly_minutes / 60
             if worked_hours < 6:
@@ -3708,12 +3724,42 @@ class ScheduleOptimiser:
             if worked_hours < 14.5:
                 return 34.0
             return 12.0
+
+        # ── Tier-ordered priority ─────────────────────────────────────────
+        t1_satisfied = all(
+            s.weekly_minutes >= TIER1_WEEKLY_TARGET_MIN
+            for s in self.trainer_states.values() if s.tier == 1
+        )
+        t2_satisfied = all(
+            s.weekly_minutes >= TIER2_WEEKLY_TARGET_MIN
+            for s in self.trainer_states.values() if s.tier == 2
+        )
+
         if state.tier == 1:
             remaining = max(0, TIER1_WEEKLY_TARGET_MIN - state.weekly_minutes)
-            return 140.0 + remaining / 60 * 8.0
+            # Strong pull toward target; tapering bonus once near cap
+            return 180.0 + remaining / 60 * 10.0
+
         if state.tier == 2:
-            return -35.0 - state.weekly_minutes / 60 * 3.0
-        return -75.0 - state.weekly_minutes / 60 * 4.0
+            if not t1_satisfied:
+                # Block T2 from taking hours while any T1 is under target
+                remaining_t1 = max(
+                    0,
+                    TIER1_WEEKLY_TARGET_MIN - min(
+                        (s.weekly_minutes for s in self.trainer_states.values() if s.tier == 1),
+                        default=0,
+                    ),
+                )
+                return -60.0 - remaining_t1 / 60 * 5.0
+            remaining = max(0, TIER2_WEEKLY_TARGET_MIN - state.weekly_minutes)
+            return 40.0 + remaining / 60 * 6.0
+
+        # Tier 3
+        if not t1_satisfied or not t2_satisfied:
+            return -120.0 - state.weekly_minutes / 60 * 6.0
+        # Only give T3 classes once T1 and T2 targets are met
+        remaining = max(0, TIER3_WEEKLY_TARGET_MAX - state.weekly_minutes)
+        return -10.0 + remaining / 60 * 3.0
 
     def _location_tier_priority_score(self, trainer: str, location: str) -> float:
         state = self.trainer_states.get(trainer)
