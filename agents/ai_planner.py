@@ -19,6 +19,9 @@ from agents.optimiser import (
     HORIZONTAL_MAX_SAME_CLASS_PER_TIME,
     HORIZONTAL_MAX_SAME_FORMAT_PER_TIME,
     LOCATION_ROOMS,
+    MAX_TRAINER_WEEKLY_MINUTES_T1,
+    MAX_TRAINER_WEEKLY_MINUTES_T2,
+    MAX_TRAINER_WEEKLY_MINUTES_T3,
     MAX_TRAINER_WEEKLY_MINUTES,
     RoomOccupancy,
     canonical_class_key,
@@ -625,7 +628,9 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         if trainer_day_location_count[day_loc_key] >= max_day:
             continue
         duration = int(slot.duration_min or get_class_duration(slot.class_name))
-        if trainer_weekly_minutes[trainer_key] + duration > MAX_TRAINER_WEEKLY_MINUTES:
+        tier = profile.get("tier", 3)
+        max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
+        if trainer_weekly_minutes[trainer_key] + duration > max_mins:
             continue
         if (
             slot.day_of_week not in trainer_worked_days[trainer_key]
@@ -816,10 +821,17 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot]) -> List[PlannedSl
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_minutes: Dict[str, int] = defaultdict(int)
 
+    # Load profiles to get tiers for weekly cap enforcement
+    from agents.ai_planner import _load_trainer_profiles
+    profiles = _load_trainer_profiles() or {}
+
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
         trainer_key = normalize_trainer_name(slot.trainer_1)
         duration = int(slot.duration_min or get_class_duration(slot.class_name))
-        if trainer_minutes[trainer_key] + duration > MAX_TRAINER_WEEKLY_MINUTES:
+        profile = profiles.get(slot.trainer_1) or profiles.get(trainer_key) or {}
+        tier = profile.get("tier", 3)
+        max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
+        if trainer_minutes[trainer_key] + duration > max_mins:
             continue
         day_key = (trainer_key, slot.day_of_week)
         start_min = slot_time_to_minutes(slot.time)

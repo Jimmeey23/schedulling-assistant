@@ -20,6 +20,7 @@ DOW_REVERSE = {v: k for k, v in DOW_MAP.items()}
 MAX_TRAINER_WEEKLY_MINUTES_T1 = 25 * 60
 MAX_TRAINER_WEEKLY_MINUTES_T2 = 15 * 60
 MAX_TRAINER_WEEKLY_MINUTES_T3 = 12 * 60
+MAX_TRAINER_WEEKLY_MINUTES = MAX_TRAINER_WEEKLY_MINUTES_T2  # Legacy alias
 TIER1_WEEKLY_TARGET_MIN = 18 * 60
 TIER2_WEEKLY_TARGET_MIN = 10 * 60
 TIER3_WEEKLY_TARGET_MAX = 6 * 60
@@ -625,6 +626,12 @@ class TrainerState:
         self.weekly_minutes: int = 0
         # day -> [(time_str, location, class_name)]
         self._schedule: Dict[str, List[Tuple[str, str, str]]] = {}
+
+    @property
+    def max_weekly_minutes(self) -> int:
+        if self.tier == 1: return MAX_TRAINER_WEEKLY_MINUTES_T1
+        if self.tier == 2: return MAX_TRAINER_WEEKLY_MINUTES_T2
+        return MAX_TRAINER_WEEKLY_MINUTES_T3
 
     def classes_today(self, day: str, location: str) -> List[str]:
         return [t for t, loc, _ in self._schedule.get(day, []) if loc == location]
@@ -1399,12 +1406,12 @@ class ScheduleOptimiser:
         if getattr(self, "trainer_home_region", {}).get(profile.get("name"), "") != "mumbai":
             return None
 
-        base_min = int(MAX_TRAINER_WEEKLY_MINUTES * MUMBAI_TIER1_SUPREME_MIN_SHARE)
-        base_max = int(MAX_TRAINER_WEEKLY_MINUTES * MUMBAI_TIER1_SUPREME_MAX_SHARE)
+        base_min = int(MAX_TRAINER_WEEKLY_MINUTES_T1 * MUMBAI_TIER1_SUPREME_MIN_SHARE)
+        base_max = int(MAX_TRAINER_WEEKLY_MINUTES_T1 * MUMBAI_TIER1_SUPREME_MAX_SHARE)
 
         # If Kwality pinned load exceeds the non-Supreme allowance, relax the
         # Supreme minimum by only the pinned excess.
-        max_non_supreme = MAX_TRAINER_WEEKLY_MINUTES - base_min
+        max_non_supreme = MAX_TRAINER_WEEKLY_MINUTES_T1 - base_min
         kwality_pinned = getattr(self, "_kwality_pinned_minutes_total", {}).get(trainer, 0)
         kwality_excess = max(0, kwality_pinned - max_non_supreme)
         adjusted_min = max(0, base_min - kwality_excess)
@@ -3511,7 +3518,7 @@ class ScheduleOptimiser:
         if day_name not in state.worked_days() and state.worked_days_count() >= 6:
             return False
         reserved_pinned = getattr(self, "_pinned_minutes_remaining", {}).get(trainer, 0)
-        if state.weekly_minutes + get_class_duration(class_name) + reserved_pinned > MAX_TRAINER_WEEKLY_MINUTES:
+        if state.weekly_minutes + get_class_duration(class_name) + reserved_pinned > state.max_weekly_minutes:
             return False
         if not state.can_add(day_name, time_str, location, class_name, max_d, win_s, win_e):
             return False
@@ -3565,12 +3572,12 @@ class ScheduleOptimiser:
                 bonus = 44.0
             if day_name not in state.worked_days() and state.worked_days_count() < 5:
                 bonus += 5.0
-            if state.weekly_minutes >= MAX_TRAINER_WEEKLY_MINUTES - 60:
+            if state.weekly_minutes >= state.max_weekly_minutes - 60:
                 bonus -= 22.0
             return max(0.0, min(72.0, bonus))
         bonus = 0.0
         if state.tier == 1:
-            remaining = max(0, MAX_TRAINER_WEEKLY_MINUTES - state.weekly_minutes)
+            remaining = max(0, TIER1_WEEKLY_TARGET_MIN - state.weekly_minutes)
             bonus += min(18.0, remaining / 60 * 1.25)
         if day_name not in state.worked_days():
             if state.worked_days_count() >= 5:

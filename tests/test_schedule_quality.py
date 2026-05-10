@@ -1765,11 +1765,16 @@ def test_courtside_is_blocked_when_trainer_has_later_main_studio_class():
     assert not state.can_add("Saturday", "10:00", "Courtside", "Studio Mat 57", 4, "07:00", "20:30")
 
 
-def test_trainer_cannot_exceed_weekly_15_hour_cap():
+def test_trainer_cannot_exceed_tier_based_weekly_cap():
+    # Anisha is T1, cap is 25h
     state = TrainerState("Anisha Shah", 1)
-    state.weekly_minutes = MAX_TRAINER_WEEKLY_MINUTES - get_class_duration("Studio Barre 57") + 1
-
+    state.weekly_minutes = state.max_weekly_minutes - get_class_duration("Studio Barre 57") + 1
     assert not state.can_add("Monday", "09:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
+
+    # Karan is T2, cap is 15h
+    state2 = TrainerState("Karan Bhatia", 2)
+    state2.weekly_minutes = state2.max_weekly_minutes - get_class_duration("Studio Barre 57") + 1
+    assert not state2.can_add("Monday", "09:00", "Kwality House, Kemps Corner", "Studio Barre 57", 4, "07:00", "20:30")
 
 
 def test_lower_tier_is_blocked_when_eligible_tier1_is_under_target():
