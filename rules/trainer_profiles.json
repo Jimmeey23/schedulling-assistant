@@ -493,7 +493,7 @@
   },
   {
     "name": "Karan Bhatia",
-    "tier": 1,
+    "tier": 3,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -1009,7 +1009,7 @@
   },
   {
     "name": "Richard D'Costa",
-    "tier": 1,
+    "tier": 2,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
@@ -1361,7 +1361,7 @@
   },
   {
     "name": "Simran Dutt",
-    "tier": 2,
+    "tier": 3,
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [

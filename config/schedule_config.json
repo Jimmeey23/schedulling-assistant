@@ -777,6 +777,7 @@
   "leave_periods": [],
   "off_days": [],
   "inactive_trainers": [
+    "",
     "Dhruv Mehta",
     "Janhavi Jain",
     "Kabir Varma",
@@ -1256,6 +1257,29 @@
         "source": "settings"
       }
     }
+  },
+  "trainer_priority": {
+    "Anisha Shah": 90,
+    "Anmol Sharma": 60,
+    "Atulan Purohit": 90,
+    "Bret Saldanha": 60,
+    "Cauveri Vikrant": 90,
+    "Chaitanya Nahar": 90,
+    "Kajol Kanchan": 90,
+    "Karan Bhatia": 90,
+    "Karanvir Bhatia": 90,
+    "Mrigakshi Jaiswal": 90,
+    "Pranjali Jain": 90,
+    "Pushyank Nahar": 90,
+    "Raunak Khemuka": 30,
+    "Reshma Sharma": 90,
+    "Richard D'Costa": 90,
+    "Rohan Dahima": 90,
+    "Shruti Kulkarni": 90,
+    "Siddhartha Kusuma": 90,
+    "Simonelle De Vitre": 60,
+    "Simran Dutt": 60,
+    "Vivaran Dhasmana": 90
   },
   "settings_options": {
     "enforce_exact_daily_targets": true,
