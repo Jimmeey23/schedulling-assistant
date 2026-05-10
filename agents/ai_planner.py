@@ -332,6 +332,7 @@ def _build_location_prompt(location: str, week_start: str,
         "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
         "SUPREME 08:00-09:00 FOCUS: for Supreme HQ, do not collapse the 8-9am demand window into only 09:00. Use the available 08:30 and 08:45 starts where trainer/room constraints allow.",
         "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Keep each exact class to 2 or fewer uses per clock time, each broad format to 3 or fewer uses per clock time, and do not make 07:30/08:30/09:00 all Barre 57, all PowerCycle, or any single repeated format.",
+        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first.",
     ]
 
     return "\n".join(lines)

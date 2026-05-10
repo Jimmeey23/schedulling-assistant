@@ -360,6 +360,13 @@ def _refresh_pipeline_state() -> None:
         return
     if _pipeline_process_alive(state.get("pid")):
         return
+    
+    # Process is dead. Give monitor thread a chance to write its state before assuming failure.
+    _time.sleep(1.0)
+    state = _read_pipeline_state()
+    if not state.get("running"):
+        return
+
     state["running"] = False
     state["status"] = "failed"
     state["pid"] = None
