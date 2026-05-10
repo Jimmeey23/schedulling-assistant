@@ -55,15 +55,35 @@ def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
 
 load_env_file()
 
-# Pipeline process state
-_pipeline_state = {
-    "running": False,
-    "status": "idle",
-    "pid": None,
-    "started": None,
-    "message": "Idle",
-}
+# Global mutable state (now synced to disk for multi-worker environments)
 _run_counter = 0
+
+PIPELINE_STATE_FILE = STATE_DIR / "pipeline_status.json"
+
+def _read_pipeline_state() -> dict:
+    default_state = {
+        "running": False,
+        "status": "idle",
+        "pid": None,
+        "started": None,
+        "message": "Idle",
+    }
+    try:
+        if PIPELINE_STATE_FILE.exists():
+            with open(PIPELINE_STATE_FILE) as f:
+                data = json.load(f)
+                return {**default_state, **data}
+    except Exception:
+        pass
+    return default_state
+
+def _write_pipeline_state(state: dict) -> None:
+    try:
+        PIPELINE_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(PIPELINE_STATE_FILE, "w") as f:
+            json.dump(state, f)
+    except Exception:
+        pass
 
 
 def _safe_child_path(base: Path, name: str) -> Path | None:
@@ -546,8 +566,8 @@ def _pipeline_process_alive(pid) -> bool:
     return True
 
 
-def _refresh_pipeline_state(state=None) -> None:
-    state = state or _pipeline_state
+def _refresh_pipeline_state() -> None:
+    state = _read_pipeline_state()
     if not state.get("running"):
         return
     if _pipeline_process_alive(state.get("pid")):
@@ -556,6 +576,7 @@ def _refresh_pipeline_state(state=None) -> None:
     state["status"] = "failed"
     state["pid"] = None
     state["message"] = "Previous pipeline process stopped before completion. Generate can be run again."
+    _write_pipeline_state(state)
 
 MIME_TYPES = {
     ".html": "text/html; charset=utf-8",
@@ -776,14 +797,15 @@ class RulesHandler(BaseHTTPRequestHandler):
         # API: pipeline status
         if path == "/api/pipeline-status":
             _refresh_pipeline_state()
-            msg = _pipeline_state["message"]
-            running = _pipeline_state["running"]
-            status = _pipeline_state.get("status", "running" if running else "idle")
+            state = _read_pipeline_state()
+            msg = state.get("message", "Idle")
+            running = state.get("running", False)
+            status = state.get("status", "running" if running else "idle")
             self._send_json(200, {
                 "running": running,
                 "status": status,
-                "pid": _pipeline_state["pid"],
-                "started": _pipeline_state["started"],
+                "pid": state.get("pid"),
+                "started": state.get("started"),
                 "message": msg,
             })
             return
@@ -897,7 +919,8 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/run-pipeline":
             global _run_counter
             _refresh_pipeline_state()
-            if _pipeline_state["running"]:
+            state = _read_pipeline_state()
+            if state.get("running"):
                 self._send_json(200, {
                     "ok": True,
                     "already_running": True,
@@ -948,13 +971,15 @@ class RulesHandler(BaseHTTPRequestHandler):
                     text=True,
                     env=options["child_env"],
                 )
-                _pipeline_state["running"] = True
-                _pipeline_state["status"] = "running"
-                _pipeline_state["pid"] = proc.pid
-                _pipeline_state["started"] = _time.time()
-                _pipeline_state["message"] = "Running — Agent 1: Ingesting data..."
+                state = _read_pipeline_state()
+                state["running"] = True
+                state["status"] = "running"
+                state["pid"] = proc.pid
+                state["started"] = _time.time()
+                state["message"] = "Running — Agent 1: Ingesting data..."
+                _write_pipeline_state(state)
 
-                def _monitor(p, state):
+                def _monitor(p):
                     stage_markers = [
                         ("Agent 1", "Running — Agent 1: Ingesting data..."),
                         ("Agent 2", "Running — Agent 2: Analysing history..."),
@@ -970,26 +995,34 @@ class RulesHandler(BaseHTTPRequestHandler):
                         print(f"  [PIPELINE] {clean}")
                         tail.append(clean)
                         tail = tail[-20:]
+                        
+                        s = _read_pipeline_state()
                         if "[Agent 5]" in clean:
                             inner = clean.split("[Agent 5]", 1)[-1].strip()
-                            state["message"] = f"Optimising schedule — {inner}"
+                            s["message"] = f"Optimising schedule — {inner}"
+                            _write_pipeline_state(s)
                             continue
+                            
                         for marker, message in stage_markers:
                             if marker in clean:
-                                state["message"] = message
+                                s["message"] = message
+                                _write_pipeline_state(s)
                                 break
+                                
                     p.wait()
+                    s = _read_pipeline_state()
                     if p.returncode == 0:
-                        state["status"] = "done"
-                        state["message"] = "Complete — reload to see new schedule."
+                        s["status"] = "done"
+                        s["message"] = "Complete — reload to see new schedule."
                     else:
-                        state["status"] = "failed"
+                        s["status"] = "failed"
                         detail = next((item for item in reversed(tail) if item.strip()), "")
-                        state["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
-                    state["running"] = False
-                    state["pid"] = None
+                        s["message"] = f"Failed (exit {p.returncode}). {detail or 'Check server logs.'}"
+                    s["running"] = False
+                    s["pid"] = None
+                    _write_pipeline_state(s)
 
-                t = threading.Thread(target=_monitor, args=(proc, _pipeline_state), daemon=True)
+                t = threading.Thread(target=_monitor, args=(proc,), daemon=True)
                 t.start()
 
                 self._send_json(200, {
@@ -998,8 +1031,10 @@ class RulesHandler(BaseHTTPRequestHandler):
                     "message": "Pipeline started. Results ready in ~2 minutes.",
                 })
             except Exception as e:
-                _pipeline_state["running"] = False
-                _pipeline_state["status"] = "failed"
+                s = _read_pipeline_state()
+                s["running"] = False
+                s["status"] = "failed"
+                _write_pipeline_state(s)
                 self._send_json(500, {"error": str(e)})
             return
 
