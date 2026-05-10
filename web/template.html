@@ -123,7 +123,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 28px; font-weight: 900; letter-spacing: -0.03em;
   background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,.55));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   line-height: 1;
 }
 #initial-loader .ld-brand-sub {
@@ -1946,6 +1946,14 @@ function getFamily(cn) {
   return "default";
 }
 function tmins(t){if(!t)return 0;const[h,m]=t.split(":").map(Number);return h*60+m}
+function getDuration(cn){
+  const lower=(cn||"").toLowerCase();
+  if(lower.includes("express") && lower.includes("cycle")) return 30;
+  if(lower.includes("cycle")) return 45;
+  if(lower.includes("recovery")) return 30;
+  if(lower.includes("express")) return 45;
+  return 57;
+}
 function minsToTime(m){const h=Math.floor(m/60);const mm=m%60;return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0")}
 function buildQuarterHourTimes(slots){
   const mins=[...new Set((slots||[]).map(s=>tmins(s.time)).filter(m=>Number.isFinite(m)&&m>0))].sort((a,b)=>a-b);
@@ -2982,7 +2990,8 @@ function renderHeatmap(area,filtered){
         const avg=rows.length?rows.reduce((sum,s)=>sum+(s.predicted_fill_rate||0),0)/rows.length:0;
         const cls=avg>=.7?"hot":avg>=.45?"warm":rows.length?"cold":"";
         const label=rows.length?`${rows.length} class${rows.length===1?"":"es"}`:"Open";
-        return`<button class="heatmap-cell ${cls}" onclick="${rows[0]?`openModal(JSON.parse(this.dataset.slot))`:""}" data-slot="${rows[0]?rvEscapeAttr(JSON.stringify(rows[0])):""}"><strong>${rows.length?pct(avg,0):"+"}</strong><span>${label}</span></button>`;
+        const classSummary = rows.map(r => `${r.location.split(",")[0]}: ${displayClass(r.class_name)} (${trainerInitials(r.trainer)})`).join("\n");
+        return`<button class="heatmap-cell ${cls}" title="${rvEscapeAttr(classSummary)}" onclick="${rows.length?`openSlotList(${rvEscapeAttr(JSON.stringify(rows))})`:""}"><strong>${rows.length?pct(avg,0):"+"}</strong><span>${label}</span></button>`;
       }).join("")}`).join("")}
     </div>
   </div>`;
@@ -2999,45 +3008,68 @@ function renderRoomView(area,filtered){
   });
   const rooms=Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0]));
   
-  const board = document.createElement("div");
-  board.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;align-items:start;overflow-x:auto;padding-bottom:20px;";
-  
-  rooms.forEach(([room, rows]) => {
-    const avg=rows.reduce((sum,s)=>sum+(s.predicted_fill_rate||0),0)/rows.length;
-    const col = document.createElement("div");
-    col.style.cssText = "background:linear-gradient(180deg,#F8FAFC,#F1F5F9);border:1px solid #DCE3EB;border-radius:18px;padding:14px;box-shadow:0 8px 24px rgba(15,23,42,.04)";
-    col.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 4px">
-        <h3 style="font-size:15px;font-weight:900;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.02em">${rvEscapeHtml(room)}</h3>
-        <span style="font-size:10px;color:#475569;font-weight:800;background:#E2E8F0;padding:2px 8px;border-radius:999px">${rows.length} classes</span>
-      </div>
-      <div style="font-size:10px;font-weight:800;color:#64748B;margin-bottom:12px;padding:0 4px">Avg Fill: <span style="color:${fillColor(avg)}">${pct(avg,1)}</span></div>
-      <div class="room-col-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
-    `;
-    const cardContainer = col.querySelector(".room-col-cards");
-    
-    // Sort by day then time
-    const dayOrder = { "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7 };
-    const sorted = rows.sort((a,b) => (dayOrder[a.day_of_week] - dayOrder[b.day_of_week]) || (a.time||"").localeCompare(b.time||""));
-    
-    let lastDay = "";
-    sorted.forEach(s => {
-      if(s.day_of_week !== lastDay) {
-        const d = document.createElement("div");
-        d.style.cssText = "font-size:10px;font-weight:900;color:#0F172A;text-transform:uppercase;letter-spacing:0.06em;margin:8px 0 2px 4px;font-family:'Plus Jakarta Sans',sans-serif";
-        d.textContent = s.day_of_week;
-        cardContainer.appendChild(d);
-        lastDay = s.day_of_week;
-      }
-      cardContainer.appendChild(makeClassCardMini(s, s.location));
-    });
-    
-    board.appendChild(col);
-  });
-  
+  const startTime = 7 * 60; // 7 AM
+  const endTime = 22 * 60; // 10 PM
+  const totalMinutes = endTime - startTime;
+  const pixelsPerMinute = 1.8; // Reduced slightly for vertical space
+
   const wrap = document.createElement("div");
-  wrap.innerHTML = `<div class="view-surface-head" style="border-radius:18px;border:1px solid #DCE3EB;margin-bottom:16px"><div class="view-surface-title">Room Allocation</div><div style="font-size:11px;color:#64748B;font-weight:800">Side-by-side space usage view</div></div>`;
-  wrap.appendChild(board);
+  wrap.className = "view-surface";
+  wrap.innerHTML = `
+    <div class="view-surface-head">
+      <div class="view-surface-title">Room Utilization Timeline</div>
+      <div style="font-size:11px;color:#64748B;font-weight:800">Precision space management view</div>
+    </div>
+    <div class="room-timeline-outer" style="background:#fff;border-radius:18px;border:1px solid #DCE3EB;overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,.06)">
+      <div class="room-timeline-container" style="display:flex;position:relative;height:700px;overflow-y:auto">
+        <!-- Time Bar -->
+        <div class="time-axis" style="width:64px;background:#F8FAFC;border-right:1px solid #DCE3EB;position:sticky;left:0;z-index:20">
+          <div style="height:48px;background:#F1F5F9;border-bottom:1px solid #DCE3EB"></div>
+          ${Array.from({length: 16}).map((_, i) => {
+            const hour = 7 + i;
+            return `<div style="height:${60 * pixelsPerMinute}px;border-bottom:1px dashed #E2E8F0;font-size:9px;color:#94A3B8;padding:4px;font-weight:900;display:flex;justify-content:flex-end;align-items:flex-start">${hour}:00</div>`;
+          }).join("")}
+        </div>
+        
+        <!-- Room Columns -->
+        <div class="room-columns-wrap" style="display:flex;flex:1;overflow-x:auto">
+          ${rooms.map(([room, rows]) => {
+            return `
+              <div class="room-column" style="min-width:200px;flex:1;border-right:1px solid #E2E8F0;position:relative;background:repeating-linear-gradient(180deg, transparent, transparent ${60*pixelsPerMinute-1}px, rgba(226,232,240,0.5) ${60*pixelsPerMinute-1}px, rgba(226,232,240,0.5) ${60*pixelsPerMinute}px)">
+                <div style="height:48px;background:#F1F5F9;border-bottom:1px solid #DCE3EB;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#0F172A;position:sticky;top:0;z-index:15;box-shadow:0 2px 4px rgba(0,0,0,0.02)">${rvEscapeHtml(room)}</div>
+                <div style="height:${totalMinutes * pixelsPerMinute}px;position:relative;padding:0 4px">
+                  ${rows.map(s => {
+                    const startM = tmins(s.time) - startTime;
+                    const dur = getDuration(s.class_name);
+                    const top = startM * pixelsPerMinute;
+                    const height = dur * pixelsPerMinute;
+                    return `
+                      <div class="room-class-slot" 
+                           style="position:absolute;left:8px;right:8px;top:${top}px;height:${height}px;background:${classColor(s.class_name)};border-radius:10px;padding:8px;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,0.12);cursor:pointer;border-left:4px solid rgba(0,0,0,0.3);transition:transform 0.2s;z-index:10"
+                           onmouseover="this.style.transform='scale(1.02)';this.style.zIndex='25'"
+                           onmouseout="this.style.transform='scale(1)';this.style.zIndex='10'"
+                           onclick='openModal(JSON.parse(this.dataset.slot))'
+                           data-slot='${rvEscapeAttr(JSON.stringify(s))}'>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+                           <span style="font-size:9px;font-weight:900;color:rgba(255,255,255,0.9)">${s.time}</span>
+                           <span style="font-size:8px;font-weight:800;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.1);padding:1px 4px;border-radius:4px">${s.day_of_week.slice(0,3)}</span>
+                        </div>
+                        <div style="font-size:11px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${displayClass(s.class_name)}</div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                           <span class="trainer-mgr-avatar" style="width:18px;height:18px;font-size:7px;background:rgba(255,255,255,0.2);color:#fff;border:none">${trainerInitials(s.trainer)}</span>
+                           <span style="font-size:9px;color:rgba(255,255,255,0.9);font-weight:800">${rvEscapeHtml(s.trainer.split(" ")[0])}</span>
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    </div>
+  `;
   area.appendChild(wrap);
 }
 
@@ -4191,6 +4223,38 @@ function drillRecommendations(s,m){
   if(m.revSeat>0&&m.revSeat<900)recs.push({priority:"medium",title:"Low Revenue Per Seat",body:`Revenue per attended seat is ${inr(m.revSeat,0)}. Review discounts, package mix, intro offers, and whether a premium class can improve yield.`,data:`Total revenue: ${inr(m.revenue,0)} | Check-ins: ${m.checked}`});
   if(!recs.length)recs.push({priority:"low",title:"Stable Slot",body:"Historical metrics do not show a major attendance, fill, cancellation, or revenue warning. Continue monitoring after the next generated schedule.",data:`Score: ${Math.round(s.score||0)}/100 | Sessions: ${m.sessions}`});
   return recs.slice(0,4);
+}
+
+function openSlotList(slots){
+  if(!slots||!slots.length)return;
+  if(slots.length===1){openModal(slots[0]);return;}
+  const backdrop=document.createElement("div");
+  backdrop.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);z-index:10000;backdrop-filter:blur(4px)";
+  const el=document.createElement("div");
+  el.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:#fff;box-shadow:0 24px 64px rgba(0,0,0,0.4);border-radius:24px;min-width:320px;padding:24px;border:1px solid rgba(0,0,0,0.05)";
+  el.innerHTML=`
+    <h2 style="font-size:16px;font-weight:900;margin-bottom:16px;color:#0F172A;display:flex;justify-content:space-between;align-items:center">
+       <span>Slot Selection</span>
+       <span style="font-size:10px;color:#64748B;background:#F1F5F9;padding:2px 8px;border-radius:999px">${slots.length} Classes</span>
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${slots.map(s=>`
+        <div style="padding:14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.2s" 
+             onmouseover="this.style.borderColor='#3B82F6';this.style.background='#fff'" 
+             onmouseout="this.style.borderColor='#E2E8F0';this.style.background='#F8FAFC'"
+             onclick='backdrop.click();openModal(${rvEscapeAttr(JSON.stringify(s))})'>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#0F172A">${displayClass(s.class_name)}</div>
+            <div style="font-size:10px;color:#64748B;font-weight:700;margin-top:2px">${s.location.split(",")[0]} <span style="color:#CBD5E1;margin:0 4px">•</span> ${s.trainer}</div>
+          </div>
+          <div style="color:#3B82F6;font-size:18px;font-weight:300">→</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  backdrop.onclick=()=>{el.remove();backdrop.remove();};
+  document.body.appendChild(backdrop);
+  document.body.appendChild(el);
 }
 
 function openModal(s){
@@ -6317,8 +6381,8 @@ let _trainerMgmtLocFilter="";
 let _settMatrixSelection=new Set();
 let _settLastValidation={errors:[],warnings:[],info:[]};
 
-const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery","special"];
-const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery","special":"Special Format"};
+const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery","fit","back_body_blaze","special"];
+const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery","fit":"FIT","back_body_blaze":"Back Body Blaze","special":"Special Format"};
 const DAYS_ALL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const LOCS_ALL=["Kwality House, Kemps Corner","Supreme HQ, Bandra","Courtside","Kenkere House","Copper & Cloves"];
 const CLASS_MIX_TARGETS={
@@ -6362,6 +6426,7 @@ function settDefaultConfig(){
     off_days:[],
     inactive_trainers:[],
     class_mix:{},
+    trainer_priority:{},
     settings_options:{
       enforce_exact_daily_targets:true,
       auto_repair_underfilled_days:true,
@@ -6624,344 +6689,159 @@ function renderSettingsView(area){
   const wrap=document.createElement("div");
   wrap.className="sett-view";
   wrap.innerHTML=`
-      <main class="sett-main" style="padding:0">
-        <div class="sett-main-actions" style="margin-bottom:20px;display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:16px">
-          <div class="sett-action-group" style="display:flex;gap:10px">
-            <button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Config</button>
-            <button class="sett-ghost-btn" onclick="settExportConfig()">Export JSON</button>
-            <button class="sett-ghost-btn" onclick="settResetMatrixSelection()">Clear Selection</button>
-          </div>
+    <div class="sett-command">
+      <aside class="sett-rail">
+        <div class="sett-nav">
+          <div class="sett-nav-group-label">Command</div>
+          <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">Overview</button>
+          <div class="sett-nav-group-label">Personnel</div>
+          <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">Trainer Directory</button>
+          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')">Certifications</button>
+          <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">Availability</button>
+          <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days</button>
+          <div class="sett-nav-group-label">Strategy</div>
+          <button class="sett-nav-btn" id="stab-rules" onclick="settSetTab('rules')">Scheduling Rules</button>
+          <button class="sett-nav-btn" id="stab-conflicts" onclick="settSetTab('conflicts')">Conflict Resolver</button>
+          <div class="sett-nav-group-label">System</div>
+          <button class="sett-nav-btn" id="stab-ai" onclick="settSetTab('ai')">AI Intelligence</button>
+          <button class="sett-nav-btn" id="stab-advanced" onclick="settSetTab('advanced')">Advanced Policy</button>
+        </div>
+        <div style="margin:20px 14px 14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)">
+          <button class="sett-ghost-btn" style="width:100%;justify-content:center" onclick="settExportConfig()">Export JSON</button>
+        </div>
+      </aside>
+
+      <main class="sett-main">
+        <div class="sett-main-actions">
           <div class="sett-action-group">
-            <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save Settings</button>
+            <button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Configuration</button>
+            <button class="sett-ghost-btn" onclick="settResetMatrixSelection()">Clear Selections</button>
           </div>
+          <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save & Apply Changes</button>
         </div>
 
-    <div class="sett-section active" id="ssec-overview">
-      <div class="sett-section-head">
-        <div>
-          <div class="sett-section-kicker">Command Center</div>
-          <div class="sett-section-label">Settings Overview</div>
-          <div class="sett-section-desc">A cleaner landing view for configuration health, weekly target load, active guardrails, and quick routing into the detailed editors.</div>
-        </div>
-        <button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Now</button>
-      </div>
-      <div id="sett-overview-wrap"></div>
-    </div>
-
-    <div class="sett-section" id="ssec-trainers">
-      <div class="sett-section-label">Trainer Directory</div>
-      <div class="sett-section-desc">Add, edit, deactivate, delete, search, and bulk update trainer profiles. Inactive trainers are excluded from scoring and generation.</div>
-      <div class="sett-subtabs">
-        <button class="sett-subtab active" data-section="trainers" data-subtab="directory" onclick="settSetSub('trainers','directory')">Directory</button>
-        <button class="sett-subtab" data-section="trainers" data-subtab="bulk" onclick="settSetSub('trainers','bulk')">Bulk Operations</button>
-      </div>
-      <div class="sett-subpanel active" data-section="trainers" data-subpanel="directory">
-      <div class="sett-tool-row">
-        <input class="sett-input" id="trainer-mgr-search" type="text" placeholder="Search trainer…" oninput="_trainerMgmtSearch=this.value;settRenderTrainerManager()">
-        <select class="sett-select" id="trainer-mgr-status" onchange="_trainerMgmtStatusFilter=this.value;settRenderTrainerManager()">
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <select class="sett-select" id="trainer-mgr-loc" onchange="_trainerMgmtLocFilter=this.value;settRenderTrainerManager()">
-          <option value="">All Locations</option>
-          ${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}
-        </select>
-        <button class="sett-mini-btn" onclick="settAddTrainer()">Add Trainer</button>
-      </div>
-      <div id="trainer-mgr-wrap"><div style="color:var(--text-muted);font-size:13px">Loading trainers…</div></div>
-      </div>
-      <div class="sett-subpanel" data-section="trainers" data-subpanel="bulk">
-        <div class="sett-tool-row">
-          <button class="sett-mini-btn" onclick="settTrainerBulkActive(true)">Activate Visible</button>
-          <button class="sett-mini-btn" onclick="settTrainerBulkActive(false)">Deactivate Visible</button>
-          <button class="sett-mini-btn" onclick="_trainerMgmtStatusFilter='inactive';document.getElementById('trainer-mgr-status').value='inactive';settSetSub('trainers','directory');settRenderTrainerManager()">Review Inactive</button>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted);line-height:1.5">Bulk operations apply to the currently filtered trainer set. Use the Directory tab filters first, then return here to activate or deactivate that visible group.</div>
-      </div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveTrainerManager()">Save Trainer Directory</button>
-        <span class="sett-save-status" id="trainer-mgr-save-status"></span>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-qualifications">
-      <div class="sett-section-label">Class Format Certifications</div>
-      <div class="sett-section-desc">Mark which class formats each trainer is certified to teach. The AI planner and replacement logic will only assign formats where a trainer is certified.</div>
-      <div class="sett-subtabs">
-        <button class="sett-subtab active" data-section="qualifications" data-subtab="matrix" onclick="settSetSub('qualifications','matrix')">Qualification Matrix</button>
-        <button class="sett-subtab" data-section="qualifications" data-subtab="bulk" onclick="settSetSub('qualifications','bulk')">Bulk Edit</button>
-      </div>
-      <div class="sett-subpanel active" data-section="qualifications" data-subpanel="matrix">
-      <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-        <input type="text" id="qual-search" placeholder="Search trainer…" oninput="_qualSearch=this.value;settRenderQualifications()" style="flex:1;min-width:160px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-      </div>
-      <div id="qual-table-wrap"><div style="color:var(--text-muted);font-size:13px">Loading trainer profiles…</div></div>
-      </div>
-      <div class="sett-subpanel" data-section="qualifications" data-subpanel="bulk">
-        <div class="sett-tool-row">
-          <button class="sett-save-btn" style="background:var(--surface2);color:var(--text)" onclick="settQualBulk(true)">Check All Visible</button>
-          <button class="sett-save-btn" style="background:var(--surface2);color:var(--text)" onclick="settQualBulk(false)">Uncheck All Visible</button>
-        </div>
-        <div style="font-size:12px;color:var(--text-muted)">Use this only for controlled clean-up. Replacement recommendations treat an all-false legacy qualification profile as unconfigured and fall back to teaching history.</div>
-      </div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveQualifications()">Save Qualifications</button>
-        <span class="sett-save-status" id="qual-save-status"></span>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-availability">
-      <div class="sett-section-label">Trainer Availability</div>
-      <div class="sett-section-desc">Set which days each trainer is available per location and their shift time window.</div>
-      <div class="sett-subtabs">
-        <button class="sett-subtab active" data-section="availability" data-subtab="planner" onclick="settSetSub('availability','planner')">Availability Planner</button>
-        <button class="sett-subtab" data-section="availability" data-subtab="filters" onclick="settSetSub('availability','filters')">Search & Filters</button>
-      </div>
-      <div class="sett-subpanel" data-section="availability" data-subpanel="filters">
-      <div style="margin-bottom:12px">
-        <input type="text" id="avail-search" placeholder="Search trainer…" oninput="settFilterAvail(this.value)" style="width:220px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-      </div>
-      </div>
-      <div class="sett-subpanel active" data-section="availability" data-subpanel="planner">
-      <div id="avail-grid-wrap" class="avail-grid"></div>
-      </div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button>
-        <span class="sett-save-status" id="avail-save-status"></span>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-leave">
-      <div class="sett-section-label">Leave & Off Days</div>
-      <div class="sett-section-desc">Record trainer leave periods and one-off unavailable dates. The scheduler will skip these trainers for affected dates.</div>
-      <div id="leave-list"></div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r12);padding:16px;margin-top:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Add Leave Period</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end">
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Trainer</label>
-            <input list="leave-trainer-list" id="leave-trainer" placeholder="Trainer name" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-            <datalist id="leave-trainer-list"></datalist>
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">From</label>
-            <input type="date" id="leave-from" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">To</label>
-            <input type="date" id="leave-to" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-          </div>
-          <button class="sett-save-btn" onclick="settAddLeave()">Add</button>
-        </div>
-        <div style="margin-top:10px">
-          <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Location (optional — leave blank for all)</label>
-          <select id="leave-loc" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface);min-width:240px">
-            <option value="">All Locations</option>
-            ${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}
-          </select>
-        </div>
-      </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r12);padding:16px;margin-top:12px">
-        <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Add One-off Off Day</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end">
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Trainer</label>
-            <input list="leave-trainer-list" id="offday-trainer" placeholder="Trainer name" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Date</label>
-            <input type="date" id="offday-date" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px">Location</label>
-            <select id="offday-loc" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r6);font-size:12px;background:var(--surface)">
-              <option value="">All Locations</option>
-              ${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}
-            </select>
-          </div>
-          <button class="sett-save-btn" onclick="settAddOffDay()">Add</button>
-        </div>
-      </div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveLeave()">Save Leave Config</button>
-        <span class="sett-save-status" id="leave-save-status"></span>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-conflicts">
-      <div class="sett-section-head">
-        <div>
-          <div class="sett-section-kicker">Validator</div>
-          <div class="sett-section-label">Conflict Resolver</div>
-          <div class="sett-section-desc">Resolve hard constraint violations and soft rule warnings. Blocking errors must be fixed before canonical settings can be saved.</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="sett-ghost-btn" onclick="settValidateAndRender()">Refresh Validation</button>
-          <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save & Apply</button>
-        </div>
-      </div>
-      <div class="sett-conflict-view">
-        <div id="sett-conflict-full-list" class="sett-conflict-full-list"></div>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-rules">
-      <div class="sett-section-head">
-        <div>
-          <div class="sett-section-kicker">Logic & Guardrails</div>
-          <div class="sett-section-label">📋 Scheduling Rules</div>
-          <div class="sett-section-desc">Manage daily targets, class format mix, universal guardrails, and custom scheduling logic.</div>
-        </div>
-        <button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save Rules</button>
-      </div>
-
-      <div class="sett-subtabs">
-        <button class="sett-subtab active" data-section="rules" data-subtab="targets" onclick="settSetSub('rules','targets')">Daily Targets</button>
-        <button class="sett-subtab" data-section="rules" data-subtab="classmix" onclick="settSetSub('rules','classmix')">Class Mix</button>
-        <button class="sett-subtab" data-section="rules" data-subtab="custom" onclick="settSetSub('rules','custom')">Custom Rules & Pins</button>
-        <button class="sett-subtab" data-section="rules" data-subtab="universal" onclick="settSetSub('rules','universal')">Universal Guardrails</button>
-      </div>
-
-      <div class="sett-subpanel active" data-section="rules" data-subpanel="targets">
-        <div id="targets-wrap"></div>
-      </div>
-
-      <div class="sett-subpanel" data-section="rules" data-subpanel="classmix">
-        <div id="classmix-wrap"></div>
-      </div>
-
-      <div class="sett-subpanel" data-section="rules" data-subpanel="custom">
-        <div id="customrules-builder"></div>
-        <div class="rule-builder-wrap" style="margin-top:20px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(0,0,0,0.2);padding:16px">
-          <div class="rule-builder-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-size:14px;font-weight:800;color:#F8FAFC">Active Logic Rules</div>
-          </div>
-          <div id="customrules-list" class="rule-list" style="display:flex;flex-direction:column;gap:12px"></div>
-        </div>
-        <div class="rule-builder-wrap" style="margin-top:20px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;background:rgba(0,0,0,0.2);padding:16px">
-          <div class="rule-builder-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-size:14px;font-weight:800;color:#F8FAFC">Manual Protected Pins</div>
-          </div>
-          <div id="manualpins-builder"></div>
-          <div id="manualpins-list" class="rule-list" style="display:flex;flex-direction:column;gap:12px;margin-top:16px"></div>
-        </div>
-      </div>
-
-      <div class="sett-subpanel" data-section="rules" data-subpanel="universal">
-        <div style="border:1px solid #E0E7FF;border-radius:var(--r12);background:linear-gradient(135deg,#EEF2FF,#F5F3FF);padding:16px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-            <span style="font-size:18px">🔒</span>
+        <div class="sett-section active" id="ssec-overview">
+          <div class="sett-section-head">
             <div>
-              <div style="font-size:12px;font-weight:900;color:#3730A3">Universal Rules — Always Active</div>
-              <div style="font-size:11px;color:#6366F1">These constraints are enforced on every generation.</div>
+              <div class="sett-section-kicker">Status</div>
+              <div class="sett-section-label">Settings Overview</div>
+              <div class="sett-section-desc">Health metrics and studio target summary.</div>
             </div>
           </div>
-          <div id="universal-rules-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px"></div>
+          <div id="sett-overview-wrap"></div>
         </div>
-      </div>
-    </div>
 
-    <div class="sett-section" id="ssec-ai">
-      <div class="sett-section-head">
-        <div>
-          <div class="sett-section-kicker">AI Intelligence</div>
-          <div class="sett-section-label">✨ AI Planner Configuration</div>
-          <div class="sett-section-desc">Control how the AI reasons about your schedule — model selection, scoring weight tuning, conflict explanation verbosity, and context strategy.</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px">
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">AI Model</div><div class="sett-option-desc">Claude model used for schedule reasoning and chat.</div></div></div>
-          <select id="ai-model-select" style="height:34px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:800;padding:0 9px;font-family:inherit;width:100%">
-            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Recommended)</option>
-            <option value="anthropic/claude-3-opus">Claude 3 Opus (Deep Reasoning)</option>
-            <option value="openai/gpt-4o">GPT-4o (Fast & Capable)</option>
-            <option value="meta-llama/llama-3.1-405b">Llama 3.1 405B (Open Sovereign)</option>
-          </select>
-        </div>
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">AI Verbosity</div><div class="sett-option-desc">How detailed the AI explains constraint violations.</div></div></div>
-          <select id="ai-verbosity-select" style="height:34px;border:1px solid #CBD5E1;border-radius:8px;background:#fff;color:#0F172A;font-size:12px;font-weight:800;padding:0 9px;font-family:inherit;width:100%">
-            <option value="concise">Concise — one-line flags</option>
-            <option value="standard" selected>Standard — brief explanations</option>
-            <option value="detailed">Detailed — full reasoning chain</option>
-          </select>
-        </div>
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">Conflict Resolution Mode</div><div class="sett-option-desc">How aggressively the AI resolves hard constraint conflicts.</div></div><label class="sett-switch"><input type="checkbox" id="ai-aggressive-resolve" checked><span class="sett-slider"></span></label></div>
-          <div class="sett-option-desc">When ON, AI backtracks up to 3× per slot. When OFF, flags violations without auto-fixing.</div>
-        </div>
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">Fill Rate Prediction</div><div class="sett-option-desc">Use historical trend data to predict slot attendance.</div></div><label class="sett-switch"><input type="checkbox" id="ai-fill-predict" checked><span class="sett-slider"></span></label></div>
-          <div class="sett-option-desc">Enables trend-weighted scoring. Slots with improving fill rate get a bonus.</div>
-        </div>
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">Smart Substitution</div><div class="sett-option-desc">AI selects best available sub when primary trainer is out.</div></div><label class="sett-switch"><input type="checkbox" id="ai-smart-sub" checked><span class="sett-slider"></span></label></div>
-          <div class="sett-option-desc">Uses tier hierarchy + historical attendance at that location to rank subs.</div>
-        </div>
-        <div class="sett-option-card">
-          <div class="sett-option-top"><div><div class="sett-option-title">Anomaly Detection</div><div class="sett-option-desc">Flag unusual drops in trainer or class performance.</div></div><label class="sett-switch"><input type="checkbox" id="ai-anomaly" checked><span class="sett-slider"></span></label></div>
-          <div class="sett-option-desc">Surfaces slots where fill rate dropped &gt;15% vs. prior 4-week average.</div>
-        </div>
-      </div>
-      <div style="border:1px solid #DCE3EB;border-radius:14px;background:#F8FAFC;padding:14px;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:900;color:#0F172A;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif">Scoring Weights</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
-          ${[["fill_rate","Fill Rate","35"],["revenue","Revenue","25"],["avg_checkin","Avg Check-in","20"],["session_frequency","Session Frequency","10"],["trend","Trend Signal","10"]].map(([id,label,def])=>`
-          <div><label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#64748B;display:block;margin-bottom:4px">${label}</label>
-          <div class="fp-score"><span style="font-size:10px;color:#94A3B8;min-width:14px">0</span><input type="range" min="0" max="50" value="${def}" id="sw-${id}" style="accent-color:#1E40AF"><span style="font-weight:700;min-width:24px;font-size:12px" id="sw-${id}-val">${def}%</span></div></div>`).join("")}
-        </div>
-        <div style="margin-top:10px;font-size:11px;color:#94A3B8">Weights are normalised automatically. Changes apply on next schedule generation.</div>
-      </div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveAiSettings&&settSaveAiSettings()">Save AI Settings</button>
-        <span class="sett-save-status" id="ai-save-status"></span>
-      </div>
-    </div>
-
-    <div class="sett-section" id="ssec-advanced">
-      <div class="sett-section-head">
-        <div>
-          <div class="sett-section-kicker">Canonical Policy</div>
-          <div class="sett-section-label">Advanced Settings</div>
-          <div class="sett-section-desc">Control how Settings resolves conflicts, how strict the planner should be, and what metadata is saved with each configuration.</div>
-        </div>
-        <button class="sett-ghost-btn" onclick="settRenderAdvancedOptions()">Reset Unsaved Fields</button>
-      </div>
-      <div id="advanced-options-wrap"></div>
-      <div class="sett-save-bar">
-        <button class="sett-save-btn" onclick="settSaveAdvancedOptions()">Save Advanced Settings</button>
-        <span class="sett-save-status" id="advanced-save-status"></span>
-      </div>
-    </div>
-
-        </main>
-        <aside class="sett-inspector">
-          <div class="sett-inspector-title">Inspector</div>
-          <div class="sett-inspector-box" id="sett-inspector-selection">Select target or class-mix cells to apply row, column, or selection bulk operators.</div>
-          <div class="sett-inspector-title">Conflict Resolver</div>
-          <div id="sett-conflict-list" class="sett-conflict-list">
-            <div class="sett-conflict-item">Config validation will appear after settings load.</div>
+        <div class="sett-section" id="ssec-trainers">
+          <div class="sett-section-label">Trainer Directory</div>
+          <div class="sett-section-desc">Manage trainer profiles and activation status.</div>
+          <div class="sett-subtabs">
+            <button class="sett-subtab active" data-section="trainers" data-subtab="directory" onclick="settSetSub('trainers','directory')">Directory</button>
+            <button class="sett-subtab" data-section="trainers" data-subtab="bulk" onclick="settSetSub('trainers','bulk')">Bulk Ops</button>
           </div>
-          <div class="sett-inspector-title" style="margin-top:14px">Precedence</div>
-          <div class="sett-inspector-box">
-            <strong>1.</strong> Settings Command Center<br>
-            <strong>2.</strong> Manual pins and hard custom rules<br>
-            <strong>3.</strong> Rules catalog toggles<br>
-            <strong>4.</strong> Planner defaults and historical ranges
+          <div class="sett-subpanel active" data-section="trainers" data-subpanel="directory">
+            <div class="sett-tool-row">
+              <input class="sett-input" id="trainer-mgr-search" type="text" placeholder="Search trainer…" oninput="_trainerMgmtSearch=this.value;settRenderTrainerManager()">
+              <button class="sett-mini-btn" onclick="settAddTrainer()">Add New</button>
+            </div>
+            <div id="trainer-mgr-wrap"></div>
           </div>
-        </aside>
-      </div>
+          <div class="sett-subpanel" data-section="trainers" data-subpanel="bulk">
+            <button class="sett-mini-btn" onclick="settTrainerBulkActive(true)">Activate Visible</button>
+            <button class="sett-mini-btn" onclick="settTrainerBulkActive(false)">Deactivate Visible</button>
+          </div>
+          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveTrainerManager()">Save Directory</button></div>
+        </div>
 
-    `;
+        <div class="sett-section" id="ssec-qualifications">
+          <div class="sett-section-label">Certifications</div>
+          <div class="sett-subtabs">
+            <button class="sett-subtab active" data-section="qualifications" data-subtab="matrix" onclick="settSetSub('qualifications','matrix')">Matrix</button>
+            <button class="sett-subtab" data-section="qualifications" data-subtab="bulk" onclick="settSetSub('qualifications','bulk')">Bulk</button>
+          </div>
+          <div class="sett-subpanel active" data-section="qualifications" data-subpanel="matrix">
+            <input type="text" id="qual-search" placeholder="Search…" oninput="_qualSearch=this.value;settRenderQualifications()" class="sett-input" style="margin-bottom:12px;width:100%">
+            <div id="qual-table-wrap"></div>
+          </div>
+          <div class="sett-subpanel" data-section="qualifications" data-subpanel="bulk">
+            <button class="sett-mini-btn" onclick="settQualBulk(true)">Check Visible</button>
+            <button class="sett-mini-btn" onclick="settQualBulk(false)">Uncheck Visible</button>
+          </div>
+          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveQualifications()">Save Certs</button></div>
+        </div>
+
+        <div class="sett-section" id="ssec-availability">
+          <div class="sett-section-label">Availability</div>
+          <div id="avail-grid-wrap" class="avail-grid"></div>
+          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button></div>
+        </div>
+
+        <div class="sett-section" id="ssec-leave">
+          <div class="sett-section-label">Leave & Off Days</div>
+          <div id="leave-list"></div>
+          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveLeave()">Save Leave</button></div>
+        </div>
+
+        <div class="sett-section" id="ssec-rules">
+          <div class="sett-section-head">
+            <div>
+              <div class="sett-section-kicker">Logic</div>
+              <div class="sett-section-label">📋 Scheduling Rules</div>
+              <div class="sett-section-desc">Targets, Mix, Priority, and Logic.</div>
+            </div>
+          </div>
+          <div class="sett-subtabs">
+            <button class="sett-subtab active" data-section="rules" data-subtab="targets" onclick="settSetSub('rules','targets')">Setup / Targets</button>
+            <button class="sett-subtab" data-section="rules" data-subtab="classmix" onclick="settSetSub('rules','classmix')">Class Mix</button>
+            <button class="sett-subtab" data-section="rules" data-subtab="priority" onclick="settSetSub('rules','priority')">Trainer Priority</button>
+            <button class="sett-subtab" data-section="rules" data-subtab="custom" onclick="settSetSub('rules','custom')">Pinned & Custom</button>
+            <button class="sett-subtab" data-section="rules" data-subtab="universal" onclick="settSetSub('rules','universal')">Universal</button>
+          </div>
+          <div class="sett-subpanel active" data-section="rules" data-subpanel="targets"><div id="targets-wrap"></div></div>
+          <div class="sett-subpanel" data-section="rules" data-subpanel="classmix"><div id="classmix-wrap"></div></div>
+          <div class="sett-subpanel" data-section="rules" data-subpanel="priority"><div id="priority-wrap"></div></div>
+          <div class="sett-subpanel" data-section="rules" data-subpanel="custom">
+            <div id="customrules-builder"></div>
+            <div id="customrules-list" class="rule-list" style="margin-top:16px"></div>
+            <div id="manualpins-builder" style="margin-top:24px"></div>
+            <div id="manualpins-list" class="rule-list" style="margin-top:16px"></div>
+          </div>
+          <div class="sett-subpanel" data-section="rules" data-subpanel="universal"><div id="universal-rules-list"></div></div>
+        </div>
+
+        <div class="sett-section" id="ssec-conflicts">
+          <div class="sett-section-head"><div><div class="sett-section-label">Conflict Resolver</div></div></div>
+          <div id="sett-conflict-full-list" class="sett-conflict-full-list"></div>
+        </div>
+
+        <div class="sett-section" id="ssec-ai">
+          <div class="sett-section-label">AI Intelligence</div>
+          <div id="ai-settings-wrap"></div>
+        </div>
+
+        <div class="sett-section" id="ssec-advanced">
+          <div class="sett-section-label">Advanced Policy</div>
+          <div id="advanced-options-wrap"></div>
+          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAdvancedOptions()">Save Policy</button></div>
+        </div>
+      </main>
+
+      <aside class="sett-inspector">
+        <div class="sett-inspector-title">Selection Inspector</div>
+        <div class="sett-inspector-box" id="sett-inspector-selection">Select cells to apply bulk changes.</div>
+        <div class="sett-inspector-title">Active Health</div>
+        <div id="sett-conflict-list" class="sett-conflict-list">
+          <div class="sett-conflict-item">Loading validation…</div>
+        </div>
+      </aside>
+    </div>
+  `;
   area.appendChild(wrap);
   settLoadData();
 }
 
 function settSetTab(tab){
   let mainTab=tab;
-  if(["targets","classmix","custom","customrules","universal"].includes(tab)) mainTab="rules";
+  if(["targets","classmix","priority","custom","customrules","universal"].includes(tab)) mainTab="rules";
   _settSection=mainTab;
   document.querySelectorAll(".sett-tab,.sett-nav-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".sett-section").forEach(s=>s.classList.remove("active"));
@@ -6972,9 +6852,10 @@ function settSetTab(tab){
   if(mainTab==="rules"){
     settRenderTargets();
     settRenderClassMix();
+    settRenderPriority();
     settRenderCustomRules();
     settRenderUniversalRulesPanel();
-    if(["targets","classmix","custom","customrules","universal"].includes(tab)){
+    if(["targets","classmix","priority","custom","customrules","universal"].includes(tab)){
       settSetSub("rules", tab==="customrules"?"custom":tab);
     } else {
       settSetSub("rules", "targets");
@@ -7208,7 +7089,7 @@ function settLoadData(){
   Promise.all([p1,p2]).then(()=>{
     settRenderOverview();
     settRenderTrainerManager();settRenderQualifications();settRenderAvailability();settRenderTargets();
-    settRenderLeave();settRenderClassMix();settRenderCustomRules();settRenderAdvancedOptions();
+    settRenderLeave();settRenderClassMix();settRenderPriority();settRenderCustomRules();settRenderAdvancedOptions();
     settPopulateLeaveTrainerList();
     settValidateAndRender();
   }).catch(e=>console.error("Settings load error",e));
@@ -7495,34 +7376,62 @@ function settSaveQualifications(){
 function settRenderAvailability(){
   const wrap=document.getElementById("avail-grid-wrap");
   if(!wrap||!_settTrainerProfiles)return;
+  
   const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
-  wrap.innerHTML="";
-  trainers.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(t=>{
-    const locs=t.locations||{};
-    Object.entries(locs).forEach(([loc,ld])=>{
-      const card=document.createElement("div");
-      card.className="avail-card";
-      const profileIsActive=trainerIsActive(t);
-      const activeDays=new Set(profileIsActive?DAYS_ALL:(ld.available_days||[]));
-      const tw=ld.time_window||{};
-      card.innerHTML=`
-        <div class="avail-name">${t.name||""}</div>
-        <div class="avail-loc-lbl">${loc.length>30?loc.slice(0,28)+"…":loc}</div>
-        <div class="avail-days" id="avail-days-${CSS.escape(t.name+":"+loc)}">
-          ${DAYS_ALL.map(d=>`<span class="avail-day-chip${activeDays.has(d)?" on":""}" data-trainer="${t.name}" data-loc="${loc}" data-day="${d}" onclick="settToggleDay(this)">${d.slice(0,3)}</span>`).join("")}
-        </div>
-        <div class="avail-time-row">
-          <label>From</label>
-          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="start" value="${profileIsActive?"07:00":(tw.start||"07:00")}">
-          <label>To</label>
-          <input type="time" data-trainer="${t.name}" data-loc="${loc}" data-field="end" value="${profileIsActive?"21:00":(tw.end||"21:00")}">
-        </div>`;
-      wrap.appendChild(card);
-    });
-  });
-  if(!wrap.children.length){
-    wrap.innerHTML=`<div style="color:var(--text-muted);font-size:13px">No trainer location data found. Check trainer_profiles.json.</div>`;
-  }
+  wrap.innerHTML=`
+    <div class="avail-matrix-container" style="background:#0F172A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden">
+      <table class="avail-matrix" style="width:100%;border-collapse:collapse;color:#F8FAFC;font-size:12px">
+        <thead>
+          <tr style="background:#1E293B;text-align:left">
+            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Trainer</th>
+            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Studio</th>
+            ${DAYS_ALL.map(d=>`<th style="padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">${d.slice(0,3)}</th>`).join("")}
+            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Window</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${trainers.sort((a,b)=>a.name.localeCompare(b.name)).map(t=>{
+            const locEntries=Object.entries(t.locations||{});
+            if(locEntries.length===0)return "";
+            return locEntries.map(([loc,ld],idx)=>{
+              const activeDays=new Set(ld.available_days||[]);
+              const tw=ld.time_window||{};
+              return `
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${idx===0?"border-top:2px solid rgba(255,255,255,0.1)":""}">
+                  ${idx===0?`<td rowspan="${locEntries.length}" style="padding:12px;font-weight:700;vertical-align:top;background:rgba(255,255,255,0.02)">${rvEscapeHtml(t.name)}</td>`:""}
+                  <td style="padding:12px;color:#94A3B8;font-size:11px">${rvEscapeHtml(loc)}</td>
+                  ${DAYS_ALL.map(d=>{
+                    const isOn=activeDays.has(d);
+                    const isWeekend=["Saturday","Sunday"].includes(d);
+                    const mustOffWeekend=["Anisha Shah","Vivaran Dhasmana","Mrigakshi Jaiswal","Pushyank Nahar"].includes(t.name) && isWeekend;
+                    const style=isOn? "background:#3B82F6;color:#fff":"background:rgba(255,255,255,0.05);color:#475569";
+                    if(mustOffWeekend) {
+                       return `<td style="padding:4px;text-align:center"><span class="avail-day-chip off-forced" style="display:inline-block;width:30px;height:30px;line-height:30px;border-radius:6px;background:#EF4444;color:#fff;font-size:9px;font-weight:900" title="Mandatory Weekend Off">OFF</span></td>`;
+                    }
+                    return `<td style="padding:4px;text-align:center">
+                      <span class="avail-day-chip ${isOn?"on":""}" 
+                            data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-day="${d}"
+                            onclick="settToggleDay(this)"
+                            style="display:inline-block;width:30px;height:30px;line-height:30px;border-radius:6px;cursor:pointer;${style};transition:all 0.2s;font-weight:800">
+                        ${d.slice(0,1)}
+                      </span>
+                    </td>`;
+                  }).join("")}
+                  <td style="padding:12px">
+                    <div style="display:flex;align-items:center;gap:4px">
+                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="start" value="${tw.start||"07:00"}" style="background:#0F172A;border:1px solid rgba(255,255,255,0.2);color:#F8FAFC;font-size:10px;padding:2px;border-radius:4px">
+                      <span style="color:#475569">-</span>
+                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="end" value="${tw.end||"21:00"}" style="background:#0F172A;border:1px solid rgba(255,255,255,0.2);color:#F8FAFC;font-size:10px;padding:2px;border-radius:4px">
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join("");
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function settToggleDay(el){el.classList.toggle("on");}

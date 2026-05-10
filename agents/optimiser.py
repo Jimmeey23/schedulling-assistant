@@ -3264,7 +3264,18 @@ class ScheduleOptimiser:
                 continue
             trainer = r["trainer"]
             tp = self.trainer_profiles.get(trainer, {})
-            if not tp.get("qualifications", {}).get("powercycle" if "Cycle" in class_name else "strength_lab" if "Strength" in class_name else "all_barre", False):
+            qual_map = {
+                "Cycle": "powercycle", "Strength": "strength_lab", "Foundations": "foundations",
+                "FIT": "fit", "Blaze": "back_body_blaze", "Mat": "mat_57",
+                "Amped": "amped_up", "HIIT": "hiit", "Recovery": "recovery"
+            }
+            needed_qual = "all_barre"
+            for k, v in qual_map.items():
+                if k in class_name:
+                    needed_qual = v
+                    break
+            
+            if not tp.get("qualifications", {}).get(needed_qual, False):
                 continue
             if self._is_inactive(trainer) or self._on_leave(trainer, date_str, location):
                 continue
@@ -3514,6 +3525,37 @@ class ScheduleOptimiser:
             if day_name in ["Saturday", "Sunday"]:
                 return False
 
+        # Monday KH Shift Restriction
+        if day_name == "Monday":
+            kh = "Kwality House, Kemps Corner"
+            m = slot_time_to_minutes(time_str)
+            is_morning = m < 780 # 13:00
+            
+            # Check existing Monday schedule for this trainer
+            for sched_time, sched_loc, _ in state.day_schedule(day_name):
+                sched_m = slot_time_to_minutes(sched_time)
+                sched_is_morning = sched_m < 780
+                
+                # If current candidate is KH Morning
+                if location == kh and is_morning:
+                    if not sched_is_morning: return False # Block evening anywhere
+                    if sched_loc != kh: return False # Block other locs in morning
+                
+                # If existing class is KH Morning
+                if sched_loc == kh and sched_is_morning:
+                    if not is_morning: return False # Block current if evening anywhere
+                    if location != kh: return False # Block current if other loc in morning
+                
+                # If current candidate is KH Evening
+                if location == kh and not is_morning:
+                    if sched_is_morning: return False # Block morning anywhere
+                    if sched_loc != kh: return False # Block other locs in evening
+                
+                # If existing class is KH Evening
+                if sched_loc == kh and not sched_is_morning:
+                    if is_morning: return False # Block current if morning anywhere
+                    if location != kh: return False # Block current if other loc in evening
+
         if day_name not in avail_days:
             return False
         tw = loc_data.get("time_window", {})
@@ -3616,11 +3658,14 @@ class ScheduleOptimiser:
                 continue
             if self._loc_excluded(name, location) or name in already_at_time:
                 continue
-            if "PowerCycle" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("powercycle", False):
-                continue
-            if "Strength Lab" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("strength_lab", False):
-                continue
-            if "Foundations" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("foundations", False):
+            # Check qualifications
+            qual_map = {"Cycle": "powercycle", "Strength": "strength_lab", "Foundations": "foundations", "FIT": "fit", "Blaze": "back_body_blaze"}
+            needed = "all_barre"
+            for k, v in qual_map.items():
+                if k in class_name:
+                    needed = v
+                    break
+            if not self.trainer_profiles.get(name, {}).get("qualifications", {}).get(needed, False):
                 continue
             if self._trainer_ok(name, location, day_name, time_str, class_name, experimental=experimental):
                 return True
@@ -3665,11 +3710,14 @@ class ScheduleOptimiser:
                 continue
             if self._loc_excluded(name, location) or name in already_at_time:
                 continue
-            if "PowerCycle" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("powercycle", False):
-                continue
-            if "Strength Lab" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("strength_lab", False):
-                continue
-            if "Foundations" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("foundations", False):
+            # Check qualifications
+            qual_map = {"Cycle": "powercycle", "Strength": "strength_lab", "Foundations": "foundations", "FIT": "fit", "Blaze": "back_body_blaze"}
+            needed = "all_barre"
+            for k, v in qual_map.items():
+                if k in class_name:
+                    needed = v
+                    break
+            if not self.trainer_profiles.get(name, {}).get("qualifications", {}).get(needed, False):
                 continue
             if self._trainer_ok(name, location, day_name, time_str, class_name, experimental=experimental):
                 eligible.append(name)
@@ -3709,11 +3757,14 @@ class ScheduleOptimiser:
                 continue
             if self._loc_excluded(name, location) or name in already_at_time:
                 continue
-            if "PowerCycle" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("powercycle", False):
-                continue
-            if "Strength Lab" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("strength_lab", False):
-                continue
-            if "Foundations" in class_name and not self.trainer_profiles.get(name, {}).get("qualifications", {}).get("foundations", False):
+            # Check qualifications
+            qual_map = {"Cycle": "powercycle", "Strength": "strength_lab", "Foundations": "foundations", "FIT": "fit", "Blaze": "back_body_blaze"}
+            needed = "all_barre"
+            for k, v in qual_map.items():
+                if k in class_name:
+                    needed = v
+                    break
+            if not self.trainer_profiles.get(name, {}).get("qualifications", {}).get(needed, False):
                 continue
             if self._trainer_ok(name, location, day_name, time_str, class_name, experimental=experimental):
                 return True
