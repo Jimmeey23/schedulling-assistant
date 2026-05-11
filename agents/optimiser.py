@@ -17,12 +17,12 @@ DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 DOW_MAP = {0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"}
 DOW_REVERSE = {v: k for k, v in DOW_MAP.items()}
 
-MAX_TRAINER_WEEKLY_MINUTES_T1 = 25 * 60
+MAX_TRAINER_WEEKLY_MINUTES_T1 = 15 * 60
 MAX_TRAINER_WEEKLY_MINUTES_T2 = 15 * 60
-MAX_TRAINER_WEEKLY_MINUTES_T3 = 12 * 60
-MAX_TRAINER_WEEKLY_MINUTES = MAX_TRAINER_WEEKLY_MINUTES_T2  # Legacy alias
-TIER1_WEEKLY_TARGET_MIN = 18 * 60
-TIER2_WEEKLY_TARGET_MIN = 10 * 60
+MAX_TRAINER_WEEKLY_MINUTES_T3 = 15 * 60
+MAX_TRAINER_WEEKLY_MINUTES = 900
+TIER1_WEEKLY_TARGET_MIN = 12 * 60
+TIER2_WEEKLY_TARGET_MIN = 8 * 60
 TIER3_WEEKLY_TARGET_MAX = 6 * 60
 SUPREME_LOCATION = "Supreme HQ, Bandra"
 KWALITY_LOCATION = "Kwality House, Kemps Corner"
@@ -498,7 +498,7 @@ def slot_is_in_blocked_window(day_name: str, time_str: str) -> bool:
         return True
     if BLOCKED_MIDDAY_START_MIN <= start_min < BLOCKED_MIDDAY_END_MIN:
         return True
-    if day_name == "Sunday" and (start_min < slot_time_to_minutes("10:00") or time_band(time_str) == "evening"):
+    if day_name == "Sunday" and start_min < slot_time_to_minutes("10:00"):
         return True
     return False
 
@@ -624,6 +624,7 @@ class TrainerState:
         self.name = name
         self.tier = tier
         self.weekly_minutes: int = 0
+        self.session_count: int = 0
         # day -> [(time_str, location, class_name)]
         self._schedule: Dict[str, List[Tuple[str, str, str]]] = {}
 
@@ -727,12 +728,24 @@ class TrainerState:
         if self.weekly_minutes + new_dur > max_mins:
             return False
 
+        # Max per day (total across all locations)
+        if len(self._schedule.get(day, [])) >= 4:
+            return False
+
+        # Global 5-day work limit (ensure 2 days off)
+        if day not in self.worked_days() and self.worked_days_count() >= 5:
+            return False
+
         # Duration-based overlap check against ALL classes today (any location)
         for (et, eloc, ecls) in self._schedule.get(day, []):
             e_start = slot_time_to_minutes(et)
             e_dur = get_class_duration(ecls)
             if time_windows_overlap(new_start, new_dur, e_start, e_dur):
                 return False
+
+        # Single location per day rule
+        if any(loc != location for _, loc, _ in self._schedule.get(day, [])):
+            return False
 
         if self._violates_location_shift_lock(day, time_str, location):
             return False
@@ -749,6 +762,7 @@ class TrainerState:
             self._schedule[day] = []
         self._schedule[day].append((time_str, location, class_name))
         self.weekly_minutes += get_class_duration(class_name)
+        self.session_count += 1
 
     def at_weekly_target(self) -> bool:
         if self.tier == 1:
@@ -1527,7 +1541,9 @@ class ScheduleOptimiser:
                                 break
                             if room is None:
                                 continue
-                            for trainer, profile in sorted(self.trainer_profiles.items()):
+                            # Prioritize Tier 1 trainers, then Tier 2, then Tier 3, then alphabetical
+                            for trainer, profile in sorted(self.trainer_profiles.items(), 
+                                                           key=lambda x: (x[1].get("tier", 3), x[0])):
                                 if trainer in used_at_time or self._is_inactive(trainer) or self._on_leave(trainer, date_str, location):
                                     continue
                                 loc_data = self._profile_location_data(profile, location)
@@ -3848,6 +3864,10 @@ class ScheduleOptimiser:
             if supreme_minutes < min_supreme_min:
                 gap = min_supreme_min - supreme_minutes
                 return -180.0 - (gap / 60.0) * 26.0
+
+        # General Kwality House T1 boost
+        if location == KWALITY_LOCATION and state.tier == 1:
+            return 150.0
 
         if state.tier == 1:
             if location == SUPREME_LOCATION:

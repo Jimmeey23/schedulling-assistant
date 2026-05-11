@@ -3,7 +3,7 @@
     {"id": "UNIV-001", "type": "always_do", "description": "Barre 57 family must be >= 25% of total weekly classes at any location", "check_fn_name": "check_barre57_minimum"},
     {"id": "UNIV-002", "type": "always_do", "description": "All 3 time bands must have >= 1 class every weekday", "check_fn_name": "check_time_bands_coverage"},
     {"id": "UNIV-003", "type": "always_do", "description": "Saturday must be max-load day", "check_fn_name": "check_saturday_max_load"},
-    {"id": "UNIV-004", "type": "never_do", "description": "Sunday max 5-6 classes, no class before 10:00", "check_fn_name": "check_sunday_limits"},
+    {"id": "UNIV-004", "type": "never_do", "description": "Sunday max 8 classes, no class before 10:00", "check_fn_name": "check_sunday_limits"},
     {"id": "UNIV-005", "type": "class_location", "description": "Specialist classes only certified trainers", "check_fn_name": "check_specialist_certification"},
     {"id": "UNIV-006", "type": "always_do", "description": "Express class must be paired with full-length equivalent on same day", "check_fn_name": "check_express_pairing"},
     {"id": "UNIV-007", "type": "never_do", "description": "Studio Recovery must never be first class of day", "check_fn_name": "check_recovery_not_first"},

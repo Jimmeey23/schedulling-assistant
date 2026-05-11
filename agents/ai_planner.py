@@ -48,9 +48,8 @@ def normalize_trainer_name(name: str) -> str:
 
 # Historical data-driven daily class count targets
 DAILY_TARGETS = {
-    "Kwality House, Kemps Corner": {
         "Monday": 12, "Tuesday": 10, "Wednesday": 11,
-        "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 6,
+        "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 8,
     },
     "Supreme HQ, Bandra": {
         "Monday": 12, "Tuesday": 11, "Wednesday": 10,
@@ -335,7 +334,8 @@ def _build_location_prompt(location: str, week_start: str,
         "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
         "SUPREME 08:00-09:00 FOCUS: for Supreme HQ, do not collapse the 8-9am demand window into only 09:00. Use the available 08:30 and 08:45 starts where trainer/room constraints allow.",
         "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Keep each exact class to 2 or fewer uses per clock time, each broad format to 3 or fewer uses per clock time, and do not make 07:30/08:30/09:00 all Barre 57, all PowerCycle, or any single repeated format.",
-        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first. Every trainer MUST get exactly 2 days off per week.",
+        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first. At KWALITY HOUSE, T1 trainers MUST teach the majority of peak slots.",
+        "RULE ADHERENCE: You MUST follow all HARD CONSTRAINTS and PINNED BLOCKS (OWNS) exactly. No trainer can work more than 5 days total across the week.",
         "LOCATION BALANCE: For trainers available at multiple locations (like Rohan, Karanvir, Richard), do not park them at only one location. Spread their sessions across their available locations to ensure a consistent brand presence.",
     ]
 
@@ -613,10 +613,10 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         time_format_key = (location, slot.time, get_class_format(slot.class_name))
         if time_format_counts[time_format_key] >= HORIZONTAL_MAX_SAME_FORMAT_PER_TIME:
             continue
-        # Sunday: no evening band (17:00+), no class before 10:00
+        # Sunday: no class before 10:00 (evening classes allowed)
         if slot.day_of_week == "Sunday":
             h = int(slot.time[:2])
-            if h >= 17 or h < 10:
+            if h < 10:
                 continue
         # Trainer must be available on that day
         allowed = trainer_allowed_days.get(slot.trainer_1) or trainer_allowed_days.get(trainer_key)
@@ -822,6 +822,7 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_minutes: Dict[str, int] = defaultdict(int)
     trainer_worked_days: Dict[str, Set[str]] = defaultdict(set)
+    trainer_daily_count: Dict[Tuple[str, str], int] = defaultdict(int)
 
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
         trainer_key = normalize_trainer_name(slot.trainer_1)
@@ -833,6 +834,10 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
         if trainer_minutes[trainer_key] + duration > max_mins:
             continue
             
+        # Global 4-session-per-day limit
+        if trainer_daily_count[(trainer_key, slot.day_of_week)] >= 4:
+            continue
+
         # Global 5-day work limit (ensure 2 days off)
         if (
             slot.day_of_week not in trainer_worked_days[trainer_key]
@@ -866,6 +871,7 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
         trainer_day_slots[day_key].append(slot)
         trainer_minutes[trainer_key] += duration
         trainer_worked_days[trainer_key].add(slot.day_of_week)
+        trainer_daily_count[(trainer_key, slot.day_of_week)] += 1
 
     dropped = len(slots) - len(kept)
     if dropped:
