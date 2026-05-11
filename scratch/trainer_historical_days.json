@@ -1,0 +1,684 @@
+{
+  "Anisha Shah": {
+    "off_days": [
+      "Sunday",
+      "Saturday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "counts": {
+      "Monday": 203,
+      "Tuesday": 178,
+      "Wednesday": 165,
+      "Thursday": 235,
+      "Friday": 81,
+      "Saturday": 16,
+      "Sunday": 3
+    }
+  },
+  "Anmol Sharma": {
+    "off_days": [
+      "Friday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Thursday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 46,
+      "Tuesday": 16,
+      "Wednesday": 24,
+      "Thursday": 53,
+      "Friday": 13,
+      "Saturday": 31,
+      "Sunday": 34
+    }
+  },
+  "Atulan Purohit": {
+    "off_days": [
+      "Sunday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 207,
+      "Tuesday": 110,
+      "Wednesday": 254,
+      "Thursday": 178,
+      "Friday": 280,
+      "Saturday": 271,
+      "Sunday": 4
+    }
+  },
+  "Bret Saldanha": {
+    "off_days": [
+      "Thursday",
+      "Wednesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 52,
+      "Tuesday": 36,
+      "Wednesday": 11,
+      "Thursday": 5,
+      "Friday": 58,
+      "Saturday": 28,
+      "Sunday": 19
+    }
+  },
+  "Cauveri Vikrant": {
+    "off_days": [
+      "Tuesday",
+      "Wednesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 192,
+      "Tuesday": 19,
+      "Wednesday": 117,
+      "Thursday": 191,
+      "Friday": 151,
+      "Saturday": 180,
+      "Sunday": 144
+    }
+  },
+  "Chaitanya Nahar": {
+    "off_days": [
+      "Thursday",
+      "Wednesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 56,
+      "Tuesday": 53,
+      "Wednesday": 18,
+      "Thursday": 2,
+      "Friday": 29,
+      "Saturday": 45,
+      "Sunday": 36
+    }
+  },
+  "Janhavi Jain": {
+    "off_days": [
+      "Monday",
+      "Sunday"
+    ],
+    "work_days": [
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 15,
+      "Tuesday": 44,
+      "Wednesday": 60,
+      "Thursday": 53,
+      "Friday": 63,
+      "Saturday": 39,
+      "Sunday": 22
+    }
+  },
+  "Kabir Varma": {
+    "off_days": [
+      "Wednesday",
+      "Thursday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 10,
+      "Tuesday": 9,
+      "Wednesday": 0,
+      "Thursday": 0,
+      "Friday": 6,
+      "Saturday": 0,
+      "Sunday": 4
+    }
+  },
+  "Kajol  Kanchan": {
+    "off_days": [
+      "Sunday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 278,
+      "Tuesday": 128,
+      "Wednesday": 317,
+      "Thursday": 251,
+      "Friday": 193,
+      "Saturday": 271,
+      "Sunday": 124
+    }
+  },
+  "Karan Bhatia": {
+    "off_days": [
+      "Tuesday",
+      "Monday"
+    ],
+    "work_days": [
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 130,
+      "Tuesday": 108,
+      "Wednesday": 194,
+      "Thursday": 178,
+      "Friday": 159,
+      "Saturday": 190,
+      "Sunday": 220
+    }
+  },
+  "Karanvir Bhatia": {
+    "off_days": [
+      "Wednesday",
+      "Monday"
+    ],
+    "work_days": [
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 147,
+      "Tuesday": 177,
+      "Wednesday": 42,
+      "Thursday": 179,
+      "Friday": 221,
+      "Saturday": 147,
+      "Sunday": 154
+    }
+  },
+  "Mrigakshi Jaiswal": {
+    "off_days": [
+      "Sunday",
+      "Saturday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "counts": {
+      "Monday": 197,
+      "Tuesday": 222,
+      "Wednesday": 206,
+      "Thursday": 266,
+      "Friday": 253,
+      "Saturday": 12,
+      "Sunday": 7
+    }
+  },
+  "Nishanth Raj": {
+    "off_days": [
+      "Wednesday",
+      "Sunday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 24,
+      "Tuesday": 56,
+      "Wednesday": 9,
+      "Thursday": 52,
+      "Friday": 40,
+      "Saturday": 53,
+      "Sunday": 16
+    }
+  },
+  "Poojitha Bhaskar": {
+    "off_days": [
+      "Wednesday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 35,
+      "Tuesday": 16,
+      "Wednesday": 7,
+      "Thursday": 27,
+      "Friday": 49,
+      "Saturday": 18,
+      "Sunday": 30
+    }
+  },
+  "Pranjali Jain": {
+    "off_days": [
+      "Sunday",
+      "Thursday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 220,
+      "Tuesday": 269,
+      "Wednesday": 201,
+      "Thursday": 77,
+      "Friday": 221,
+      "Saturday": 348,
+      "Sunday": 20
+    }
+  },
+  "Pushyank Nahar": {
+    "off_days": [
+      "Sunday",
+      "Friday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 258,
+      "Tuesday": 257,
+      "Wednesday": 209,
+      "Thursday": 229,
+      "Friday": 129,
+      "Saturday": 204,
+      "Sunday": 34
+    }
+  },
+  "Raunak Khemuka": {
+    "off_days": [
+      "Wednesday",
+      "Saturday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 31,
+      "Tuesday": 26,
+      "Wednesday": 14,
+      "Thursday": 19,
+      "Friday": 18,
+      "Saturday": 14,
+      "Sunday": 44
+    }
+  },
+  "Reshma Sharma": {
+    "off_days": [
+      "Friday",
+      "Thursday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 249,
+      "Tuesday": 256,
+      "Wednesday": 183,
+      "Thursday": 139,
+      "Friday": 52,
+      "Saturday": 292,
+      "Sunday": 177
+    }
+  },
+  "Richard  D'Costa": {
+    "off_days": [
+      "Wednesday",
+      "Monday"
+    ],
+    "work_days": [
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 167,
+      "Tuesday": 220,
+      "Wednesday": 46,
+      "Thursday": 204,
+      "Friday": 182,
+      "Saturday": 193,
+      "Sunday": 224
+    }
+  },
+  "Rohan Dahima": {
+    "off_days": [
+      "Friday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Thursday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 190,
+      "Tuesday": 134,
+      "Wednesday": 262,
+      "Thursday": 313,
+      "Friday": 127,
+      "Saturday": 214,
+      "Sunday": 168
+    }
+  },
+  "Saniya Jaiswal": {
+    "off_days": [
+      "Sunday",
+      "Saturday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "counts": {
+      "Monday": 61,
+      "Tuesday": 62,
+      "Wednesday": 38,
+      "Thursday": 57,
+      "Friday": 40,
+      "Saturday": 4,
+      "Sunday": 2
+    }
+  },
+  "Shruti Kulkarni": {
+    "off_days": [
+      "Sunday",
+      "Wednesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 176,
+      "Tuesday": 197,
+      "Wednesday": 163,
+      "Thursday": 247,
+      "Friday": 261,
+      "Saturday": 197,
+      "Sunday": 142
+    }
+  },
+  "Shruti Suresh": {
+    "off_days": [
+      "Tuesday",
+      "Saturday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 52,
+      "Tuesday": 36,
+      "Wednesday": 77,
+      "Thursday": 77,
+      "Friday": 44,
+      "Saturday": 40,
+      "Sunday": 55
+    }
+  },
+  "Siddhartha Kusuma": {
+    "off_days": [
+      "Monday",
+      "Thursday"
+    ],
+    "work_days": [
+      "Tuesday",
+      "Wednesday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 24,
+      "Tuesday": 130,
+      "Wednesday": 128,
+      "Thursday": 51,
+      "Friday": 64,
+      "Saturday": 104,
+      "Sunday": 103
+    }
+  },
+  "Simonelle De Vitre": {
+    "off_days": [
+      "Thursday",
+      "Sunday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Friday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 79,
+      "Tuesday": 95,
+      "Wednesday": 71,
+      "Thursday": 4,
+      "Friday": 20,
+      "Saturday": 30,
+      "Sunday": 19
+    }
+  },
+  "Simran Dutt": {
+    "off_days": [
+      "Thursday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Wednesday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 41,
+      "Tuesday": 4,
+      "Wednesday": 52,
+      "Thursday": 1,
+      "Friday": 31,
+      "Saturday": 46,
+      "Sunday": 47
+    }
+  },
+  "Sovena Shetty": {
+    "off_days": [
+      "Monday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 0,
+      "Tuesday": 0,
+      "Wednesday": 1,
+      "Thursday": 2,
+      "Friday": 2,
+      "Saturday": 0,
+      "Sunday": 0
+    }
+  },
+  "Upasna Paranjpe": {
+    "off_days": [
+      "Tuesday",
+      "Wednesday"
+    ],
+    "work_days": [
+      "Monday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 10,
+      "Tuesday": 0,
+      "Wednesday": 0,
+      "Thursday": 18,
+      "Friday": 0,
+      "Saturday": 2,
+      "Sunday": 0
+    }
+  },
+  "Veena  Narasimhan": {
+    "off_days": [
+      "Monday",
+      "Tuesday"
+    ],
+    "work_days": [
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 0,
+      "Tuesday": 0,
+      "Wednesday": 10,
+      "Thursday": 0,
+      "Friday": 1,
+      "Saturday": 35,
+      "Sunday": 27
+    }
+  },
+  "Vivaran  Dhasmana": {
+    "off_days": [
+      "Friday",
+      "Thursday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Saturday",
+      "Sunday"
+    ],
+    "counts": {
+      "Monday": 27,
+      "Tuesday": 29,
+      "Wednesday": 23,
+      "Thursday": 8,
+      "Friday": 4,
+      "Saturday": 29,
+      "Sunday": 17
+    }
+  },
+  "Vivaran Dhasmana": {
+    "off_days": [
+      "Sunday",
+      "Friday"
+    ],
+    "work_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Saturday"
+    ],
+    "counts": {
+      "Monday": 185,
+      "Tuesday": 282,
+      "Wednesday": 264,
+      "Thursday": 177,
+      "Friday": 111,
+      "Saturday": 155,
+      "Sunday": 5
+    }
+  }
+}

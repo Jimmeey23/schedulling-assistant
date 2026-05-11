@@ -4,6 +4,11 @@
       "enabled": true,
       "label": "Universal Constraints",
       "description": "Limited default guardrails that apply to every schedule. Studio, trainer, and class-specific rules must be created and saved from Settings."
+    },
+    "trainer_specific": {
+      "enabled": true,
+      "label": "Trainer Specific Constraints",
+      "description": "Trainer-specific availability, caps, and owned blocks."
     }
   },
   "rules": {

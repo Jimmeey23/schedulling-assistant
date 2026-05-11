@@ -821,6 +821,7 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
     kept: List[PlannedSlot] = []
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_minutes: Dict[str, int] = defaultdict(int)
+    trainer_worked_days: Dict[str, Set[str]] = defaultdict(set)
 
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
         trainer_key = normalize_trainer_name(slot.trainer_1)
@@ -828,8 +829,17 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
         profile = profiles.get(slot.trainer_1) or profiles.get(trainer_key) or {}
         tier = profile.get("tier", 3)
         max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
+        
         if trainer_minutes[trainer_key] + duration > max_mins:
             continue
+            
+        # Global 5-day work limit (ensure 2 days off)
+        if (
+            slot.day_of_week not in trainer_worked_days[trainer_key]
+            and len(trainer_worked_days[trainer_key]) >= 5
+        ):
+            continue
+
         day_key = (trainer_key, slot.day_of_week)
         start_min = slot_time_to_minutes(slot.time)
 
@@ -851,9 +861,11 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
             for existing in trainer_day_slots[day_key]
         ):
             continue
+            
         kept.append(slot)
         trainer_day_slots[day_key].append(slot)
         trainer_minutes[trainer_key] += duration
+        trainer_worked_days[trainer_key].add(slot.day_of_week)
 
     dropped = len(slots) - len(kept)
     if dropped:
