@@ -223,7 +223,7 @@
       "day": "Friday",
       "time": "09:00",
       "class": "Studio FIT",
-      "trainer": "Anisha Shah",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -263,7 +263,7 @@
       "day": "Sunday",
       "time": "11:30",
       "class": "Studio Barre 57",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Rohan Dahima",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -283,7 +283,7 @@
       "day": "Tuesday",
       "time": "19:00",
       "class": "Studio FIT",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Anisha Shah",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -313,7 +313,7 @@
       "day": "Tuesday",
       "time": "17:45",
       "class": "Studio Barre 57 Express",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Rohan Dahima",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -373,7 +373,7 @@
       "day": "Friday",
       "time": "17:45",
       "class": "Studio Barre 57",
-      "trainer": "Pranjali Jain",
+      "trainer": "Richard D'Costa",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -388,7 +388,7 @@
       "enabled": true
     },
     {
-      "id": "pin-tue-1745-studiobar-kwa",
+      "id": "pin-tue-1745-studiobar57-kwa",
       "location": "Kwality House, Kemps Corner",
       "day": "Tuesday",
       "time": "17:45",
@@ -453,7 +453,7 @@
       "day": "Thursday",
       "time": "08:00",
       "class": "Studio PowerCycle",
-      "trainer": "Anmol Sharma",
+      "trainer": "Cauveri Vikrant",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -503,7 +503,7 @@
       "day": "Thursday",
       "time": "09:30",
       "class": "Studio Mat 57",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Anisha Shah",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -683,7 +683,7 @@
       "day": "Sunday",
       "time": "10:15",
       "class": "Studio Barre 57",
-      "trainer": "Karanvir Bhatia",
+      "trainer": "Karan Bhatia",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -703,7 +703,7 @@
       "day": "Tuesday",
       "time": "19:00",
       "class": "Studio Barre 57",
-      "trainer": "Karan Bhatia",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -713,7 +713,7 @@
       "day": "Thursday",
       "time": "19:30",
       "class": "Studio FIT",
-      "trainer": "Pranjali Jain",
+      "trainer": "Atulan Purohit",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -728,33 +728,53 @@
       "enabled": true
     },
     {
-      "id": "pin-mon-0715-studiostr-kwa",
-      "location": "Kwality House, Kemps Corner",
-      "day": "Monday",
-      "time": "07:15",
-      "class": "Studio Strength Lab",
-      "trainer": "Reshma Sharma",
-      "note": "Auto-pinned from high-performance historical slots",
-      "enabled": true
-    },
-    {
-      "id": "pin-wed-0730-studiostr-kwa",
-      "location": "Kwality House, Kemps Corner",
-      "day": "Wednesday",
-      "time": "07:30",
-      "class": "Studio Strength Lab",
-      "trainer": "Anisha Shah",
-      "note": "Auto-pinned from high-performance historical slots",
-      "enabled": true
-    },
-    {
       "id": "pin-mon-1915-studiostr-kwa",
       "location": "Kwality House, Kemps Corner",
       "day": "Monday",
       "time": "19:15",
       "class": "Studio Strength Lab",
-      "trainer": "Pranjali Jain",
+      "trainer": "Atulan Purohit",
       "note": "Auto-pinned from high-performance historical slots",
+      "enabled": true
+    },
+    {
+      "id": "pin-thu-0800-studiopow-kwa",
+      "location": "Kwality House, Kemps Corner",
+      "day": "Thursday",
+      "time": "08:00",
+      "class": "Studio PowerCycle",
+      "trainer": "Rohan Dahima",
+      "note": "Pinned from high-performance historical data",
+      "enabled": true
+    },
+    {
+      "id": "pin-sat-1000-studiopow-kwa",
+      "location": "Kwality House, Kemps Corner",
+      "day": "Saturday",
+      "time": "10:00",
+      "class": "Studio PowerCycle",
+      "trainer": "Bret Saldanha",
+      "note": "Pinned from high-performance historical data",
+      "enabled": true
+    },
+    {
+      "id": "pin-sat-1100-studiopow-sup",
+      "location": "Supreme HQ, Bandra",
+      "day": "Saturday",
+      "time": "11:00",
+      "class": "Studio PowerCycle",
+      "trainer": "Cauveri Vikrant",
+      "note": "Pinned from high-performance historical data",
+      "enabled": true
+    },
+    {
+      "id": "pin-wed-1800-studiostr-kwa",
+      "location": "Kwality House, Kemps Corner",
+      "day": "Wednesday",
+      "time": "18:00",
+      "class": "Studio Strength Lab",
+      "trainer": "Atulan Purohit",
+      "note": "Pinned - KW-006 compliant: Wed evening, Atulan exclusively",
       "enabled": true
     }
   ],
@@ -1303,6 +1323,6 @@
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-08T06:25:57.370Z"
+    "updated_at": "2026-05-11T06:34:37.062Z"
   }
 }

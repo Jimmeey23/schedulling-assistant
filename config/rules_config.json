@@ -4,14 +4,14 @@
       "enabled": true,
       "label": "Universal Constraints",
       "description": "Limited default guardrails that apply to every schedule. Studio, trainer, and class-specific rules must be created and saved from Settings."
-    },
-    "trainer_specific": {
-      "enabled": true,
-      "label": "Trainer Specific Constraints",
-      "description": "Trainer-specific availability, caps, and owned blocks."
     }
   },
   "rules": {
+    "UNIV-001": {
+      "enabled": true,
+      "description": "Barre 57 family must be >= 25% of total weekly classes at any location",
+      "title": "UNIV-001"
+    },
     "UNIV-002": {
       "enabled": true,
       "description": "All 3 time bands must have >= 2 class every weekday",
@@ -27,6 +27,26 @@
       "description": "Sunday max 5-6 classes, no class before 9:00",
       "title": "UNIV-004"
     },
+    "UNIV-005": {
+      "enabled": false,
+      "description": "Specialist classes only certified trainers",
+      "title": "UNIV-005"
+    },
+    "UNIV-006": {
+      "enabled": false,
+      "description": "Express class must be paired with full-length equivalent on same day",
+      "title": "UNIV-006"
+    },
+    "UNIV-007": {
+      "enabled": true,
+      "description": "Studio Recovery must never be first class of day",
+      "title": "UNIV-007"
+    },
+    "UNIV-008": {
+      "enabled": true,
+      "description": "Foundations never at 11:30 or 19:15",
+      "title": "UNIV-008"
+    },
     "UNIV-009": {
       "enabled": false,
       "description": "No trainer > 4 consecutive classes without 5 min gap",
@@ -37,10 +57,60 @@
       "description": "No trainer > 4 classes in one day",
       "title": "UNIV-010"
     },
+    "UNIV-011": {
+      "enabled": true,
+      "description": "PowerCycle NEVER at Kenkere House",
+      "title": "UNIV-011"
+    },
+    "UNIV-012": {
+      "enabled": true,
+      "description": "Strength Lab ONLY at Kwality House",
+      "title": "UNIV-012"
+    },
+    "UNIV-013": {
+      "enabled": true,
+      "description": "Pre/Post Natal NEVER at ANY LOCATION",
+      "title": "UNIV-013"
+    },
     "UNIV-014": {
       "enabled": true,
       "description": "Peak midday slot must never be empty",
       "title": "UNIV-014"
+    },
+    "UNIV-015": {
+      "enabled": true,
+      "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day",
+      "title": "UNIV-015"
+    },
+    "UNIV-016": {
+      "enabled": false,
+      "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays",
+      "title": "UNIV-016"
+    },
+    "UNIV-017": {
+      "enabled": true,
+      "description": "Always assign Tier 1 trainer to primary peak slot",
+      "title": "UNIV-017"
+    },
+    "UNIV-018": {
+      "enabled": false,
+      "description": "Trainer substitution protocol hierarchy",
+      "title": "UNIV-018"
+    },
+    "UNIV-019": {
+      "enabled": false,
+      "description": "Specialist classes no substitution with non-certified",
+      "title": "UNIV-019"
+    },
+    "UNIV-020": {
+      "enabled": false,
+      "description": "Never roster trainer at location with < 30 historical sessions",
+      "title": "UNIV-020"
+    },
+    "UNIV-021": {
+      "enabled": true,
+      "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations",
+      "title": "UNIV-021"
     },
     "UNIV-022": {
       "enabled": true,
@@ -61,6 +131,11 @@
       "enabled": true,
       "description": "Every trainer must get at least 1 full day off each week; 2 is preferred",
       "title": "UNIV-025"
+    },
+    "UNIV-026": {
+      "enabled": true,
+      "description": "Recovery sessions must be the last class in their shift at that location",
+      "title": "UNIV-026"
     }
   }
 }

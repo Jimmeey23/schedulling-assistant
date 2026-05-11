@@ -25,18 +25,6 @@
       "description": "Sunday max 5-6 classes, no class before 9:00"
     },
     {
-      "constraint_id": "UNIV-005",
-      "type": "class_location",
-      "location": null,
-      "description": "Specialist classes only certified trainers"
-    },
-    {
-      "constraint_id": "UNIV-006",
-      "type": "always_do",
-      "location": null,
-      "description": "Express class must be paired with full-length equivalent on same day"
-    },
-    {
       "constraint_id": "UNIV-007",
       "type": "never_do",
       "location": null,
@@ -85,34 +73,10 @@
       "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day"
     },
     {
-      "constraint_id": "UNIV-016",
-      "type": "always_do",
-      "location": null,
-      "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays"
-    },
-    {
       "constraint_id": "UNIV-017",
       "type": "always_do",
       "location": null,
       "description": "Always assign Tier 1 trainer to primary peak slot"
-    },
-    {
-      "constraint_id": "UNIV-018",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "Trainer substitution protocol hierarchy"
-    },
-    {
-      "constraint_id": "UNIV-019",
-      "type": "never_do",
-      "location": null,
-      "description": "Specialist classes no substitution with non-certified"
-    },
-    {
-      "constraint_id": "UNIV-020",
-      "type": "trainer_availability",
-      "location": null,
-      "description": "Never roster trainer at location with < 30 historical sessions"
     },
     {
       "constraint_id": "UNIV-021",

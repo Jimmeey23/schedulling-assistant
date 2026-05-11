@@ -743,6 +743,7 @@ def test_greedy_protected_slots_respect_trainer_available_days():
         "Friday",
         "2026-05-15",
         0,
+        0,
         [],
         [],
         RoomOccupancy({"studio_a": {"capacity": 22, "families": None}}),
@@ -2325,6 +2326,7 @@ def test_kwality_protected_class_times_can_share_clock_time_when_rooms_are_free(
         "Monday",
         "2026-05-04",
         target_count=2,
+        day_max=2,
         am_slots=["10:15"],
         pm_slots=[],
         room_occ=RoomOccupancy({

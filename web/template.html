@@ -6774,8 +6774,8 @@ function renderSettingsView(area){
         <div class="sett-section" id="ssec-availability">
           <div class="sett-section-label">Availability</div>
           <div class="sett-section-desc">Set which days each trainer is available per studio and their shift time window.</div>
-          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-            <div id="avail-grid-wrap" class="avail-grid" style="min-width:640px"></div>
+          <div style="display:block;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch">
+            <div id="avail-grid-wrap"></div>
           </div>
           <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button></div>
         </div>
@@ -7382,16 +7382,17 @@ function settRenderAvailability(){
   const wrap=document.getElementById("avail-grid-wrap");
   if(!wrap||!_settTrainerProfiles)return;
   
+  const LOC_ABBR={"Kwality House, Kemps Corner":"Kwality KC","Supreme HQ, Bandra":"Supreme B","Kenkere House":"Kenkere","Courtside":"Courtside","Copper & Cloves":"Copper"};
   const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
   wrap.innerHTML=`
     <div class="avail-matrix-container" style="background:#0F172A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden">
-      <table class="avail-matrix" style="width:100%;border-collapse:collapse;color:#F8FAFC;font-size:12px">
+      <table class="avail-matrix" style="border-collapse:collapse;color:#F8FAFC;font-size:12px;table-layout:auto">
         <thead>
           <tr style="background:#1E293B;text-align:left">
-            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Trainer</th>
-            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Studio</th>
-            ${DAYS_ALL.map(d=>`<th style="padding:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)">${d.slice(0,3)}</th>`).join("")}
-            <th style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.1)">Window</th>
+            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Trainer</th>
+            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Studio</th>
+            ${DAYS_ALL.map(d=>`<th style="padding:8px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);font-size:10px;white-space:nowrap">${d.slice(0,2)}</th>`).join("")}
+            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Window</th>
           </tr>
         </thead>
         <tbody>
@@ -7401,32 +7402,33 @@ function settRenderAvailability(){
             return locEntries.map(([loc,ld],idx)=>{
               const activeDays=new Set(ld.available_days||[]);
               const tw=ld.time_window||{};
+              const locLabel=LOC_ABBR[loc]||loc;
               return `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${idx===0?"border-top:2px solid rgba(255,255,255,0.1)":""}">
-                  ${idx===0?`<td rowspan="${locEntries.length}" style="padding:12px;font-weight:700;vertical-align:top;background:rgba(255,255,255,0.02)">${rvEscapeHtml(t.name)}</td>`:""}
-                  <td style="padding:12px;color:#94A3B8;font-size:11px">${rvEscapeHtml(loc)}</td>
+                  ${idx===0?`<td rowspan="${locEntries.length}" style="padding:8px 12px;font-weight:700;vertical-align:top;background:rgba(255,255,255,0.02);white-space:nowrap;font-size:11px">${rvEscapeHtml(t.name)}</td>`:""}
+                  <td style="padding:6px 12px;color:#94A3B8;font-size:10px;white-space:nowrap">${rvEscapeHtml(locLabel)}</td>
                   ${DAYS_ALL.map(d=>{
                     const isOn=activeDays.has(d);
                     const isWeekend=["Saturday","Sunday"].includes(d);
                     const mustOffWeekend=["Anisha Shah","Vivaran Dhasmana","Mrigakshi Jaiswal","Pushyank Nahar"].includes(t.name) && isWeekend;
-                    const style=isOn? "background:#3B82F6;color:#fff":"background:rgba(255,255,255,0.05);color:#475569";
-                    if(mustOffWeekend) {
-                       return `<td style="padding:4px;text-align:center"><span class="avail-day-chip off-forced" style="display:inline-block;width:30px;height:30px;line-height:30px;border-radius:6px;background:#EF4444;color:#fff;font-size:9px;font-weight:900" title="Mandatory Weekend Off">OFF</span></td>`;
+                    const style=isOn?"background:#3B82F6;color:#fff":"background:rgba(255,255,255,0.05);color:#475569";
+                    if(mustOffWeekend){
+                      return `<td style="padding:3px;text-align:center"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;background:#EF4444;color:#fff;font-size:8px;font-weight:900" title="Mandatory Weekend Off">✕</span></td>`;
                     }
-                    return `<td style="padding:4px;text-align:center">
-                      <span class="avail-day-chip ${isOn?"on":""}" 
+                    return `<td style="padding:3px;text-align:center">
+                      <span class="avail-day-chip ${isOn?"on":""}"
                             data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-day="${d}"
                             onclick="settToggleDay(this)"
-                            style="display:inline-block;width:30px;height:30px;line-height:30px;border-radius:6px;cursor:pointer;${style};transition:all 0.2s;font-weight:800">
+                            style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;cursor:pointer;${style};transition:all 0.15s;font-weight:800;font-size:10px;user-select:none">
                         ${d.slice(0,1)}
                       </span>
                     </td>`;
                   }).join("")}
-                  <td style="padding:12px">
-                    <div style="display:flex;align-items:center;gap:4px">
-                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="start" value="${tw.start||"07:00"}" style="background:#0F172A;border:1px solid rgba(255,255,255,0.2);color:#F8FAFC;font-size:10px;padding:2px;border-radius:4px">
-                      <span style="color:#475569">-</span>
-                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="end" value="${tw.end||"21:00"}" style="background:#0F172A;border:1px solid rgba(255,255,255,0.2);color:#F8FAFC;font-size:10px;padding:2px;border-radius:4px">
+                  <td style="padding:6px 12px;white-space:nowrap">
+                    <div style="display:flex;align-items:center;gap:3px">
+                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="start" value="${tw.start||"07:00"}" style="background:#1E293B;border:1px solid rgba(255,255,255,0.15);color:#F8FAFC;font-size:10px;padding:2px 4px;border-radius:4px;width:76px">
+                      <span style="color:#475569;font-size:10px">–</span>
+                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="end" value="${tw.end||"21:00"}" style="background:#1E293B;border:1px solid rgba(255,255,255,0.15);color:#F8FAFC;font-size:10px;padding:2px 4px;border-radius:4px;width:76px">
                     </div>
                   </td>
                 </tr>
@@ -7450,7 +7452,7 @@ function settSaveAvailability(){
     if(chip.classList.contains("on"))updatedMap[k].days.push(chip.dataset.day);
   });
   const timeInputs={};
-  document.querySelectorAll(".avail-time-row input").forEach(inp=>{
+  document.querySelectorAll(".avail-time-inp").forEach(inp=>{
     const k=inp.dataset.trainer+":"+inp.dataset.loc;
     if(!timeInputs[k])timeInputs[k]={};
     timeInputs[k][inp.dataset.field]=inp.value;
