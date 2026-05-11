@@ -24,7 +24,7 @@
     {"id": "UNIV-022", "type": "trainer_availability", "description": "A trainer cannot be scheduled across 2 locations in the same shift", "check_fn_name": "check_trainer_single_location_per_shift"},
     {"id": "UNIV-023", "type": "never_do", "description": "Same class formats must not be scheduled consecutively", "check_fn_name": "check_no_consecutive_class_formats"},
     {"id": "UNIV-024", "type": "slot_required", "description": "No classes before 07:00, between 13:00-15:00, or after 20:30", "check_fn_name": "check_blocked_time_windows"},
-    {"id": "UNIV-025", "type": "trainer_availability", "description": "Every trainer must get at least 1 full day off each week; 2 is preferred", "check_fn_name": "check_trainer_rest_days"},
+    {"id": "UNIV-025", "type": "trainer_availability", "description": "Every trainer must get exactly 2 full days off each week", "check_fn_name": "check_trainer_rest_days"},
     {"id": "UNIV-026", "type": "never_do", "description": "Recovery sessions must be the last class in their shift at that location", "check_fn_name": "check_recovery_last_in_shift"}
   ]
 }

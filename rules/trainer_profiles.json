@@ -647,13 +647,8 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
           "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
+          "Friday"
         ],
         "time_window": {
           "start": "07:00",
@@ -670,11 +665,7 @@
         "available_days": [
           "Monday",
           "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
+          "Wednesday"
         ],
         "time_window": {
           "start": "07:00",
@@ -693,9 +684,7 @@
           "Tuesday",
           "Wednesday",
           "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
+          "Friday"
         ],
         "time_window": {
           "start": "07:00",

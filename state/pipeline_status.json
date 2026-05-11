@@ -1,1 +1,1 @@
-{"running": false, "status": "done", "pid": null, "started": 1778438904.465913, "message": "Complete \u2014 reload to see new schedule."}
+{"running": false, "status": "failed", "pid": null, "started": 1778476361.506432, "message": "Failed (exit 1). ImportError: cannot import name '_load_trainer_profiles' from 'agents.ai_planner' (/Users/jimmeeygondaa/scheduler-team/agents/ai_planner.py)"}

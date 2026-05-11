@@ -335,7 +335,8 @@ def _build_location_prompt(location: str, week_start: str,
         "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
         "SUPREME 08:00-09:00 FOCUS: for Supreme HQ, do not collapse the 8-9am demand window into only 09:00. Use the available 08:30 and 08:45 starts where trainer/room constraints allow.",
         "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Keep each exact class to 2 or fewer uses per clock time, each broad format to 3 or fewer uses per clock time, and do not make 07:30/08:30/09:00 all Barre 57, all PowerCycle, or any single repeated format.",
-        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first.",
+        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first. Every trainer MUST get exactly 2 days off per week.",
+        "LOCATION BALANCE: For trainers available at multiple locations (like Rohan, Karanvir, Richard), do not park them at only one location. Spread their sessions across their available locations to ensure a consistent brand presence.",
     ]
 
     return "\n".join(lines)
@@ -634,7 +635,7 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
             continue
         if (
             slot.day_of_week not in trainer_worked_days[trainer_key]
-            and len(trainer_worked_days[trainer_key]) >= 6
+            and len(trainer_worked_days[trainer_key]) >= 5
         ):
             continue
         day_key = (trainer_key, slot.day_of_week)
@@ -813,17 +814,13 @@ def _has_enough_slots_after_enforcement(location: str, slots: List[PlannedSlot])
     return len(slots) >= max(20, int(target * 0.90))
 
 
-def _enforce_global_trainer_overlaps(slots: List[PlannedSlot]) -> List[PlannedSlot]:
+def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -> List[PlannedSlot]:
     """Final cross-location guard after all location plans are combined."""
     from collections import defaultdict
 
     kept: List[PlannedSlot] = []
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_minutes: Dict[str, int] = defaultdict(int)
-
-    # Load profiles to get tiers for weekly cap enforcement
-    from agents.ai_planner import _load_trainer_profiles
-    profiles = _load_trainer_profiles() or {}
 
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
         trainer_key = normalize_trainer_name(slot.trainer_1)
@@ -835,6 +832,15 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot]) -> List[PlannedSl
             continue
         day_key = (trainer_key, slot.day_of_week)
         start_min = slot_time_to_minutes(slot.time)
+
+        # Ensure single location per day rule
+        existing_at_other_loc = any(
+            existing.location != slot.location
+            for existing in trainer_day_slots[day_key]
+        )
+        if existing_at_other_loc:
+            continue
+
         if any(
             time_windows_overlap(
                 start_min,
@@ -1019,7 +1025,7 @@ class AISchedulePlanner:
             print(f"    {location}: {len(slots)} slots | {violations} violations | fill≈{pred_fill:.0%}")
             all_slots.extend(slots)
 
-        all_slots = _enforce_global_trainer_overlaps(all_slots)
+        all_slots = _enforce_global_trainer_overlaps(all_slots, profiles_by_name)
         _print_utilisation(all_slots, profiles_by_name)
 
         output = {
