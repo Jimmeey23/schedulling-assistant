@@ -48,6 +48,7 @@ def normalize_trainer_name(name: str) -> str:
 
 # Historical data-driven daily class count targets
 DAILY_TARGETS = {
+    "Kwality House, Kemps Corner": {
         "Monday": 12, "Tuesday": 10, "Wednesday": 11,
         "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 8,
     },
