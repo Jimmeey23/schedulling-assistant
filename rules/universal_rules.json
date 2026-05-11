@@ -1,30 +1,160 @@
 {
   "hard_constraints": [
-    {"id": "UNIV-001", "type": "always_do", "description": "Barre 57 family must be >= 25% of total weekly classes at any location", "check_fn_name": "check_barre57_minimum"},
-    {"id": "UNIV-002", "type": "always_do", "description": "All 3 time bands must have >= 1 class every weekday", "check_fn_name": "check_time_bands_coverage"},
-    {"id": "UNIV-003", "type": "always_do", "description": "Saturday must be max-load day", "check_fn_name": "check_saturday_max_load"},
-    {"id": "UNIV-004", "type": "never_do", "description": "Sunday max 8 classes, no class before 10:00", "check_fn_name": "check_sunday_limits"},
-    {"id": "UNIV-005", "type": "class_location", "description": "Specialist classes only certified trainers", "check_fn_name": "check_specialist_certification"},
-    {"id": "UNIV-006", "type": "always_do", "description": "Express class must be paired with full-length equivalent on same day", "check_fn_name": "check_express_pairing"},
-    {"id": "UNIV-007", "type": "never_do", "description": "Studio Recovery must never be first class of day", "check_fn_name": "check_recovery_not_first"},
-    {"id": "UNIV-008", "type": "never_do", "description": "Foundations never at 11:30 or 19:15", "check_fn_name": "check_foundations_slots"},
-    {"id": "UNIV-009", "type": "trainer_availability", "description": "No trainer > 3 consecutive classes without 5 min gap", "check_fn_name": "check_trainer_consecutive"},
-    {"id": "UNIV-010", "type": "trainer_availability", "description": "No trainer > 4 classes in one day", "check_fn_name": "check_trainer_daily_max"},
-    {"id": "UNIV-011", "type": "class_location", "description": "PowerCycle NEVER at Kenkere House", "check_fn_name": "check_powercycle_not_kenkere"},
-    {"id": "UNIV-012", "type": "class_location", "description": "Strength Lab ONLY at Kwality House", "check_fn_name": "check_strength_lab_kwality_only"},
-    {"id": "UNIV-013", "type": "class_location", "description": "Pre/Post Natal NEVER at ANY LOCATION", "check_fn_name": "check_prenatal_kwality_only"},
-    {"id": "UNIV-014", "type": "slot_required", "description": "Peak midday slot must never be empty", "check_fn_name": "check_peak_midday_filled"},
-    {"id": "UNIV-015", "type": "always_do", "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day", "check_fn_name": "check_early_barre57"},
-    {"id": "UNIV-016", "type": "always_do", "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays", "check_fn_name": "check_evening_barre57"},
-    {"id": "UNIV-017", "type": "always_do", "description": "Always assign Tier 1 trainer to primary peak slot", "check_fn_name": "check_peak_tier1"},
-    {"id": "UNIV-018", "type": "trainer_availability", "description": "Trainer substitution protocol hierarchy", "check_fn_name": "check_substitution_hierarchy"},
-    {"id": "UNIV-019", "type": "never_do", "description": "Specialist classes no substitution with non-certified", "check_fn_name": "check_specialist_no_sub"},
-    {"id": "UNIV-020", "type": "trainer_availability", "description": "Never roster trainer at location with < 30 historical sessions", "check_fn_name": "check_trainer_location_history"},
-    {"id": "UNIV-021", "type": "never_do", "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations", "check_fn_name": "check_banned_class_formats"},
-    {"id": "UNIV-022", "type": "trainer_availability", "description": "A trainer cannot be scheduled across 2 locations in the same shift", "check_fn_name": "check_trainer_single_location_per_shift"},
-    {"id": "UNIV-023", "type": "never_do", "description": "Same class formats must not be scheduled consecutively", "check_fn_name": "check_no_consecutive_class_formats"},
-    {"id": "UNIV-024", "type": "slot_required", "description": "No classes before 07:00, between 13:00-15:00, or after 20:30", "check_fn_name": "check_blocked_time_windows"},
-    {"id": "UNIV-025", "type": "trainer_availability", "description": "Every trainer must get exactly 2 full days off each week", "check_fn_name": "check_trainer_rest_days"},
-    {"id": "UNIV-026", "type": "never_do", "description": "Recovery sessions must be the last class in their shift at that location", "check_fn_name": "check_recovery_last_in_shift"}
+    {
+      "id": "UNIV-001",
+      "type": "always_do",
+      "description": "Barre 57 family must be >= 25% of total weekly classes at any location",
+      "check_fn_name": "check_barre57_minimum"
+    },
+    {
+      "id": "UNIV-002",
+      "type": "always_do",
+      "description": "Every active studio day must include AM and PM coverage; use midday coverage where demand and qualified trainers support it",
+      "check_fn_name": "check_time_bands_coverage"
+    },
+    {
+      "id": "UNIV-003",
+      "type": "always_do",
+      "description": "Saturday should be a high-load day, without violating weekly floors, trainer caps, or quality gates",
+      "check_fn_name": "check_saturday_max_load"
+    },
+    {
+      "id": "UNIV-004",
+      "type": "never_do",
+      "description": "Sunday may carry AM and PM coverage when targets require it; no Sunday class should start before 10:00",
+      "check_fn_name": "check_sunday_limits"
+    },
+    {
+      "id": "UNIV-005",
+      "type": "class_location",
+      "description": "Specialist classes only certified trainers",
+      "check_fn_name": "check_specialist_certification"
+    },
+    {
+      "id": "UNIV-006",
+      "type": "always_do",
+      "description": "Express class must be paired with full-length equivalent on same day",
+      "check_fn_name": "check_express_pairing"
+    },
+    {
+      "id": "UNIV-007",
+      "type": "never_do",
+      "description": "Studio Recovery must never be first class of day",
+      "check_fn_name": "check_recovery_not_first"
+    },
+    {
+      "id": "UNIV-008",
+      "type": "never_do",
+      "description": "Foundations never at 11:30 or 19:15",
+      "check_fn_name": "check_foundations_slots"
+    },
+    {
+      "id": "UNIV-009",
+      "type": "trainer_availability",
+      "description": "Avoid long trainer runs; keep consecutive assignments practical and respect the 4 assigned hours/day cap",
+      "check_fn_name": "check_trainer_consecutive"
+    },
+    {
+      "id": "UNIV-010",
+      "type": "trainer_availability",
+      "description": "No trainer may exceed 4 assigned hours in one day",
+      "check_fn_name": "check_trainer_daily_max"
+    },
+    {
+      "id": "UNIV-011",
+      "type": "class_location",
+      "description": "PowerCycle NEVER at Kenkere House",
+      "check_fn_name": "check_powercycle_not_kenkere"
+    },
+    {
+      "id": "UNIV-012",
+      "type": "class_location",
+      "description": "Strength Lab ONLY at Kwality House",
+      "check_fn_name": "check_strength_lab_kwality_only"
+    },
+    {
+      "id": "UNIV-013",
+      "type": "class_location",
+      "description": "Pre/Post Natal is not auto-scheduled unless manually pinned or saved as a hard custom rule at an eligible location",
+      "check_fn_name": "check_prenatal_kwality_only"
+    },
+    {
+      "id": "UNIV-014",
+      "type": "slot_required",
+      "description": "Peak midday slot must never be empty",
+      "check_fn_name": "check_peak_midday_filled"
+    },
+    {
+      "id": "UNIV-015",
+      "type": "always_do",
+      "description": "Prioritize at least one strong Barre 57 family option in the AM block every active day",
+      "check_fn_name": "check_early_barre57"
+    },
+    {
+      "id": "UNIV-016",
+      "type": "always_do",
+      "description": "Prioritize strong Barre 57 or Cardio Barre coverage in weekday PM demand windows",
+      "check_fn_name": "check_evening_barre57"
+    },
+    {
+      "id": "UNIV-017",
+      "type": "always_do",
+      "description": "Prioritize Tier 1 trainers for primary peak slots where qualified and available",
+      "check_fn_name": "check_peak_tier1"
+    },
+    {
+      "id": "UNIV-018",
+      "type": "trainer_availability",
+      "description": "Trainer substitution protocol hierarchy",
+      "check_fn_name": "check_substitution_hierarchy"
+    },
+    {
+      "id": "UNIV-019",
+      "type": "never_do",
+      "description": "Specialist classes no substitution with non-certified",
+      "check_fn_name": "check_specialist_no_sub"
+    },
+    {
+      "id": "UNIV-020",
+      "type": "trainer_availability",
+      "description": "Trainer location history is a preference signal, not a hard block, unless saved as a custom rule",
+      "check_fn_name": "check_trainer_location_history"
+    },
+    {
+      "id": "UNIV-021",
+      "type": "never_do",
+      "description": "Do not schedule proven low-performing class/trainer/slot histories unless manually pinned; unsupported formats require explicit custom rules",
+      "check_fn_name": "check_banned_class_formats"
+    },
+    {
+      "id": "UNIV-022",
+      "type": "trainer_availability",
+      "description": "A trainer cannot be scheduled across 2 locations in the same shift",
+      "check_fn_name": "check_trainer_single_location_per_shift"
+    },
+    {
+      "id": "UNIV-023",
+      "type": "never_do",
+      "description": "Same class formats must not be scheduled consecutively",
+      "check_fn_name": "check_no_consecutive_class_formats"
+    },
+    {
+      "id": "UNIV-024",
+      "type": "slot_required",
+      "description": "No classes before 07:00, between 13:00-15:00, or after 20:30",
+      "check_fn_name": "check_blocked_time_windows"
+    },
+    {
+      "id": "UNIV-025",
+      "type": "trainer_availability",
+      "description": "Every trainer must have at least 1 weekly off day; 2 is preferred when coverage allows, and no trainer may exceed 2 days without assignments unless unavoidable",
+      "check_fn_name": "check_trainer_rest_days"
+    },
+    {
+      "id": "UNIV-026",
+      "type": "never_do",
+      "description": "Recovery sessions must be the last class in their shift at that location",
+      "check_fn_name": "check_recovery_last_in_shift"
+    }
   ]
 }

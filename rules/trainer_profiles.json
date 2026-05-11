@@ -7,9 +7,7 @@
         "available_days": [
           "Monday",
           "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday"
+          "Wednesday"
         ],
         "time_window": {
           "start": "07:00",
@@ -20,13 +18,14 @@
         "avg_checkin": 7.7,
         "session_count": 280,
         "owned_blocks": [],
-        "notes": "Highest avg attendance. Mon-Wed ONLY. Pre/Post Natal specialist."
+        "notes": "Highest avg attendance. Mon-Wed ONLY. Pre/Post Natal specialist.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
           "Thursday",
           "Friday"
         ],
@@ -49,7 +48,11 @@
             ]
           }
         ],
-        "notes": "THURSDAYS ONLY at Bandra. Never any other day."
+        "notes": "Historic preferred Thursday morning block at Bandra. Availability is governed by available_days and saved Settings rules.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       }
     },
     "qualifications": {
@@ -63,7 +66,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Saturday"
+    ]
   },
   {
     "name": "Anmol Sharma",
@@ -86,7 +93,11 @@
         "avg_checkin": 3,
         "session_count": 72,
         "owned_blocks": [],
-        "notes": "PowerCycle specialist. Evening only."
+        "notes": "PowerCycle specialist. Evening only.",
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -105,7 +116,11 @@
         "avg_checkin": 2.9,
         "session_count": 55,
         "owned_blocks": [],
-        "notes": "PowerCycle specialist. Evening only."
+        "notes": "PowerCycle specialist. Evening only.",
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -119,7 +134,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       }
     },
     "qualifications": {
@@ -133,7 +152,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Friday",
+      "Tuesday"
+    ]
   },
   {
     "name": "Atulan Purohit",
@@ -169,7 +192,11 @@
             ]
           }
         ],
-        "notes": "SOLE Strength Lab trainer at Kwality. Mon/Wed evenings for Strength Lab."
+        "notes": "SOLE Strength Lab trainer at Kwality. Mon/Wed evenings for Strength Lab.",
+        "week_off_days": [
+          "Sunday",
+          "Tuesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -205,7 +232,11 @@
             ]
           }
         ],
-        "notes": "Owns Fri/Sat morning block at Supreme."
+        "notes": "Owns Fri/Sat morning block at Supreme.",
+        "week_off_days": [
+          "Sunday",
+          "Tuesday"
+        ]
       }
     },
     "qualifications": {
@@ -219,7 +250,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Tuesday"
+    ]
   },
   {
     "name": "Bret Saldanha",
@@ -242,7 +277,11 @@
         "avg_checkin": 3.2,
         "session_count": 85,
         "owned_blocks": [],
-        "notes": "PowerCycle specialist. Evening only."
+        "notes": "PowerCycle specialist. Evening only.",
+        "week_off_days": [
+          "Thursday",
+          "Wednesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -261,7 +300,11 @@
         "avg_checkin": 3,
         "session_count": 60,
         "owned_blocks": [],
-        "notes": "PowerCycle specialist. Evening only."
+        "notes": "PowerCycle specialist. Evening only.",
+        "week_off_days": [
+          "Thursday",
+          "Wednesday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -275,7 +318,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Thursday",
+          "Wednesday"
+        ]
       }
     },
     "qualifications": {
@@ -289,7 +336,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Thursday",
+      "Wednesday"
+    ]
   },
   {
     "name": "Cauveri Vikrant",
@@ -307,7 +358,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Tuesday",
+          "Wednesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -326,7 +381,11 @@
         "avg_checkin": 5.3,
         "session_count": 245,
         "owned_blocks": [],
-        "notes": "PRIMARY PowerCycle trainer at Supreme."
+        "notes": "PRIMARY PowerCycle trainer at Supreme.",
+        "week_off_days": [
+          "Tuesday",
+          "Wednesday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -340,7 +399,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Tuesday",
+          "Wednesday"
+        ]
       }
     },
     "qualifications": {
@@ -354,7 +417,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Tuesday",
+      "Wednesday"
+    ]
   },
   {
     "name": "Chaitanya Nahar",
@@ -377,7 +444,11 @@
         "avg_checkin": 3.5,
         "session_count": 72,
         "owned_blocks": [],
-        "notes": "Afternoons only. Never mornings."
+        "notes": "Afternoons only. Never mornings.",
+        "week_off_days": [
+          "Thursday",
+          "Wednesday"
+        ]
       },
       "Copper & Cloves": {
         "available_days": [
@@ -391,7 +462,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Thursday",
+          "Wednesday"
+        ]
       }
     },
     "qualifications": {
@@ -405,7 +480,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Thursday",
+      "Wednesday"
+    ]
   },
   {
     "name": "Kajol Kanchan",
@@ -414,10 +493,10 @@
       "Kenkere House": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
           "Thursday",
-          "Friday",
-          "Saturday"
+          "Friday"
         ],
         "time_window": {
           "start": "07:00",
@@ -437,21 +516,29 @@
             ]
           }
         ],
-        "notes": "6-day anchor trainer. Sat 09:00 mandatory."
+        "notes": "6-day anchor trainer. Sat 09:00 mandatory.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Copper & Cloves": {
         "available_days": [
           "Monday",
+          "Tuesday",
           "Wednesday",
           "Thursday",
-          "Friday",
-          "Saturday"
+          "Friday"
         ],
         "time_window": {
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       }
     },
     "qualifications": {
@@ -465,7 +552,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Saturday"
+    ]
   },
   {
     "name": "Karan Bhatia",
@@ -483,7 +574,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 2,
+        "week_off_days": [
+          "Tuesday",
+          "Monday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -498,7 +593,7 @@
           "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 2,
         "avg_checkin": 5.2,
         "session_count": 190,
         "owned_blocks": [
@@ -510,7 +605,11 @@
             ]
           }
         ],
-        "notes": "Owns Sunday 10:15 and 11:30 at Supreme."
+        "notes": "Owns Sunday 10:15 and 11:30 at Supreme.",
+        "week_off_days": [
+          "Tuesday",
+          "Monday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -524,7 +623,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Tuesday",
+          "Monday"
+        ]
       }
     },
     "qualifications": {
@@ -538,7 +641,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Tuesday",
+      "Monday"
+    ]
   },
   {
     "name": "Karanvir Bhatia",
@@ -546,24 +653,28 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
-          "Monday",
           "Tuesday",
           "Thursday",
           "Friday",
+          "Saturday",
           "Sunday"
         ],
         "time_window": {
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Wednesday",
+          "Monday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
-          "Monday",
           "Tuesday",
           "Thursday",
           "Friday",
+          "Saturday",
           "Sunday"
         ],
         "time_window": {
@@ -575,21 +686,29 @@
         "avg_checkin": 5.4,
         "session_count": 260,
         "owned_blocks": [],
-        "notes": "High versatility Tier 1 at Supreme."
+        "notes": "High versatility Tier 1 at Supreme.",
+        "week_off_days": [
+          "Wednesday",
+          "Monday"
+        ]
       },
       "Courtside": {
         "available_days": [
-          "Monday",
           "Tuesday",
           "Thursday",
           "Friday",
+          "Saturday",
           "Sunday"
         ],
         "time_window": {
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Wednesday",
+          "Monday"
+        ]
       }
     },
     "qualifications": {
@@ -603,7 +722,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Wednesday",
+      "Monday"
+    ]
   },
   {
     "name": "Mrigakshi Jaiswal",
@@ -611,9 +734,6 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
           "Thursday",
           "Friday"
         ],
@@ -626,15 +746,17 @@
         "avg_checkin": 5.6,
         "session_count": 175,
         "owned_blocks": [],
-        "notes": "Thu/Fri ONLY at Kwality. Pre/Post Natal specialist."
+        "notes": "Thu/Fri ONLY at Kwality. Pre/Post Natal specialist.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
           "Monday",
           "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday"
+          "Wednesday"
         ],
         "time_window": {
           "start": "07:00",
@@ -645,7 +767,11 @@
         "avg_checkin": 5.1,
         "session_count": 95,
         "owned_blocks": [],
-        "notes": "Mon/Tue/Wed evenings only at Supreme."
+        "notes": "Mon/Tue/Wed evenings only at Supreme.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -659,7 +785,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       }
     },
     "qualifications": {
@@ -673,7 +803,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Saturday"
+    ]
   },
   {
     "name": "Pranjali Jain",
@@ -705,7 +839,11 @@
             ]
           }
         ],
-        "notes": "Owns Saturday 10:15-12:30 block."
+        "notes": "Owns Saturday 10:15-12:30 block.",
+        "week_off_days": [
+          "Sunday",
+          "Thursday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -719,7 +857,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Thursday"
+        ]
       }
     },
     "qualifications": {
@@ -733,7 +875,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Thursday"
+    ]
   },
   {
     "name": "Pushyank Nahar",
@@ -781,7 +927,11 @@
             ]
           }
         ],
-        "notes": "Owns Mon/Tue/Thu morning blocks (pinned). Available all days for other slots."
+        "notes": "Owns Mon/Tue/Thu morning blocks (pinned). Available all days for other slots.",
+        "week_off_days": [
+          "Sunday",
+          "Friday"
+        ]
       },
       "Copper & Cloves": {
         "available_days": [
@@ -795,7 +945,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Friday"
+        ]
       }
     },
     "qualifications": {
@@ -809,7 +963,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Friday"
+    ]
   },
   {
     "name": "Raunak Khemuka",
@@ -827,7 +985,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 2,
+        "week_off_days": [
+          "Wednesday",
+          "Saturday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -846,7 +1008,11 @@
         "avg_checkin": 2.8,
         "session_count": 65,
         "owned_blocks": [],
-        "notes": "PowerCycle specialist. Evening only. Low avg attendance."
+        "notes": "PowerCycle specialist. Evening only. Low avg attendance.",
+        "week_off_days": [
+          "Wednesday",
+          "Saturday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -860,7 +1026,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Wednesday",
+          "Saturday"
+        ]
       }
     },
     "qualifications": {
@@ -874,7 +1044,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Wednesday",
+      "Saturday"
+    ]
   },
   {
     "name": "Reshma Sharma",
@@ -897,7 +1071,11 @@
         "avg_checkin": 5.5,
         "session_count": 180,
         "owned_blocks": [],
-        "notes": "Amped Up specialist."
+        "notes": "Amped Up specialist.",
+        "week_off_days": [
+          "Friday",
+          "Thursday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -915,7 +1093,11 @@
         "max_classes_per_day": 4,
         "avg_checkin": 6.2,
         "session_count": 220,
-        "notes": "PowerCycle specialist at Supreme. Mon/Tue/Wed/Sat."
+        "notes": "PowerCycle specialist at Supreme. Mon/Tue/Wed/Sat.",
+        "week_off_days": [
+          "Friday",
+          "Thursday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -929,7 +1111,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Friday",
+          "Thursday"
+        ]
       }
     },
     "qualifications": {
@@ -943,7 +1129,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Friday",
+      "Thursday"
+    ]
   },
   {
     "name": "Richard D'Costa",
@@ -951,9 +1141,9 @@
     "locations": {
       "Kwality House, Kemps Corner": {
         "available_days": [
-          "Tuesday",
+          "Monday",
+          "Wednesday",
           "Thursday",
-          "Friday",
           "Saturday",
           "Sunday"
         ],
@@ -966,13 +1156,17 @@
         "avg_checkin": 5.4,
         "session_count": 350,
         "owned_blocks": [],
-        "notes": "High versatility. PowerCycle certified."
+        "notes": "High versatility. PowerCycle certified.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
-          "Tuesday",
+          "Monday",
+          "Wednesday",
           "Thursday",
-          "Friday",
           "Saturday",
           "Sunday"
         ],
@@ -984,21 +1178,29 @@
         "max_classes_per_day": 4,
         "avg_checkin": 5.8,
         "session_count": 91,
-        "notes": "Multi-location trainer. PC qualified."
+        "notes": "Multi-location trainer. PC qualified.",
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       },
       "Courtside": {
         "available_days": [
+          "Monday",
           "Tuesday",
+          "Wednesday",
           "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
+          "Friday"
         ],
         "time_window": {
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Saturday"
+        ]
       }
     },
     "qualifications": {
@@ -1012,7 +1214,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Saturday"
+    ]
   },
   {
     "name": "Rohan Dahima",
@@ -1043,7 +1249,11 @@
             ]
           }
         ],
-        "notes": "Owns Thursday morning block. Amped Up specialist."
+        "notes": "Owns Thursday morning block. Amped Up specialist.",
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -1057,7 +1267,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -1071,7 +1285,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Friday",
+          "Tuesday"
+        ]
       }
     },
     "qualifications": {
@@ -1085,7 +1303,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Friday",
+      "Tuesday"
+    ]
   },
   {
     "name": "Shruti Kulkarni",
@@ -1093,11 +1315,11 @@
     "locations": {
       "Kenkere House": {
         "available_days": [
+          "Monday",
           "Tuesday",
           "Thursday",
           "Friday",
-          "Saturday",
-          "Sunday"
+          "Saturday"
         ],
         "time_window": {
           "start": "07:00",
@@ -1130,21 +1352,29 @@
             ]
           }
         ],
-        "notes": "Owns Thu/Fri mornings and Sunday midday (pinned). Also available all other days."
+        "notes": "Owns Thu/Fri mornings and Sunday midday (pinned). Also available all other days.",
+        "week_off_days": [
+          "Sunday",
+          "Wednesday"
+        ]
       },
       "Copper & Cloves": {
         "available_days": [
+          "Monday",
           "Tuesday",
           "Thursday",
           "Friday",
-          "Saturday",
-          "Sunday"
+          "Saturday"
         ],
         "time_window": {
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Wednesday"
+        ]
       }
     },
     "qualifications": {
@@ -1158,7 +1388,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Sunday",
+      "Wednesday"
+    ]
   },
   {
     "name": "Siddhartha Kusuma",
@@ -1181,7 +1415,11 @@
         "avg_checkin": 4.2,
         "session_count": 110,
         "owned_blocks": [],
-        "notes": "Foundations certified."
+        "notes": "Foundations certified.",
+        "week_off_days": [
+          "Monday",
+          "Thursday"
+        ]
       },
       "Copper & Cloves": {
         "available_days": [
@@ -1195,7 +1433,11 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Monday",
+          "Thursday"
+        ]
       }
     },
     "qualifications": {
@@ -1209,7 +1451,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Monday",
+      "Thursday"
+    ]
   },
   {
     "name": "Simonelle De Vitre",
@@ -1240,7 +1486,11 @@
           "end": "22:00"
         },
         "max_classes_per_day": 4,
-        "session_count": 0
+        "session_count": 0,
+        "week_off_days": [
+          "Thursday",
+          "Sunday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -1254,7 +1504,11 @@
           "start": "06:00",
           "end": "22:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Thursday",
+          "Sunday"
+        ]
       },
       "Courtside": {
         "available_days": [
@@ -1268,9 +1522,17 @@
           "start": "06:00",
           "end": "22:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Thursday",
+          "Sunday"
+        ]
       }
-    }
+    },
+    "historic_week_off_days": [
+      "Thursday",
+      "Sunday"
+    ]
   },
   {
     "name": "Simran Dutt",
@@ -1281,20 +1543,25 @@
           "Monday",
           "Tuesday",
           "Wednesday",
-          "Saturday",
-          "Sunday"
+          "Thursday",
+          "Friday",
+          "Saturday"
         ],
         "time_window": {
           "start": "06:00",
           "end": "22:00"
         },
-        "max_classes_per_day": 2
+        "max_classes_per_day": 2,
+        "week_off_days": [
+          "Thursday",
+          "Tuesday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
           "Monday",
-          "Tuesday",
           "Wednesday",
+          "Friday",
           "Saturday",
           "Sunday"
         ],
@@ -1326,13 +1593,17 @@
             ]
           }
         ],
-        "notes": "Owns Tue/Wed morning blocks at Supreme."
+        "notes": "Owns Tue/Wed morning blocks at Supreme.",
+        "week_off_days": [
+          "Thursday",
+          "Tuesday"
+        ]
       },
       "Courtside": {
         "available_days": [
           "Monday",
-          "Tuesday",
           "Wednesday",
+          "Friday",
           "Saturday",
           "Sunday"
         ],
@@ -1340,7 +1611,11 @@
           "start": "06:00",
           "end": "22:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Thursday",
+          "Tuesday"
+        ]
       }
     },
     "qualifications": {
@@ -1354,7 +1629,11 @@
       "hiit": false,
       "recovery": false
     },
-    "active": true
+    "active": true,
+    "historic_week_off_days": [
+      "Thursday",
+      "Tuesday"
+    ]
   },
   {
     "name": "Vivaran Dhasmana",
@@ -1385,7 +1664,11 @@
           "end": "21:00"
         },
         "max_classes_per_day": 4,
-        "session_count": 0
+        "session_count": 0,
+        "week_off_days": [
+          "Sunday",
+          "Friday"
+        ]
       },
       "Supreme HQ, Bandra": {
         "available_days": [
@@ -1399,8 +1682,16 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4
+        "max_classes_per_day": 4,
+        "week_off_days": [
+          "Sunday",
+          "Friday"
+        ]
       }
-    }
+    },
+    "historic_week_off_days": [
+      "Sunday",
+      "Friday"
+    ]
   }
 ]

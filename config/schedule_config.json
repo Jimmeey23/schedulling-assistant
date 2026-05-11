@@ -2,7 +2,7 @@
   "targets": {
     "Kwality House, Kemps Corner": {
       "Monday": {
-        "target": 10,
+        "target": 11,
         "max": 14,
         "source": "settings"
       },
@@ -13,64 +13,64 @@
       },
       "Wednesday": {
         "target": 10,
-        "max": 13,
+        "max": 14,
         "source": "settings"
       },
       "Thursday": {
         "target": 11,
-        "max": 14,
+        "max": 15,
         "source": "settings"
       },
       "Friday": {
         "target": 10,
-        "max": 13,
+        "max": 14,
         "source": "settings"
       },
       "Saturday": {
         "target": 12,
-        "max": 16,
+        "max": 17,
         "source": "settings"
       },
       "Sunday": {
         "target": 6,
-        "max": 9,
+        "max": 10,
         "source": "settings"
       }
     },
     "Supreme HQ, Bandra": {
       "Monday": {
-        "target": 9,
-        "max": 13,
+        "target": 10,
+        "max": 14,
         "source": "settings"
       },
       "Tuesday": {
         "target": 10,
-        "max": 13,
+        "max": 14,
         "source": "settings"
       },
       "Wednesday": {
         "target": 9,
-        "max": 13,
+        "max": 14,
         "source": "settings"
       },
       "Thursday": {
         "target": 10,
-        "max": 12,
+        "max": 15,
         "source": "settings"
       },
       "Friday": {
-        "target": 8,
-        "max": 13,
+        "target": 9,
+        "max": 14,
         "source": "settings"
       },
       "Saturday": {
-        "target": 10,
-        "max": 13,
+        "target": 12,
+        "max": 18,
         "source": "settings"
       },
       "Sunday": {
         "target": 6,
-        "max": 8,
+        "max": 10,
         "source": "settings"
       }
     },
@@ -113,17 +113,17 @@
     },
     "Kenkere House": {
       "Monday": {
-        "target": 8,
+        "target": 9,
         "max": 12,
         "source": "settings"
       },
       "Tuesday": {
-        "target": 8,
+        "target": 9,
         "max": 9,
         "source": "settings"
       },
       "Wednesday": {
-        "target": 6,
+        "target": 7,
         "max": 12,
         "source": "settings"
       },
@@ -138,12 +138,12 @@
         "source": "settings"
       },
       "Saturday": {
-        "target": 7,
+        "target": 8,
         "max": 11,
         "source": "settings"
       },
       "Sunday": {
-        "target": 5,
+        "target": 6,
         "max": 6,
         "source": "settings"
       }
@@ -223,7 +223,7 @@
       "day": "Friday",
       "time": "09:00",
       "class": "Studio FIT",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Anisha Shah",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -263,7 +263,7 @@
       "day": "Sunday",
       "time": "11:30",
       "class": "Studio Barre 57",
-      "trainer": "Rohan Dahima",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -283,7 +283,7 @@
       "day": "Tuesday",
       "time": "19:00",
       "class": "Studio FIT",
-      "trainer": "Anisha Shah",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -313,7 +313,7 @@
       "day": "Tuesday",
       "time": "17:45",
       "class": "Studio Barre 57 Express",
-      "trainer": "Rohan Dahima",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -373,7 +373,7 @@
       "day": "Friday",
       "time": "17:45",
       "class": "Studio Barre 57",
-      "trainer": "Richard D'Costa",
+      "trainer": "Pranjali Jain",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -388,7 +388,7 @@
       "enabled": true
     },
     {
-      "id": "pin-tue-1745-studiobar57-kwa",
+      "id": "pin-tue-1745-studiobar-kwa",
       "location": "Kwality House, Kemps Corner",
       "day": "Tuesday",
       "time": "17:45",
@@ -453,7 +453,7 @@
       "day": "Thursday",
       "time": "08:00",
       "class": "Studio PowerCycle",
-      "trainer": "Cauveri Vikrant",
+      "trainer": "Anmol Sharma",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -503,7 +503,7 @@
       "day": "Thursday",
       "time": "09:30",
       "class": "Studio Mat 57",
-      "trainer": "Anisha Shah",
+      "trainer": "Mrigakshi Jaiswal",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -683,7 +683,7 @@
       "day": "Sunday",
       "time": "10:15",
       "class": "Studio Barre 57",
-      "trainer": "Karan Bhatia",
+      "trainer": "Karanvir Bhatia",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -703,7 +703,7 @@
       "day": "Tuesday",
       "time": "19:00",
       "class": "Studio Barre 57",
-      "trainer": "Mrigakshi Jaiswal",
+      "trainer": "Karan Bhatia",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -713,7 +713,7 @@
       "day": "Thursday",
       "time": "19:30",
       "class": "Studio FIT",
-      "trainer": "Atulan Purohit",
+      "trainer": "Pranjali Jain",
       "note": "Auto-pinned from high-performance historical slots",
       "enabled": true
     },
@@ -728,53 +728,33 @@
       "enabled": true
     },
     {
+      "id": "pin-mon-0715-studiostr-kwa",
+      "location": "Kwality House, Kemps Corner",
+      "day": "Monday",
+      "time": "07:15",
+      "class": "Studio Strength Lab",
+      "trainer": "Reshma Sharma",
+      "note": "Auto-pinned from high-performance historical slots",
+      "enabled": true
+    },
+    {
+      "id": "pin-wed-0730-studiostr-kwa",
+      "location": "Kwality House, Kemps Corner",
+      "day": "Wednesday",
+      "time": "07:30",
+      "class": "Studio Strength Lab",
+      "trainer": "Anisha Shah",
+      "note": "Auto-pinned from high-performance historical slots",
+      "enabled": true
+    },
+    {
       "id": "pin-mon-1915-studiostr-kwa",
       "location": "Kwality House, Kemps Corner",
       "day": "Monday",
       "time": "19:15",
       "class": "Studio Strength Lab",
-      "trainer": "Atulan Purohit",
+      "trainer": "Pranjali Jain",
       "note": "Auto-pinned from high-performance historical slots",
-      "enabled": true
-    },
-    {
-      "id": "pin-thu-0800-studiopow-kwa",
-      "location": "Kwality House, Kemps Corner",
-      "day": "Thursday",
-      "time": "08:00",
-      "class": "Studio PowerCycle",
-      "trainer": "Rohan Dahima",
-      "note": "Pinned from high-performance historical data",
-      "enabled": true
-    },
-    {
-      "id": "pin-sat-1000-studiopow-kwa",
-      "location": "Kwality House, Kemps Corner",
-      "day": "Saturday",
-      "time": "10:00",
-      "class": "Studio PowerCycle",
-      "trainer": "Bret Saldanha",
-      "note": "Pinned from high-performance historical data",
-      "enabled": true
-    },
-    {
-      "id": "pin-sat-1100-studiopow-sup",
-      "location": "Supreme HQ, Bandra",
-      "day": "Saturday",
-      "time": "11:00",
-      "class": "Studio PowerCycle",
-      "trainer": "Cauveri Vikrant",
-      "note": "Pinned from high-performance historical data",
-      "enabled": true
-    },
-    {
-      "id": "pin-wed-1800-studiostr-kwa",
-      "location": "Kwality House, Kemps Corner",
-      "day": "Wednesday",
-      "time": "18:00",
-      "class": "Studio Strength Lab",
-      "trainer": "Atulan Purohit",
-      "note": "Pinned - KW-006 compliant: Wed evening, Atulan exclusively",
       "enabled": true
     }
   ],
@@ -1279,27 +1259,27 @@
     }
   },
   "trainer_priority": {
-    "Anisha Shah": 90,
+    "Anisha Shah": 100,
     "Anmol Sharma": 60,
-    "Atulan Purohit": 90,
+    "Atulan Purohit": 100,
     "Bret Saldanha": 60,
     "Cauveri Vikrant": 90,
     "Chaitanya Nahar": 90,
-    "Kajol Kanchan": 90,
+    "Kajol Kanchan": 100,
     "Karan Bhatia": 90,
-    "Karanvir Bhatia": 90,
-    "Mrigakshi Jaiswal": 90,
-    "Pranjali Jain": 90,
-    "Pushyank Nahar": 90,
+    "Karanvir Bhatia": 100,
+    "Mrigakshi Jaiswal": 100,
+    "Pranjali Jain": 100,
+    "Pushyank Nahar": 100,
     "Raunak Khemuka": 30,
-    "Reshma Sharma": 90,
+    "Reshma Sharma": 100,
     "Richard D'Costa": 90,
-    "Rohan Dahima": 90,
-    "Shruti Kulkarni": 90,
+    "Rohan Dahima": 100,
+    "Shruti Kulkarni": 100,
     "Siddhartha Kusuma": 90,
     "Simonelle De Vitre": 60,
     "Simran Dutt": 60,
-    "Vivaran Dhasmana": 90
+    "Vivaran Dhasmana": 100
   },
   "settings_options": {
     "enforce_exact_daily_targets": true,
@@ -1313,16 +1293,76 @@
     "target_cap_buffer": 1,
     "target_selection_strategy": "seeded_range",
     "weekly_hours_cap": 15,
+    "tier1_min_weekly_hours": 12,
+    "tier1_ideal_weekly_hours": 13,
+    "max_daily_trainer_hours": 4,
+    "max_trainer_work_days": 6,
     "max_classes_per_day_default": 3,
+    "enforce_assignment_days": true,
+    "enforce_leave_and_off_days": true,
+    "trainer_week_off_strategy": "historic_lowest_days",
+    "max_week_off_days": 2,
+    "protect_pinned_classes_from_repair": true,
+    "hard_block_inactive_trainers": true,
+    "require_certified_format_match": true,
     "conflict_policy": "settings_override_soft_rules",
-    "ai_api_key": "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",
+    "ai_api_key": "",
     "ai_provider": "openrouter",
     "ai_model": "openai/gpt-oss-120b:free",
-    "ai_base_url": ""
+    "ai_backup_model": "z-ai/glm-4.5-air:free",
+    "ai_base_url": "",
+    "location_weekly_floors": {
+      "Kwality House, Kemps Corner": 70,
+      "Supreme HQ, Bandra": 65,
+      "Kenkere House": 55
+    }
   },
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-11T06:34:37.062Z"
+    "updated_at": "2026-05-11T11:18:34.003Z"
+  },
+  "scoring_weights": {
+    "fill_rate": 25,
+    "revenue": 25,
+    "avg_checkin": 36,
+    "session_frequency": 10,
+    "trend": 4
+  },
+  "am_pm_settings": {
+    "morning_cap_pct": 50,
+    "enforce_split": false,
+    "peak_slots": [
+      "11:00",
+      "11:30",
+      "19:15"
+    ]
+  },
+  "format_trainer_priority": {
+    "mumbai_powercycle": [
+      "Vivaran Dhasmana",
+      "Cauveri Vikrant",
+      "Karanvir Bhatia"
+    ],
+    "strength_fit": [
+      "Atulan Purohit",
+      "Mrigakshi Jaiswal",
+      "Anisha Shah",
+      "Reshma Sharma",
+      "Richard D'Costa"
+    ]
+  },
+  "preferred_trainer_weekly_target_hours": {
+    "Anisha Shah": 15,
+    "Rohan Dahima": 15,
+    "Reshma Sharma": 15,
+    "Atulan Purohit": 15,
+    "Pranjali Jain": 15,
+    "Karanvir Bhatia": 15,
+    "Mrigakshi Jaiswal": 15,
+    "Vivaran Dhasmana": 15,
+    "Pushyank Nahar": 15,
+    "Kajol Kanchan": 15,
+    "Shruti Kulkarni": 15
   }
 }

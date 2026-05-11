@@ -936,7 +936,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .control-center-modal .modal-meta{color:#64748B}
 .control-center-modal .modal-close{color:#64748B;background:#F8FAFC;border:1px solid #E2E8F0}
 .control-center-modal .modal-close:hover{background:#E2E8F0;color:#0F172A}
-.control-center-shell{display:grid;grid-template-columns:240px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+.control-center-shell{display:grid;grid-template-columns:250px minmax(0,1fr)300px;flex:1;min-height:0;overflow:hidden}
 .control-center-rail{background:#fff;border-right:1px solid #E2E8F0;padding:0;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
 .cc-rail-header{padding:16px 20px 12px;border-bottom:1px solid #E2E8F0;background:#fff;position:sticky;top:0;z-index:2}
 .cc-rail-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
@@ -944,7 +944,12 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .cc-nav-group{margin-top:8px;margin-bottom:2px}
 .cc-nav-group-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#CBD5E1;padding:0 10px 4px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px}
 .cc-nav-group-label::after{content:"";flex:1;height:1px;background:#F1F5F9}
-.control-center-main{padding:24px 28px 30px;overflow-y:auto;min-height:0;background:#F8FAFC}
+.control-center-main{padding:22px 24px 28px;overflow-y:auto;min-height:0;background:#F8FAFC}
+.control-center-inspector{background:#fff;border-left:1px solid #E2E8F0;padding:16px;overflow-y:auto;min-height:0}
+.cc-inspector-card{border:1px solid #E2E8F0;border-radius:14px;background:#F8FAFC;padding:13px;margin-bottom:12px}
+.cc-inspector-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-inspector-copy{font-size:11px;color:#64748B;line-height:1.45}
+.cc-inspector-actions{display:grid;grid-template-columns:1fr;gap:8px}
 .control-center-nav{display:flex;flex-direction:column;gap:2px}
 .control-center-nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:#64748B;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:background .12s,color .12s;font-size:13px}
 .control-center-nav-btn:hover{background:#F1F5F9;color:#0F172A}
@@ -959,8 +964,8 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .control-center-nav-btn.active .control-center-status{background:#DBEAFE;color:#1E40AF}
 .control-center-intro{border:1px solid #DCE3EB;border-radius:16px;background:#fff;padding:16px 18px;margin-bottom:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
 .control-center-panel .sett-view,.control-center-panel .rules-view{max-width:none;padding:0}
-.control-center-panel .sett-view-header,.control-center-panel .sett-rail,.control-center-panel .sett-inspector,.control-center-panel .rv-header,.control-center-panel .rv-rail,.control-center-panel .rv-inspector{display:none}
-.control-center-panel .sett-command,.control-center-panel .rv-command-shell{grid-template-columns:1fr}
+.control-center-panel .sett-view-header,.control-center-panel .settings-console-old-rail,.control-center-panel .settings-console-old-inspector,.control-center-panel .rv-header,.control-center-panel .rv-rail,.control-center-panel .rv-inspector{display:none}
+.control-center-panel .settings-console-layout,.control-center-panel .rv-command-shell{grid-template-columns:1fr}
 .control-center-panel .sett-main,.control-center-panel .rv-main{min-width:0}
 .control-center-panel .sett-main-actions,.control-center-panel .rv-main-toolbar{margin-top:0}
 @media(max-width:1100px){.drill-layout{grid-template-columns:1fr;height:94vh}.drill-rail{max-height:none}.drill-photo{height:360px}.drill-main{border-left:0}.drill-kpi-grid{grid-template-columns:repeat(2,1fr)}}
@@ -1310,9 +1315,9 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .target-input-row{display:flex;gap:8px;align-items:center}
 .target-input-row label{font-size:10px;color:var(--text-muted);min-width:54px}
 .target-input-row input{width:46px;border:1px solid var(--border);border-radius:var(--r4);padding:3px 6px;font-size:12px;font-weight:700;font-family:inherit;text-align:center;color:var(--text)}
-.sett-command{display:grid;grid-template-columns:228px minmax(0,1fr)292px;gap:14px;align-items:start}
-.sett-rail,.sett-inspector{position:sticky;top:108px;background:linear-gradient(180deg,#fff,#F8FAFC);border:1px solid #DCE3EB;border-radius:18px;box-shadow:0 12px 32px rgba(15,23,42,.06);padding:0;overflow:hidden}
-.sett-rail>.sett-source-card:first-child,.sett-rail>div:first-child{margin:14px 14px 0}
+.settings-console-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+.settings-console-old-rail,.settings-console-old-inspector{position:sticky;top:108px;background:linear-gradient(180deg,#fff,#F8FAFC);border:1px solid #DCE3EB;border-radius:18px;box-shadow:0 12px 32px rgba(15,23,42,.06);padding:0;overflow:hidden}
+.settings-console-old-rail>.sett-source-card:first-child,.settings-console-old-rail>div:first-child{margin:14px 14px 0}
 .sett-nav{padding:10px 14px 14px;gap:3px;display:flex;flex-direction:column}
 .sett-source-card{border:1px solid #BBF7D0;background:#F0FDF4;border-radius:12px;padding:10px;margin-bottom:12px}
 .sett-source-card.warn{border-color:#FDE68A;background:#FFFBEB}.sett-source-card.error{border-color:#FECACA;background:#FEF2F2}
@@ -1422,7 +1427,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   box-shadow:inset 0 1px 2px rgba(15,23,42,.02);
 }
 @media(max-width:1280px){.sett-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sett-location-summary,.sett-option-grid{grid-template-columns:1fr}}
-@media(max-width:1160px){.sett-command{grid-template-columns:1fr}.sett-rail,.sett-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}}
+@media(max-width:1160px){.settings-console-layout{grid-template-columns:1fr}.settings-console-old-rail,.settings-console-old-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}.control-center-shell{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.control-center-rail{display:block;border-right:0;border-bottom:1px solid #E2E8F0;max-height:174px}.control-center-nav{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding:10px 12px}.control-center-nav-btn{min-width:178px;flex:0 0 auto}.cc-nav-group{display:none}.control-center-inspector{display:none}.control-center-main{padding:18px 16px 22px}}
 @media(max-width:720px){.sett-overview-grid{grid-template-columns:1fr}.sett-main-actions{align-items:stretch}.sett-action-group{width:100%}.sett-ghost-btn{flex:1}}
 .chat-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,#fff,#F8FAFC);color:#111820;border:1px solid rgba(226,232,240,.95);font-size:22px;cursor:pointer;box-shadow:0 24px 54px rgba(15,23,42,.18);display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s,border-color .18s;overflow:hidden;animation:agentPulse 4.8s ease-in-out infinite}
 .chat-fab::before{content:"";position:absolute;inset:7px;border-radius:19px;background:linear-gradient(135deg,#111820,#0F766E);opacity:.08}
@@ -5661,15 +5666,13 @@ function pollPipelineStatus(){
 // CONTROL CENTER MODAL
 // ============================================================
 const CONTROL_CENTER_SECTIONS={
-  overview:{label:"Overview",icon:"🏠",group:"core",summary:"Status",detail:"Configuration health and quick status.",panel:"settings",heading:"Overview",description:"Review config health, trainer counts, and schedule targets.",activate(){settSetTab("overview");}},
-  scheduling:{label:"Scheduling Rules",icon:"📅",group:"schedule",summary:"Targets & logic",detail:"Daily targets, class mix, priorities, and constraints.",panel:"settings",heading:"Scheduling Rules",description:"Manage class targets, format mix, trainer priorities, and custom constraints.",activate(){settSetTab("rules");settSetSub("rules","targets");}},
-  trainers:{label:"Trainer Profiles",icon:"👥",group:"people",summary:"Profiles",detail:"Manage trainer profiles and status.",panel:"settings",heading:"Trainer Profiles",description:"Manage trainer profiles, studio access, and activation status.",activate(){settSetTab("trainers");}},
-  qualifications:{label:"Certifications",icon:"🏅",group:"people",summary:"Class access",detail:"Class format certifications per trainer.",panel:"settings",heading:"Certifications",description:"Which trainers are certified to teach each class format.",activate(){settSetTab("qualifications");}},
-  availability:{label:"Availability",icon:"🗓",group:"people",summary:"Days & windows",detail:"Trainer days and time windows per studio.",panel:"settings",heading:"Availability",description:"Set weekly day availability and time windows per trainer per studio.",activate(){settSetTab("availability");}},
-  leave:{label:"Leave & Off Days",icon:"🌴",group:"people",summary:"Absences",detail:"Log trainer leave periods.",panel:"settings",heading:"Leave & Off Days",description:"Mark trainer leave so the planner routes around it.",activate(){settSetTab("leave");}},
-  ai:{label:"AI & Model",icon:"✨",group:"system",summary:"Model config",detail:"Configure AI model and scoring weights.",panel:"settings",heading:"AI Intelligence",description:"Tune how the AI planner reasons about your schedule.",activate(){settSetTab("ai");}},
-  advanced:{label:"Advanced",icon:"⚙️",group:"system",summary:"Options",detail:"Planner options and API key.",panel:"settings",heading:"Advanced Settings",description:"Manage planner behavior and integration options.",activate(){settSetTab("advanced");}},
-  catalog:{label:"Rule Catalog",icon:"📋",group:"system",summary:"Built-in rules",detail:"Review built-in scheduling constraints.",panel:"rules",heading:"Rule Catalog",description:"Review and toggle built-in scheduling safeguards.",activate(){rvSetScope("overview");}}
+  overview:{label:"Settings Console",icon:"🏠",group:"core",summary:"Status",detail:"Applied to every generation.",panel:"settings",heading:"Settings Console",description:"One source of truth for generated schedules, manual edits, trainer setup, and AI generation.",activate(){settSetTab("overview");}},
+  scheduling:{label:"Schedule Setup",icon:"📅",group:"schedule",summary:"Targets + Mix",detail:"Targets, Class Mix and Formats, and priority.",panel:"settings",heading:"Schedule Setup",description:"Manage daily targets, class mix, and planner count selection before generation.",activate(){settSetTab("rules");settSetSub("rules","targets");}},
+  rules:{label:"Rules and Pinned Classes",icon:"📌",group:"schedule",summary:"Hard rules",detail:"Pinned classes and active safeguards.",panel:"settings",heading:"Rules and Pinned Classes",description:"Review all active custom rules, pinned classes, universal safeguards, and generation controls in one place.",activate(){settSetTab("customrules");}},
+  trainers:{label:"Trainer Setup",icon:"👥",group:"people",summary:"Profiles",detail:"Directory and active status.",panel:"settings",heading:"Trainer Setup",description:"Manage trainer profiles, studio access, tiers, and activation status.",activate(){settSetTab("trainers");}},
+  qualifications:{label:"Certifications",icon:"🏅",group:"people",summary:"Eligible",detail:"Current class-format eligibility.",panel:"settings",heading:"Certifications",description:"Control which trainers are certified to teach each current class format.",activate(){settSetTab("qualifications");}},
+  availability:{label:"Availability",icon:"🗓",group:"people",summary:"Days + Leave",detail:"Assignment days, week offs, and time windows.",panel:"settings",heading:"Availability",description:"Set trainer assignment days, studio-specific availability, historic week offs, leave, and time windows used by generation.",activate(){settSetTab("availability");}},
+  ai:{label:"AI & Generation",icon:"⚙️",group:"system",summary:"Policy",detail:"Model config and generation settings.",panel:"settings",heading:"AI & Generation",description:"Tune AI settings, validation gates, and generation behavior.",activate(){settSetTab("advanced");}}
 };
 const CC_GROUPS={
   core:{label:""},
@@ -5697,7 +5700,7 @@ function renderControlCenterNav(){
 function renderControlCenterShell(){
   const box=document.getElementById("modal-box"); if(!box)return;
   box.className="modal-box control-center-modal";
-  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">⚡ Control Center</div><div class="modal-meta">Manage settings, trainer setup, rules, and AI configuration.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="cc-rail-header"><div class="cc-rail-title">Navigation</div></div><div class="cc-rail-nav-wrap"><div class="control-center-nav">${renderControlCenterNav()}</div></div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Overview</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main></div>`;
+  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">Settings Console</div><div class="modal-meta">Applied to every generation: targets, trainers, assignment days, off days, class mix, rules, pins, and AI configuration.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="cc-rail-header"><div class="cc-rail-title">Settings</div></div><div class="cc-rail-nav-wrap"><div class="control-center-nav">${renderControlCenterNav()}</div></div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Settings Console</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main><aside class="control-center-inspector"><div class="cc-inspector-card sett-generation-contract"><div class="cc-inspector-title">Generation Contract</div><div class="cc-inspector-copy">Saved settings are the canonical source for every Standard, AI, and repair generation. Trainer assignment days, week off dates, inactive status, class mix caps, and hard custom rules are validated before assignment.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Actions</div><div class="cc-inspector-actions"><button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save & Apply Changes</button><button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Configuration</button><button class="sett-ghost-btn" onclick="settExportConfig()">Export JSON</button></div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Selection Inspector</div><div class="sett-inspector-box" id="sett-inspector-selection">Select target or class-mix cells to apply bulk changes.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Active Health</div><div id="sett-conflict-list" class="sett-conflict-list"><div class="sett-conflict-item">Loading validation...</div></div></div></aside></div>`;
 }
 function controlCenterEnsurePanel(panelName){
   const panelId=panelName==="rules"?"control-center-rules-panel":"control-center-settings-panel";
@@ -5730,6 +5733,84 @@ function openControlCenterModal(sectionKey="overview"){
 // ============================================================
 // RULES VIEW
 // ============================================================
+const BUILTIN_RULES_CATALOG={
+  groups:[
+    {id:"universal",label:"Universal",description:"Apply to all 3 studio locations",enabled:true,rules:[
+      {id:"UNIV-001",type:"hard",label:"Barre 57 ≥ 25% of weekly classes",description:"Barre 57 family must be ≥ 25% of total weekly classes at any location",enabled:true,risk_level:"critical",impact_area:"Class Mix",status_tag:"Mandatory"},
+      {id:"UNIV-002",type:"hard",label:"All 3 time bands covered daily",description:"All 3 time bands must have ≥ 1 class every weekday (morning / midday / evening)",enabled:true,risk_level:"critical",impact_area:"Slot Coverage",status_tag:"Mandatory"},
+      {id:"UNIV-003",type:"hard",label:"Saturday is max-load day",description:"Saturday must never have fewer classes than any other day of the week",enabled:true,risk_level:"high",impact_area:"Day Distribution",status_tag:"Recommended"},
+      {id:"UNIV-004",type:"hard",label:"Sunday max 5–6 classes, no early/evening",description:"Sunday max 5–6 classes. No class before 10:00. No evening band.",enabled:true,risk_level:"high",impact_area:"Sunday Policy",status_tag:"Mandatory"},
+      {id:"UNIV-005",type:"hard",label:"Specialist classes — certified trainers only",description:"PowerCycle, Strength Lab, Pre/Post Natal, Foundations — only certified trainers may teach",enabled:true,risk_level:"critical",impact_area:"Trainer Certification",status_tag:"Mandatory"},
+      {id:"UNIV-006",type:"hard",label:"Express class must pair with full-length equivalent",description:"Any Express class must be paired with a full-length equivalent of the same type on the same day",enabled:true,risk_level:"high",impact_area:"Class Pairing",status_tag:"Recommended"},
+      {id:"UNIV-007",type:"hard",label:"Studio Recovery never first class of day",description:"Studio Recovery must NEVER be the first class of the day at any location",enabled:true,risk_level:"high",impact_area:"Class Ordering",status_tag:"Mandatory"},
+      {id:"UNIV-008",type:"hard",label:"Foundations never at 11:30 or 19:15",description:"Foundations must never be scheduled in 11:30 or 19:15 slots",enabled:true,risk_level:"medium",impact_area:"Slot Restriction",status_tag:"Recommended"},
+      {id:"UNIV-009",type:"hard",label:"No trainer > 3 consecutive classes without gap",description:"No trainer more than 3 consecutive classes without ≥ 30 min gap",enabled:true,risk_level:"high",impact_area:"Trainer Welfare",status_tag:"Mandatory"},
+      {id:"UNIV-010",type:"hard",label:"No trainer > 4 classes per day",description:"No trainer more than 4 classes in one day",enabled:true,risk_level:"critical",impact_area:"Trainer Welfare",status_tag:"Mandatory"},
+      {id:"UNIV-011",type:"hard",label:"PowerCycle never at Kenkere",description:"PowerCycle NEVER at Kenkere House — not for any reason",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+      {id:"UNIV-012",type:"hard",label:"Strength Lab only at Kwality",description:"Strength Lab ONLY at Kwality House, Kemps Corner",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+      {id:"UNIV-013",type:"hard",label:"Pre/Post Natal only at Kwality",description:"Pre/Post Natal ONLY at Kwality House, Kemps Corner",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+      {id:"UNIV-014",type:"hard",label:"Peak midday slot never empty",description:"Peak midday slot must never be empty at any location",enabled:true,risk_level:"critical",impact_area:"Slot Coverage",status_tag:"Mandatory"},
+      {id:"UNIV-015",type:"always_do",label:"≥ 1 Barre 57 before 10:00 AM every day",description:"Always schedule ≥ 1 Barre 57 before 10:00 AM every day",enabled:true,risk_level:"high",impact_area:"Morning Programming",status_tag:"Recommended"},
+      {id:"UNIV-016",type:"always_do",label:"Barre 57 or Cardio Barre in 19:00–19:30 on weekdays",description:"Always schedule Barre 57 or Cardio Barre in the 19:00–19:30 window on weekdays",enabled:true,risk_level:"high",impact_area:"Evening Programming",status_tag:"Recommended"},
+      {id:"UNIV-017",type:"always_do",label:"Tier 1 trainer at primary peak slot",description:"Always assign a Tier 1 trainer to the primary peak slot",enabled:true,risk_level:"high",impact_area:"Trainer Quality",status_tag:"Recommended"},
+      {id:"UNIV-018",type:"trainer_availability",label:"Substitution: same tier + class → one tier lower → cross-location",description:"Trainer substitution protocol: same tier + same class → one tier lower + same class → cross-location trainer with ≥ 30 sessions at that location",enabled:true,risk_level:"medium",impact_area:"Substitution",status_tag:"Recommended"},
+      {id:"UNIV-019",type:"hard",label:"No substitution for specialist classes with non-certified trainers",description:"Specialist classes (PowerCycle, Strength Lab, Pre/Post Natal) — NO substitution with non-certified trainers",enabled:true,risk_level:"critical",impact_area:"Trainer Certification",status_tag:"Mandatory"},
+      {id:"UNIV-020",type:"hard",label:"No trainer where they have < 30 historical sessions",description:"Never roster a trainer at a location where they have < 30 historical sessions",enabled:true,risk_level:"high",impact_area:"Trainer History",status_tag:"Recommended"},
+    ]},
+    {id:"kwality",label:"Kwality House",description:"Kwality House, Kemps Corner specific rules",enabled:true,rules:[
+      {id:"KW-001",type:"always_do",label:"11:30 AM slot — Tier 1 trainer always",description:"11:30 AM slot must always be filled with a Tier 1 trainer",enabled:true,risk_level:"critical",impact_area:"Peak Slot",status_tag:"Mandatory"},
+      {id:"KW-002",type:"trainer_availability",label:"Anisha Shah — Mon/Tue/Wed only at Kwality",description:"Anisha Shah → Mon/Tue/Wed ONLY. Never Thu/Sat/Sun at Kwality.",enabled:true,risk_level:"high",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"KW-003",type:"trainer_availability",label:"Mrigakshi Jaiswal — Thu/Fri only at Kwality",description:"Mrigakshi Jaiswal → Thu/Fri ONLY at Kwality.",enabled:true,risk_level:"high",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"KW-004",type:"trainer_availability",label:"Pranjali Jain owns Saturday 10:15–12:30",description:"Pranjali Jain owns Saturday 10:15–12:30 block at Kwality",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"KW-005",type:"trainer_availability",label:"Rohan Dahima owns Thursday morning block",description:"Rohan Dahima owns Thursday morning (09:15, 10:15) block at Kwality",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"KW-006",type:"hard",label:"Strength Lab — Atulan exclusively, Mon/Wed evenings",description:"Strength Lab → Atulan Purohit EXCLUSIVELY. Mon/Wed evenings only. Max 2×/week.",enabled:true,risk_level:"critical",impact_area:"Specialist Class",status_tag:"Mandatory"},
+      {id:"KW-007",type:"hard",label:"Pre/Post Natal — Anisha (Mon–Wed) / Mrigakshi (Thu–Fri)",description:"Pre/Post Natal → Anisha Shah (Mon–Wed), Mrigakshi Jaiswal (Thu–Fri). Mornings only (08:30–11:30).",enabled:true,risk_level:"critical",impact_area:"Specialist Class",status_tag:"Mandatory"},
+      {id:"KW-008",type:"soft",label:"Strength Lab max 2×/week total",description:"Strength Lab max 2× per week total at Kwality",enabled:true,risk_level:"medium",impact_area:"Class Volume",status_tag:"Recommended"},
+    ]},
+    {id:"supreme",label:"Supreme HQ",description:"Supreme HQ, Bandra specific rules",enabled:true,rules:[
+      {id:"SU-001",type:"hard",label:"PowerCycle equal pillar — min 2 per weekday",description:"PowerCycle must be treated as equal pillar to Barre 57 — minimum 2 PowerCycle classes per day on weekdays",enabled:true,risk_level:"critical",impact_area:"Class Mix",status_tag:"Mandatory"},
+      {id:"SU-002",type:"always_do",label:"Cauveri Vikrant — first choice for all PowerCycle at Supreme",description:"Cauveri Vikrant is first-choice for ALL PowerCycle slots at Supreme",enabled:true,risk_level:"high",impact_area:"Trainer Priority",status_tag:"Mandatory"},
+      {id:"SU-003",type:"trainer_availability",label:"Anisha Shah — Thursdays only at Supreme",description:"Anisha Shah → THURSDAYS ONLY at Supreme HQ. Never any other day. Teaches 08:00–11:00 block only.",enabled:true,risk_level:"critical",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"SU-004",type:"trainer_availability",label:"Vivaran Dhasmana owns Tue/Wed mornings at Supreme",description:"Vivaran Dhasmana owns Tue/Wed morning blocks (07:30–11:00) at Supreme",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"SU-005",type:"trainer_availability",label:"Karan Bhatia owns Sunday 10:15 and 11:30 at Supreme",description:"Karan Bhatia owns Sunday 10:15 and 11:30 blocks at Supreme",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"SU-006",type:"trainer_availability",label:"Atulan Purohit owns Fri/Sat mornings at Supreme",description:"Atulan Purohit owns Fri/Sat morning block (09:00–11:30) at Supreme",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"SU-007",type:"trainer_availability",label:"Mrigakshi Jaiswal — Mon/Tue/Wed evenings only at Supreme",description:"Mrigakshi Jaiswal → Mon/Tue/Wed evenings only at Supreme. Not available other days here.",enabled:true,risk_level:"high",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"SU-008",type:"always_do",label:"18:00 weekday slot — Tier 1 trainer",description:"18:00 PM slot must always have a Tier 1 trainer on weekdays",enabled:true,risk_level:"high",impact_area:"Peak Slot",status_tag:"Recommended"},
+      {id:"SU-009",type:"never_do",label:"No Strength Lab at Supreme",description:"No Strength Lab at Supreme HQ — Kwality only",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+      {id:"SU-010",type:"never_do",label:"No Pre/Post Natal at Supreme",description:"No Pre/Post Natal at Supreme HQ — Kwality only",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+    ]},
+    {id:"kenkere",label:"Kenkere House",description:"Kenkere House, Bengaluru specific rules",enabled:true,rules:[
+      {id:"KE-001",type:"never_do",label:"PowerCycle NEVER at Kenkere",description:"PowerCycle NEVER at Kenkere House — not for any reason",enabled:true,risk_level:"critical",impact_area:"Location Restriction",status_tag:"Mandatory"},
+      {id:"KE-002",type:"always_do",label:"Kajol Kanchan — 6-day anchor, never reduce",description:"Kajol Kanchan is 6-day anchor — never reduce her allocation without confirmed coverage",enabled:true,risk_level:"critical",impact_area:"Trainer Anchor",status_tag:"Mandatory"},
+      {id:"KE-003",type:"trainer_availability",label:"Pushyank Nahar owns Mon/Tue/Thu mornings",description:"Pushyank Nahar owns Mon/Tue/Thu morning blocks (07:15, 09:00, 11:00)",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"KE-004",type:"trainer_availability",label:"Shruti Kulkarni owns Thu/Fri mornings + Sunday midday",description:"Shruti Kulkarni owns Thu/Fri mornings and Sunday midday",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"KE-005",type:"trainer_availability",label:"Veena Narasimhan — weekends 16:00–17:15 only",description:"Veena Narasimhan → weekends ONLY, 16:00–17:15 window ONLY",enabled:true,risk_level:"medium",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"KE-006",type:"trainer_availability",label:"Chaitanya Nahar — Mon/Sat/Sun afternoons only",description:"Chaitanya Nahar → Mon/Sat/Sun afternoons only (16:00–18:45). Never mornings.",enabled:true,risk_level:"high",impact_area:"Trainer Lock",status_tag:"Mandatory"},
+      {id:"KE-007",type:"always_do",label:"09:00 AM — Tier 1 trainer every day",description:"09:00 AM must be filled with a Tier 1 trainer every day at Kenkere",enabled:true,risk_level:"critical",impact_area:"Peak Slot",status_tag:"Mandatory"},
+      {id:"KE-008",type:"hard",label:"Saturday 09:00–11:00 — Kajol or Pushyank only",description:"Saturday 09:00–11:00 block → Kajol Kanchan or Pushyank Nahar ONLY",enabled:true,risk_level:"high",impact_area:"Owned Block",status_tag:"Mandatory"},
+      {id:"KE-009",type:"hard",label:"Foundations — certified trainers only at Kenkere",description:"Foundations certified trainers only: Shruti Kulkarni, Poojitha Bhaskar, Siddhartha Kusuma, Shruti Suresh, Pushyank Nahar, Kajol Kanchan",enabled:true,risk_level:"critical",impact_area:"Trainer Certification",status_tag:"Mandatory"},
+    ]},
+    {id:"classmix",label:"Class Mix",description:"Weekly class mix targets and soft constraints",enabled:true,rules:[
+      {id:"MIX-001",type:"soft",label:"Barre 57 family 45–55% of weekly classes",description:"Barre 57 family 45–55% of weekly classes. Penalty 10 per % below 45.",enabled:true,risk_level:"high",impact_area:"Class Mix",status_tag:"Recommended"},
+      {id:"MIX-002",type:"soft",label:"PowerCycle: 8–10% at Kwality, 25–28% at Supreme, 0% at Kenkere",description:"PowerCycle 8–10% at Kwality, 25–28% at Supreme, 0% at Kenkere",enabled:true,risk_level:"high",impact_area:"Class Mix",status_tag:"Recommended"},
+      {id:"MIX-003",type:"soft",label:"Mat 57 min 3–4×/week per location",description:"Mat 57 minimum 3–4× per week at each location",enabled:true,risk_level:"medium",impact_area:"Class Mix",status_tag:"Recommended"},
+      {id:"MIX-004",type:"soft",label:"FIT 1× daily, morning slots",description:"FIT 1× daily, morning slots preferred",enabled:true,risk_level:"medium",impact_area:"Class Mix",status_tag:"Recommended"},
+      {id:"MIX-005",type:"soft",label:"Foundations daily at Kenkere; 2–3×/week elsewhere",description:"Foundations at Kenkere 1× daily; Kwality/Supreme 2–3×/week",enabled:true,risk_level:"medium",impact_area:"Class Mix",status_tag:"Recommended"},
+      {id:"MIX-006",type:"soft",label:"Recovery — weekends only, afternoon slots",description:"Recovery weekends only, afternoon slots (12:30–16:00)",enabled:true,risk_level:"low",impact_area:"Class Mix",status_tag:"Optional"},
+      {id:"MIX-007",type:"soft",label:"Back Body Blaze — morning only, max 3×/week",description:"Back Body Blaze morning only (07:30–09:00), max 3×/week",enabled:true,risk_level:"low",impact_area:"Class Mix",status_tag:"Optional"},
+      {id:"MIX-008",type:"soft",label:"Studio Amped Up! max 1–2×/week; Reshma or Rohan only",description:"Studio Amped Up! max 1–2×/week; Reshma Sharma or Rohan Dahima only",enabled:true,risk_level:"low",impact_area:"Class Mix",status_tag:"Optional"},
+      {id:"MIX-009",type:"soft",label:"Cardio Barre 1×/day, evenings preferred",description:"Cardio Barre 1×/day, evenings preferred",enabled:false,risk_level:"low",impact_area:"Class Mix",status_tag:"Optional"},
+      {id:"MIX-010",type:"soft",label:"Strength Lab max 2×/week at Kwality, Mon/Wed evenings",description:"Strength Lab max 2×/week at Kwality, Mon/Wed evenings only",enabled:true,risk_level:"medium",impact_area:"Class Mix",status_tag:"Recommended"},
+    ]},
+    {id:"slots",label:"Slot Priority",description:"Slot filling priority and peak window rules",enabled:true,rules:[
+      {id:"SLOT-001",type:"slot_required",label:"Always fill peak midday and prime evening",description:"Always fill peak midday (11:00–11:30) and prime evening (19:00–19:30)",enabled:true,risk_level:"critical",impact_area:"Slot Coverage",status_tag:"Mandatory"},
+      {id:"SLOT-002",type:"slot_required",label:"Fill morning block and early evening",description:"Fill morning block (08:00–09:30) and early evening (17:45–18:15)",enabled:true,risk_level:"high",impact_area:"Slot Coverage",status_tag:"Recommended"},
+      {id:"SLOT-003",type:"slot_required",label:"Fill early morning and late evening if trainers available",description:"Fill early morning (07:00–07:30) and late evening (20:00) if trainers available",enabled:false,risk_level:"low",impact_area:"Slot Coverage",status_tag:"Optional"},
+      {id:"SLOT-004",type:"soft",label:"Mid-afternoon optional — location dependent",description:"Mid-afternoon (13:00–16:00) optional — location dependent",enabled:false,risk_level:"low",impact_area:"Slot Coverage",status_tag:"Optional"},
+    ]},
+  ]
+};
+
 let _rulesCatalog=null;
 let _rulesScope="all";
 
@@ -6010,16 +6091,21 @@ function rvRunPipeline(){
 
 function rvLoadRules(){
   fetch("/api/rules-config")
-    .then(r=>r.json())
+    .then(r=>r.ok?r.json():Promise.reject("not ok"))
     .then(data=>{
-      _rulesCatalog=data;
-      rvRenderRail();
-      rvRenderKpis();
-      rvRenderCatalog();
-      rvRenderInspector();
+      if(data&&Array.isArray(data.groups)&&data.groups.length){
+        _rulesCatalog=data;
+      } else {
+        _rulesCatalog=JSON.parse(JSON.stringify(BUILTIN_RULES_CATALOG));
+      }
+      rvRenderRail();rvRenderKpis();rvRenderCatalog();rvRenderInspector();
       setRVStatus("Rules loaded","ok");
     })
-    .catch(()=>setRVStatus("Could not load rules","error"));
+    .catch(()=>{
+      _rulesCatalog=JSON.parse(JSON.stringify(BUILTIN_RULES_CATALOG));
+      rvRenderRail();rvRenderKpis();rvRenderCatalog();rvRenderInspector();
+      setRVStatus("Using built-in rule catalog","ok");
+    });
 }
 
 function rvRenderCatalog(searchTerm){
@@ -6383,10 +6469,40 @@ let _trainerMgmtLocFilter="";
 let _settMatrixSelection=new Set();
 let _settLastValidation={errors:[],warnings:[],info:[]};
 
-const QUAL_KEYS=["all_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery","fit","back_body_blaze","special"];
-const QUAL_LABELS={"all_barre":"All Barre","mat_57":"Mat 57","powercycle":"PowerCycle","strength_lab":"Strength Lab","foundations":"Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Amped Up","hiit":"HIIT","recovery":"Recovery","fit":"FIT","back_body_blaze":"Back Body Blaze","special":"Special Format"};
+const QUAL_KEYS=["all_barre","cardio_barre","mat_57","powercycle","strength_lab","foundations","pre_post_natal","amped_up","hiit","recovery","fit","back_body_blaze","express_barre","express_cycle","studio_recovery","barre_flow","special"];
+const QUAL_LABELS={"all_barre":"Studio Barre 57","cardio_barre":"Studio Cardio Barre","mat_57":"Studio Mat 57","powercycle":"Studio PowerCycle","strength_lab":"Studio Strength Lab","foundations":"Studio Foundations","pre_post_natal":"Pre/Post Natal","amped_up":"Studio Amped Up!","hiit":"Studio HIIT","recovery":"Studio Recovery","fit":"Studio FIT","back_body_blaze":"Studio Back Body Blaze","express_barre":"Barre/Cardio/Mat Express","express_cycle":"Studio PowerCycle Express","studio_recovery":"Studio Recovery","barre_flow":"Studio Barre Flow","special":"Hosted / Special Format"};
+const QUAL_FORMAT_HINTS={
+  all_barre:"Studio Barre 57",
+  cardio_barre:"Studio Cardio Barre, Studio Cardio Barre Express, Studio Cardio Barre Plus",
+  mat_57:"Studio Mat 57, Studio Mat 57 Express",
+  powercycle:"Studio PowerCycle",
+  strength_lab:"Studio Strength Lab",
+  foundations:"Studio Foundations",
+  amped_up:"Studio Amped Up!",
+  hiit:"Studio HIIT",
+  recovery:"Studio Recovery",
+  fit:"Studio FIT, Studio FIT Express",
+  back_body_blaze:"Studio Back Body Blaze",
+  express_barre:"Studio Barre 57 Express, Studio Cardio Barre Express, Studio Mat 57 Express",
+  express_cycle:"Studio PowerCycle Express",
+  studio_recovery:"Studio Recovery",
+  barre_flow:"Studio Barre Flow",
+  special:"Hosted classes, partnership classes, and custom workshop formats"
+};
 const DAYS_ALL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const LOCS_ALL=["Kwality House, Kemps Corner","Supreme HQ, Bandra","Courtside","Kenkere House","Copper & Cloves"];
+function settHistoricWeekOffDays(t){
+  const days=Array.isArray(t?.historic_week_off_days)?t.historic_week_off_days:[];
+  return days.filter(d=>DAYS_ALL.includes(d)).slice(0,2);
+}
+function settDefaultAvailableDays(t){
+  const offs=new Set(settHistoricWeekOffDays(t));
+  const days=DAYS_ALL.filter(d=>!offs.has(d));
+  return days.length?days:DAYS_ALL;
+}
+function settAvailabilityDaysFor(t,ld){
+  return Array.isArray(ld?.available_days)&&ld.available_days.length?ld.available_days:settDefaultAvailableDays(t);
+}
 const CLASS_MIX_TARGETS={
   "Kwality House, Kemps Corner":{
     "Studio Barre 57":{min:14,max:22},"Studio Cardio Barre":{min:8,max:10},"Studio Mat 57":{min:5,max:8},
@@ -6441,11 +6557,23 @@ function settDefaultConfig(){
       target_cap_buffer:1,
       target_selection_strategy:"seeded_range",
       weekly_hours_cap:15,
+      tier1_min_weekly_hours:12,
+      tier1_ideal_weekly_hours:13,
+      max_daily_trainer_hours:4,
+      max_trainer_work_days:6,
       max_classes_per_day_default:3,
+      enforce_assignment_days:true,
+      enforce_leave_and_off_days:true,
+      trainer_week_off_strategy:"historic_lowest_days",
+      max_week_off_days:2,
+      protect_pinned_classes_from_repair:true,
+      hard_block_inactive_trainers:true,
+      require_certified_format_match:true,
       conflict_policy:"settings_override_soft_rules",
       ai_api_key:"",
       ai_provider:"openrouter",
       ai_model:"openai/gpt-oss-120b:free",
+      ai_backup_model:"z-ai/glm-4.5-air:free",
       ai_base_url:"",
     },
     source_of_truth:{
@@ -6470,11 +6598,18 @@ function settNormalizeConfig(config){
   if(!validTargetStrategies.has(next.settings_options.target_selection_strategy))next.settings_options.target_selection_strategy=base.settings_options.target_selection_strategy;
   next.settings_options.target_cap_buffer=Number(next.settings_options.target_cap_buffer??base.settings_options.target_cap_buffer);
   next.settings_options.weekly_hours_cap=Number(next.settings_options.weekly_hours_cap??base.settings_options.weekly_hours_cap);
+  next.settings_options.tier1_min_weekly_hours=Number(next.settings_options.tier1_min_weekly_hours??base.settings_options.tier1_min_weekly_hours);
+  next.settings_options.tier1_ideal_weekly_hours=Number(next.settings_options.tier1_ideal_weekly_hours??base.settings_options.tier1_ideal_weekly_hours);
+  next.settings_options.max_daily_trainer_hours=Number(next.settings_options.max_daily_trainer_hours??base.settings_options.max_daily_trainer_hours);
+  next.settings_options.max_trainer_work_days=Math.max(1,Math.min(6,Number(next.settings_options.max_trainer_work_days??base.settings_options.max_trainer_work_days)));
   next.settings_options.max_classes_per_day_default=Number(next.settings_options.max_classes_per_day_default??base.settings_options.max_classes_per_day_default);
+  next.settings_options.max_week_off_days=Math.max(0,Math.min(2,Number(next.settings_options.max_week_off_days??base.settings_options.max_week_off_days)));
+  if(!["historic_lowest_days","manual_only"].includes(next.settings_options.trainer_week_off_strategy))next.settings_options.trainer_week_off_strategy=base.settings_options.trainer_week_off_strategy;
   next.settings_options.ai_api_key=String(next.settings_options.ai_api_key||"");
   next.settings_options.ai_provider=String(next.settings_options.ai_provider||"openrouter").toLowerCase();
   if(!["openrouter","openai"].includes(next.settings_options.ai_provider))next.settings_options.ai_provider="openrouter";
   next.settings_options.ai_model=String(next.settings_options.ai_model||base.settings_options.ai_model||"openai/gpt-oss-120b:free");
+  next.settings_options.ai_backup_model=String(next.settings_options.ai_backup_model||base.settings_options.ai_backup_model||"z-ai/glm-4.5-air:free");
   next.settings_options.ai_base_url=String(next.settings_options.ai_base_url||"");
   next.manual_protected=Array.isArray(next.manual_protected)?next.manual_protected:[];
   next.manual_excluded=Array.isArray(next.manual_excluded)?next.manual_excluded:[];
@@ -6591,7 +6726,16 @@ function settValidateConfig(config){
     });
   }
   if(Number(cfg.settings_options?.weekly_hours_cap||0)<=0)errors.push("Advanced: weekly trainer hours cap must be greater than zero.");
+  if(Number(cfg.settings_options?.tier1_min_weekly_hours||0)<1)errors.push("Advanced: Tier 1 minimum weekly hours must be greater than zero.");
+  if(Number(cfg.settings_options?.tier1_ideal_weekly_hours||0)<Number(cfg.settings_options?.tier1_min_weekly_hours||0))warnings.push("Advanced: Tier 1 ideal hours should be at least the Tier 1 minimum.");
+  if(Number(cfg.settings_options?.tier1_ideal_weekly_hours||0)>Number(cfg.settings_options?.weekly_hours_cap||0))warnings.push("Advanced: Tier 1 ideal hours should not exceed the weekly cap.");
+  if(Number(cfg.settings_options?.max_daily_trainer_hours||0)>4)warnings.push("Generation: max trainer hours/day is above the recommended 4-hour cap.");
+  if(Number(cfg.settings_options?.max_trainer_work_days||0)>6)errors.push("Generation: trainer work days cannot allow all 7 days.");
   if(Number(cfg.settings_options?.max_classes_per_day_default||0)<=0)errors.push("Advanced: default classes per day cap must be greater than zero.");
+  if(Number(cfg.settings_options?.max_week_off_days||0)>2)errors.push("Advanced: max default week-off days cannot exceed 2.");
+  if(!cfg.settings_options?.enforce_assignment_days)warnings.push("Generation: assignment-day enforcement is disabled.");
+  if(!cfg.settings_options?.enforce_leave_and_off_days)warnings.push("Generation: leave and week-off enforcement is disabled.");
+  if(!cfg.settings_options?.protect_pinned_classes_from_repair)warnings.push("Generation: repair may move pinned classes.");
   if(cfg.settings_options?.block_hard_conflict_saves===false)warnings.push("Advanced: invalid saves are allowed; Settings will still be treated as canonical.");
   if(!cfg.settings_options?.pipeline_requires_validation)warnings.push("Advanced: pipeline validation gate is disabled.");
   return {errors,warnings,info};
@@ -6691,28 +6835,7 @@ function renderSettingsView(area){
   const wrap=document.createElement("div");
   wrap.className="sett-view";
   wrap.innerHTML=`
-    <div class="sett-command">
-      <aside class="sett-rail">
-        <div class="sett-nav">
-          <div class="sett-nav-group-label">Command</div>
-          <button class="sett-nav-btn active" id="stab-overview" onclick="settSetTab('overview')">Overview</button>
-          <div class="sett-nav-group-label">Personnel</div>
-          <button class="sett-nav-btn" id="stab-trainers" onclick="settSetTab('trainers')">Trainer Directory</button>
-          <button class="sett-nav-btn" id="stab-qualifications" onclick="settSetTab('qualifications')">Certifications</button>
-          <button class="sett-nav-btn" id="stab-availability" onclick="settSetTab('availability')">Availability</button>
-          <button class="sett-nav-btn" id="stab-leave" onclick="settSetTab('leave')">Leave & Off Days</button>
-          <div class="sett-nav-group-label">Strategy</div>
-          <button class="sett-nav-btn" id="stab-rules" onclick="settSetTab('rules')">Scheduling Rules</button>
-          <button class="sett-nav-btn" id="stab-conflicts" onclick="settSetTab('conflicts')">Conflict Resolver</button>
-          <div class="sett-nav-group-label">System</div>
-          <button class="sett-nav-btn" id="stab-ai" onclick="settSetTab('ai')">AI Intelligence</button>
-          <button class="sett-nav-btn" id="stab-advanced" onclick="settSetTab('advanced')">Advanced Policy</button>
-        </div>
-        <div style="margin:20px 14px 14px;padding-top:14px;border-top:1px solid #E2E8F0">
-          <button class="sett-ghost-btn" style="width:100%;justify-content:center" onclick="settExportConfig()">Export JSON</button>
-        </div>
-      </aside>
-
+    <div class="settings-console-layout">
       <main class="sett-main">
         <div class="sett-main-actions">
           <div class="sett-action-group">
@@ -6774,24 +6897,28 @@ function renderSettingsView(area){
         <div class="sett-section" id="ssec-availability">
           <div class="sett-section-label">Availability</div>
           <div class="sett-section-desc">Set which days each trainer is available per studio and their shift time window.</div>
-          <div style="display:block;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch">
-            <div id="avail-grid-wrap"></div>
+          <div class="sett-subtabs">
+            <button class="sett-subtab active" data-section="availability" data-subtab="weekly" onclick="settSetSub('availability','weekly')">Weekly Availability</button>
+            <button class="sett-subtab" data-section="availability" data-subtab="leave" onclick="settSetSub('availability','leave')">Leave & Off Days</button>
+          </div>
+          <div class="sett-subpanel active" data-section="availability" data-subpanel="weekly">
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <div id="avail-grid-wrap" class="avail-grid" style="min-width:640px"></div>
           </div>
           <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button></div>
-        </div>
-
-        <div class="sett-section" id="ssec-leave">
-          <div class="sett-section-label">Leave & Off Days</div>
-          <div id="leave-list"></div>
-          <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveLeave()">Save Leave</button></div>
+          </div>
+          <div class="sett-subpanel" data-section="availability" data-subpanel="leave">
+            <div id="leave-list"></div>
+            <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveLeave()">Save Leave</button></div>
+          </div>
         </div>
 
         <div class="sett-section" id="ssec-rules">
           <div class="sett-section-head">
             <div>
               <div class="sett-section-kicker">Logic</div>
-              <div class="sett-section-label">📋 Scheduling Rules</div>
-              <div class="sett-section-desc">Targets, Mix, Priority, and Logic.</div>
+              <div class="sett-section-label">Scheduling Rules</div>
+              <div class="sett-section-desc">Setup targets, Class Mix and Formats, trainer priority, pinned classes, custom rules, and universal safeguards.</div>
             </div>
           </div>
           <div class="sett-subtabs">
@@ -6830,14 +6957,6 @@ function renderSettingsView(area){
         </div>
       </main>
 
-      <aside class="sett-inspector">
-        <div class="sett-inspector-title">Selection Inspector</div>
-        <div class="sett-inspector-box" id="sett-inspector-selection">Select cells to apply bulk changes.</div>
-        <div class="sett-inspector-title">Active Health</div>
-        <div id="sett-conflict-list" class="sett-conflict-list">
-          <div class="sett-conflict-item">Loading validation…</div>
-        </div>
-      </aside>
     </div>
   `;
   area.appendChild(wrap);
@@ -6847,6 +6966,7 @@ function renderSettingsView(area){
 function settSetTab(tab){
   let mainTab=tab;
   if(["targets","classmix","priority","custom","customrules","universal"].includes(tab)) mainTab="rules";
+  if(tab==="leave") mainTab="availability";
   _settSection=mainTab;
   document.querySelectorAll(".sett-tab,.sett-nav-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".sett-section").forEach(s=>s.classList.remove("active"));
@@ -6870,13 +6990,8 @@ function settSetTab(tab){
   settResetMatrixSelection(false);
   if(mainTab==="overview")settRenderOverview();
   if(mainTab==="advanced")settRenderAdvancedOptions();
-  if(mainTab==="ai"){
-    ["fill_rate","revenue","avg_checkin","session_frequency","trend"].forEach(id=>{
-      const sl=document.getElementById("sw-"+id);
-      const vl=document.getElementById("sw-"+id+"-val");
-      if(sl&&vl){sl.oninput=()=>{vl.textContent=sl.value+"%";};}
-    });
-  }
+  if(mainTab==="ai"){settRenderAISettings();}
+  if(mainTab==="availability"&&tab==="leave")settSetSub("availability","leave");
   settValidateAndRender();
 }
 
@@ -7035,6 +7150,7 @@ function settRenderAdvancedOptions(){
       <div class="sett-option-grid">
         ${settAdvancedOptionCard("field","ai_provider","AI Provider","Choose where AI schedule generation requests are sent.",`<select onchange="settSetAdvancedOption('ai_provider',this.value,'string')"><option value="openrouter" ${o.ai_provider==="openrouter"?"selected":""}>OpenRouter</option><option value="openai" ${o.ai_provider==="openai"?"selected":""}>OpenAI-Compatible</option></select>`)}
         ${settAdvancedOptionCard("field","ai_model","AI Model","Model name to use for Generate with AI.",`<input type="text" value="${rvEscapeAttr(o.ai_model||"openai/gpt-oss-120b:free")}" placeholder="openai/gpt-oss-120b:free" autocomplete="off" onchange="settSetAdvancedOption('ai_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_backup_model","Backup AI Model","Second model retried automatically when the primary plan parses poorly or fails hard-limit enforcement.",`<input type="text" value="${rvEscapeAttr(o.ai_backup_model||"z-ai/glm-4.5-air:free")}" placeholder="z-ai/glm-4.5-air:free" autocomplete="off" onchange="settSetAdvancedOption('ai_backup_model',this.value,'string')">`)}
         ${settAdvancedOptionCard("field","ai_base_url","AI Base URL (Optional)","Override provider base URL when needed.",`<input type="text" value="${rvEscapeAttr(o.ai_base_url||"")}" placeholder="https://openrouter.ai/api/v1" autocomplete="off" onchange="settSetAdvancedOption('ai_base_url',this.value,'string')">`)}
         ${settAdvancedOptionCard("field","ai_api_key","AI API Key","Saved in Control Center and used only when you click Generate with AI.",`<input type="password" value="${rvEscapeAttr(o.ai_api_key||"")}" placeholder="Paste API key" autocomplete="off" onchange="settSetAdvancedOption('ai_api_key',this.value,'string')">`)}
       </div>
@@ -7054,9 +7170,20 @@ function settRenderAdvancedOptions(){
         ${settAdvancedOptionCard("toggle","enforce_exact_daily_targets","Prioritize exact daily targets","Tell the planner to treat daily target counts as the preferred allocation before exploratory classes.",toggle("enforce_exact_daily_targets"))}
         ${settAdvancedOptionCard("toggle","auto_repair_underfilled_days","Auto-repair underfilled days","Allow the planner to add safe classes when a day cannot reach the target.",toggle("auto_repair_underfilled_days"))}
         ${settAdvancedOptionCard("toggle","allow_soft_mix_overrides","Allow soft class-mix overrides","Permit controlled deviations from class-mix targets when trainer availability blocks a cleaner plan.",toggle("allow_soft_mix_overrides"))}
+        ${settAdvancedOptionCard("toggle","enforce_assignment_days","Enforce assignment days","Block trainer assignments outside the saved studio-specific availability days.",toggle("enforce_assignment_days"))}
+        ${settAdvancedOptionCard("toggle","enforce_leave_and_off_days","Enforce leave and week offs","Block trainer assignments on saved leave periods, dated off days, and historic week-off defaults.",toggle("enforce_leave_and_off_days"))}
+        ${settAdvancedOptionCard("field","trainer_week_off_strategy","Week-off defaulting","Choose how trainer default week offs are selected when a profile still has all seven days active.",select("trainer_week_off_strategy",[["historic_lowest_days","Use historic lowest-use days"],["manual_only","Manual only"]]))}
+        ${settAdvancedOptionCard("field","max_week_off_days","Max default week offs","Maximum historic week-off days assigned by default per trainer.",number("max_week_off_days",0,2,1))}
+        ${settAdvancedOptionCard("toggle","protect_pinned_classes_from_repair","Protect pinned classes from repair","Keep manual pins fixed when auto-repair fills target gaps.",toggle("protect_pinned_classes_from_repair"))}
+        ${settAdvancedOptionCard("toggle","hard_block_inactive_trainers","Block inactive trainers","Prevent inactive trainer profiles from being used by Standard, AI, and repair generation.",toggle("hard_block_inactive_trainers"))}
+        ${settAdvancedOptionCard("toggle","require_certified_format_match","Require certification match","Treat trainer format certification as a hard eligibility check before assignment.",toggle("require_certified_format_match"))}
         ${settAdvancedOptionCard("field","target_selection_strategy","Daily count selection","Choose how the planner picks the desired class count inside each min/max day range.",select("target_selection_strategy",[["seeded_range","Seeded range per run"],["balanced_midpoint","Balanced midpoint"],["lower_bias","Lower bias"],["upper_bias","Upper bias"]]))}
         ${settAdvancedOptionCard("field","target_cap_buffer","Target cap buffer","Minimum gap between daily min and max before validation warns about low repair room.",number("target_cap_buffer",0,8,1))}
-        ${settAdvancedOptionCard("field","weekly_hours_cap","Tier-1 weekly hours cap","Default weekly utilization cap used by planner guardrail copy and reporting metadata.",number("weekly_hours_cap",1,40,0.5))}
+        ${settAdvancedOptionCard("field","weekly_hours_cap","Tier-1 weekly hours cap","Hard Tier 1 weekly cap used by planner guardrail copy and reporting metadata.",number("weekly_hours_cap",1,40,0.5))}
+        ${settAdvancedOptionCard("field","tier1_min_weekly_hours","Tier-1 minimum weekly hours","Minimum target the planner pulls Tier 1 trainers toward before lower-tier fill.",number("tier1_min_weekly_hours",1,15,0.5))}
+        ${settAdvancedOptionCard("field","tier1_ideal_weekly_hours","Tier-1 ideal weekly hours","Preferred Tier 1 utilisation target before tapering toward the 15h cap.",number("tier1_ideal_weekly_hours",1,15,0.5))}
+        ${settAdvancedOptionCard("field","max_daily_trainer_hours","Max trainer hours/day","Hard daily trainer assignment cap across all classes and locations.",number("max_daily_trainer_hours",1,8,0.5))}
+        ${settAdvancedOptionCard("field","max_trainer_work_days","Max trainer work days","Prevents all-seven-day trainer schedules while allowing one or two weekly off days.",number("max_trainer_work_days",1,6,1))}
         ${settAdvancedOptionCard("field","max_classes_per_day_default","Default classes per instructor/day","Fallback per-day instructor cap when a profile does not specify a tighter value.",number("max_classes_per_day_default",1,8,1))}
       </div>
     </div>
@@ -7082,6 +7209,146 @@ function settSaveAdvancedOptions(){
   settSaveCanonicalConfig("advanced","Advanced settings saved");
 }
 
+function settRenderAISettings(){
+  const wrap=document.getElementById("ai-settings-wrap");
+  if(!wrap)return;
+  const cfg=(_settSchedConfig||{});
+  const sw=cfg.scoring_weights||{fill_rate:35,revenue:25,avg_checkin:20,session_frequency:10,trend:10};
+  const tb=cfg.time_band_weights||{morning:1.0,midday:1.15,evening:1.1};
+  const ap=cfg.am_pm_settings||{morning_cap_pct:50,enforce_split:false,peak_slots:["11:00","11:30","19:00","19:15"]};
+  const sliderRow=(id,label,val,min,max,step,desc)=>`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:800;color:#0F172A">${label}</span>
+        <span id="sw-${id}-val" style="font-size:13px;font-weight:900;color:#1E40AF;min-width:36px;text-align:right">${val}${step<1?"×":"%"}</span>
+      </div>
+      <input type="range" id="sw-${id}" min="${min}" max="${max}" step="${step}" value="${val}"
+        style="width:100%;accent-color:#1E40AF"
+        oninput="document.getElementById('sw-${id}-val').textContent=this.value+'${step<1?"×":"%"}';settUpdateScoringWeight('${id}',this.value)">
+      <div style="font-size:10px;color:#64748B;margin-top:3px">${desc}</div>
+    </div>`;
+  wrap.innerHTML=`
+    <div class="sett-config-panel" style="margin-bottom:12px">
+      <div class="sett-section-kicker">Scoring Weights</div>
+      <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5">Controls how the optimiser ranks class × trainer × slot combos. Weights must sum to 100.</div>
+      <div id="sw-sum-badge" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;margin-bottom:16px;background:#D1FAE5;color:#065F46">Sum: ${Object.values(sw).reduce((a,b)=>a+Number(b),0)}% ✓</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px">
+        ${sliderRow("fill_rate","Fill Rate",sw.fill_rate,0,60,1,"% of seats filled — primary quality signal")}
+        ${sliderRow("revenue","Revenue",sw.revenue,0,50,1,"Normalised revenue per session within location")}
+        ${sliderRow("avg_checkin","Avg Check-in",sw.avg_checkin,0,40,1,"Average bodies in the room — absolute attendance")}
+        ${sliderRow("session_frequency","Session Frequency",sw.session_frequency,0,30,1,"How often this combo runs — recency & reliability signal")}
+        ${sliderRow("trend","Trend",sw.trend,0,30,1,"Positive fill-rate slope over last 12 weeks gets bonus")}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="sett-ghost-btn" onclick="settResetScoringWeights()">Reset Defaults</button>
+        <button class="sett-ghost-btn primary" onclick="settSaveAISettings()">Save Weights</button>
+      </div>
+    </div>
+
+    <div class="sett-config-panel" style="margin-bottom:12px">
+      <div class="sett-section-kicker">AM / PM Time-Band Multipliers</div>
+      <div style="font-size:12px;color:#64748B;margin-bottom:14px;line-height:1.5">Multiplies the composite score for slots in each time band. 1.0 = neutral. Above 1.0 = prefer this band. Below 1.0 = deprioritise.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px">
+        ${sliderRow("tb_morning","Morning (07:00–09:59)",tb.morning,0.5,2.0,0.05,"Early-bird classes — higher if your AM crowd is loyal")}
+        ${sliderRow("tb_midday","Midday (10:00–12:59)",tb.midday,0.5,2.0,0.05,"Peak studio window — usually highest traffic")}
+        ${sliderRow("tb_evening","Evening (17:00–20:30)",tb.evening,0.5,2.0,0.05,"After-work crowd — strong at most locations")}
+      </div>
+      <div style="margin-top:8px">
+        <label style="font-size:11px;font-weight:800;color:#0F172A;display:flex;align-items:center;gap:8px">
+          <input type="checkbox" ${ap.enforce_split?"checked":""} onchange="settSetAMPMOption('enforce_split',this.checked)">
+          Enforce AM / PM split cap
+        </label>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
+          <label style="font-size:11px;color:#64748B">Morning classes cap (% of day)</label>
+          <input type="number" min="20" max="80" value="${ap.morning_cap_pct||50}" style="width:70px;height:30px;border:1px solid #CBD5E1;border-radius:6px;padding:0 8px;font-size:12px;font-weight:700" oninput="settSetAMPMOption('morning_cap_pct',+this.value)">
+          <span style="font-size:11px;color:#64748B">%</span>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:10px;font-weight:900;text-transform:uppercase;color:#64748B;letter-spacing:.06em;margin-bottom:8px">Peak Priority Slots</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="peak-slots-row">
+          ${["07:00","07:15","07:30","08:00","08:30","09:00","09:15","09:30","10:00","10:15","10:30","11:00","11:30","17:30","17:45","18:00","18:30","19:00","19:15","19:30","20:00"].map(t=>{
+            const on=(ap.peak_slots||[]).includes(t);
+            return`<button class="sett-mini-btn${on?" primary":""}" onclick="settTogglePeakSlot('${t}',this)" style="font-size:10px;padding:3px 8px">${t}</button>`;
+          }).join("")}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="sett-ghost-btn primary" onclick="settSaveAISettings()">Save AM/PM Settings</button>
+      </div>
+    </div>
+
+    <div class="sett-config-panel">
+      <div class="sett-section-kicker">Planner Intelligence</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        <div class="sett-option-card">
+          <div class="sett-option-top"><span class="sett-option-title">Score Floor</span><input type="number" min="0" max="50" value="${cfg.score_floor||25}" style="width:56px;height:28px;border:1px solid #CBD5E1;border-radius:6px;padding:0 6px;font-size:12px" onchange="settSetPlannerOption('score_floor',+this.value)"></div>
+          <div class="sett-option-desc">Classes scoring below this threshold are marked DROP and excluded unless forced by mix rules.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><span class="sett-option-title">PROTECT Threshold</span><input type="number" min="50" max="100" value="${cfg.protect_threshold||70}" style="width:56px;height:28px;border:1px solid #CBD5E1;border-radius:6px;padding:0 6px;font-size:12px" onchange="settSetPlannerOption('protect_threshold',+this.value)"></div>
+          <div class="sett-option-desc">Slots scoring at or above this are PROTECT — always included in the optimised schedule.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><span class="sett-option-title">Backtrack Depth</span><input type="number" min="1" max="10" value="${cfg.backtrack_depth||3}" style="width:56px;height:28px;border:1px solid #CBD5E1;border-radius:6px;padding:0 6px;font-size:12px" onchange="settSetPlannerOption('backtrack_depth',+this.value)"></div>
+          <div class="sett-option-desc">Max retries per slot when hard constraints block the top candidate. Higher = slower but more complete.</div>
+        </div>
+        <div class="sett-option-card">
+          <div class="sett-option-top"><span class="sett-option-title">Trend Window</span><input type="number" min="4" max="26" value="${cfg.trend_window_weeks||12}" style="width:56px;height:28px;border:1px solid #CBD5E1;border-radius:6px;padding:0 6px;font-size:12px" onchange="settSetPlannerOption('trend_window_weeks',+this.value)"><span style="font-size:10px;color:#64748B;margin-left:4px">wks</span></div>
+          <div class="sett-option-desc">Number of calendar weeks used to calculate fill-rate trend (positive slope gets scoring bonus).</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function settUpdateScoringWeight(key,val){
+  if(!_settSchedConfig)_settSchedConfig=settNormalizeConfig({});
+  if(!_settSchedConfig.scoring_weights)_settSchedConfig.scoring_weights={fill_rate:35,revenue:25,avg_checkin:20,session_frequency:10,trend:10};
+  _settSchedConfig.scoring_weights[key]=Number(val);
+  const sum=Object.values(_settSchedConfig.scoring_weights).reduce((a,b)=>a+Number(b),0);
+  const badge=document.getElementById("sw-sum-badge");
+  if(badge){
+    const ok=Math.abs(sum-100)<1;
+    badge.style.background=ok?"#D1FAE5":"#FEF3C7";
+    badge.style.color=ok?"#065F46":"#B45309";
+    badge.textContent=`Sum: ${sum}% ${ok?"✓":"⚠ should be 100"}`;
+  }
+}
+
+function settSetAMPMOption(key,val){
+  if(!_settSchedConfig)_settSchedConfig=settNormalizeConfig({});
+  if(!_settSchedConfig.am_pm_settings)_settSchedConfig.am_pm_settings={morning_cap_pct:50,enforce_split:false,peak_slots:["11:00","11:30","19:00","19:15"]};
+  _settSchedConfig.am_pm_settings[key]=val;
+}
+
+function settTogglePeakSlot(t,btn){
+  if(!_settSchedConfig)_settSchedConfig=settNormalizeConfig({});
+  if(!_settSchedConfig.am_pm_settings)_settSchedConfig.am_pm_settings={morning_cap_pct:50,enforce_split:false,peak_slots:["11:00","11:30","19:00","19:15"]};
+  const slots=_settSchedConfig.am_pm_settings.peak_slots||[];
+  const idx=slots.indexOf(t);
+  if(idx>=0){slots.splice(idx,1);btn.classList.remove("primary");}
+  else{slots.push(t);btn.classList.add("primary");}
+  _settSchedConfig.am_pm_settings.peak_slots=slots;
+}
+
+function settSetPlannerOption(key,val){
+  if(!_settSchedConfig)_settSchedConfig=settNormalizeConfig({});
+  _settSchedConfig[key]=val;
+}
+
+function settResetScoringWeights(){
+  if(!_settSchedConfig)_settSchedConfig=settNormalizeConfig({});
+  _settSchedConfig.scoring_weights={fill_rate:35,revenue:25,avg_checkin:20,session_frequency:10,trend:10};
+  settRenderAISettings();
+  showToast("Scoring weights reset to defaults","");
+}
+
+function settSaveAISettings(){
+  if(!_settSchedConfig)return;
+  settSaveCanonicalConfig("ai","AI & scoring settings saved");
+}
+
 function settLoadData(){
   const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
     _settTrainerProfiles=Array.isArray(d)?d:(Array.isArray(d?.data)?d.data:[]);
@@ -7094,7 +7361,7 @@ function settLoadData(){
   Promise.all([p1,p2]).then(()=>{
     settRenderOverview();
     settRenderTrainerManager();settRenderQualifications();settRenderAvailability();settRenderTargets();
-    settRenderLeave();settRenderClassMix();settRenderPriority();settRenderCustomRules();settRenderAdvancedOptions();
+    settRenderLeave();settRenderClassMix();settRenderPriority();settRenderCustomRules();settRenderAdvancedOptions();settRenderAISettings();
     settPopulateLeaveTrainerList();
     settValidateAndRender();
   }).catch(e=>console.error("Settings load error",e));
@@ -7152,12 +7419,13 @@ function settRenderTrainerManager(){
           ${LOCS_ALL.map(loc=>{
             const ld=(t.locations||{})[loc]||{};
             const enabled=!!(t.locations||{})[loc];
-            const activeDays=new Set(ld.available_days||DAYS_ALL);
+            const activeDays=new Set(enabled?settAvailabilityDaysFor(t,ld):[]);
             const tw=ld.time_window||{};
+            const weekOffs=settHistoricWeekOffDays(t);
             return`<div class="trainer-mgr-loc" data-loc="${rvEscapeAttr(loc)}">
               <div class="trainer-mgr-loc-head">
                 <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" class="trainer-mgr-loc-enabled" ${enabled?"checked":""}> ${rvEscapeHtml(loc.split(",")[0])}</label>
-                <span style="font-size:9px;color:var(--text-muted)">${ld.session_count||0} sessions</span>
+                <span style="font-size:9px;color:var(--text-muted)">${ld.session_count||0} sessions${weekOffs.length?` · off ${weekOffs.map(d=>d.slice(0,3)).join("/")}`:""}</span>
               </div>
               <div class="avail-days">
                 ${DAYS_ALL.map(day=>`<span class="avail-day-chip${activeDays.has(day)?" on":""}" data-day="${day}" onclick="settToggleDay(this)">${day.slice(0,3)}</span>`).join("")}
@@ -7194,7 +7462,7 @@ function settCollectTrainerManager(){
       const loc=locEl.dataset.loc;
       const selectedDays=[...locEl.querySelectorAll(".avail-day-chip.on")].map(ch=>ch.dataset.day);
       const old=(prev.locations||{})[loc]||{};
-      const days=[...new Set(selectedDays.length?selectedDays:(old.available_days||DAYS_ALL))];
+      const days=[...new Set(selectedDays.length?selectedDays:settAvailabilityDaysFor(prev,old))];
       locs[loc]={
         ...old,
         available_days:days,
@@ -7292,8 +7560,9 @@ function settRenderQualifications(){
     <thead><tr>
       <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Trainer</th>
       <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Tier</th>
-      ${QUAL_KEYS.map(k=>`<th title="${k}" style="background:#1E293B;border-color:rgba(255,255,255,0.1)"><div class="qual-col-head">
+      ${QUAL_KEYS.map(k=>`<th title="${rvEscapeAttr(QUAL_FORMAT_HINTS[k]||k)}" style="background:#1E293B;border-color:rgba(255,255,255,0.1)"><div class="qual-col-head">
         <span style="font-size:8px;font-weight:900;color:#F8FAFC">${QUAL_LABELS[k]||k}</span>
+        <span style="font-size:7px;font-weight:700;color:#94A3B8;line-height:1.2">${rvEscapeHtml((QUAL_FORMAT_HINTS[k]||"").split(",").slice(0,2).join(", "))}</span>
         <div class="qual-col-actions">
           <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#3B82F6" title="Enable All" onclick="settQualColumn('${k}',true);event.stopPropagation()">+</button>
           <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#EF4444" title="Disable All" onclick="settQualColumn('${k}',false);event.stopPropagation()">−</button>
@@ -7345,9 +7614,9 @@ function settQualColumn(key,on){
 }
 
 function settFilterAvail(q){
-  document.querySelectorAll(".avail-card").forEach(c=>{
-    const name=(c.querySelector(".avail-name")||{}).textContent||"";
-    c.style.display=(!q||name.toLowerCase().includes(q.toLowerCase()))?"":"none";
+  document.querySelectorAll(".avail-trainer-card").forEach(c=>{
+    const name=c.dataset.trainer||"";
+    c.style.display=(!q||name.includes(q.toLowerCase()))?"":"none";
   });
 }
 
@@ -7381,67 +7650,176 @@ function settSaveQualifications(){
 function settRenderAvailability(){
   const wrap=document.getElementById("avail-grid-wrap");
   if(!wrap||!_settTrainerProfiles)return;
-  
-  const LOC_ABBR={"Kwality House, Kemps Corner":"Kwality KC","Supreme HQ, Bandra":"Supreme B","Kenkere House":"Kenkere","Courtside":"Courtside","Copper & Cloves":"Copper"};
   const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
-  wrap.innerHTML=`
-    <div class="avail-matrix-container" style="background:#0F172A;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden">
-      <table class="avail-matrix" style="border-collapse:collapse;color:#F8FAFC;font-size:12px;table-layout:auto">
-        <thead>
-          <tr style="background:#1E293B;text-align:left">
-            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Trainer</th>
-            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Studio</th>
-            ${DAYS_ALL.map(d=>`<th style="padding:8px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1);font-size:10px;white-space:nowrap">${d.slice(0,2)}</th>`).join("")}
-            <th style="padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.1);white-space:nowrap">Window</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${trainers.sort((a,b)=>a.name.localeCompare(b.name)).map(t=>{
-            const locEntries=Object.entries(t.locations||{});
-            if(locEntries.length===0)return "";
-            return locEntries.map(([loc,ld],idx)=>{
-              const activeDays=new Set(ld.available_days||[]);
-              const tw=ld.time_window||{};
-              const locLabel=LOC_ABBR[loc]||loc;
-              return `
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);${idx===0?"border-top:2px solid rgba(255,255,255,0.1)":""}">
-                  ${idx===0?`<td rowspan="${locEntries.length}" style="padding:8px 12px;font-weight:700;vertical-align:top;background:rgba(255,255,255,0.02);white-space:nowrap;font-size:11px">${rvEscapeHtml(t.name)}</td>`:""}
-                  <td style="padding:6px 12px;color:#94A3B8;font-size:10px;white-space:nowrap">${rvEscapeHtml(locLabel)}</td>
-                  ${DAYS_ALL.map(d=>{
-                    const isOn=activeDays.has(d);
-                    const isWeekend=["Saturday","Sunday"].includes(d);
-                    const mustOffWeekend=["Anisha Shah","Vivaran Dhasmana","Mrigakshi Jaiswal","Pushyank Nahar"].includes(t.name) && isWeekend;
-                    const style=isOn?"background:#3B82F6;color:#fff":"background:rgba(255,255,255,0.05);color:#475569";
-                    if(mustOffWeekend){
-                      return `<td style="padding:3px;text-align:center"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;background:#EF4444;color:#fff;font-size:8px;font-weight:900" title="Mandatory Weekend Off">✕</span></td>`;
-                    }
-                    return `<td style="padding:3px;text-align:center">
-                      <span class="avail-day-chip ${isOn?"on":""}"
-                            data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-day="${d}"
-                            onclick="settToggleDay(this)"
-                            style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:5px;cursor:pointer;${style};transition:all 0.15s;font-weight:800;font-size:10px;user-select:none">
-                        ${d.slice(0,1)}
-                      </span>
-                    </td>`;
-                  }).join("")}
-                  <td style="padding:6px 12px;white-space:nowrap">
-                    <div style="display:flex;align-items:center;gap:3px">
-                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="start" value="${tw.start||"07:00"}" style="background:#1E293B;border:1px solid rgba(255,255,255,0.15);color:#F8FAFC;font-size:10px;padding:2px 4px;border-radius:4px;width:76px">
-                      <span style="color:#475569;font-size:10px">–</span>
-                      <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="end" value="${tw.end||"21:00"}" style="background:#1E293B;border:1px solid rgba(255,255,255,0.15);color:#F8FAFC;font-size:10px;padding:2px 4px;border-radius:4px;width:76px">
-                    </div>
-                  </td>
-                </tr>
-              `;
-            }).join("");
-          }).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
+  const LOC_SHORT={"Kwality House, Kemps Corner":"Kwality","Supreme HQ, Bandra":"Supreme","Kenkere House":"Kenkere","Courtside":"Courtside","Copper & Cloves":"Copper+Cloves"};
+  const TIER_COLOR={"1":"#1E40AF","2":"#7C3AED","3":"#D97706","4":"#64748B"};
+  const sorted=[...trainers].sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+
+  // toolbar
+  const tb=document.createElement("div");
+  tb.style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px";
+  tb.innerHTML=`
+    <input type="text" placeholder="Search trainer…" oninput="settFilterAvail(this.value)" class="sett-input" style="min-width:160px;flex:1">
+    <select class="sett-select" id="avail-loc-filter" onchange="settFilterAvailByLoc(this.value)" style="min-width:160px">
+      <option value="">All Studios</option>
+      ${(LOCS_ALL||["Kwality House, Kemps Corner","Supreme HQ, Bandra","Kenkere House"]).map(l=>`<option value="${l}">${LOC_SHORT[l]||l}</option>`).join("")}
+    </select>
+    <select class="sett-select" id="avail-tier-filter" onchange="settFilterAvailByTier(this.value)">
+      <option value="">All Tiers</option>
+      <option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option>
+    </select>
+    <button class="sett-ghost-btn" onclick="settExpandAllAvail()">Expand All</button>
+    <button class="sett-ghost-btn" onclick="settCollapseAllAvail()">Collapse All</button>`;
+  wrap.innerHTML="";
+  wrap.appendChild(tb);
+
+  const grid=document.createElement("div");
+  grid.className="avail-cards-container";
+  grid.style="display:flex;flex-direction:column;gap:12px";
+  grid.id="avail-cards-container";
+
+  sorted.forEach(t=>{
+    const locEntries=Object.entries(t.locations||{});
+    if(!locEntries.length)return;
+    const active=trainerIsActive(t);
+    const img=trainerImage(t.name);
+    const tierColor=TIER_COLOR[String(t.tier||3)]||"#64748B";
+
+    const card=document.createElement("div");
+    card.className="avail-trainer-card";
+    card.dataset.trainer=(t.name||"").toLowerCase();
+    card.dataset.tier=String(t.tier||3);
+    card.dataset.locs=locEntries.map(([l])=>l).join("|");
+    card.style="border:1px solid #E2E8F0;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(15,23,42,.04)";
+
+    // header
+    const hdr=document.createElement("div");
+    hdr.style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;cursor:pointer;user-select:none";
+    hdr.innerHTML=`
+      <div style="width:36px;height:36px;border-radius:50%;background:${tierColor}22;border:2px solid ${tierColor};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:${tierColor};flex-shrink:0;overflow:hidden">
+        ${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`<span>${trainerInitials(t.name||"")}</span>`}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:#0F172A">${rvEscapeHtml(t.name||"")}</div>
+        <div style="font-size:10px;color:#64748B;margin-top:2px">${locEntries.map(([l])=>LOC_SHORT[l]||l).join(" · ")} &nbsp;·&nbsp; ${active?'<span style="color:#15803D;font-weight:700">Active</span>':'<span style="color:#B91C1C;font-weight:700">Inactive</span>'}${settHistoricWeekOffDays(t).length?` &nbsp;·&nbsp; Historic off: <b>${settHistoricWeekOffDays(t).map(d=>d.slice(0,3)).join(", ")}</b>`:""}</div>
+      </div>
+      <span style="font-size:9px;font-weight:900;padding:2px 8px;border-radius:6px;background:${tierColor}22;color:${tierColor}">T${t.tier||3}</span>
+      <span class="avail-card-chevron" style="font-size:14px;color:#94A3B8;transition:transform .2s">▾</span>`;
+    hdr.onclick=()=>{
+      const body=card.querySelector(".avail-card-body");
+      const chev=hdr.querySelector(".avail-card-chevron");
+      const open=body.style.display!=="none";
+      body.style.display=open?"none":"grid";
+      if(chev)chev.style.transform=open?"":"rotate(-180deg)";
+    };
+    card.appendChild(hdr);
+
+    // body
+    const body=document.createElement("div");
+    body.className="avail-card-body";
+    body.style="padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px";
+
+    locEntries.forEach(([loc,ld],li)=>{
+      const activeDays=new Set(settAvailabilityDaysFor(t,ld));
+      const tw=ld.time_window||{};
+      const maxPerDay=ld.max_classes_per_day||3;
+      const amPmPref=ld.am_pm_preference||"any";
+
+      const locBlock=document.createElement("div");
+      locBlock.className="avail-location-card";
+      locBlock.style="border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;padding:12px;min-width:0";
+      locBlock.innerHTML=`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#64748B;background:#F1F5F9;border-radius:6px;padding:3px 8px">${rvEscapeHtml(LOC_SHORT[loc]||loc)}</span>
+          <span style="font-size:10px;color:#94A3B8">${rvEscapeHtml(loc)}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start">
+          <div>
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:#94A3B8;letter-spacing:.06em;margin-bottom:6px">Available Days</div>
+            <div style="display:flex;gap:4px">
+              ${DAYS_ALL.map(d=>{
+                const on=activeDays.has(d);
+                const weekend=["Saturday","Sunday"].includes(d);
+                return `<button class="avail-day-chip${on?" on":""}"
+                  data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-day="${d}"
+                  onclick="settToggleDay(this)"
+                  style="width:32px;height:32px;border-radius:7px;border:1px solid ${on?"#3B82F6":"#E2E8F0"};background:${on?"#3B82F6":"#F8FAFC"};color:${on?"#fff":"#94A3B8"};font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;${weekend&&on?"border-color:#6366F1;background:#6366F1":""}"
+                  title="${d}">${d.slice(0,2)}</button>`;
+              }).join("")}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:#94A3B8;letter-spacing:.06em;margin-bottom:6px">Time Window</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="start"
+                value="${tw.start||"07:00"}"
+                style="height:32px;border:1px solid #CBD5E1;border-radius:7px;background:#fff;color:#0F172A;font-size:11px;padding:0 6px;font-family:inherit;width:90px">
+              <span style="color:#94A3B8;font-size:12px">→</span>
+              <input type="time" class="avail-time-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-field="end"
+                value="${tw.end||"21:00"}"
+                style="height:32px;border:1px solid #CBD5E1;border-radius:7px;background:#fff;color:#0F172A;font-size:11px;padding:0 6px;font-family:inherit;width:90px">
+            </div>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:#94A3B8;letter-spacing:.06em;margin-bottom:6px">Max / Day</div>
+            <input type="number" class="avail-max-inp" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}"
+              min="1" max="6" value="${maxPerDay}"
+              style="height:32px;width:60px;border:1px solid #CBD5E1;border-radius:7px;background:#fff;color:#0F172A;font-size:13px;font-weight:800;padding:0 8px;font-family:inherit;text-align:center">
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:#94A3B8;letter-spacing:.06em;margin-bottom:6px">AM/PM Pref</div>
+            <select class="avail-ampm-sel" data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}"
+              style="height:32px;border:1px solid #CBD5E1;border-radius:7px;background:#fff;color:#0F172A;font-size:11px;padding:0 8px;font-family:inherit;font-weight:700">
+              <option value="any" ${amPmPref==="any"?"selected":""}>Any</option>
+              <option value="am" ${amPmPref==="am"?"selected":""}>AM Only</option>
+              <option value="pm" ${amPmPref==="pm"?"selected":""}>PM Only</option>
+              <option value="am_pref" ${amPmPref==="am_pref"?"selected":""}>Prefer AM</option>
+              <option value="pm_pref" ${amPmPref==="pm_pref"?"selected":""}>Prefer PM</option>
+            </select>
+          </div>
+          ${ld.notes?`<div style="width:100%;margin-top:4px;padding:7px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;font-size:10px;color:#92400E;line-height:1.45">${rvEscapeHtml(ld.notes)}</div>`:""}
+        </div>`;
+      body.appendChild(locBlock);
+    });
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+
+  wrap.appendChild(grid);
 }
 
-function settToggleDay(el){el.classList.toggle("on");}
+function settFilterAvailByLoc(loc){
+  document.querySelectorAll(".avail-trainer-card").forEach(c=>{
+    const locs=c.dataset.locs||"";
+    c.style.display=(!loc||locs.includes(loc))?"":"none";
+  });
+}
+
+function settFilterAvailByTier(tier){
+  document.querySelectorAll(".avail-trainer-card").forEach(c=>{
+    c.style.display=(!tier||c.dataset.tier===tier)?"":"none";
+  });
+}
+
+function settExpandAllAvail(){
+  document.querySelectorAll(".avail-card-body").forEach(b=>{b.style.display="grid";});
+  document.querySelectorAll(".avail-card-chevron").forEach(c=>{c.style.transform="rotate(-180deg)";});
+}
+
+function settCollapseAllAvail(){
+  document.querySelectorAll(".avail-card-body").forEach(b=>{b.style.display="none";});
+  document.querySelectorAll(".avail-card-chevron").forEach(c=>{c.style.transform="";});
+}
+
+function settToggleDay(el){
+  el.classList.toggle("on");
+  const on=el.classList.contains("on");
+  if(el.classList.contains("avail-day-chip")){
+    el.style.background=on?"#3B82F6":"#F8FAFC";
+    el.style.borderColor=on?"#3B82F6":"#E2E8F0";
+    el.style.color=on?"#fff":"#94A3B8";
+  }
+}
 
 function settSaveAvailability(){
   if(!_settTrainerProfiles)return;
@@ -7457,16 +7835,22 @@ function settSaveAvailability(){
     if(!timeInputs[k])timeInputs[k]={};
     timeInputs[k][inp.dataset.field]=inp.value;
   });
+  const maxInputs={};
+  document.querySelectorAll(".avail-max-inp").forEach(inp=>{
+    maxInputs[inp.dataset.trainer+":"+inp.dataset.loc]=Number(inp.value)||3;
+  });
+  const ampmSels={};
+  document.querySelectorAll(".avail-ampm-sel").forEach(sel=>{
+    ampmSels[sel.dataset.trainer+":"+sel.dataset.loc]=sel.value;
+  });
   const updated=(_settTrainerProfiles||[]).map(t=>{
     const locs={...t.locations};
-    const profileIsActive=trainerIsActive(t);
     Object.keys(locs).forEach(loc=>{
       const k=t.name+":"+loc;
-      if(updatedMap[k]){locs[loc]={...locs[loc],available_days:profileIsActive?DAYS_ALL:updatedMap[k].days};}
-      if(timeInputs[k]){
-        const normalizedWindow=profileIsActive?{start:"07:00",end:"21:00"}:timeInputs[k];
-        locs[loc]={...locs[loc],time_window:{...(locs[loc].time_window||{}),...normalizedWindow}};
-      }
+      if(updatedMap[k]){locs[loc]={...locs[loc],available_days:updatedMap[k].days};}
+      if(timeInputs[k]){locs[loc]={...locs[loc],time_window:{...(locs[loc].time_window||{}),...timeInputs[k]}};}
+      if(maxInputs[k]!==undefined){locs[loc]={...locs[loc],max_classes_per_day:maxInputs[k]};}
+      if(ampmSels[k]){locs[loc]={...locs[loc],am_pm_preference:ampmSels[k]};}
     });
     return{...t,locations:locs};
   });
@@ -8035,17 +8419,22 @@ function settRenderUniversalRulesPanel(){
   fetch("/api/rules-config")
     .then(r=>r.ok?r.json():{})
     .then(data=>{
-      // data may be the catalog (groups) or the raw universal_rules shape
       let rules=[];
-      if(Array.isArray(data?.groups)){
+      if(Array.isArray(data?.groups)&&data.groups.length){
         rules=data.groups.flatMap(g=>g.rules||[]);
         if(!_rulesCatalog)_rulesCatalog=data;
       } else if(Array.isArray(data?.hard_constraints)){
         rules=data.hard_constraints;
+      } else {
+        if(!_rulesCatalog)_rulesCatalog=JSON.parse(JSON.stringify(BUILTIN_RULES_CATALOG));
+        rules=BUILTIN_RULES_CATALOG.groups.flatMap(g=>g.rules||[]);
       }
       _settRenderUnivCards(host,rules);
     })
-    .catch(()=>{host.innerHTML='<div style="color:#EF4444;font-size:12px;padding:8px">Could not load universal rules — check API.</div>';});
+    .catch(()=>{
+      const rules=BUILTIN_RULES_CATALOG.groups.flatMap(g=>g.rules||[]);
+      _settRenderUnivCards(host,rules);
+    });
 }
 function _settRenderUnivCards(host,rules){
   if(!rules.length){

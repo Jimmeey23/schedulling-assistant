@@ -1,23 +1,42 @@
 {
-  "location": "Kenkere House",
+  "policy_note": "Canonical source: schedule_config.json for targets/custom rules and trainer_profiles.json for availability/certifications. This file documents location guardrails only; trainer ownership is preference unless saved as a hard custom rule.",
   "hard_constraints": [
-    {"id": "KE-001", "type": "never_do", "description": "PowerCycle NEVER at Kenkere", "check_fn_name": "check_ke_no_powercycle"},
-    {"id": "KE-002", "type": "always_do", "description": "Kajol Kanchan 6-day anchor - never reduce without confirmed coverage", "check_fn_name": "check_ke_kajol_anchor"},
-    {"id": "KE-003", "type": "always_do", "description": "Pushyank Nahar owns Mon/Tue/Thu morning blocks", "check_fn_name": "check_ke_pushyank_blocks"},
-    {"id": "KE-004", "type": "always_do", "description": "Shruti Kulkarni owns Thu/Fri mornings and Sunday midday", "check_fn_name": "check_ke_shruti_blocks"},
-    {"id": "KE-005", "type": "trainer_availability", "description": "Veena Narasimhan weekends only 16:00-17:15", "check_fn_name": "check_ke_veena_window"},
-    {"id": "KE-006", "type": "trainer_availability", "description": "Chaitanya Nahar Mon/Sat/Sun afternoons only 16:00-18:45", "check_fn_name": "check_ke_chaitanya_window"},
-    {"id": "KE-007", "type": "slot_required", "description": "09:00 AM must be filled with Tier 1 trainer every day", "check_fn_name": "check_ke_0900_tier1"},
-    {"id": "KE-008", "type": "always_do", "description": "Saturday 09:00-11:00: Kajol or Pushyank ONLY", "check_fn_name": "check_ke_sat_morning"},
-    {"id": "KE-009", "type": "class_location", "description": "Foundations certified trainers only at Kenkere", "check_fn_name": "check_ke_foundations_certified"}
+    {
+      "id": "KE-001",
+      "type": "weekly_floor",
+      "description": "Kenkere weekly assignment count must never fall below 55",
+      "check_fn_name": "check_ke_weekly_floor_55"
+    },
+    {
+      "id": "KE-002",
+      "type": "never_do",
+      "description": "PowerCycle is never scheduled at Kenkere",
+      "check_fn_name": "check_ke_no_powercycle"
+    },
+    {
+      "id": "KE-003",
+      "type": "slot_required",
+      "description": "09:00/09:15/10:00/10:15 morning block should prioritize Tier 1 trainers where qualified and available",
+      "check_fn_name": "check_ke_morning_tier1"
+    },
+    {
+      "id": "KE-004",
+      "type": "preference",
+      "description": "Kenkere Tier 1 coverage should prioritize Kajol, Pushyank, and Shruti Kulkarni when qualified and available",
+      "check_fn_name": "score_ke_tier1_priority"
+    },
+    {
+      "id": "KE-005",
+      "type": "class_location",
+      "description": "Foundations requires certified trainers at Kenkere",
+      "check_fn_name": "check_ke_foundations_certified"
+    },
+    {
+      "id": "KE-006",
+      "type": "quality_gate",
+      "description": "Do not schedule proven low-performing class/trainer/slot histories unless manually pinned",
+      "check_fn_name": "check_ke_low_performer_gate"
+    }
   ],
-  "target_classes_per_day": {
-    "Monday": 8,
-    "Tuesday": 8,
-    "Wednesday": 6,
-    "Thursday": 8,
-    "Friday": 8,
-    "Saturday": 7,
-    "Sunday": 5
-  }
+  "target_classes_per_week": 55
 }

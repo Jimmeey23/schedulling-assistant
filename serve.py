@@ -103,6 +103,13 @@ def _schedule_config_path() -> Path:
     return PROJECT_ROOT / "config" / "schedule_config.json"
 
 
+def _write_json_atomic(path: Path, payload) -> None:
+    path.parent.mkdir(exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
 def _trainer_profiles_path() -> Path:
     if TRAINER_PROFILES_PATH != DEFAULT_TRAINER_PROFILES_PATH:
         return TRAINER_PROFILES_PATH
@@ -137,6 +144,7 @@ def _saved_ai_runtime_settings() -> dict:
     return {
         "provider": str(settings.get("ai_provider") or "openrouter").strip().lower(),
         "model": str(settings.get("ai_model") or "").strip(),
+        "backup_model": str(settings.get("ai_backup_model") or "z-ai/glm-4.5-air:free").strip(),
         "base_url": str(settings.get("ai_base_url") or "").strip(),
     }
 
@@ -152,7 +160,11 @@ def _inject_ai_key_env(child_env: dict, api_key: str) -> None:
 def _inject_ai_runtime_env(child_env: dict, runtime: dict) -> None:
     provider = str(runtime.get("provider") or "openrouter").strip().lower()
     model = str(runtime.get("model") or "").strip()
+    backup_model = str(runtime.get("backup_model") or "").strip()
     base_url = str(runtime.get("base_url") or "").strip()
+    if backup_model:
+        child_env["AI_BACKUP_MODEL"] = backup_model
+        child_env["OPENROUTER_BACKUP_MODEL"] = backup_model
     if provider == "openai":
         if model:
             child_env["OPENAI_MODEL"] = model
@@ -1048,8 +1060,7 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/save-trainer-profiles":
             try:
                 payload = json.loads(body_raw)
-                with open(_trainer_profiles_path(), "w") as f:
-                    json.dump(payload, f, indent=2)
+                _write_json_atomic(_trainer_profiles_path(), payload)
                 print("  [API] Trainer profiles saved")
                 self._send_json(200, {"ok": True})
             except Exception as e:
@@ -1060,10 +1071,7 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/save-schedule-config":
             try:
                 payload = json.loads(body_raw)
-                cfg_path = _schedule_config_path()
-                cfg_path.parent.mkdir(exist_ok=True)
-                with open(cfg_path, "w") as f:
-                    json.dump(payload, f, indent=2)
+                _write_json_atomic(_schedule_config_path(), payload)
                 print("  [API] Schedule config saved")
                 self._send_json(200, {"ok": True})
             except Exception as e:

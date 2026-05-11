@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 PROJECT_ROOT = Path(__file__).parent
 ENV_PATH = PROJECT_ROOT / ".env"
 DEFAULT_MODEL = "openai/gpt-oss-120b:free"
+DEFAULT_BACKUP_MODEL = "z-ai/glm-4.5-air:free"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
 try:
@@ -46,6 +47,7 @@ def get_ai_settings() -> Optional[dict]:
     return {
         "api_key": api_key,
         "model": os.environ.get("OPENROUTER_MODEL") or os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL,
+        "backup_model": os.environ.get("AI_BACKUP_MODEL") or os.environ.get("OPENROUTER_BACKUP_MODEL") or DEFAULT_BACKUP_MODEL,
         "base_url": os.environ.get("OPENROUTER_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or DEFAULT_BASE_URL,
     }
 

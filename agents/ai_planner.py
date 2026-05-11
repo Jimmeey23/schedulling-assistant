@@ -23,14 +23,17 @@ from agents.optimiser import (
     MAX_TRAINER_WEEKLY_MINUTES_T2,
     MAX_TRAINER_WEEKLY_MINUTES_T3,
     MAX_TRAINER_WEEKLY_MINUTES,
+    MAX_TRAINER_DAILY_MINUTES,
+    MAX_TRAINER_WORK_DAYS,
     RoomOccupancy,
     canonical_class_key,
     get_class_format,
     get_class_duration,
+    is_low_performing_history,
     slot_time_to_minutes,
     time_windows_overlap,
 )
-from ai_provider import OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
+from ai_provider import DEFAULT_BACKUP_MODEL, OPENAI_AVAILABLE, create_ai_client, create_chat_completion, get_ai_settings
 from rule_config import build_rules_catalog, get_active_format_rules, load_rules_config
 
 STATE_DIR = Path("state")
@@ -50,7 +53,7 @@ def normalize_trainer_name(name: str) -> str:
 DAILY_TARGETS = {
     "Kwality House, Kemps Corner": {
         "Monday": 12, "Tuesday": 10, "Wednesday": 11,
-        "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 8,
+        "Thursday": 11, "Friday": 10, "Saturday": 12, "Sunday": 6,
     },
     "Supreme HQ, Bandra": {
         "Monday": 12, "Tuesday": 11, "Wednesday": 10,
@@ -66,16 +69,16 @@ DAILY_TARGETS = {
 LOCATION_SLOTS = {
     "Kwality House, Kemps Corner": {
         "am": ["07:15", "07:30", "08:00", "08:15", "08:30", "08:45",
-               "09:00", "09:15", "09:30", "10:00", "10:15", "11:00", "11:15", "11:30"],
+               "09:00", "09:15", "09:30", "10:00", "10:15", "11:00", "11:15", "11:30", "11:45"],
         "pm": ["17:00", "17:15", "17:30", "17:45", "18:00", "18:15",
                "18:30", "18:45", "19:00", "19:15", "19:30"],
     },
     "Supreme HQ, Bandra": {
         "am": ["07:30", "08:00", "08:15", "08:30", "08:45", "09:00",
                "09:15", "09:30", "09:45", "10:00", "10:15", "10:30",
-               "11:00", "11:30", "12:00", "12:30"],
+               "11:00", "11:15", "11:30", "11:45", "12:00", "12:30"],
         "pm": ["16:30", "17:00", "17:30", "17:45", "18:00", "18:15",
-               "18:30", "19:00", "19:15", "19:30", "20:00", "20:15"],
+               "18:30", "18:45", "19:00", "19:15", "19:30", "20:00", "20:15"],
     },
     "Kenkere House": {
         "am": ["07:15", "08:30", "09:00", "09:15", "10:00", "10:15",
@@ -190,6 +193,16 @@ def _build_system_prompt(profiles: list, rules_catalog: dict) -> str:
         sections.append(universal_block)
     sections.append(
         "Use only universal defaults plus rules saved in Settings. Do not invent trainer-, studio-, or class-specific policies."
+    )
+    sections.append(
+        "Planning method: build the schedule as a constraint-satisfaction plan. First place manual pins and high-confidence protected slots, "
+        "then fill saved daily targets using only qualified available trainers, then balance Tier 1 utilisation, class mix, and parallel room usage. "
+        "Before returning JSON, self-check every slot for trainer availability day, leave/off day, certification, overlapping class time, one shift/day, "
+        "one location/shift, 4h/day cap, 15h/week Tier 1 cap, room availability, and daily target count. Remove or replace any violating slot."
+    )
+    sections.append(
+        "Accuracy requirements: prefer fewer valid slots over many invalid slots, but do not stop early. Use exact names from the prompt, exact HH:MM times, "
+        "and include all seven days for the requested location. Return a single JSON object only."
     )
     sections.append(
         "Horizontal weekly mix: for each location and clock time, vary class formats across the week. "
@@ -332,11 +345,12 @@ def _build_location_prompt(location: str, week_start: str,
         "Return JSON only — no markdown, no explanation.",
         'Schema: {"location":"...","week_start":"...","schedule":[{"day":"Monday","time":"08:30","class":"Studio Barre 57","trainer":"Trainer Name","cover":"Cover Trainer"},...]}',
         "",
-        "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. No duplicate times per day. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
-        "SUPREME 08:00-09:00 FOCUS: for Supreme HQ, do not collapse the 8-9am demand window into only 09:00. Use the available 08:30 and 08:45 starts where trainer/room constraints allow.",
+        "CRITICAL: ALL 7 days. Hit saved daily targets. Use exact class/trainer names from above. Parallel classes are allowed only when room capacity allows; duplicate time starts are allowed for different rooms/classes, but not duplicate class format spam. Every slot needs a cover trainer. Apply only universal defaults plus rules saved in Settings.",
+        "MUMBAI PARALLEL PEAKS: For Kwality House and Supreme HQ, actively use parallel-room starts in 08:00/08:15/08:30/08:45, 11:00/11:15/11:30/11:45, and 18:00/18:15/18:30/18:45 clusters where rooms and trainers allow. Do not collapse these clusters into only 09:00, 11:30, 18:00, or 19:00.",
         "HORIZONTAL MIX: At the same clock time across the week, rotate formats/classes. Keep each exact class to 2 or fewer uses per clock time, each broad format to 3 or fewer uses per clock time, and do not make 07:30/08:30/09:00 all Barre 57, all PowerCycle, or any single repeated format.",
-        "TIER UTILIZATION: Ensure Tier 1 (T1) trainers are scheduled for more total hours/classes than Tier 2 (T2) trainers, and Tier 2 trainers are scheduled for more than Tier 3 (T3) trainers across the location. Maximize T1 trainer utilization first. At KWALITY HOUSE, T1 trainers MUST teach the majority of peak slots.",
-        "RULE ADHERENCE: You MUST follow all HARD CONSTRAINTS and PINNED BLOCKS (OWNS) exactly. No trainer can work more than 5 days total across the week.",
+        "TIER UTILIZATION: Maximize qualified Tier 1 (T1) trainers first and keep them in a 12-15h weekly operating band where feasible. Every trainer must have at least 1 off day, preferably 2 off days, and no trainer may be assigned on all 7 days.",
+        "TRAINER LOAD: One trainer may work only one shift per day, one location per shift, and no more than 4 assigned hours in a day. Tier 1 trainers should land near 12-13h where feasible and never exceed 15h/week.",
+        "LOW-PERFORMER BLOCK: Do not schedule proven weak class/trainer/slot histories. Any option with repeated history below 3 average check-ins or below 22% fill is a rejection, not a fallback.",
         "LOCATION BALANCE: For trainers available at multiple locations (like Rohan, Karanvir, Richard), do not park them at only one location. Spread their sessions across their available locations to ensure a consistent brand presence.",
     ]
 
@@ -540,6 +554,13 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
     """Drop slots violating hard weekly caps, day/time rules, and trainer availability."""
     from collections import defaultdict
 
+    config_path = CONFIG_DIR / "schedule_config.json"
+    try:
+        with open(config_path) as f:
+            schedule_config = json.load(f)
+    except Exception:
+        schedule_config = {}
+
     # Build trainer availability lookup
     trainer_allowed_days: Dict[str, set] = {}
     if profiles_by_name:
@@ -567,13 +588,8 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         return slot_time_to_minutes(start) <= start_min < slot_time_to_minutes(end)
 
     def _weekly_mix_max(class_name: str) -> Optional[int]:
-        config_path = CONFIG_DIR / "schedule_config.json"
-        if not config_path.exists():
-            return None
         try:
-            with open(config_path) as f:
-                config = json.load(f)
-            mix = config.get("class_mix", {}).get(location, {})
+            mix = schedule_config.get("class_mix", {}).get(location, {})
             canonical = canonical_class_key(class_name)
             entry = mix.get(class_name) or mix.get(canonical) or {}
             if isinstance(entry, dict) and entry.get("max") is not None:
@@ -582,14 +598,85 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
             return None
         return None
 
+    def _is_settings_off_day(slot: PlannedSlot, trainer_key: str) -> bool:
+        for leave in schedule_config.get("leave_periods", []) or []:
+            if normalize_trainer_name(leave.get("trainer")) != trainer_key:
+                continue
+            if leave.get("location") and leave.get("location") != location:
+                continue
+            if leave.get("from_date") <= slot.date <= leave.get("to_date"):
+                return True
+        for off_day in schedule_config.get("off_days", []) or []:
+            if normalize_trainer_name(off_day.get("trainer")) != trainer_key:
+                continue
+            if off_day.get("location") and off_day.get("location") != location:
+                continue
+            if off_day.get("date") == slot.date:
+                return True
+        return False
+
+    def _custom_rule_blocks(slot: PlannedSlot, trainer_key: str) -> bool:
+        for rule in schedule_config.get("custom_rules", []) or []:
+            if not isinstance(rule, dict) or rule.get("enabled") is False:
+                continue
+            if rule.get("priority", "hard") != "hard":
+                continue
+            rule_type = rule.get("rule_type")
+            operator = rule.get("operator", "never")
+            rule_location = rule.get("location")
+            rule_day = rule.get("day")
+            rule_time = (rule.get("time") or "")[:5]
+            rule_class = rule.get("class_name") or rule.get("class")
+            rule_trainer = normalize_trainer_name(rule.get("trainer"))
+
+            location_matches = not rule_location or rule_location == location
+            day_matches = not rule_day or rule_day == slot.day_of_week
+            time_matches = not rule_time or rule_time == slot.time[:5]
+            class_matches = not rule_class or canonical_class_key(rule_class) == canonical_class_key(slot.class_name)
+            trainer_matches = not rule_trainer or rule_trainer == trainer_key
+
+            if rule_type == "trainer_availability":
+                if operator == "never" and location_matches and day_matches and time_matches and trainer_matches:
+                    return True
+                if operator == "only" and trainer_matches:
+                    if rule_location and rule_location != location:
+                        return True
+                    if rule_day and rule_day != slot.day_of_week:
+                        return True
+                    if rule_time and rule_time != slot.time[:5]:
+                        return True
+            elif rule_type == "class_time_restriction":
+                if operator == "never" and location_matches and day_matches and time_matches and class_matches:
+                    return True
+            elif rule_type == "time_window_rule" and operator == "block_window" and location_matches and day_matches and class_matches:
+                start = rule.get("time")
+                end = rule.get("time_end")
+                if start:
+                    slot_start = slot_time_to_minutes(slot.time)
+                    slot_duration = int(slot.duration_min or get_class_duration(slot.class_name))
+                    rule_start = slot_time_to_minutes(start[:5])
+                    if end:
+                        rule_end = slot_time_to_minutes(end[:5])
+                        if time_windows_overlap(slot_start, slot_duration, rule_start, max(0, rule_end - rule_start)):
+                            return True
+                    elif slot_start == rule_start:
+                        return True
+        return False
+
     kept = []
     class_weekly_counts: Dict[str, int] = defaultdict(int)
     time_class_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
     time_format_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_day_location_count: Dict[Tuple[str, str, str], int] = defaultdict(int)
+    trainer_day_minutes: Dict[Tuple[str, str], int] = defaultdict(int)
+    trainer_day_shifts: Dict[Tuple[str, str], Set[str]] = defaultdict(set)
+    trainer_day_shift_locations: Dict[Tuple[str, str, str], Set[str]] = defaultdict(set)
     trainer_weekly_minutes: Dict[str, int] = defaultdict(int)
     trainer_worked_days: Dict[str, Set[str]] = defaultdict(set)
+
+    def _shift_label(time_str: str) -> str:
+        return "AM" if slot_time_to_minutes(time_str) < 13 * 60 else "PM"
 
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.class_name)):
         if _trainer_disabled(slot.trainer_1, profiles_by_name or {}):
@@ -602,6 +689,10 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         ):
             continue
         trainer_key = normalize_trainer_name(slot.trainer_1)
+        if _is_settings_off_day(slot, trainer_key):
+            continue
+        if _custom_rule_blocks(slot, trainer_key):
+            continue
         profile = _profile_for(slot.trainer_1)
         loc_data = (profile.get("locations") or {}).get(location, {})
         class_key = canonical_class_key(slot.class_name)
@@ -614,7 +705,7 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         time_format_key = (location, slot.time, get_class_format(slot.class_name))
         if time_format_counts[time_format_key] >= HORIZONTAL_MAX_SAME_FORMAT_PER_TIME:
             continue
-        # Sunday: no class before 10:00 (evening classes allowed)
+        # Sunday: no class before 10:00; PM coverage is allowed and expected.
         if slot.day_of_week == "Sunday":
             h = int(slot.time[:2])
             if h < 10:
@@ -634,12 +725,20 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
         if trainer_weekly_minutes[trainer_key] + duration > max_mins:
             continue
+        day_key = (trainer_key, slot.day_of_week)
+        if trainer_day_minutes[day_key] + duration > MAX_TRAINER_DAILY_MINUTES:
+            continue
         if (
             slot.day_of_week not in trainer_worked_days[trainer_key]
-            and len(trainer_worked_days[trainer_key]) >= 5
+            and len(trainer_worked_days[trainer_key]) >= MAX_TRAINER_WORK_DAYS
         ):
             continue
-        day_key = (trainer_key, slot.day_of_week)
+        shift = _shift_label(slot.time)
+        if trainer_day_shifts[day_key] and shift not in trainer_day_shifts[day_key]:
+            continue
+        shift_key = (trainer_key, slot.day_of_week, shift)
+        if trainer_day_shift_locations[shift_key] and location not in trainer_day_shift_locations[shift_key]:
+            continue
         start_min = slot_time_to_minutes(slot.time)
         if any(
             time_windows_overlap(
@@ -657,6 +756,9 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
         time_format_counts[time_format_key] += 1
         trainer_day_slots[day_key].append(slot)
         trainer_day_location_count[day_loc_key] += 1
+        trainer_day_minutes[day_key] += duration
+        trainer_day_shifts[day_key].add(shift)
+        trainer_day_shift_locations[shift_key].add(location)
         trainer_weekly_minutes[trainer_key] += duration
         trainer_worked_days[trainer_key].add(slot.day_of_week)
 
@@ -688,8 +790,10 @@ def _enforce_hard_limits(slots: List[PlannedSlot], location: str,
 def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlot]:
     score_lookup: Dict[tuple, float] = {}
     fill_lookup: Dict[tuple, float] = {}
+    hist_lookup: Dict[tuple, dict] = {}
     group_score_lookup: Dict[tuple, float] = {}
     group_fill_lookup: Dict[tuple, float] = {}
+    group_hist_lookup: Dict[tuple, dict] = {}
     day_score_lookup: Dict[tuple, float] = {}
     day_fill_lookup: Dict[tuple, float] = {}
     group_day_score_lookup: Dict[tuple, float] = {}
@@ -702,6 +806,7 @@ def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlo
         key = (r["location"], r["class"], day, time_str)
         group_score_lookup[key] = r.get("score", 30.0)
         group_fill_lookup[key] = r.get("avg_fill_rate", r.get("blended_fill", 0.35))
+        group_hist_lookup[key] = r
         day_key = (r["location"], r["class"], day)
         if day_key not in group_day_score_lookup or r.get("score", 30.0) > group_day_score_lookup[day_key]:
             group_day_score_lookup[day_key] = r.get("score", 30.0)
@@ -712,6 +817,7 @@ def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlo
         key = (r["location"], r["class"], r["trainer"], r["day"], time_str)
         score_lookup[key] = r.get("score", 30.0)
         fill_lookup[key] = r.get("avg_fill_rate", 0.35)
+        hist_lookup[key] = r
         day_key = (r["location"], r["class"], r["trainer"], r["day"])
         if day_key not in day_score_lookup or r.get("score", 30.0) > day_score_lookup[day_key]:
             day_score_lookup[day_key] = r.get("score", 30.0)
@@ -731,6 +837,9 @@ def _score_slots(slots: List[PlannedSlot], scores_data: dict) -> List[PlannedSlo
             exact_key,
             group_fill_lookup.get(group_key, day_fill_lookup.get(day_key, group_day_fill_lookup.get(group_day_key, 0.20))),
         )
+        hist = hist_lookup.get(exact_key) or group_hist_lookup.get(group_key)
+        if hist and is_low_performing_history(hist):
+            slot.constraint_violations.append("LOW-PERFORMER: below minimum historical fill/check-in threshold")
 
     return slots
 
@@ -822,8 +931,6 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
     kept: List[PlannedSlot] = []
     trainer_day_slots: Dict[Tuple[str, str], List[PlannedSlot]] = defaultdict(list)
     trainer_minutes: Dict[str, int] = defaultdict(int)
-    trainer_worked_days: Dict[str, Set[str]] = defaultdict(set)
-    trainer_daily_count: Dict[Tuple[str, str], int] = defaultdict(int)
 
     for slot in sorted(slots, key=lambda s: (DAY_NAMES.index(s.day_of_week), s.time, s.location, s.class_name)):
         trainer_key = normalize_trainer_name(slot.trainer_1)
@@ -831,21 +938,8 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
         profile = profiles.get(slot.trainer_1) or profiles.get(trainer_key) or {}
         tier = profile.get("tier", 3)
         max_mins = MAX_TRAINER_WEEKLY_MINUTES_T1 if tier == 1 else (MAX_TRAINER_WEEKLY_MINUTES_T2 if tier == 2 else MAX_TRAINER_WEEKLY_MINUTES_T3)
-        
         if trainer_minutes[trainer_key] + duration > max_mins:
             continue
-            
-        # Global 4-session-per-day limit
-        if trainer_daily_count[(trainer_key, slot.day_of_week)] >= 4:
-            continue
-
-        # Global 5-day work limit (ensure 2 days off)
-        if (
-            slot.day_of_week not in trainer_worked_days[trainer_key]
-            and len(trainer_worked_days[trainer_key]) >= 5
-        ):
-            continue
-
         day_key = (trainer_key, slot.day_of_week)
         start_min = slot_time_to_minutes(slot.time)
 
@@ -867,12 +961,9 @@ def _enforce_global_trainer_overlaps(slots: List[PlannedSlot], profiles: dict) -
             for existing in trainer_day_slots[day_key]
         ):
             continue
-            
         kept.append(slot)
         trainer_day_slots[day_key].append(slot)
         trainer_minutes[trainer_key] += duration
-        trainer_worked_days[trainer_key].add(slot.day_of_week)
-        trainer_daily_count[(trainer_key, slot.day_of_week)] += 1
 
     dropped = len(slots) - len(kept)
     if dropped:
@@ -958,7 +1049,16 @@ class AISchedulePlanner:
             return self._fallback()
 
         model_name = settings["model"]
-        print(f"[Agent 5] AI Planner starting — {model_name} will build each location's schedule...")
+        backup_model = (settings.get("backup_model") or DEFAULT_BACKUP_MODEL or "").strip()
+        model_sequence = []
+        for candidate in (model_name, backup_model):
+            if candidate and candidate not in model_sequence:
+                model_sequence.append(candidate)
+        print(
+            f"[Agent 5] AI Planner starting — {model_sequence[0]} will build each location's schedule"
+            + (f" (backup: {model_sequence[1]})" if len(model_sequence) > 1 else "")
+            + "..."
+        )
 
         # Load all state files
         try:
@@ -996,26 +1096,37 @@ class AISchedulePlanner:
         }
 
         def _plan_location(location: str):
-            raw = self._call_model(client, model_name, system_prompt, user_prompts[location], location)
-            if raw is None:
-                return location, None, [f"{location}: AI call failed"]
+            attempts = []
+            for attempt_model in model_sequence:
+                raw = self._call_model(client, attempt_model, system_prompt, user_prompts[location], location)
+                if raw is None:
+                    attempts.append(f"{location}: {attempt_model} call failed")
+                    continue
 
-            slots, errors = _parse_schedule_response(
-                raw, location, self.target_week_start, profiles_by_name
-            )
-            if len(slots) < 20:
-                return location, None, [f"{location}: only {len(slots)} slots parsed"]
+                slots, errors = _parse_schedule_response(
+                    raw, location, self.target_week_start, profiles_by_name
+                )
+                if len(slots) < 20:
+                    attempts.append(f"{location}: {attempt_model} only {len(slots)} slots parsed")
+                    attempts.extend(errors[:2])
+                    continue
 
-            slots = _validate_slots(slots, location, profiles_by_name)
-            slots = _enforce_hard_limits(slots, location, profiles_by_name)
-            if not _has_enough_slots_after_enforcement(location, slots):
-                return location, None, [
-                    f"{location}: only {len(slots)} slots remained after hard-limit enforcement"
-                ]
-            slots = _score_slots(slots, scores_data)
-            return location, slots, errors
+                slots = _validate_slots(slots, location, profiles_by_name)
+                slots = _enforce_hard_limits(slots, location, profiles_by_name)
+                slots = _score_slots(slots, scores_data)
+                slots = [slot for slot in slots if not any("LOW-PERFORMER" in v for v in (slot.constraint_violations or []))]
+                if not _has_enough_slots_after_enforcement(location, slots):
+                    attempts.append(
+                        f"{location}: {attempt_model} only {len(slots)} slots remained after hard-limit enforcement"
+                    )
+                    attempts.extend(errors[:2])
+                    continue
+                if attempt_model != model_sequence[0]:
+                    attempts.append(f"{location}: recovered with backup model {attempt_model}")
+                return location, slots, attempts + errors
+            return location, None, attempts or [f"{location}: AI call failed"]
 
-        print(f"  [Agent 5] Calling {model_name} for all {len(self.locations)} locations in parallel...")
+        print(f"  [Agent 5] Calling {', '.join(model_sequence)} for all {len(self.locations)} locations in parallel...")
         results: Dict[str, tuple] = {}
         with ThreadPoolExecutor(max_workers=len(self.locations)) as pool:
             futures = {pool.submit(_plan_location, loc): loc for loc in self.locations}
@@ -1053,6 +1164,7 @@ class AISchedulePlanner:
             "ai_planned": True,
             "ai_repaired_locations": repaired_locations,
             "parse_errors": all_errors,
+            "ai_models": model_sequence,
             "variation_seed": self.variation_seed,
             "output_suffix": self.output_suffix,
         }

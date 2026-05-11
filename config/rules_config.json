@@ -14,26 +14,26 @@
     },
     "UNIV-002": {
       "enabled": true,
-      "description": "All 3 time bands must have >= 2 class every weekday",
+      "description": "Every active studio day must include AM and PM coverage; use midday coverage where demand and qualified trainers support it",
       "title": "UNIV-002"
     },
     "UNIV-003": {
       "enabled": true,
-      "description": "Saturday must be max-load day",
+      "description": "Saturday should be a high-load day, without violating weekly floors, trainer caps, or quality gates",
       "title": "UNIV-003"
     },
     "UNIV-004": {
       "enabled": true,
-      "description": "Sunday max 5-6 classes, no class before 9:00",
+      "description": "Sunday may carry AM and PM coverage when targets require it; no Sunday class should start before 10:00",
       "title": "UNIV-004"
     },
     "UNIV-005": {
-      "enabled": false,
+      "enabled": true,
       "description": "Specialist classes only certified trainers",
       "title": "UNIV-005"
     },
     "UNIV-006": {
-      "enabled": false,
+      "enabled": true,
       "description": "Express class must be paired with full-length equivalent on same day",
       "title": "UNIV-006"
     },
@@ -49,12 +49,12 @@
     },
     "UNIV-009": {
       "enabled": false,
-      "description": "No trainer > 4 consecutive classes without 5 min gap",
+      "description": "Avoid long trainer runs; keep consecutive assignments practical and respect the 4 assigned hours/day cap",
       "title": "UNIV-009"
     },
     "UNIV-010": {
       "enabled": true,
-      "description": "No trainer > 4 classes in one day",
+      "description": "No trainer may exceed 4 assigned hours in one day",
       "title": "UNIV-010"
     },
     "UNIV-011": {
@@ -69,7 +69,7 @@
     },
     "UNIV-013": {
       "enabled": true,
-      "description": "Pre/Post Natal NEVER at ANY LOCATION",
+      "description": "Pre/Post Natal is not auto-scheduled unless manually pinned or saved as a hard custom rule at an eligible location",
       "title": "UNIV-013"
     },
     "UNIV-014": {
@@ -79,37 +79,37 @@
     },
     "UNIV-015": {
       "enabled": true,
-      "description": "Always schedule >= 1 Barre 57 before 10:00 AM every day",
+      "description": "Prioritize at least one strong Barre 57 family option in the AM block every active day",
       "title": "UNIV-015"
     },
     "UNIV-016": {
-      "enabled": false,
-      "description": "Always schedule Barre 57 or Cardio Barre 19:00-19:30 weekdays",
+      "enabled": true,
+      "description": "Prioritize strong Barre 57 or Cardio Barre coverage in weekday PM demand windows",
       "title": "UNIV-016"
     },
     "UNIV-017": {
       "enabled": true,
-      "description": "Always assign Tier 1 trainer to primary peak slot",
+      "description": "Prioritize Tier 1 trainers for primary peak slots where qualified and available",
       "title": "UNIV-017"
     },
     "UNIV-018": {
-      "enabled": false,
+      "enabled": true,
       "description": "Trainer substitution protocol hierarchy",
       "title": "UNIV-018"
     },
     "UNIV-019": {
-      "enabled": false,
+      "enabled": true,
       "description": "Specialist classes no substitution with non-certified",
       "title": "UNIV-019"
     },
     "UNIV-020": {
       "enabled": false,
-      "description": "Never roster trainer at location with < 30 historical sessions",
+      "description": "Trainer location history is a preference signal, not a hard block, unless saved as a custom rule",
       "title": "UNIV-020"
     },
     "UNIV-021": {
       "enabled": true,
-      "description": "Never schedule banned class formats: SWEAT In 30, Dance Recovery, Pre/Post Natal, Hosted Class, Foundations",
+      "description": "Do not schedule proven low-performing class/trainer/slot histories unless manually pinned; unsupported formats require explicit custom rules",
       "title": "UNIV-021"
     },
     "UNIV-022": {
@@ -129,7 +129,7 @@
     },
     "UNIV-025": {
       "enabled": true,
-      "description": "Every trainer must get at least 1 full day off each week; 2 is preferred",
+      "description": "Every trainer must have at least 1 weekly off day; 2 is preferred when coverage allows, and no trainer may exceed 2 days without assignments unless unavoidable",
       "title": "UNIV-025"
     },
     "UNIV-026": {
