@@ -6,11 +6,17 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "web" / "template.html"
+APP_CSS = ROOT / "web" / "app.css"
+APP_JS = ROOT / "web" / "app.js"
 INDEX = ROOT / "web" / "index.html"
 
 
+def _web_ui_source() -> str:
+    return "\n".join(path.read_text() for path in (TEMPLATE, APP_CSS, APP_JS) if path.exists())
+
+
 def _replace_trainer_source() -> str:
-    src = TEMPLATE.read_text()
+    src = _web_ui_source()
     start = src.index("async function openReplaceTrainerModal")
     end = src.index("// ============================================================\n// SHOW SIMILAR MODAL", start)
     return src[start:end]
@@ -48,7 +54,7 @@ def test_replace_trainer_suggestions_have_one_click_apply_button():
 
     assert 'data-replace-payload' in source
     assert 'applyTrainerReplacement(JSON.parse' in source
-    assert 'fetch("/api/replace-trainer"' in TEMPLATE.read_text()
+    assert 'fetch("/api/replace-trainer"' in _web_ui_source()
 
 
 def test_replace_trainer_endpoint_updates_schedule_data(tmp_path, monkeypatch):
@@ -105,13 +111,16 @@ def test_replace_trainer_endpoint_updates_schedule_data(tmp_path, monkeypatch):
 
 
 def test_calendar_empty_slots_open_manual_add_modal():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert "openAddClassModal({location:_loc" in source
     assert 'fetch("/api/add-class"' in source
+    assert 'fetch(endpoint' in source
     assert "Historic options for this exact studio/day/time" in source
     assert 'id="manual-custom-class"' in source
-    assert "customClass||cls" in source
+    assert "manualEligibleTrainerOptions(ctx,cls)" in source
+    assert "Private Session" in source
+    assert 'id="manual-recurring-session"' in source
     assert "historicSlotIntel(_loc,d,t)" in source
     assert "sg-empty-intel" in source
 
@@ -149,7 +158,7 @@ def test_add_class_endpoint_appends_manual_slot(tmp_path, monkeypatch):
 
 
 def test_calendar_classes_can_be_removed_and_dragged():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert "div.draggable=true" in source
     assert 'data-action="remove"' in source
@@ -229,6 +238,125 @@ def test_manual_add_validates_trainer_availability(tmp_path, monkeypatch):
         )
 
 
+def test_manual_add_rejects_unqualified_trainer(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text('{"locations":{"Studio A":[]},"iterations":{}}')
+    profiles_path = tmp_path / "profiles.json"
+    profiles_path.write_text(
+        '[{"name":"Trainer A","active":true,"locations":{"Studio A":{"available_days":["Monday"],"time_window":{"start":"07:00","end":"21:00"},"max_classes_per_day":3}},"qualifications":{"mat_57":false,"powercycle":true}}]'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "TRAINER_PROFILES_PATH", profiles_path)
+
+    with pytest.raises(ValueError, match="not qualified"):
+        app._add_class_to_schedule(
+            {
+                "iteration": "Main",
+                "slot": {
+                    "location": "Studio A",
+                    "date": "2026-05-04",
+                    "day_of_week": "Monday",
+                    "time": "10:00",
+                    "class_name": "Studio Mat 57",
+                    "trainer_1": "Trainer A",
+                    "room": "Studio 1",
+                },
+            }
+        )
+
+
+def test_manual_add_rejects_room_overlap(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text(
+        '{"locations":{"Studio A":[{"location":"Studio A","date":"2026-05-04","day_of_week":"Monday","time":"10:00","duration_min":57,"class_name":"Studio Mat 57","room":"Studio 1","trainer_1":"Trainer B"}]},"iterations":{}}'
+    )
+    profiles_path = tmp_path / "profiles.json"
+    profiles_path.write_text(
+        '[{"name":"Trainer A","active":true,"locations":{"Studio A":{"available_days":["Monday"],"time_window":{"start":"07:00","end":"21:00"},"max_classes_per_day":3}},"qualifications":{"mat_57":true}}]'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "TRAINER_PROFILES_PATH", profiles_path)
+
+    with pytest.raises(ValueError, match="already occupied"):
+        app._add_class_to_schedule(
+            {
+                "iteration": "Main",
+                "slot": {
+                    "location": "Studio A",
+                    "date": "2026-05-04",
+                    "day_of_week": "Monday",
+                    "time": "10:30",
+                    "duration_min": 57,
+                    "class_name": "Studio Mat 57",
+                    "trainer_1": "Trainer A",
+                    "room": "Studio 1",
+                },
+            }
+        )
+
+
+def test_manual_recurring_add_validates_batch_before_writing(tmp_path, monkeypatch):
+    import app
+
+    web_dir = tmp_path / "web"
+    web_dir.mkdir()
+    schedule_path = web_dir / "schedule_data.json"
+    schedule_path.write_text('{"locations":{"Studio A":[]},"iterations":{}}')
+    profiles_path = tmp_path / "profiles.json"
+    profiles_path.write_text(
+        '[{"name":"Trainer A","active":true,"locations":{"Studio A":{"available_days":["Monday","Tuesday"],"time_window":{"start":"07:00","end":"21:00"},"max_classes_per_day":3}},"qualifications":{"mat_57":true}}]'
+    )
+    monkeypatch.setattr(app, "WEB_DIR", web_dir)
+    monkeypatch.setattr(app, "TRAINER_PROFILES_PATH", profiles_path)
+    monkeypatch.setattr(app, "_save_schedule_to_supabase", lambda data: False)
+
+    result = app._add_classes_to_schedule(
+        {
+            "iteration": "Main",
+            "slots": [
+                {
+                    "location": "Studio A",
+                    "date": "2026-05-04",
+                    "day_of_week": "Monday",
+                    "time": "10:00",
+                    "duration_min": 57,
+                    "class_name": "Private Session (Studio Mat 57)",
+                    "private_session_format": "Studio Mat 57",
+                    "is_private_session": True,
+                    "trainer_1": "Trainer A",
+                    "room": "Studio 1",
+                    "capacity": 1,
+                },
+                {
+                    "location": "Studio A",
+                    "date": "2026-05-05",
+                    "day_of_week": "Tuesday",
+                    "time": "10:00",
+                    "duration_min": 57,
+                    "class_name": "Private Session (Studio Mat 57)",
+                    "private_session_format": "Studio Mat 57",
+                    "is_private_session": True,
+                    "trainer_1": "Trainer A",
+                    "room": "Studio 1",
+                    "capacity": 1,
+                },
+            ],
+        }
+    )
+
+    assert result["added"] == 2
+    text = schedule_path.read_text()
+    assert text.count("Private Session") == 2
+
+
 def test_remove_class_endpoint_deletes_slot(tmp_path, monkeypatch):
     import app
 
@@ -261,7 +389,7 @@ def test_remove_class_endpoint_deletes_slot(tmp_path, monkeypatch):
 
 
 def test_settings_frontend_does_not_expose_supabase_tab():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert "stab-supabase" not in source
     assert "ssec-supabase" not in source
@@ -269,7 +397,7 @@ def test_settings_frontend_does_not_expose_supabase_tab():
 
 
 def test_settings_exposes_custom_rules_and_manual_pins():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert 'id="stab-customrules"' in source
     assert 'id="ssec-customrules"' in source
@@ -307,7 +435,7 @@ scripts.forEach((script,i)=>new vm.Script(script,{filename:`${process.argv[1]}#s
 
 
 def test_drilldown_fallback_never_uses_cross_class_nearby_rows():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
     start = source.index("function drillFallbackRowsFromHistoricCache")
     end = source.index("function drillSessionRows", start)
     fn = source[start:end]
@@ -318,7 +446,7 @@ def test_drilldown_fallback_never_uses_cross_class_nearby_rows():
 
 
 def test_multi_location_columns_scale_to_selected_locations():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert "const mlLocColWidth=132" in source
     assert "const mlDayMinWidth=Math.max(mlLocColWidth,locs.length*mlLocColWidth)" in source
@@ -326,21 +454,21 @@ def test_multi_location_columns_scale_to_selected_locations():
 
 
 def test_karanvir_thumbnail_mapping_exists():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert '"karanvir":"/images/Karanvir.jpg"' in source
     assert (ROOT / "web" / "images" / "Karanvir.jpg").exists()
 
 
 def test_drop_recommendation_is_not_labeled_manual():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert 'DROP:"Review"' in source
     assert 'if(r==="DROP"||r==="MANUAL")return"MANUAL"' not in source
 
 
 def test_pipeline_status_polls_immediately_and_keeps_top_bar_visible():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert 'if(bar)bar.className="visible";' in source
     assert "tick();" in source
@@ -348,7 +476,7 @@ def test_pipeline_status_polls_immediately_and_keeps_top_bar_visible():
 
 
 def test_generated_index_keeps_sleek_card_styles():
-    source = INDEX.read_text()
+    source = _web_ui_source()
 
     assert ".cc-hover-tools" in source
     assert ".cc-mini{min-height:78px" in source
@@ -356,7 +484,7 @@ def test_generated_index_keeps_sleek_card_styles():
 
 
 def test_stats_protected_and_experimental_cards_open_decision_modal():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert 'sc("Protected",protected_,"green","protected")' in source
     assert 'sc("Experimental",experimental,"amber","experimental")' in source
@@ -366,7 +494,7 @@ def test_stats_protected_and_experimental_cards_open_decision_modal():
 
 
 def test_analytics_class_mix_uses_canonical_format_counts():
-    source = TEMPLATE.read_text()
+    source = _web_ui_source()
 
     assert "function canonicalMixClass" in source
     assert "canonicalMixClass(s.class_name||\"Unknown\")" in source

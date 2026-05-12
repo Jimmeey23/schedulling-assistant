@@ -83,6 +83,8 @@ LOCATION_WEEKLY_CLASS_BOUNDS = {
     KWALITY_LOCATION: {"min": 70, "max": 80},
     SUPREME_LOCATION: {"min": 65, "max": 75},
     "Kenkere House": {"min": 55, "max": 70},
+    "Courtside": {"min": 9, "max": 11},
+    "Copper & Cloves": {"min": 9, "max": 13},
 }
 HIGH_PRIORITY_TRAINERS = {
     "Anisha Shah", "Rohan Dahima", "Reshma Sharma", "Atulan Purohit", "Pranjali Jain",
@@ -93,12 +95,13 @@ MUMBAI_POWERCYCLE_PRIORITY_TRAINERS = {"Vivaran Dhasmana", "Cauveri Vikrant", "K
 STRENGTH_FIT_PRIORITY_TRAINERS = {
     "Atulan Purohit", "Mrigakshi Jaiswal", "Anisha Shah", "Reshma Sharma", "Richard D'Costa"
 }
-MUMBAI_TIER1_SUPREME_MIN_SHARE = 0.40
+MUMBAI_TIER1_SUPREME_MIN_SHARE = 0.45
 MUMBAI_TIER1_SUPREME_MAX_SHARE = 0.55
 MIN_CLASS_START_MIN = 7 * 60
 BLOCKED_MIDDAY_START_MIN = 13 * 60
 BLOCKED_MIDDAY_END_MIN = 15 * 60
 MAX_CLASS_START_MIN = 20 * 60 + 30
+EARLY_REPAIR_EVIDENCE_CUTOFF_MIN = 8 * 60 + 30
 
 # Accurate class durations in minutes
 CLASS_DURATIONS: Dict[str, int] = {
@@ -201,9 +204,7 @@ DERIVED_LOCATION_SOURCES = {
     "Courtside": ["Kwality House, Kemps Corner", "Supreme HQ, Bandra"],
     "Copper & Cloves": ["Copper & Cloves", "Kenkere House"],
 }
-WEEKEND_ONLY_TARGETS = {
-    "Courtside": {"Saturday": 2, "Sunday": 2},
-}
+WEEKEND_ONLY_TARGETS = {}
 COURTSIDE_ALLOWED_CANONICAL_CLASSES = {
     "Studio Barre 57",
     "Studio Mat 57",
@@ -397,6 +398,7 @@ MIN_SCHEDULABLE_SCORE = 50.0
 MIN_PROVEN_AVG_CHECKIN = 3.0
 MIN_PROVEN_FILL_RATE = 0.22
 MIN_PROVEN_SESSIONS = 3
+MIN_EARLY_REPAIR_SESSIONS = 8
 
 # Per-class hard scheduling constraints (day/time guards applied inside _build_candidates)
 # Each entry: (allowed_days, earliest_start_min, latest_start_min)
@@ -516,6 +518,21 @@ def class_difficulty_level(class_name: str) -> str:
     return "intermediate"
 
 
+def has_early_repair_slot_evidence(class_name: str, time_str: str, hist: dict) -> bool:
+    """Final repair slots before 08:30 need real class-slot backing.
+
+    The repair pass exists to fill missed volume targets after ranked options
+    are exhausted. It should not invent demand-sensitive early-morning classes,
+    especially advanced formats like FIT or Strength, from empty history.
+    """
+    if slot_time_to_minutes(time_str) >= EARLY_REPAIR_EVIDENCE_CUTOFF_MIN:
+        return True
+    sessions = int((hist or {}).get("session_count", 0) or 0)
+    if sessions < MIN_EARLY_REPAIR_SESSIONS:
+        return False
+    return not is_low_performing_history(hist)
+
+
 def normalize_trainer_name(name: str) -> str:
     return " ".join(str(name or "").split())
 
@@ -526,6 +543,8 @@ def qualification_key_for_class(class_name: str) -> str:
         return "powercycle"
     if "strength lab" in lower:
         return "strength_lab"
+    if "fit" in lower:
+        return "fit"
     if "mat 57" in lower:
         return "mat_57"
     if "foundations" in lower:
@@ -591,7 +610,7 @@ def slot_is_in_blocked_window(day_name: str, time_str: str) -> bool:
         return True
     if BLOCKED_MIDDAY_START_MIN <= start_min < BLOCKED_MIDDAY_END_MIN:
         return True
-    if day_name == "Sunday" and (start_min < slot_time_to_minutes("10:00") or time_band(time_str) == "evening"):
+    if day_name == "Sunday" and start_min < slot_time_to_minutes("10:00"):
         return True
     return False
 
@@ -1585,6 +1604,7 @@ class ScheduleOptimiser:
     def _build_pinned_minutes_remaining(self) -> Dict[str, int]:
         pinned_minutes: Dict[str, int] = defaultdict(int)
         self._kwality_pinned_minutes_total: Dict[str, int] = defaultdict(int)
+        self._supreme_pinned_minutes_total: Dict[str, int] = defaultdict(int)
         for location in self.locations:
             for day_name in DAY_ORDER:
                 for slot in self._get_pinned_slots(location, day_name):
@@ -1596,6 +1616,8 @@ class ScheduleOptimiser:
                     pinned_minutes[trainer] += duration
                     if location == KWALITY_LOCATION:
                         self._kwality_pinned_minutes_total[trainer] += duration
+                    elif location == SUPREME_LOCATION:
+                        self._supreme_pinned_minutes_total[trainer] += duration
         return pinned_minutes
 
     def _mumbai_tier1_supreme_band(self, trainer: str) -> Optional[Tuple[int, int]]:
@@ -1606,16 +1628,19 @@ class ScheduleOptimiser:
         if getattr(self, "trainer_home_region", {}).get(profile.get("name"), "") != "mumbai":
             return None
 
-        base_min = int(MAX_TRAINER_WEEKLY_MINUTES_T1 * MUMBAI_TIER1_SUPREME_MIN_SHARE)
-        base_max = int(MAX_TRAINER_WEEKLY_MINUTES_T1 * MUMBAI_TIER1_SUPREME_MAX_SHARE)
+        balance_target_minutes = min(MAX_TRAINER_WEEKLY_MINUTES_T1, TIER1_WEEKLY_TARGET_MIN)
+        base_min = int(balance_target_minutes * MUMBAI_TIER1_SUPREME_MIN_SHARE)
+        base_max = int(balance_target_minutes * MUMBAI_TIER1_SUPREME_MAX_SHARE)
 
         # If Kwality pinned load exceeds the non-Supreme allowance, relax the
         # Supreme minimum by only the pinned excess.
-        max_non_supreme = MAX_TRAINER_WEEKLY_MINUTES_T1 - base_min
+        max_non_supreme = balance_target_minutes - base_min
         kwality_pinned = getattr(self, "_kwality_pinned_minutes_total", {}).get(trainer, 0)
         kwality_excess = max(0, kwality_pinned - max_non_supreme)
         adjusted_min = max(0, base_min - kwality_excess)
-        adjusted_max = max(adjusted_min, base_max)
+        supreme_pinned = getattr(self, "_supreme_pinned_minutes_total", {}).get(trainer, 0)
+        adjusted_min = max(adjusted_min, min(supreme_pinned, MAX_TRAINER_WEEKLY_MINUTES_T1))
+        adjusted_max = max(adjusted_min, base_max, min(supreme_pinned, MAX_TRAINER_WEEKLY_MINUTES_T1))
         supreme_profile = self._profile_location_data(profile, SUPREME_LOCATION) or {}
         available_days = supreme_profile.get("available_days") or []
         max_per_day = int(supreme_profile.get("max_classes_per_day") or 4)
@@ -1630,6 +1655,45 @@ class ScheduleOptimiser:
         if not remaining or not trainer:
             return
         remaining[trainer] = max(0, remaining.get(trainer, 0) - get_class_duration(class_name))
+
+    def _has_kwality_manual_pin_for_trainer_day(self, trainer: str, day_name: str) -> bool:
+        if not trainer or not day_name:
+            return False
+        for pin in self.schedule_config.get("manual_protected", []) or []:
+            if not isinstance(pin, dict) or pin.get("enabled") is False:
+                continue
+            pin_location = pin.get("location")
+            pin_day = pin.get("day") or pin.get("day_of_week")
+            pin_trainer = pin.get("trainer") or pin.get("trainer_1")
+            if (
+                pin_location == KWALITY_LOCATION
+                and pin_day == day_name
+                and pin_trainer == trainer
+            ):
+                return True
+        return False
+
+    def _should_prioritize_kwality_manual_pin(self, trainer: str, location: str, day_name: str) -> bool:
+        state = self.trainer_states.get(trainer)
+        return (
+            state is not None
+            and state.tier == 1
+            and location != KWALITY_LOCATION
+            and self._has_kwality_manual_pin_for_trainer_day(trainer, day_name)
+        )
+
+    def _mumbai_tier1_balance_allows_assignment(self, trainer: str, location: str, class_name: str) -> bool:
+        state = self.trainer_states.get(trainer)
+        if not state or state.tier != 1 or location != SUPREME_LOCATION:
+            return True
+        band = self._mumbai_tier1_supreme_band(trainer)
+        if not band:
+            return True
+        _, max_supreme_min = band
+        supreme_pinned = getattr(self, "_supreme_pinned_minutes_total", {}).get(trainer, 0)
+        hard_max = max(max_supreme_min, supreme_pinned)
+        projected = state.minutes_at_location(SUPREME_LOCATION) + get_class_duration(class_name)
+        return projected <= hard_max
 
     def _drop_inactive_slots(self, slots: List[ScheduleSlot]) -> List[ScheduleSlot]:
         kept: List[ScheduleSlot] = []
@@ -1695,6 +1759,8 @@ class ScheduleOptimiser:
                     tw = loc_data.get("time_window", {})
                     win_s, win_e = self._time_window(t1_name, slot.location, tw.get("start", "06:00"), tw.get("end", "22:00"))
                     max_d = self._max_per_day(t1_name, slot.location, loc_data.get("max_classes_per_day", 4))
+                    if not self._mumbai_tier1_balance_allows_assignment(t1_name, slot.location, cname):
+                        continue
                     if not t1_state.can_add(slot.day_of_week, slot.time, slot.location, cname, max_d, win_s, win_e):
                         continue
                     # Perform swap.
@@ -1779,6 +1845,8 @@ class ScheduleOptimiser:
                                 continue
                             if self._class_mix_hard_blocked(location, class_name):
                                 continue
+                            if self._same_class_already_at_time(slots_today, time_str, class_name):
+                                continue
                             if self._would_repeat_consecutive_format(slots_today, time_str, class_name):
                                 continue
                             if would_block_recovery(class_name, time_str, slots_today):
@@ -1814,6 +1882,8 @@ class ScheduleOptimiser:
                                 # Refuse to backfill a proven weak combination — keeping the
                                 # quality gate symmetric with the main candidate path.
                                 if is_low_performing_history(hist):
+                                    continue
+                                if not has_early_repair_slot_evidence(class_name, time_str, hist):
                                     continue
                                 recommendation = "PROTECT_EXACT" if is_protected_strength_lab_history(class_name, hist) else "INCLUDE"
                                 public_score, placement_score, recommendation, slot_is_exp = self._public_score_fields(
@@ -1859,10 +1929,6 @@ class ScheduleOptimiser:
         the lower bound and max is the ceiling. The optimiser picks inside
         that range so generated class totals are not fixed to either edge.
         """
-        # Courtside is intentionally fixed: 2 Saturday + 2 Sunday, none on weekdays.
-        if location in WEEKEND_ONLY_TARGETS:
-            return int(WEEKEND_ONLY_TARGETS[location].get(day_name, 0))
-
         # Persisted settings override (if provided from the Settings modal)
         config_targets = self.schedule_config.get("targets", {}).get(location, {}).get(day_name, {})
         if isinstance(config_targets, dict) and (
@@ -2089,15 +2155,19 @@ class ScheduleOptimiser:
             for s in avail
             if s["viable"] and not slot_is_in_blocked_window("Monday", s["time"][:5])
         }
-        if not viable and location in WEEKEND_ONLY_TARGETS:
-            viable = {"09:00", "10:15", "11:30", "17:00", "18:00"}
-        elif not viable:
+        if not viable:
             viable = {"08:30", "09:30", "10:15", "11:30", "17:30", "18:30"}
         elif location in {KWALITY_LOCATION, SUPREME_LOCATION} and viable.intersection(MUMBAI_PARALLEL_PEAK_TIMES | {"09:00"}):
             viable.update(MUMBAI_PARALLEL_PEAK_TIMES)
 
         am = sorted(t for t in viable if is_am_slot(t))
         pm = sorted(t for t in viable if not is_am_slot(t))
+
+        if is_derived_studio(location):
+            if not am:
+                am = sorted(set(am + ["08:30", "09:30", "10:15", "11:30"]))
+            if not pm:
+                pm = sorted(set(pm + ["17:30", "18:00", "18:30"]))
 
         location_priority = LOCATION_AM_SLOT_PRIORITY.get(location, [])
         priority_rank = {time: idx for idx, time in enumerate(location_priority)}
@@ -2209,6 +2279,18 @@ class ScheduleOptimiser:
         if len(all_slots) <= target and current_minutes <= soft_cap_minutes:
             return
 
+        config_targets = self.schedule_config.get("targets", {}).get(location, {})
+        daily_floors: Dict[str, int] = {}
+        for day_name in DAY_ORDER:
+            limits = config_targets.get(day_name) or {}
+            if isinstance(limits, dict) and (limits.get("min") is not None or limits.get("target") is not None):
+                daily_floors[day_name] = int(limits.get("min", limits.get("target")) or 0)
+            else:
+                daily_floors[day_name] = int((DATA_DRIVEN_DAILY_RANGES.get(location) or {}).get(day_name, (0, 0))[0] or 0)
+        day_counts: Dict[str, int] = defaultdict(int)
+        for slot in all_slots:
+            day_counts[slot.day_of_week] += 1
+
         def _priority_drop_score(slot: "ScheduleSlot") -> tuple:
             # Drop low-impact slots first while protecting manual commitments.
             is_hard_kept = slot.recommendation in {"PINNED", "PROTECT_EXACT"}
@@ -2228,7 +2310,10 @@ class ScheduleOptimiser:
                 break
             if slot.recommendation in {"PINNED", "PROTECT_EXACT"}:
                 continue
+            if day_counts.get(slot.day_of_week, 0) <= daily_floors.get(slot.day_of_week, 0):
+                continue
             all_slots.remove(slot)
+            day_counts[slot.day_of_week] = max(0, day_counts.get(slot.day_of_week, 0) - 1)
             key = slot.class_name.split("(")[0].strip()
             weekly_class_counts[key] = max(0, weekly_class_counts.get(key, 0) - 1)
 
@@ -2246,7 +2331,8 @@ class ScheduleOptimiser:
             "Kwality House, Kemps Corner": 70,
             "Supreme HQ, Bandra": 65,
             "Kenkere House": 55,
-            "Courtside": 4,
+            "Courtside": 9,
+            "Copper & Cloves": 9,
         }.get(location, 0)
         weekly_min = (LOCATION_WEEKLY_CLASS_BOUNDS.get(location) or {}).get("min", configured_floor)
         if location in LOCATION_WEEKLY_CLASS_BOUNDS:
@@ -2277,10 +2363,7 @@ class ScheduleOptimiser:
                     continue
                 day_idx = DOW_REVERSE[day_name]
                 date_str = (week_start + timedelta(days=day_idx)).isoformat()
-                if location in WEEKEND_ONLY_TARGETS:
-                    day_max = self._pick_daily_target(location, day_name)
-                else:
-                    day_max = int((config_targets.get(day_name) or {}).get("max", self._pick_daily_target(location, day_name) + 2))
+                day_max = int((config_targets.get(day_name) or {}).get("max", self._pick_daily_target(location, day_name) + 2))
                 if len(by_day.get(day_name, [])) >= day_max:
                     continue
                 used_at_time: Dict[str, Set[str]] = {}
@@ -2348,19 +2431,14 @@ class ScheduleOptimiser:
         for day_name in DAY_ORDER:
             if not self._location_allowed_day(location, day_name):
                 continue
-            if location in WEEKEND_ONLY_TARGETS:
-                target = self._pick_daily_target(location, day_name)
-                min_target = target
-                day_max = target
-            else:
-                limits = config_targets.get(day_name) or {}
-                if not isinstance(limits, dict) or (
-                    limits.get("target") is None and limits.get("min") is None
-                ):
-                    continue
-                min_target = int(limits.get("min", limits.get("target")) or 0)
-                day_max = int(limits.get("max", min_target) or min_target)
-                target = min(max(self._pick_daily_target(location, day_name), min_target), day_max)
+            limits = config_targets.get(day_name) or {}
+            if not isinstance(limits, dict) or (
+                limits.get("target") is None and limits.get("min") is None
+            ):
+                continue
+            min_target = int(limits.get("min", limits.get("target")) or 0)
+            day_max = int(limits.get("max", min_target) or min_target)
+            target = min(max(self._pick_daily_target(location, day_name), min_target), day_max)
             day_idx = DOW_REVERSE[day_name]
             date_str = (week_start + timedelta(days=day_idx)).isoformat()
 
@@ -2395,6 +2473,22 @@ class ScheduleOptimiser:
                         weekly_class_counts=weekly_class_counts,
                         class_format_count_today=class_format_count_today,
                     )
+                    if not result and len(slots_today) < min_target:
+                        result = self._fallback_slot(
+                            location, day_name, date_str, time_str, used_at_time, shift_trainers,
+                            room_occ, is_prime=is_prime_slot(time_str),
+                            fmt_today=class_format_count_today,
+                            slots_today=slots_today,
+                            weekly_class_counts=weekly_class_counts,
+                            enforce_tier_priority=False,
+                        )
+                    if not result and len(slots_today) < min_target:
+                        result = self._daily_floor_repair_slot(
+                            location, day_name, date_str, time_str, used_at_time,
+                            shift_trainers, room_occ, slots_today,
+                            weekly_class_counts=weekly_class_counts,
+                            class_format_count_today=class_format_count_today,
+                        )
                     if not result:
                         continue
                     room_occ.occupy(
@@ -2533,6 +2627,16 @@ class ScheduleOptimiser:
                 continue
             trainer = p["trainer"]
             cname = p["class"]
+            if (
+                is_manual_pin
+                and self._should_prioritize_kwality_manual_pin(trainer, location, day_name)
+            ):
+                print(
+                    f"  WARNING: Skipping manual pin {cname} at {location} {day_name} {t} "
+                    f"for {trainer}; Kwality manual pin on the same day takes priority"
+                )
+                self._release_pinned_reservation(trainer, cname)
+                continue
             if self._same_class_already_at_time(slots_today, t, cname):
                 continue
             if is_excluded_class(cname, self.class_family.get(cname, "")):
@@ -2641,7 +2745,11 @@ class ScheduleOptimiser:
                 continue
             trainer = r["trainer"]
             cname = r["class"]
+            if self._should_prioritize_kwality_manual_pin(trainer, location, day_name):
+                continue
             if self._same_class_already_at_time(slots_today, t, cname):
+                continue
+            if not self._mumbai_tier1_balance_allows_assignment(trainer, location, cname):
                 continue
             if not self._horizontal_mix_allows_candidate(location, t, cname):
                 continue
@@ -3416,7 +3524,8 @@ class ScheduleOptimiser:
                        already_at_time, shift_trainers, room_occ: RoomOccupancy,
                        is_prime, fmt_today: Optional[Dict[str, int]] = None,
                        slots_today: Optional[List["ScheduleSlot"]] = None,
-                       weekly_class_counts: Optional[Dict[str, int]] = None) -> Optional[ScheduleSlot]:
+                       weekly_class_counts: Optional[Dict[str, int]] = None,
+                       enforce_tier_priority: bool = True) -> Optional[ScheduleSlot]:
         rooms = LOCATION_ROOMS.get(location, {})
         start_min = slot_time_to_minutes(time_str)
         shift = "AM" if is_am_slot(time_str) else "PM"
@@ -3511,12 +3620,14 @@ class ScheduleOptimiser:
                 # Don't skip at target — deprioritize by sorting (handled via priority fn)
                 if not self._trainer_ok(name, location, day_name, time_str, cname):
                     continue
-                if state.tier > 1 and self._tier1_under_target_exists_for_slot(
+                if enforce_tier_priority and state.tier > 1 and self._tier1_under_target_exists_for_slot(
                     location, day_name, date_str, time_str, cname, already_at_time,
                     exclude_trainer=name,
                 ):
                     continue
                 if (
+                    enforce_tier_priority
+                    and
                     location == "Supreme HQ, Bandra"
                     and state.tier > 1
                     and self._tier1_available_for_slot(
@@ -3578,6 +3689,124 @@ class ScheduleOptimiser:
                 historical_no_show_rate=hist.get("avg_no_show_rate", 0.0),
                 performance_score=public_score,
                 placement_score=placement_score,
+                )
+        return None
+
+    def _daily_floor_repair_slot(
+        self,
+        location: str,
+        day_name: str,
+        date_str: str,
+        time_str: str,
+        used_at_time: Dict[str, Set[str]],
+        shift_trainers: Dict[str, List[str]],
+        room_occ: RoomOccupancy,
+        slots_today: List["ScheduleSlot"],
+        weekly_class_counts: Optional[Dict[str, int]] = None,
+        class_format_count_today: Optional[Dict[str, int]] = None,
+    ) -> Optional[ScheduleSlot]:
+        """Last-resort daily floor repair that keeps hard constraints only."""
+        if slot_is_in_blocked_window(day_name, time_str):
+            return None
+        rooms = LOCATION_ROOMS.get(location, {})
+        start_min = slot_time_to_minutes(time_str)
+        fallback_classes = [
+            "Studio Barre 57",
+            "Studio Cardio Barre",
+            "Studio Mat 57",
+            "Studio Barre 57 Express",
+            "Studio Mat 57 Express",
+            "Studio FIT",
+            "Studio PowerCycle",
+        ]
+        if location == KWALITY_LOCATION:
+            fallback_classes.append("Studio PowerCycle Express")
+        already_trainers = used_at_time.get(time_str, set())
+        wcc = weekly_class_counts or {}
+        fmt_today = class_format_count_today or {}
+        shift = "AM" if is_am_slot(time_str) else "PM"
+
+        def trainer_sort(item):
+            name, state = item
+            return (
+                0 if name in shift_trainers.get(shift, []) else 1,
+                state.tier,
+                state.weekly_minutes,
+                state.classes_at_location(location),
+                name,
+            )
+
+        for class_name in fallback_classes:
+            if not location_class_allowed(location, class_name):
+                continue
+            if self._same_class_already_at_time(slots_today, time_str, class_name):
+                continue
+            if self._would_repeat_consecutive_format(slots_today, time_str, class_name):
+                continue
+            if would_block_recovery(class_name, time_str, slots_today):
+                continue
+            fam = self.class_family.get(class_name, "barre_57")
+            if is_excluded_class(class_name, fam):
+                continue
+            if not self._class_mix_allows_candidate(
+                location, class_name, self._weekly_count(wcc, slots_today, class_name)
+            ):
+                continue
+            cap = MAX_FORMAT_PER_DAY.get(class_name, DEFAULT_MAX_FORMAT_PER_DAY)
+            if fmt_today.get(class_name, 0) >= cap:
+                continue
+            dur = get_class_duration(class_name)
+            room = self._find_best_room(room_occ, day_name, fam, start_min, dur, get_class_format(class_name))
+            if room is None:
+                continue
+            needed_qual = qualification_key_for_class(class_name)
+            for trainer, state in sorted(self.trainer_states.items(), key=trainer_sort):
+                if trainer in already_trainers:
+                    continue
+                profile = self.trainer_profiles.get(trainer, {})
+                if not profile.get("qualifications", {}).get(needed_qual, False):
+                    continue
+                if self._is_inactive(trainer) or self._on_leave(trainer, date_str, location):
+                    continue
+                if self._custom_rule_blocks(location, day_name, time_str, class_name, trainer):
+                    continue
+                if self._loc_excluded(trainer, location):
+                    continue
+                if not self._trainer_ok(trainer, location, day_name, time_str, class_name, experimental=True):
+                    continue
+                hist = self._get_hist(location, class_name, trainer, DOW_REVERSE[day_name], time_str)
+                public_score, placement_score, recommendation, slot_is_exp = self._public_score_fields(
+                    35.0,
+                    35.0,
+                    hist.get("session_count", 0),
+                    "CONSIDER",
+                    True,
+                )
+                return ScheduleSlot(
+                    location=location,
+                    date=date_str,
+                    day_of_week=day_name,
+                    time=time_str,
+                    class_name=class_name,
+                    trainer_1=trainer,
+                    trainer_2="",
+                    cover="",
+                    room=room,
+                    capacity=rooms.get(room, {}).get("capacity", 15),
+                    duration_min=dur,
+                    predicted_fill_rate=self._evidence_adjusted_fill(hist),
+                    score=public_score,
+                    recommendation=recommendation,
+                    is_experimental=slot_is_exp,
+                    scheduling_reason="Daily floor repair: minimum class count required this slot.",
+                    historical_avg_fill=hist.get("avg_fill_rate", 0.0),
+                    historical_avg_checkin=hist.get("avg_checkin", 0.0),
+                    historical_session_count=hist.get("session_count", 0),
+                    historical_late_cancel_rate=hist.get("avg_late_cancel_rate", 0.0),
+                    historical_no_show_rate=hist.get("avg_no_show_rate", 0.0),
+                    performance_score=public_score,
+                    placement_score=placement_score,
+                    constraint_violations=self._quick_check(location, day_name, time_str, class_name, slots_today),
                 )
         return None
 
@@ -3962,6 +4191,8 @@ class ScheduleOptimiser:
         state = self.trainer_states.get(trainer)
         if state is None:
             return False
+        if self._should_prioritize_kwality_manual_pin(trainer, location, day_name):
+            return False
 
         # Monday KH Shift Restriction
         if day_name == "Monday":
@@ -4001,6 +4232,8 @@ class ScheduleOptimiser:
                                          tw.get("start", "06:00"), tw.get("end", "22:00"))
         max_d = self._max_per_day(trainer, location, loc_data.get("max_classes_per_day", 4))
         if day_name not in state.worked_days() and state.worked_days_count() >= MAX_TRAINER_WORK_DAYS:
+            return False
+        if not self._mumbai_tier1_balance_allows_assignment(trainer, location, class_name):
             return False
         reserved_pinned = getattr(self, "_pinned_minutes_remaining", {}).get(trainer, 0)
         if state.weekly_minutes + get_class_duration(class_name) + reserved_pinned > state.max_weekly_minutes:

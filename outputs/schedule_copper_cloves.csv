@@ -3,8 +3,7 @@
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
 07:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Chaitanya Nahar,Studio 1,14,17%,11,17%,1.9,Top performer: Chaitanya Nahar,,,,,,,,,,,,,,,,,,,,,
 11:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves FIT,Siddhartha Kusuma,Studio 1,14,20%,14,20%,2.0,Top performer: Siddhartha Kusu,
-17:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Chaitanya Nahar,Studio 1,14,8%,1,8%,1.0,Top trainer rejected: Siddhart,,,,,,,,,,,
-17:15,,,,,,,,,,,Copper + Cloves Barre 57,Chaitanya Nahar,Studio 1,14,20%,29,20%,2.1,Top performer: Chaitanya Nahar,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+18:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Siddhartha Kusuma,Studio 1,14,17%,23,17%,1.7,Top performer: Siddhartha Kusu,,,,,,,,,,,,,,,,,,,,,
 19:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Copper + Cloves Barre 57,Kajol Kanchan,Studio 1,14,15%,11,15%,1.7,Top performer: Kajol Kanchan —,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 
@@ -12,19 +11,18 @@ Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Clas
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Chaitanya Nahar,3,2.8,15%,Copper + Cloves Barre 57
+Chaitanya Nahar,1,0.9,17%,Copper + Cloves Barre 57
 Kajol Kanchan,1,0.9,15%,Copper + Cloves Barre 57
-Siddhartha Kusuma,1,0.9,20%,Copper + Cloves FIT
+Siddhartha Kusuma,2,1.9,18%,Copper + Cloves Barre 57
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
-Copper + Cloves Barre 57,4,15%,4
+Copper + Cloves Barre 57,3,16%,2
 Copper + Cloves FIT,1,20%,1
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
 07:30,-,-,-,-,Copper + Cloves Barre 57,-,-,1
 11:30,-,-,-,-,-,-,Copper + Cloves FIT,1
-17:00,-,-,-,-,-,Copper + Cloves Barre 57,-,1
-17:15,-,Copper + Cloves Barre 57,-,-,-,-,-,1
+18:15,-,-,-,-,Copper + Cloves Barre 57,-,-,1
 19:45,-,-,-,Copper + Cloves Barre 57,-,-,-,1

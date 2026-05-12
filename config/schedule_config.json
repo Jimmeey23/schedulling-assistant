@@ -76,28 +76,28 @@
     },
     "Courtside": {
       "Monday": {
-        "target": 0,
-        "max": 0,
+        "target": 1,
+        "max": 1,
         "source": "settings"
       },
       "Tuesday": {
-        "target": 0,
-        "max": 0,
+        "target": 1,
+        "max": 1,
         "source": "settings"
       },
       "Wednesday": {
-        "target": 0,
-        "max": 0,
+        "target": 1,
+        "max": 1,
         "source": "settings"
       },
       "Thursday": {
-        "target": 0,
-        "max": 0,
+        "target": 1,
+        "max": 1,
         "source": "settings"
       },
       "Friday": {
-        "target": 0,
-        "max": 0,
+        "target": 1,
+        "max": 1,
         "source": "settings"
       },
       "Saturday": {
@@ -119,7 +119,7 @@
       },
       "Tuesday": {
         "target": 9,
-        "max": 9,
+        "max": 10,
         "source": "settings"
       },
       "Wednesday": {
@@ -129,12 +129,12 @@
       },
       "Thursday": {
         "target": 8,
-        "max": 8,
+        "max": 9,
         "source": "settings"
       },
       "Friday": {
         "target": 8,
-        "max": 8,
+        "max": 10,
         "source": "settings"
       },
       "Saturday": {
@@ -144,7 +144,7 @@
       },
       "Sunday": {
         "target": 6,
-        "max": 6,
+        "max": 7,
         "source": "settings"
       }
     },
@@ -1326,7 +1326,7 @@
   "source_of_truth": {
     "owner": "settings-command-center",
     "conflict_policy": "settings_override_soft_rules",
-    "updated_at": "2026-05-11T19:39:23.800Z"
+    "updated_at": "2026-05-12T07:38:19.862Z"
   },
   "scoring_weights": {
     "fill_rate": 25,

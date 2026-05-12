@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Physique 57 chatbot icon">
+  <defs>
+    <linearGradient id="bubble" x1="330" y1="275" x2="665" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#63C7DF"/>
+      <stop offset=".48" stop-color="#A891C3"/>
+      <stop offset=".76" stop-color="#E87897"/>
+      <stop offset="1" stop-color="#F3C979"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="318" y1="286" x2="718" y2="642" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6B7DD4"/>
+      <stop offset=".46" stop-color="#8FC9E1"/>
+      <stop offset=".74" stop-color="#EF7191"/>
+      <stop offset="1" stop-color="#F2CB87"/>
+    </linearGradient>
+    <clipPath id="bubbleClip">
+      <path d="M512 250c-111 0-201 82-201 183 0 39 13 75 36 105l-45 94 104-33c31 12 66 18 106 18 111 0 201-82 201-184S623 250 512 250Z"/>
+    </clipPath>
+  </defs>
+  <rect width="1024" height="1024" fill="#112232"/>
+  <g transform="translate(0 10)">
+    <path d="M514 238c-119 0-216 88-216 197 0 40 13 78 36 110l-44 91 99-31c35 17 78 27 125 27 119 0 216-88 216-197S633 238 514 238Z" fill="none" stroke="url(#ring)" stroke-width="9"/>
+    <path d="M512 250c-111 0-201 82-201 183 0 39 13 75 36 105l-45 94 104-33c31 12 66 18 106 18 111 0 201-82 201-184S623 250 512 250Z" fill="url(#bubble)"/>
+    <g clip-path="url(#bubbleClip)">
+      <path d="M474 373c41-17 88-6 112 9 18 37 10 80 38 113 16 18 24 28 17 42-35 68-99 88-176 77 42-19 50-49 58-92 5-30 25-37 49-39-19-25-55-34-93-28-29 4-55 15-72 35 7-45 25-91 67-117Z" fill="#112232"/>
+      <path d="M450 384c-45 39-72 84-77 134-5 47-26 82-58 118l-31 8 52-105c-24-32-37-68-37-108 0-89 73-165 172-182-23 20-34 57-21 135Z" fill="#112232" opacity=".95"/>
+      <g fill="none" stroke="#112232" stroke-width="4" stroke-linecap="round" opacity=".95">
+        <path d="M338 279h151"/>
+        <path d="M327 292h197"/>
+        <path d="M321 305h216"/>
+        <path d="M316 318h229"/>
+        <path d="M311 331h235"/>
+        <path d="M307 344h238"/>
+        <path d="M304 357h232"/>
+        <path d="M301 370h221"/>
+        <path d="M299 383h204"/>
+        <path d="M298 396h184"/>
+        <path d="M298 409h165"/>
+        <path d="M298 422h145"/>
+        <path d="M299 435h127"/>
+        <path d="M301 448h111"/>
+        <path d="M304 461h96"/>
+        <path d="M308 474h83"/>
+        <path d="M315 487h69"/>
+        <path d="M326 500h52"/>
+        <path d="M341 513h34"/>
+      </g>
+      <path d="M433 484c21 6 39 17 52 31 8 9 7 22-2 30-8 8-21 8-30 0-13-12-30-19-50-22 8-12 18-25 30-39Z" fill="#B9B2D5" opacity=".75"/>
+      <path d="M636 447c-12 11-25 18-38 22" stroke="#F5D18C" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+      <path d="M600 513c11 0 20 7 20 16 0 10-9 18-20 18" fill="none" stroke="#E9819A" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <text x="512" y="760" text-anchor="middle" fill="#F7FAFC" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="76" font-weight="800" letter-spacing="10">PHYSIQUE 57</text>
+  </g>
+</svg>

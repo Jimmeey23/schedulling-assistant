@@ -169,9 +169,14 @@ def _normalize_pipeline_week(value: str | None) -> str:
 
 
 def _saved_ai_api_key() -> str:
-    # Prefer saved config when present (backward compatible); otherwise fall
-    # back to env vars (production deployment pattern — config no longer
-    # persists keys to disk; see _scrub in save endpoint).
+    try:
+        from ai_provider import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+    env_key = (os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY") or "").strip()
+    if env_key:
+        return env_key
     try:
         data = json.loads(_schedule_config_path().read_text())
         settings = data.get("settings_options") or {}
@@ -180,15 +185,18 @@ def _saved_ai_api_key() -> str:
             return cfg_key
     except Exception:
         pass
+    return ""
+
+
+def _saved_deepseek_api_key() -> str:
     try:
         from ai_provider import load_dotenv_if_present
         load_dotenv_if_present()
     except Exception:
         pass
-    return (os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY") or "").strip()
-
-
-def _saved_deepseek_api_key() -> str:
+    env_key = (os.environ.get("DEEPSEEK_API_KEY") or "").strip()
+    if env_key:
+        return env_key
     try:
         data = json.loads(_schedule_config_path().read_text())
         settings = data.get("settings_options") or {}
@@ -197,12 +205,7 @@ def _saved_deepseek_api_key() -> str:
             return cfg_key
     except Exception:
         pass
-    try:
-        from ai_provider import load_dotenv_if_present
-        load_dotenv_if_present()
-    except Exception:
-        pass
-    return (os.environ.get("DEEPSEEK_API_KEY") or "").strip()
+    return ""
 
 def _saved_ai_runtime_settings() -> dict:
     try:
@@ -364,10 +367,10 @@ def _resolve_pipeline_request_options(payload=None) -> dict:
     child_env["PYTHONUNBUFFERED"] = "1"
 
     if use_ai:
-        api_key = str(payload.get("api_key") or "").strip() or _saved_ai_api_key()
+        api_key = _saved_ai_api_key() or str(payload.get("api_key") or "").strip()
         deepseek_api_key = (
-            str(payload.get("deepseek_api_key") or "").strip()
-            or _saved_deepseek_api_key()
+            _saved_deepseek_api_key()
+            or str(payload.get("deepseek_api_key") or "").strip()
         )
         runtime = _saved_ai_runtime_settings()
         payload_provider = str(payload.get("ai_provider") or "").strip().lower()
@@ -558,13 +561,104 @@ def _profile_location_data(profile, loc):
     return max(candidates, key=lambda item: item.get("session_count", 0)) if candidates else None
 
 
-def _validate_manual_slot(data, iteration, slot, original_slot=None):
+def _manual_class_base(slot):
+    if slot.get("is_private_session") and slot.get("private_session_format"):
+        return slot.get("private_session_format") or ""
+    return slot.get("class_name") or ""
+
+
+def _qual_key_for_manual_class(class_name):
+    lower = str(class_name or "").lower()
+    if "powercycle" in lower or "power cycle" in lower:
+        return "powercycle"
+    if "strength lab" in lower:
+        return "strength_lab"
+    if "fit" in lower:
+        return "fit"
+    if "mat 57" in lower:
+        return "mat_57"
+    if "foundations" in lower:
+        return "foundations"
+    if "pre/post" in lower or "pre post" in lower or "natal" in lower:
+        return "pre_post_natal"
+    if "amped" in lower:
+        return "amped_up"
+    if "hiit" in lower:
+        return "hiit"
+    if "recovery" in lower:
+        return "recovery"
+    if "back body blaze" in lower:
+        return "back_body_blaze"
+    if "cardio barre" in lower:
+        return "cardio_barre"
+    return "all_barre"
+
+
+def _trainer_qualified_for_manual_class(profile, class_name):
+    q = profile.get("qualifications") or {}
+    if not any(bool(v) for v in q.values()):
+        return True
+    key = _qual_key_for_manual_class(class_name)
+    if q.get(key):
+        return True
+    lower = str(class_name or "").lower()
+    if "express" in lower and key == "powercycle" and q.get("express_cycle"):
+        return True
+    if "express" in lower and key in {"all_barre", "cardio_barre", "mat_57"} and q.get("express_barre"):
+        return True
+    return False
+
+
+def _manual_class_allowed_at_location(slot):
+    loc = slot.get("location") or ""
+    class_name = _manual_class_base(slot)
+    if not class_name:
+        return True
+    if "private session" in str(slot.get("class_name") or "").lower() and not slot.get("private_session_format"):
+        return True
+    if "PowerCycle" in class_name and loc not in MUMBAI_LOCATIONS:
+        raise ValueError(f"{class_name} is not enabled for {loc}")
+    if "Strength Lab" in class_name and loc != "Kwality House, Kemps Corner":
+        raise ValueError(f"{class_name} is not enabled for {loc}")
+    cfg_path = PROJECT_ROOT / "config" / "schedule_config.json"
+    try:
+        cfg = json.loads(cfg_path.read_text()) if cfg_path.exists() else {}
+        entry = ((cfg.get("class_mix") or {}).get(loc) or {}).get(class_name) or {}
+        if int(entry.get("min", 0) or 0) == 0 and int(entry.get("max", 1) or 0) == 0:
+            raise ValueError(f"{class_name} is disabled for {loc} in class mix settings")
+    except ValueError:
+        raise
+    except Exception:
+        pass
+
+
+def _room_overlaps(slot, rows):
+    room = (slot.get("room") or "").strip()
+    if not room:
+        return None
+    for r in rows:
+        if (r.get("location") or "") != (slot.get("location") or ""):
+            continue
+        if (r.get("day_of_week") or "") != (slot.get("day_of_week") or ""):
+            continue
+        if (r.get("room") or "").strip() != room:
+            continue
+        if _slot_overlap(slot, r):
+            return r
+    return None
+
+
+def _validate_manual_slot(data, iteration, slot, original_slot=None, additional_rows=None):
     trainer = slot.get("trainer_1") or ""
     profile = _trainer_profile(trainer)
     if not profile:
         raise ValueError(f"No active trainer profile found for {trainer}")
     if profile.get("active") is False:
         raise ValueError(f"{trainer} is inactive")
+    _manual_class_allowed_at_location(slot)
+    base_class = _manual_class_base(slot)
+    if base_class and "private session" not in base_class.lower() and not _trainer_qualified_for_manual_class(profile, base_class):
+        raise ValueError(f"{trainer} is not qualified for {base_class}")
     loc = slot.get("location") or ""
     loc_profile = _profile_location_data(profile, loc)
     if not loc_profile:
@@ -587,8 +681,15 @@ def _validate_manual_slot(data, iteration, slot, original_slot=None):
     else:
         for loc_rows in ((data.get("iterations") or {}).get(iteration) or {}).values():
             rows.extend(loc_rows or [])
+    rows.extend(additional_rows or [])
     rows = [r for r in rows if not (original_slot and _same_schedule_slot(r, original_slot))]
     trainer_rows = [r for r in rows if (r.get("trainer_1") or "").strip().lower() == trainer.strip().lower()]
+    room_conflict = _room_overlaps(slot, rows)
+    if room_conflict:
+        raise ValueError(
+            f"{slot.get('room')} is already occupied at {slot.get('location')} on "
+            f"{slot.get('day_of_week')} {slot.get('time')}"
+        )
 
     max_day = int(loc_profile.get("max_classes_per_day") or 4)
     same_day_loc = [r for r in trainer_rows if r.get("location") == loc and r.get("day_of_week") == day]
@@ -682,6 +783,43 @@ def _add_class_to_schedule(payload):
 
     supabase_saved = _write_schedule_data(data)
     return {"added": 1, "supabase_saved": supabase_saved}
+
+
+def _add_classes_to_schedule(payload):
+    slots = payload.get("slots") or []
+    iteration = payload.get("iteration") or "Main"
+    if not isinstance(slots, list) or not slots:
+        raise ValueError("Missing slots")
+
+    path = WEB_DIR / "schedule_data.json"
+    if not path.exists():
+        raise FileNotFoundError("web/schedule_data.json was not found")
+    data = json.loads(path.read_text())
+
+    prepared = []
+    pending = []
+    for raw in slots:
+        slot = dict(raw or {})
+        required = ("location", "day_of_week", "time", "class_name", "trainer_1")
+        missing = [k for k in required if not slot.get(k)]
+        if missing:
+            raise ValueError(f"Missing slot field(s): {', '.join(missing)}")
+        slot.setdefault("recommendation", "MANUAL")
+        slot.setdefault("manual_added", True)
+        slot.setdefault("scheduling_reason", "Manual recurring class added from calendar")
+        _validate_manual_slot(data, iteration, slot, additional_rows=pending)
+        prepared.append(slot)
+        pending.append(slot)
+
+    for slot in prepared:
+        loc = slot["location"]
+        if iteration == "Main":
+            data.setdefault("locations", {}).setdefault(loc, []).append(slot)
+        else:
+            data.setdefault("iterations", {}).setdefault(iteration, {}).setdefault(loc, []).append(slot)
+
+    supabase_saved = _write_schedule_data(data)
+    return {"added": len(prepared), "supabase_saved": supabase_saved}
 
 
 def _save_schedule_to_supabase(data):
@@ -1361,6 +1499,16 @@ def add_class():
     try:
         payload = request.get_json(force=True)
         result = _add_class_to_schedule(payload)
+        return _json({"ok": True, **result})
+    except Exception as e:
+        return _json({"error": str(e)}, 400)
+
+
+@app.route("/api/add-classes", methods=["POST"])
+def add_classes():
+    try:
+        payload = request.get_json(force=True)
+        result = _add_classes_to_schedule(payload)
         return _json({"ok": True, **result})
     except Exception as e:
         return _json({"error": str(e)}, 400)

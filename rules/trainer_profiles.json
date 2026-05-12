@@ -465,7 +465,7 @@
   },
   {
     "name": "Chaitanya Nahar",
-    "tier": 1,
+    "tier": 2,
     "locations": {
       "Kenkere House": {
         "available_days": [
@@ -480,7 +480,7 @@
           "end": "21:00"
         },
         "avg_classes_per_day": 1.5,
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "avg_checkin": 3.5,
         "session_count": 72,
         "owned_blocks": [],
@@ -502,7 +502,7 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "week_off_days": [
           "Thursday",
           "Wednesday"
@@ -1532,7 +1532,7 @@
   },
   {
     "name": "Siddhartha Kusuma",
-    "tier": 1,
+    "tier": 2,
     "locations": {
       "Kenkere House": {
         "available_days": [
@@ -1547,7 +1547,7 @@
           "end": "21:00"
         },
         "avg_classes_per_day": 2,
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "avg_checkin": 4.2,
         "session_count": 110,
         "owned_blocks": [],
@@ -1569,7 +1569,7 @@
           "start": "07:00",
           "end": "21:00"
         },
-        "max_classes_per_day": 4,
+        "max_classes_per_day": 3,
         "week_off_days": [
           "Monday",
           "Thursday"
