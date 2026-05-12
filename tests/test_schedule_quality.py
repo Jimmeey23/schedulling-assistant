@@ -192,6 +192,31 @@ def test_derived_studio_viable_slots_add_reserve_pm_window_when_sparse():
     assert {"17:30", "18:00", "18:30"}.issubset(set(pm_slots))
 
 
+def test_derived_studio_viable_slots_use_scored_historic_times_when_available():
+    optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
+    optimiser.slot_availability = {
+        "Copper & Cloves": [
+            {"time": "09:00", "viable": True},
+            {"time": "09:15", "viable": True},
+            {"time": "11:30", "viable": True},
+        ]
+    }
+    optimiser.scores_data = {
+        "class_slot_ranking": [
+            {"location": "Copper & Cloves", "day": 1, "time": "17:15", "class": "Copper + Cloves Barre 57", "trainer": "Chaitanya Nahar", "score": 25.45, "fill": 0.19, "sessions": 29},
+            {"location": "Copper & Cloves", "day": 4, "time": "18:15", "class": "Copper + Cloves Barre 57", "trainer": "Siddhartha Kusuma", "score": 27.49, "fill": 0.16, "sessions": 23},
+            {"location": "Copper & Cloves", "day": 5, "time": "09:00", "class": "Copper + Cloves Mat 57", "trainer": "Pushyank Nahar", "score": 55.88, "fill": 0.46, "sessions": 11},
+        ]
+    }
+    optimiser._build_score_indexes()
+
+    am_slots, pm_slots = optimiser._get_viable_slots("Copper & Cloves")
+
+    assert "09:00" in am_slots
+    assert "17:15" in pm_slots
+    assert "18:15" in pm_slots
+
+
 def test_mumbai_viable_slots_add_requested_parallel_peak_clusters():
     optimiser = ScheduleOptimiser(target_week_start="2026-05-04", locations=[])
     optimiser.slot_availability = {

@@ -10,24 +10,23 @@ Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Clas
 09:30,,,,,,,,,,,Studio FIT,Vivaran Dhasmana,Studio 1,14,92%,4,92%,9.2,Pinned block — rule ownership ,,,,,,,,,,,,Studio Mat 57,Anisha Shah,Studio 1,14,68%,70,68%,7.6,Top performer: Anisha Shah — 7,,Studio PowerCycle Express,Karan Bhatia,PowerCycle Studio,14,15%,15,15%,1.9,Top performer: Karan Bhatia — ,,Studio PowerCycle,Bret Saldanha,PowerCycle Studio,14,49%,86,49%,6.3,Top trainer rejected: Anisha S,,,,,,,,,,,
 09:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Karan Bhatia,Studio 2,14,33%,18,33%,4.7,Top performer: Karan Bhatia — ,,,,,,,,,,,
 10:00,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,33%,44,33%,4.2,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,68%,35,68%,8.7,Pinned block — rule ownership ,
-10:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Atulan Purohit,Studio 1,14,34%,46,34%,4.7,Top performer: Atulan Purohit ,,Studio FIT,Atulan Purohit,Studio 1,14,82%,62,82%,8.2,Top performer: Atulan Purohit ,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,100%,1,100%,14.0,Pinned block — rule ownership ,
-10:30,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Reshma Sharma,PowerCycle Studio,14,30%,11,30%,3.9,Top performer: Reshma Sharma —,,Studio PowerCycle,Anisha Shah,PowerCycle Studio,14,27%,54,27%,3.5,Top trainer rejected: Mrigaksh,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-11:00,Studio Barre 57,Simran Dutt,Studio 2,14,64%,1,64%,9.0,Pinned block — rule ownership ,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,42%,57,42%,4.9,Top performer: Vivaran Dhasman,,Studio Barre 57,Simonelle De Vitre,Studio 2,14,30%,6,30%,3.0,Top trainer rejected: Vivaran ,,,,,,,,,,,,Studio Mat 57,Karanvir Bhatia,Studio 2,14,38%,37,38%,4.1,Score 50.6/100 (CONSIDER) — 37,,Studio PowerCycle,Bret Saldanha,PowerCycle Studio,14,65%,88,65%,8.2,Top trainer rejected: Anisha S,,,,,,,,,,,
-11:15,,,,,,,,,,,Studio Barre 57,Mrigakshi Jaiswal,Studio 2,14,27%,5,27%,3.8,Top trainer rejected: Vivaran ,,,,,,,,,,,,Studio Barre 57,Anmol Sharma,Studio 1,14,35%,82,35%,4.9,Top trainer rejected: Cauveri ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-11:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Pranjali Jain,Studio 1,14,54%,97,54%,7.5,Top trainer rejected: Anisha S,,Studio PowerCycle Express,Cauveri Vikrant,PowerCycle Studio,14,56%,18,56%,7.2,Top performer: Cauveri Vikrant,
-11:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Anmol Sharma,Studio 1,14,28%,99,28%,3.9,Top trainer rejected: Karan Bh,
-12:00,,,,,,,,,,,Studio PowerCycle,Vivaran Dhasmana,PowerCycle Studio,14,85%,1,85%,11.0,Top trainer rejected: Mrigaksh,,,,,,,,,,,,Studio PowerCycle Express,Anisha Shah,PowerCycle Studio,14,30%,13,30%,3.8,Top performer: Anisha Shah — 1,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Cauveri Vikrant,Studio 2,14,20%,0,0%,0.0,Weekly floor repair: conservat,
+10:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Atulan Purohit,Studio 1,14,34%,46,34%,4.7,Top performer: Atulan Purohit ,,,,,,,,,,,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,100%,1,100%,14.0,Pinned block — rule ownership ,
+10:30,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Reshma Sharma,PowerCycle Studio,14,30%,11,30%,3.9,Top performer: Reshma Sharma —,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+11:00,Studio Barre 57,Simran Dutt,Studio 2,14,64%,1,64%,9.0,Pinned block — rule ownership ,,Studio Back Body Blaze,Vivaran Dhasmana,Studio 1,14,42%,57,42%,4.9,Top performer: Vivaran Dhasman,,Studio FIT,Vivaran Dhasmana,Studio 1,14,61%,57,61%,6.1,Top performer: Vivaran Dhasman,,Studio Barre 57,Anisha Shah,Studio 1,14,36%,47,36%,5.0,Top performer: Anisha Shah — 4,,Studio Mat 57,Karanvir Bhatia,Studio 2,14,38%,37,38%,4.1,Score 50.6/100 (CONSIDER) — 37,,Studio PowerCycle,Bret Saldanha,PowerCycle Studio,14,65%,88,65%,8.2,Top trainer rejected: Anisha S,,,,,,,,,,,
+11:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Pranjali Jain,Studio 1,14,70%,1,70%,7.0,Top trainer rejected: Atulan P,,,,,,,,,,,
+11:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Atulan Purohit,Studio 1,14,20%,0,0%,0.0,Experimental: no historical da,,Studio Barre 57,Simonelle De Vitre,Studio 2,14,54%,97,54%,7.5,Top trainer rejected: Anisha S,,Studio PowerCycle Express,Cauveri Vikrant,PowerCycle Studio,14,56%,18,56%,7.2,Top performer: Cauveri Vikrant,
+11:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Bret Saldanha,Studio 1,14,28%,99,28%,3.9,Top trainer rejected: Karan Bh,
+12:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle Express,Anisha Shah,PowerCycle Studio,14,30%,13,30%,3.8,Top performer: Anisha Shah — 1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 12:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Recovery,Pranjali Jain,Studio 1,14,41%,94,41%,5.3,Top trainer rejected: Karan Bh,,,,,,,,,,,
-15:15,,,,,,,,,,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,20%,0,0%,0.0,Barre 57 per-shift guarantee (,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Cauveri Vikrant,Studio 1,14,20%,0,0%,0.0,Barre 57 per-shift guarantee (,,,,,,,,,,,,,,,,,,,,,
 16:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Cardio Barre,Shruti Kulkarni,Studio 2,14,20%,0,0%,0.0,Daily floor repair: minimum cl,,Studio PowerCycle Express,Richard D'Costa,PowerCycle Studio,14,14%,17,14%,1.9,Top performer: Richard D'Costa,
 16:30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Anmol Sharma,PowerCycle Studio,14,19%,13,19%,2.5,Top performer: Anmol Sharma — ,,,,,,,,,,,
 17:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Richard D'Costa,Studio 1,14,43%,18,43%,4.8,Top trainer rejected: Reshma S,
-17:45,Studio Barre 57,Vivaran Dhasmana,Studio 2,14,46%,11,46%,6.5,Top performer: Vivaran Dhasman,,Studio Cardio Barre,Reshma Sharma,Studio 2,14,29%,5,29%,4.0,Top trainer rejected: Mrigaksh,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,46%,20,46%,6.0,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,
-18:00,Studio PowerCycle,Anmol Sharma,PowerCycle Studio,14,24%,11,24%,3.2,Top performer: Anmol Sharma — ,,Studio PowerCycle,Raunak Khemuka,PowerCycle Studio,14,15%,13,15%,1.9,Top performer: Raunak Khemuka ,,,,,,,,,,,,Studio Barre 57,Atulan Purohit,Studio 1,14,30%,16,30%,4.2,Top performer: Atulan Purohit ,,Studio Barre 57,Anisha Shah,Studio 2,14,27%,74,27%,3.7,Top trainer rejected: Reshma S,,Studio Mat 57,Shruti Kulkarni,Studio 2,14,20%,0,0%,0.0,Daily floor repair: minimum cl,,,,,,,,,,,
-18:15,Studio Barre 57,Mrigakshi Jaiswal,Studio 1,14,44%,27,44%,6.1,Top performer: Mrigakshi Jaisw,,,,,,,,,,,,Studio Back Body Blaze,Pranjali Jain,Studio 1,14,29%,9,29%,4.1,Top trainer rejected: Vivaran ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+17:45,Studio Barre 57,Vivaran Dhasmana,Studio 2,14,46%,11,46%,6.5,Top performer: Vivaran Dhasman,,Studio Barre 57,Reshma Sharma,Studio 2,14,36%,1,36%,5.0,Top trainer rejected: Karan Bh,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,46%,20,46%,6.0,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,
+18:00,Studio PowerCycle,Anmol Sharma,PowerCycle Studio,14,24%,11,24%,3.2,Top performer: Anmol Sharma — ,,Studio PowerCycle,Raunak Khemuka,PowerCycle Studio,14,15%,13,15%,1.9,Top performer: Raunak Khemuka ,,Studio Cardio Barre Express,Pranjali Jain,Studio 1,14,24%,3,24%,3.3,Top trainer rejected: Mrigaksh,,Studio Barre 57,Atulan Purohit,Studio 1,14,30%,16,30%,4.2,Top performer: Atulan Purohit ,,,,,,,,,,,,Studio Mat 57,Shruti Kulkarni,Studio 2,14,20%,0,0%,0.0,Daily floor repair: minimum cl,,,,,,,,,,,
+18:15,Studio Barre 57,Mrigakshi Jaiswal,Studio 1,14,44%,27,44%,6.1,Top performer: Mrigakshi Jaisw,,,,,,,,,,,,Studio Back Body Blaze,Richard D'Costa,Studio 2,14,29%,9,29%,4.1,Top trainer rejected: Vivaran ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 18:30,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Mrigakshi Jaiswal,PowerCycle Studio,14,29%,13,29%,3.8,Top performer: Mrigakshi Jaisw,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio PowerCycle,Reshma Sharma,PowerCycle Studio,14,37%,60,37%,4.8,Top trainer rejected: Vivaran ,
-19:00,,,,,,,,,,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,47%,47,47%,6.4,Top performer: Karanvir Bhatia,,Studio Mat 57,Richard D'Costa,Studio 2,14,34%,12,34%,4.1,Top trainer rejected: Pranjali,,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,42%,46,42%,4.5,Top trainer rejected: Anisha S,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-19:15,,,,,,,,,,,Studio PowerCycle Express,Simonelle De Vitre,PowerCycle Studio,14,52%,17,52%,6.8,Top performer: Simonelle De Vi,,Studio Barre 57,Mrigakshi Jaiswal,Studio 1,14,45%,20,45%,6.2,Top performer: Mrigakshi Jaisw,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,49%,51,49%,6.4,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+19:00,,,,,,,,,,,Studio Barre 57,Karanvir Bhatia,Studio 1,14,47%,47,47%,6.4,Top performer: Karanvir Bhatia,,,,,,,,,,,,Studio Mat 57 Express,Karanvir Bhatia,Studio 2,14,42%,46,42%,4.5,Top trainer rejected: Anisha S,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+19:15,,,,,,,,,,,Studio PowerCycle Express,Simonelle De Vitre,PowerCycle Studio,14,52%,17,52%,6.8,Top performer: Simonelle De Vi,,Studio Mat 57,Pranjali Jain,Studio 2,14,35%,8,35%,4.2,Coverage: best available train,,Studio PowerCycle,Cauveri Vikrant,PowerCycle Studio,14,49%,51,49%,6.4,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Reshma Sharma,Studio 1,14,20%,0,0%,0.0,Experimental: no historical da,
 19:30,Studio PowerCycle,Anmol Sharma,PowerCycle Studio,14,39%,11,39%,5.1,Top performer: Anmol Sharma — ,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Karanvir Bhatia,Studio 2,14,71%,18,71%,7.1,Top performer: Karanvir Bhatia,,Studio PowerCycle Express,Cauveri Vikrant,PowerCycle Studio,14,40%,52,40%,5.1,Top performer: Cauveri Vikrant,,,,,,,,,,,,,,,,,,,,,
 20:00,,,,,,,,,,,Studio Recovery,Karanvir Bhatia,Studio 1,14,42%,11,42%,5.4,Top performer: Karanvir Bhatia,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
@@ -36,32 +35,33 @@ Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Clas
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Anisha Shah,5,4.1,36%,Studio Barre 57
-Anmol Sharma,7,5.9,34%,Studio PowerCycle
-Atulan Purohit,7,6.7,56%,Studio FIT
-Bret Saldanha,3,2.2,43%,Studio PowerCycle
-Cauveri Vikrant,10,7.8,47%,Studio PowerCycle
+Anisha Shah,4,3.3,40%,Studio Barre 57
+Anmol Sharma,5,4.0,35%,Studio PowerCycle
+Atulan Purohit,7,6.7,48%,Studio Barre 57
+Bret Saldanha,4,3.2,39%,Studio PowerCycle
+Cauveri Vikrant,8,5.9,53%,Studio PowerCycle
 Karan Bhatia,2,1.4,24%,Studio PowerCycle Express
-Karanvir Bhatia,9,8.1,49%,Studio Barre 57
-Mrigakshi Jaiswal,5,4.5,34%,Studio Barre 57
-Pranjali Jain,3,2.8,42%,Studio Back Body Blaze
+Karanvir Bhatia,8,7.2,53%,Studio Barre 57
+Mrigakshi Jaiswal,4,3.6,35%,Studio Barre 57
+Pranjali Jain,4,3.6,43%,Studio Cardio Barre Express
 Raunak Khemuka,1,0.8,15%,Studio PowerCycle
-Reshma Sharma,6,5.3,34%,Studio Cardio Barre
-Richard D'Costa,4,3.3,33%,Studio Mat 57
+Reshma Sharma,7,6.2,33%,Studio Barre 57
+Richard D'Costa,4,3.3,32%,Studio Back Body Blaze
 Shruti Kulkarni,2,1.9,20%,Studio Mat 57
-Simonelle De Vitre,2,1.4,41%,Studio PowerCycle Express
+Simonelle De Vitre,2,1.4,53%,Studio PowerCycle Express
 Simran Dutt,1,0.9,64%,Studio Barre 57
-Vivaran Dhasmana,8,7.0,61%,Studio FIT
+Vivaran Dhasmana,7,6.2,57%,Studio FIT
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
 Studio Back Body Blaze,2,36%,2
-Studio Barre 57,22,40%,7
-Studio Cardio Barre,7,36%,6
-Studio FIT,9,67%,7
+Studio Barre 57,20,41%,7
+Studio Cardio Barre,6,38%,5
+Studio Cardio Barre Express,1,24%,1
+Studio FIT,8,72%,6
 Studio Mat 57,7,44%,7
 Studio Mat 57 Express,1,42%,1
-Studio PowerCycle,19,41%,7
+Studio PowerCycle,17,39%,7
 Studio PowerCycle Express,6,34%,4
 Studio Recovery,2,42%,2
 
@@ -76,23 +76,22 @@ Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
 09:30,-,Studio FIT,-,Studio Mat 57,Studio PowerCycle Express,Studio PowerCycle,-,4
 09:45,-,-,-,-,-,Studio Barre 57,-,1
 10:00,Studio PowerCycle,-,-,-,-,-,Studio PowerCycle,2
-10:15,-,-,-,-,Studio Cardio Barre,Studio FIT,Studio Barre 57,3
-10:30,-,-,Studio PowerCycle,Studio PowerCycle,-,-,-,2
-11:00,Studio Barre 57,Studio Back Body Blaze,Studio Barre 57,-,Studio Mat 57,Studio PowerCycle,-,5
-11:15,-,Studio Barre 57,-,Studio Barre 57,-,-,-,2
-11:30,-,-,-,-,-,Studio Barre 57,Studio PowerCycle Express,2
+10:15,-,-,-,-,Studio Cardio Barre,-,Studio Barre 57,2
+10:30,-,-,Studio PowerCycle,-,-,-,-,1
+11:00,Studio Barre 57,Studio Back Body Blaze,Studio FIT,Studio Barre 57,Studio Mat 57,Studio PowerCycle,-,6
+11:15,-,-,-,-,-,Studio FIT,-,1
+11:30,-,-,-,-,Studio Barre 57,Studio Barre 57,Studio PowerCycle Express,3
 11:45,-,-,-,-,-,-,Studio Cardio Barre,1
-12:00,-,Studio PowerCycle,-,Studio PowerCycle Express,-,-,Studio FIT,3
+12:00,-,-,-,Studio PowerCycle Express,-,-,-,1
 12:30,-,-,-,-,-,Studio Recovery,-,1
-15:15,-,Studio Barre 57,-,-,Studio Barre 57,-,-,2
 16:00,-,-,-,-,-,Studio Cardio Barre,Studio PowerCycle Express,2
 16:30,-,-,-,-,-,Studio PowerCycle,-,1
 17:00,-,-,-,-,-,-,Studio Mat 57,1
-17:45,Studio Barre 57,Studio Cardio Barre,-,-,Studio PowerCycle,-,-,3
-18:00,Studio PowerCycle,Studio PowerCycle,-,Studio Barre 57,Studio Barre 57,Studio Mat 57,-,5
+17:45,Studio Barre 57,Studio Barre 57,-,-,Studio PowerCycle,-,-,3
+18:00,Studio PowerCycle,Studio PowerCycle,Studio Cardio Barre Express,Studio Barre 57,-,Studio Mat 57,-,5
 18:15,Studio Barre 57,-,Studio Back Body Blaze,-,-,-,-,2
 18:30,-,-,Studio PowerCycle,-,-,-,Studio PowerCycle,2
-19:00,-,Studio Barre 57,Studio Mat 57,Studio Mat 57 Express,-,-,-,3
-19:15,-,Studio PowerCycle Express,Studio Barre 57,Studio PowerCycle,-,-,-,3
+19:00,-,Studio Barre 57,-,Studio Mat 57 Express,-,-,-,2
+19:15,-,Studio PowerCycle Express,Studio Mat 57,Studio PowerCycle,-,-,Studio Barre 57,4
 19:30,Studio PowerCycle,-,-,Studio FIT,Studio PowerCycle Express,-,-,3
 20:00,-,Studio Recovery,-,-,-,-,-,1

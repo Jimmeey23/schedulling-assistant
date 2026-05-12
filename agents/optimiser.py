@@ -1355,6 +1355,58 @@ class ScheduleOptimiser:
             for row in self._ranking_by_location.get(source, [])
         ]
 
+    def _derived_slot_history_times(self, location: str) -> Tuple[List[str], List[str]]:
+        if not hasattr(self, "scores_data"):
+            return [], []
+        rows = self._candidate_rows(location, 0, day_filter=False)
+        if not rows:
+            return [], []
+        by_time: Dict[str, dict] = {}
+        for row in rows:
+            time_str = str(row.get("time") or "")[:5]
+            if not time_str:
+                continue
+            stats = by_time.setdefault(
+                time_str,
+                {"count": 0, "score_total": 0.0, "best_score": 0.0, "best_fill": 0.0, "best_sessions": 0},
+            )
+            stats["count"] += 1
+            score = float(row.get("score", 0.0) or 0.0)
+            fill = float(row.get("fill", row.get("avg_fill_rate", 0.0)) or 0.0)
+            sessions = int(row.get("sessions", row.get("session_count", 0)) or 0)
+            stats["score_total"] += score
+            stats["best_score"] = max(stats["best_score"], score)
+            stats["best_fill"] = max(stats["best_fill"], fill)
+            stats["best_sessions"] = max(stats["best_sessions"], sessions)
+
+        def include(time_str: str, stats: dict) -> bool:
+            return (
+                stats["best_sessions"] >= 3
+                or stats["count"] >= 3
+                or stats["best_score"] >= 25.0
+                or stats["best_fill"] >= 0.30
+            )
+
+        ranked = []
+        for time_str, stats in by_time.items():
+            if not include(time_str, stats):
+                continue
+            avg_score = stats["score_total"] / max(stats["count"], 1)
+            ranked.append(
+                (
+                    0 if stats["best_sessions"] >= 8 else 1,
+                    -stats["best_score"],
+                    -avg_score,
+                    -stats["best_fill"],
+                    -stats["best_sessions"],
+                    time_str,
+                )
+            )
+        ranked.sort()
+        am = [time_str for *_rest, time_str in ranked if is_am_slot(time_str)]
+        pm = [time_str for *_rest, time_str in ranked if not is_am_slot(time_str)]
+        return am, pm
+
     def _class_candidate_rows(self, location: str, class_name: str, day: int) -> List[dict]:
         if not hasattr(self, "_ranking_by_location_class_day"):
             self._build_score_indexes()
@@ -1595,9 +1647,9 @@ class ScheduleOptimiser:
         priority = {
             SUPREME_LOCATION: 0,
             KWALITY_LOCATION: 1,
-            "Kenkere House": 2,
-            "Courtside": 3,
-            "Copper & Cloves": 4,
+            "Copper & Cloves": 2,
+            "Kenkere House": 3,
+            "Courtside": 4,
         }
         return sorted(self.locations, key=lambda loc: (priority.get(loc, 50), self.locations.index(loc)))
 
@@ -2164,6 +2216,9 @@ class ScheduleOptimiser:
         pm = sorted(t for t in viable if not is_am_slot(t))
 
         if is_derived_studio(location):
+            hist_am, hist_pm = self._derived_slot_history_times(location)
+            am = list(dict.fromkeys(am + hist_am[:6]))
+            pm = list(dict.fromkeys(pm + hist_pm[:4]))
             if not am:
                 am = sorted(set(am + ["08:30", "09:30", "10:15", "11:30"]))
             if not pm:
