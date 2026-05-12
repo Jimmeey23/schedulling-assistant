@@ -399,7 +399,9 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .cc:hover{transform:translateY(-4px) scale(1.025);box-shadow:0 20px 48px -10px rgba(15,23,42,.28),0 0 0 1.5px rgba(147,197,253,.4);z-index:100;border-color:rgba(148,163,184,.9)}
 .cc:hover::after{height:4px}
 .cc-day-time{font-size:8.5px;font-weight:900;color:#475569;text-transform:uppercase;letter-spacing:.1em;padding:4px 8px;background:#F1F5F9;border-radius:6px;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
-.cc-mini{min-height:104px;padding:8px;margin-bottom:6px;border-radius:12px}
+.cc-mini{min-height:78px;padding:8px;margin-bottom:6px;border-radius:12px}
+.class-card-modern-surface{display:contents}
+.cc-metric-pill{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 6px;background:rgba(15,23,42,.07);color:#334155}
 .cc-mini:hover{min-height:140px;transform:translateY(-3px) scale(1.02)}
 .cc-mini .cc-bottom{grid-template-columns:auto 1fr auto;border-radius:8px;padding:6px}
 .cc-mini .cc-score-ring{width:26px;height:26px;flex-basis:26px;font-size:10px}
@@ -817,7 +819,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   box-shadow:var(--sh-lg);animation:mIn 0.2s ease;
 }
 .modal-box.drill-modal{width:min(1440px,calc(100vw - 96px));max-height:calc(100vh - 96px);border-radius:22px;overflow:hidden;background:#F8FAFC}
-.modal-box.control-center-modal{width:min(1540px,calc(100vw - 72px));height:min(900px,calc(100vh - 72px));max-height:calc(100vh - 72px);border-radius:18px;overflow:hidden;background:#F8FAFC;color:#0F172A;display:flex;flex-direction:column;box-shadow:0 20px 48px rgba(15,23,42,0.16),0 0 0 1px #E2E8F0}
+.modal-box.control-center-modal{width:min(1580px,calc(100vw - 56px));height:min(930px,calc(100vh - 56px));max-height:calc(100vh - 56px);border-radius:22px;overflow:hidden;background:#F6F8FB;color:#0F172A;display:flex;flex-direction:column;box-shadow:0 30px 90px rgba(15,23,42,0.22),0 0 0 1px rgba(148,163,184,.35)}
 @keyframes mIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-hdr{
   padding:20px 24px 16px;border-bottom:1px solid var(--border);
@@ -931,38 +933,56 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 .drill-session-table td.num{text-align:right;font-weight:700;color:#0F172A}.drill-session-table td.fill-low{color:#DC2626}.drill-session-table td.fill-mid{color:#D97706}.drill-session-table td.fill-high{color:#16A34A}
 .drill-score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px}
 .drill-score-grid .score-component{background:#fff}
-.control-center-modal .modal-hdr{background:#fff;border-bottom:1px solid #E2E8F0;padding:14px 24px}
+.control-center-modal .modal-hdr{background:linear-gradient(135deg,#FFFFFF 0%,#F8FAFC 52%,#EEF4FF 100%);border-bottom:1px solid rgba(203,213,225,.9);padding:16px 22px;position:relative;overflow:hidden}
+.control-center-modal .modal-hdr::before{content:"";position:absolute;inset:auto 48px -74px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.13),transparent 68%);pointer-events:none}
 .control-center-modal .modal-class-name{color:#0F172A}
 .control-center-modal .modal-meta{color:#64748B}
-.control-center-modal .modal-close{color:#64748B;background:#F8FAFC;border:1px solid #E2E8F0}
-.control-center-modal .modal-close:hover{background:#E2E8F0;color:#0F172A}
-.control-center-shell{display:grid;grid-template-columns:250px minmax(0,1fr)300px;flex:1;min-height:0;overflow:hidden}
-.control-center-rail{background:#fff;border-right:1px solid #E2E8F0;padding:0;overflow-y:auto;min-height:0;display:flex;flex-direction:column}
-.cc-rail-header{padding:16px 20px 12px;border-bottom:1px solid #E2E8F0;background:#fff;position:sticky;top:0;z-index:2}
-.cc-rail-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:#94A3B8;font-family:'Plus Jakarta Sans',sans-serif}
+.control-center-modal .modal-close{color:#64748B;background:#fff;border:1px solid #CBD5E1;border-radius:11px;box-shadow:0 8px 18px rgba(15,23,42,.08)}
+.control-center-modal .modal-close:hover{background:#0F172A;border-color:#0F172A;color:#fff}
+.control-center-modal .cc-title-stack{position:relative;z-index:1;display:flex;flex-direction:row;gap:14px;align-items:center}
+.control-center-modal .cc-title-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#0F172A,#1E40AF);box-shadow:0 16px 34px rgba(30,64,175,.26),inset 0 1px 0 rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;flex:0 0 auto}
+.control-center-modal .cc-title-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.control-center-modal .cc-live-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;font-family:'Plus Jakarta Sans',sans-serif}
+.control-center-modal .cc-live-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.14)}
+.control-center-shell{display:grid;grid-template-columns:268px minmax(0,1fr)318px;flex:1;min-height:0;overflow:hidden;background:#F6F8FB}
+.control-center-rail{background:linear-gradient(180deg,#111827 0%,#172033 100%);border-right:1px solid rgba(15,23,42,.8);padding:0;overflow-y:auto;min-height:0;display:flex;flex-direction:column;color:#E5E7EB}
+.cc-rail-header{padding:18px 18px 14px;border-bottom:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.28);position:sticky;top:0;z-index:2;backdrop-filter:blur(14px)}
+.cc-rail-title{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.13em;color:#93C5FD;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-rail-sub{font-size:11px;color:#94A3B8;line-height:1.45;margin-top:7px;font-weight:650}
 .cc-rail-nav-wrap{padding:12px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
 .cc-nav-group{margin-top:8px;margin-bottom:2px}
-.cc-nav-group-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#CBD5E1;padding:0 10px 4px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px}
-.cc-nav-group-label::after{content:"";flex:1;height:1px;background:#F1F5F9}
-.control-center-main{padding:22px 24px 28px;overflow-y:auto;min-height:0;background:#F8FAFC}
-.control-center-inspector{background:#fff;border-left:1px solid #E2E8F0;padding:16px;overflow-y:auto;min-height:0}
-.cc-inspector-card{border:1px solid #E2E8F0;border-radius:14px;background:#F8FAFC;padding:13px;margin-bottom:12px}
-.cc-inspector-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif}
+.cc-nav-group-label{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.13em;color:#64748B;padding:8px 10px 5px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:6px}
+.cc-nav-group-label::after{content:"";flex:1;height:1px;background:rgba(148,163,184,.18)}
+.control-center-main{padding:22px 24px 28px;overflow-y:auto;min-height:0;background:linear-gradient(180deg,#F8FAFC 0%,#F1F5F9 100%)}
+.control-center-inspector{background:#FFFFFF;border-left:1px solid #E2E8F0;padding:16px;overflow-y:auto;min-height:0;box-shadow:inset 1px 0 0 rgba(255,255,255,.9)}
+.cc-inspector-card{border:1px solid #E2E8F0;border-radius:16px;background:linear-gradient(180deg,#FFFFFF,#F8FAFC);padding:14px;margin-bottom:12px;box-shadow:0 10px 28px rgba(15,23,42,.055)}
+.cc-inspector-card.accent{background:linear-gradient(145deg,#0F172A,#1D2B45);border-color:#334155;color:#E5E7EB;box-shadow:0 18px 44px rgba(15,23,42,.22)}
+.cc-inspector-card.accent .cc-inspector-title{color:#93C5FD}
+.cc-inspector-card.accent .cc-inspector-copy{color:#CBD5E1}
+.cc-inspector-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:#475569;margin-bottom:8px;font-family:'Plus Jakarta Sans',sans-serif}
 .cc-inspector-copy{font-size:11px;color:#64748B;line-height:1.45}
 .cc-inspector-actions{display:grid;grid-template-columns:1fr;gap:8px}
 .control-center-nav{display:flex;flex-direction:column;gap:2px}
-.control-center-nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:#64748B;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:background .12s,color .12s;font-size:13px}
-.control-center-nav-btn:hover{background:#F1F5F9;color:#0F172A}
-.control-center-nav-btn.active{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE}
-.cc-nav-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center;line-height:1}
+.control-center-nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 10px;border-radius:12px;border:1px solid transparent;background:transparent;color:#CBD5E1;cursor:pointer;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;transition:background .14s,color .14s,border-color .14s,transform .14s;font-size:13px}
+.control-center-nav-btn:hover{background:rgba(255,255,255,.07);color:#fff;border-color:rgba(148,163,184,.22);transform:translateX(2px)}
+.control-center-nav-btn.active{background:linear-gradient(135deg,#FFFFFF,#EFF6FF);color:#0F172A;border-color:rgba(147,197,253,.9);box-shadow:0 12px 28px rgba(0,0,0,.22)}
+.cc-nav-icon{font-size:14px;flex-shrink:0;width:28px;height:28px;text-align:center;line-height:28px;border-radius:10px;background:rgba(255,255,255,.07);color:#93C5FD}
+.control-center-nav-btn.active .cc-nav-icon{background:#DBEAFE;color:#1D4ED8}
 .cc-nav-text{flex:1;min-width:0}
-.control-center-nav-title{font-size:12px;font-weight:700;display:block}
+.control-center-nav-title{font-size:12px;font-weight:900;display:block;letter-spacing:-.01em}
 .control-center-nav-desc{display:none}
 .control-center-intro{display:none}
-.control-center-nav-desc{font-size:10px;color:#94A3B8;font-weight:600;line-height:1.3;margin-top:1px;display:block}
-.control-center-status{font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap;background:#F1F5F9;border-radius:6px;padding:2px 6px;flex-shrink:0;color:#64748B}
-.control-center-nav-btn.active .control-center-status{background:#DBEAFE;color:#1E40AF}
-.control-center-intro{border:1px solid #DCE3EB;border-radius:16px;background:#fff;padding:16px 18px;margin-bottom:16px;box-shadow:0 8px 20px rgba(15,23,42,.04)}
+.control-center-nav-desc{font-size:10px;color:#94A3B8;font-weight:650;line-height:1.35;margin-top:2px;display:block}
+.control-center-nav-btn.active .control-center-nav-desc{color:#64748B}
+.control-center-status{font-size:9px;font-weight:900;text-transform:uppercase;white-space:nowrap;background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.18);border-radius:999px;padding:3px 7px;flex-shrink:0;color:#94A3B8}
+.control-center-nav-btn.active .control-center-status{background:#DBEAFE;color:#1E40AF;border-color:#BFDBFE}
+.control-center-intro{border:1px solid #DCE3EB;border-radius:18px;background:linear-gradient(135deg,#FFFFFF,#F8FAFC);padding:17px 18px;margin-bottom:16px;box-shadow:0 12px 28px rgba(15,23,42,.055)}
+.control-center-intro .control-center-nav-title{font-size:18px;letter-spacing:-.03em;color:#0F172A}
+.control-center-intro .control-center-nav-desc{font-size:12px;color:#64748B;max-width:760px}
+.cc-status-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.cc-status-tile{border:1px solid #E2E8F0;border-radius:12px;background:#fff;padding:10px 11px;box-shadow:0 4px 12px rgba(15,23,42,.035)}
+.cc-status-tile span{display:block;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#94A3B8;margin-bottom:5px}
+.cc-status-tile b{display:block;font-size:14px;color:#0F172A;font-family:'Plus Jakarta Sans',sans-serif}
 .control-center-panel .sett-view,.control-center-panel .rules-view{max-width:none;padding:0}
 .control-center-panel .sett-view-header,.control-center-panel .settings-console-old-rail,.control-center-panel .settings-console-old-inspector,.control-center-panel .rv-header,.control-center-panel .rv-rail,.control-center-panel .rv-inspector{display:none}
 .control-center-panel .settings-console-layout,.control-center-panel .rv-command-shell{grid-template-columns:1fr}
@@ -1429,6 +1449,564 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
 @media(max-width:1280px){.sett-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sett-location-summary,.sett-option-grid{grid-template-columns:1fr}}
 @media(max-width:1160px){.settings-console-layout{grid-template-columns:1fr}.settings-console-old-rail,.settings-console-old-inspector{position:static}.sett-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sett-nav-group-label{display:none}.control-center-shell{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}.control-center-rail{display:block;border-right:0;border-bottom:1px solid #E2E8F0;max-height:174px}.control-center-nav{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding:10px 12px}.control-center-nav-btn{min-width:178px;flex:0 0 auto}.cc-nav-group{display:none}.control-center-inspector{display:none}.control-center-main{padding:18px 16px 22px}}
 @media(max-width:720px){.sett-overview-grid{grid-template-columns:1fr}.sett-main-actions{align-items:stretch}.sett-action-group{width:100%}.sett-ghost-btn{flex:1}}
+
+/* Studio Control Room settings skin */
+.control-center-modal .sett-main-actions{
+  position:sticky;top:-22px;z-index:40;
+  border:1px solid rgba(203,213,225,.82);
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(18px) saturate(1.35);
+  border-radius:16px;
+  box-shadow:0 14px 34px rgba(15,23,42,.075);
+}
+.control-center-modal .sett-section{
+  border:1px solid rgba(203,213,225,.92);
+  border-radius:18px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFF 100%);
+  box-shadow:0 18px 44px rgba(15,23,42,.07);
+  padding:22px;
+}
+.control-center-modal .sett-section-label{
+  font-size:19px;
+  letter-spacing:-.035em;
+  color:#0B1220;
+  font-weight:900;
+}
+.control-center-modal .sett-section-desc{
+  max-width:760px;
+  margin-bottom:18px;
+  color:#64748B;
+}
+.control-center-modal .sett-section-head{
+  margin-bottom:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid #E5E7EB;
+}
+.control-center-modal .sett-section-kicker{
+  color:#2563EB;
+  letter-spacing:.11em;
+}
+.control-center-modal .sett-view,
+.control-center-modal .sett-section,
+.control-center-modal .sett-config-panel,
+.control-center-modal .sett-option-card,
+.control-center-modal .sett-kpi-card,
+.control-center-modal .trainer-mgr-card,
+.control-center-modal .qual-wrap,
+.control-center-modal .avail-trainer-card,
+.control-center-modal .rule-card,
+.control-center-modal .pin-card{
+  color:#0F172A;
+}
+.control-center-modal label,
+.control-center-modal .sett-bulk-field label{
+  color:#64748B;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  font-size:10px;
+}
+.control-center-modal .sett-tool-row,
+.control-center-modal .sett-control-strip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  border:1px solid #E2E8F0;
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:14px;
+}
+.control-center-modal .sett-control-strip .sett-input,
+.control-center-modal .sett-control-strip .sett-select,
+.control-center-modal .sett-tool-row .sett-input,
+.control-center-modal .sett-tool-row .sett-select{
+  min-height:38px;
+}
+.control-center-modal .sett-config-panel{
+  border-color:#E2E8F0;
+  border-radius:16px;
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);
+  box-shadow:0 10px 26px rgba(15,23,42,.045);
+  padding:16px;
+}
+.control-center-modal .sett-kpi-card,
+.control-center-modal .sett-location-card,
+.control-center-modal .sett-option-card{
+  border-color:#E2E8F0;
+  border-radius:14px;
+  background:#FFFFFF;
+  box-shadow:0 8px 20px rgba(15,23,42,.045);
+}
+.control-center-modal .sett-kpi-card{
+  min-height:108px;
+  position:relative;
+  overflow:hidden;
+}
+.control-center-modal .sett-kpi-card::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;
+  height:3px;
+  background:linear-gradient(90deg,#2563EB,#14B8A6);
+}
+.control-center-modal .sett-kpi-value{
+  font-size:25px;
+  color:#0B1220;
+}
+.control-center-modal .sett-option-card{
+  transition:border-color .16s,transform .16s,box-shadow .16s;
+}
+.control-center-modal button.sett-option-card:hover{
+  border-color:#93C5FD;
+  transform:translateY(-2px);
+  box-shadow:0 18px 36px rgba(37,99,235,.12);
+}
+.control-center-modal .sett-subtabs{
+  gap:6px;
+  border:1px solid #E2E8F0;
+  background:#F8FAFC;
+  border-radius:14px;
+  padding:6px;
+  margin-bottom:16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+}
+.control-center-modal .sett-subtab{
+  border:1px solid transparent;
+  border-radius:10px;
+  padding:8px 12px;
+  color:#64748B;
+  font-weight:900;
+  min-height:38px;
+  text-align:center;
+}
+.control-center-modal .sett-subtab:hover{
+  border-color:#BFDBFE;
+  background:#EFF6FF;
+  color:#1D4ED8;
+}
+.control-center-modal .sett-subtab.active{
+  background:#0F172A;
+  border-color:#0F172A;
+  color:#fff;
+  box-shadow:0 8px 18px rgba(15,23,42,.16);
+}
+.control-center-modal .sett-ghost-btn,
+.control-center-modal .sett-save-btn,
+.control-center-modal .sett-mini-btn{
+  border-radius:10px;
+  letter-spacing:-.01em;
+}
+.control-center-modal .sett-save-btn,
+.control-center-modal .sett-ghost-btn.primary{
+  background:linear-gradient(135deg,#0F172A,#1E40AF);
+  border-color:#1E40AF;
+  box-shadow:0 12px 26px rgba(30,64,175,.22);
+}
+.control-center-modal .sett-save-btn:hover,
+.control-center-modal .sett-ghost-btn.primary:hover{
+  background:linear-gradient(135deg,#111827,#2563EB);
+  border-color:#2563EB;
+}
+.control-center-modal .sett-input,
+.control-center-modal .sett-select,
+.control-center-modal .sett-textarea,
+.control-center-modal .sett-bulk-field select,
+.control-center-modal .sett-bulk-field input{
+  border-color:#CBD5E1;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+.control-center-modal .sett-input:focus,
+.control-center-modal .sett-select:focus,
+.control-center-modal .sett-textarea:focus{
+  border-color:#2563EB;
+  box-shadow:0 0 0 3px rgba(37,99,235,.14);
+}
+.control-center-modal .sett-matrix-toolbar{
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC)!important;
+  border-color:#E2E8F0!important;
+  border-radius:16px;
+  padding:13px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:12px;
+  align-items:end;
+  margin-bottom:12px;
+}
+.control-center-modal .sett-matrix-toolbar .sett-ghost-btn{min-height:39px}
+.control-center-modal .sett-bulk-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.control-center-modal .sett-bulk-field select,
+.control-center-modal .sett-bulk-field input{width:100%;min-width:0}
+.control-center-modal .sett-toolbar-stack{display:grid;gap:10px;margin-bottom:14px}
+.control-center-modal .sett-matrix-wrap{
+  background:#fff!important;
+  border-color:#DCE3EB!important;
+  box-shadow:0 12px 32px rgba(15,23,42,.06)!important;
+}
+.control-center-modal .sett-matrix th,
+.control-center-modal .sett-matrix th[style],
+.control-center-modal .sett-matrix td:first-child,
+.control-center-modal .sett-matrix-rowhead[style]{
+  background:#F8FAFC!important;
+  color:#475569!important;
+  border-color:#E2E8F0!important;
+}
+.control-center-modal .sett-matrix-cell,
+.control-center-modal .sett-matrix-cell[style]{
+  background:#FFFFFF!important;
+  border-color:#DCE3EB!important;
+  color:#0F172A!important;
+  box-shadow:0 4px 12px rgba(15,23,42,.035);
+}
+.control-center-modal .sett-matrix-cell:hover{
+  background:#EFF6FF!important;
+  border-color:#93C5FD!important;
+  transform:translateY(-1px);
+}
+.control-center-modal .sett-matrix-cell.selected{
+  background:#DBEAFE!important;
+  border-color:#2563EB!important;
+}
+.control-center-modal .sett-matrix-mini input{
+  background:#F8FAFC!important;
+  border-color:#CBD5E1!important;
+  color:#0F172A!important;
+}
+.control-center-modal .sett-matrix-mini span{
+  color:#64748B!important;
+}
+.control-center-modal .sett-inspector-box{
+  background:#fff;
+  border-color:#E2E8F0;
+}
+.control-center-modal .trainer-mgr-grid{
+  grid-template-columns:repeat(auto-fill,minmax(430px,1fr));
+  gap:14px;
+}
+.control-center-modal .trainer-mgr-card{
+  border:1px solid #DCE3EB;
+  border-radius:16px;
+  background:linear-gradient(180deg,#FFFFFF,#FBFDFF);
+  box-shadow:0 14px 32px rgba(15,23,42,.06);
+  padding:15px;
+}
+.control-center-modal .trainer-mgr-top{align-items:center;margin-bottom:12px}
+.control-center-modal .trainer-mgr-avatar{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+}
+.control-center-modal .trainer-mgr-fields{
+  grid-template-columns:minmax(190px,1fr) 116px 108px;
+  gap:8px;
+}
+.control-center-modal .trainer-mgr-active-label{
+  height:38px;
+  justify-content:center;
+  border:1px solid #BBF7D0;
+  background:#F0FDF4;
+  border-radius:10px;
+  color:#15803D!important;
+}
+.control-center-modal .trainer-mgr-active-label.off{
+  border-color:#FECACA;
+  background:#FEF2F2;
+  color:#B91C1C!important;
+}
+.control-center-modal .trainer-mgr-meta{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+}
+.control-center-modal .trainer-mgr-pill{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:28px;
+  border-radius:9px;
+  border-color:#E2E8F0;
+  background:#F8FAFC;
+  color:#475569;
+  text-align:center;
+}
+.control-center-modal .trainer-mgr-locs{
+  grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:9px;
+}
+.control-center-modal .trainer-mgr-loc{
+  border:1px solid #E2E8F0;
+  border-radius:12px;
+  background:#F8FAFC;
+  padding:10px;
+}
+.control-center-modal .trainer-mgr-loc-head{
+  min-height:30px;
+  color:#334155;
+}
+.control-center-modal .trainer-mgr-loc-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 72px;
+  gap:7px;
+}
+.control-center-modal .trainer-mgr-bulk-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+.control-center-modal .trainer-mgr-bulk-card,
+.control-center-modal .rule-builder-card,
+.control-center-modal .pin-builder-card{
+  border:1px solid #E2E8F0;
+  border-radius:16px;
+  background:#FFFFFF;
+  box-shadow:0 10px 24px rgba(15,23,42,.045);
+  padding:14px;
+}
+.control-center-modal .qual-wrap{
+  overflow:auto;
+  border:1px solid #DCE3EB;
+  border-radius:16px;
+  background:#FFFFFF;
+  box-shadow:0 12px 30px rgba(15,23,42,.055);
+}
+.control-center-modal .qual-table{
+  table-layout:fixed;
+  min-width:1180px;
+  width:100%;
+  background:#fff;
+}
+.control-center-modal .qual-table col.qual-name-col{width:230px}
+.control-center-modal .qual-table col.qual-tier-col{width:76px}
+.control-center-modal .qual-table col.qual-format-col{width:112px}
+.control-center-modal .qual-table th{
+  background:#F8FAFC;
+  color:#475569;
+  border-color:#E2E8F0;
+  height:72px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.control-center-modal .qual-table td{
+  border-color:#E2E8F0;
+  height:48px;
+  background:#fff;
+}
+.control-center-modal .qual-table tr:nth-child(even) td{background:#FBFDFF}
+.control-center-modal .qual-col-head{min-height:58px;justify-content:space-between}
+.control-center-modal .qual-format-label{
+  width:100%;
+  min-height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  font-weight:900;
+  color:#0F172A;
+  line-height:1.15;
+  text-align:center;
+}
+.control-center-modal .qual-format-hint{
+  min-height:18px;
+  font-size:8px;
+  font-weight:700;
+  color:#64748B;
+  line-height:1.15;
+  text-align:center;
+  overflow:hidden;
+}
+.control-center-modal .qual-row-name{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+.control-center-modal .qual-row-name span:last-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.control-center-modal .qual-tier{
+  min-width:32px;
+  padding:4px 8px;
+  background:#DBEAFE;
+  color:#1D4ED8;
+}
+.control-center-modal .avail-workspace{width:100%;min-width:0}
+.control-center-modal .avail-cards-container{
+  display:grid!important;
+  grid-template-columns:1fr;
+  gap:12px;
+  width:100%;
+}
+.control-center-modal .avail-trainer-card{
+  border:1px solid #DCE3EB!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 12px 28px rgba(15,23,42,.055)!important;
+}
+.control-center-modal .avail-card-head{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  gap:12px;
+  align-items:center;
+  padding:13px 15px;
+  background:#F8FAFC;
+  border-bottom:1px solid #E2E8F0;
+  cursor:pointer;
+}
+.control-center-modal .avail-card-body{
+  padding:14px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:12px;
+  width:100%;
+}
+.control-center-modal .avail-location-card{
+  border:1px solid #E2E8F0!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC)!important;
+  padding:12px!important;
+}
+.control-center-modal .avail-loc-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  align-items:start;
+}
+.control-center-modal .avail-days-row{display:flex;gap:5px;flex-wrap:nowrap}
+.control-center-modal .avail-day-chip{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:900;
+}
+.control-center-modal .priority-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:12px;
+}
+.control-center-modal .priority-card{
+  border:1px solid #E2E8F0;
+  border-radius:15px;
+  background:#fff;
+  padding:13px;
+  box-shadow:0 10px 24px rgba(15,23,42,.045);
+}
+.control-center-modal .priority-card-head{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) 72px;
+  gap:10px;
+  align-items:center;
+}
+.control-center-modal .priority-bar{
+  margin-top:12px;
+  height:6px;
+  background:#E2E8F0;
+  border-radius:999px;
+  overflow:hidden;
+}
+.control-center-modal .priority-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,#2563EB,#14B8A6);
+  transition:width .18s ease;
+}
+.control-center-modal .rule-list-grid{
+  display:grid;
+  gap:10px;
+}
+.control-center-modal .rule-card,
+.control-center-modal .pin-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  border:1px solid #E2E8F0;
+  border-radius:14px;
+  background:#FFFFFF;
+  padding:12px 13px;
+  box-shadow:0 8px 20px rgba(15,23,42,.04);
+}
+.control-center-modal .rule-title,
+.control-center-modal .pin-title{
+  font-size:13px;
+  font-weight:900;
+  color:#0F172A;
+  line-height:1.25;
+}
+.control-center-modal .rule-meta,
+.control-center-modal .pin-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:6px;
+}
+.control-center-modal .sett-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:74px;
+  min-height:24px;
+  padding:3px 8px;
+  border:1px solid #E2E8F0;
+  border-radius:999px;
+  background:#F8FAFC;
+  color:#475569;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.control-center-modal .sett-badge.blue{background:#EFF6FF;border-color:#BFDBFE;color:#1D4ED8}
+.control-center-modal .sett-badge.green{background:#F0FDF4;border-color:#BBF7D0;color:#15803D}
+.control-center-modal .sett-badge.red{background:#FEF2F2;border-color:#FECACA;color:#B91C1C}
+.control-center-modal .rule-builder-layout{
+  display:grid;
+  grid-template-columns:minmax(240px,.7fr) minmax(0,1.3fr);
+  overflow:hidden;
+}
+.control-center-modal .rule-builder-aside{
+  padding:16px;
+  border-right:1px solid #E2E8F0;
+  background:#F8FAFC;
+}
+.control-center-modal .rule-builder-main{padding:16px}
+.control-center-modal .form-grid-even{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;
+  align-items:end;
+}
+@media(max-width:1160px){
+  .control-center-rail{background:#111827}
+  .cc-status-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .control-center-modal .trainer-mgr-grid{grid-template-columns:1fr}
+  .control-center-modal .avail-loc-grid{grid-template-columns:1fr 1fr}
+  .control-center-modal .rule-builder-layout{grid-template-columns:1fr}
+  .control-center-modal .rule-builder-aside{border-right:0;border-bottom:1px solid #E2E8F0}
+}
+@media(max-width:720px){
+  .modal-box.control-center-modal{width:calc(100vw - 18px);height:calc(100vh - 18px);max-height:calc(100vh - 18px);border-radius:16px}
+  .control-center-modal .modal-hdr{padding:13px 14px}
+  .cc-title-mark{display:none}
+  .cc-live-chip{display:none}
+  .control-center-main{padding:14px 12px 18px}
+  .cc-status-strip{grid-template-columns:1fr}
+  .control-center-modal .sett-section{padding:16px;border-radius:15px}
+  .control-center-modal .trainer-mgr-fields{grid-template-columns:1fr}
+  .control-center-modal .trainer-mgr-meta{grid-template-columns:1fr}
+  .control-center-modal .trainer-mgr-locs{grid-template-columns:1fr}
+  .control-center-modal .avail-card-head{grid-template-columns:auto minmax(0,1fr) auto}
+  .control-center-modal .avail-card-head .sett-badge{display:none}
+  .control-center-modal .avail-loc-grid{grid-template-columns:1fr}
+}
 .chat-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg,#fff,#F8FAFC);color:#111820;border:1px solid rgba(226,232,240,.95);font-size:22px;cursor:pointer;box-shadow:0 24px 54px rgba(15,23,42,.18);display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s,border-color .18s;overflow:hidden;animation:agentPulse 4.8s ease-in-out infinite}
 .chat-fab::before{content:"";position:absolute;inset:7px;border-radius:19px;background:linear-gradient(135deg,#111820,#0F766E);opacity:.08}
 .chat-fab:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 28px 64px rgba(15,23,42,.26);border-color:#CBD5E1}
@@ -1578,7 +2156,7 @@ details.fp-section[open] .fp-section-hdr::after{transform:rotate(-180deg)}
   <div class="ld-orb2"></div>
   <div class="ld-card">
     <div class="ld-logo-row">
-      <img class="ld-logo-img" src="images/plan57-speed-calendar-v2.png" alt="Plan57">
+      <span class="ld-logo-img" aria-hidden="true"></span>
       <div class="ld-brand">
         <div class="ld-brand-name">Plan<span style="color:#F97316">57</span></div>
         <div class="ld-brand-sub">Class Schedule Planner</div>
@@ -5431,14 +6009,20 @@ function runPipelineFromHeader(useAi=false){
   buttons.forEach(b=>{if(b)b.disabled=true;});
   setGenerateButtonsLoading(true,useAi);
   
-  const aiOpts = _settSchedConfig?.settings_options||{};
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
+  const aiOpts = _settSchedConfig.settings_options||{};
   const apiKey = String(aiOpts.ai_api_key||"").trim();
+  const deepseekKey = String(aiOpts.deepseek_api_key||"").trim();
   const payload = {week_start:weekStart,use_ai:Boolean(useAi)};
   if(useAi){
     if(apiKey) payload.api_key = apiKey;
-    payload.ai_provider = String(aiOpts.ai_provider||"openrouter");
+    if(deepseekKey) payload.deepseek_api_key = deepseekKey;
+    payload.ai_provider = String(aiOpts.ai_provider||"deepseek");
     payload.ai_model = String(aiOpts.ai_model||"openai/gpt-oss-120b:free");
+    payload.ai_backup_model = String(aiOpts.ai_backup_model||"z-ai/glm-4.5-air:free");
     payload.ai_base_url = String(aiOpts.ai_base_url||"");
+    payload.deepseek_model = String(aiOpts.deepseek_model||"deepseek-v4-flash");
+    payload.deepseek_base_url = String(aiOpts.deepseek_base_url||"https://api.deepseek.com");
   }
   fetch("/api/run-pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(r=>r.json())
@@ -5462,8 +6046,9 @@ function runPipelineFromHeader(useAi=false){
 }
 
 function optimizeScheduleWithAI(){
-  const aiOpts = _settSchedConfig?.settings_options||{};
-  const apiKey = String(aiOpts.ai_api_key||"").trim();
+  _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
+  const aiOpts = _settSchedConfig.settings_options||{};
+  const apiKey = String(aiOpts.ai_optimize_api_key||aiOpts.deepseek_api_key||aiOpts.ai_api_key||"").trim();
   const payload = {
     iteration:_iter||"Main",
     location:_loc||"",
@@ -5512,11 +6097,11 @@ function optSumShow(json) {
 
   const typeLabels = {
     swap_trainer:"Trainer Swap", add_class:"Class Added", remove_class:"Class Removed",
-    move_class:"Class Moved", change_class:"Class Changed"
+    move_class:"Class Moved", change_time:"Time Changed", change_class:"Class Changed", change_level:"Level Changed"
   };
 
   function opIcon(type) {
-    return {swap_trainer:"↔",add_class:"+",remove_class:"−",move_class:"→",change_class:"~"}[type]||"·";
+    return {swap_trainer:"↔",add_class:"+",remove_class:"−",move_class:"→",change_time:"→",change_class:"~",change_level:"~"}[type]||"·";
   }
 
   function slotMeta(s) {
@@ -5535,16 +6120,23 @@ function optSumShow(json) {
     let changeDesc = "";
     if (opType === "swap_trainer") {
       changeDesc = `<span class="opt-sum-pill trainer">${rvEscapeHtml(b.trainer_1||"?")}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill trainer">${rvEscapeHtml(a.trainer_1||"?")}</span>`;
-    } else if (opType === "move_class") {
+    } else if (opType === "move_class" || opType === "change_time") {
       changeDesc = `<span class="opt-sum-pill time">${rvEscapeHtml(slotMeta(b))}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill time">${rvEscapeHtml(slotMeta(a))}</span>`;
     } else if (opType === "change_class") {
       changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(b.class_name||"?")}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill class-name">${rvEscapeHtml(a.class_name||"?")}</span>`;
+    } else if (opType === "change_level") {
+      changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(b.class_level||b.level||"?")}</span><span class="opt-sum-arrow">→</span><span class="opt-sum-pill class-name">${rvEscapeHtml(a.class_level||a.level||"?")}</span>`;
     } else if (opType === "add_class") {
       changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(a.class_name||"?")}</span> with <span class="opt-sum-pill trainer">${rvEscapeHtml(a.trainer_1||"?")}</span>`;
     } else if (opType === "remove_class") {
       changeDesc = `<span class="opt-sum-pill class-name">${rvEscapeHtml(b.class_name||"?")}</span> with <span class="opt-sum-pill trainer">${rvEscapeHtml(b.trainer_1||"?")}</span>`;
     }
     const meta = slotMeta(b) || slotMeta(a);
+    const validation = Array.isArray(item.validation) ? item.validation : [];
+    const evidence = Array.isArray(item.evidence) ? item.evidence : [];
+    const detailHtml = [...validation, ...evidence].slice(0, 5).map(line =>
+      `<div class="opt-sum-change-reason" style="color:#64748B">${rvEscapeHtml(line)}</div>`
+    ).join("");
     return `<div class="opt-sum-change ${type}">
       <div class="opt-sum-change-icon">${opIcon(opType)}</div>
       <div class="opt-sum-change-body">
@@ -5552,6 +6144,7 @@ function optSumShow(json) {
         <div class="opt-sum-change-meta">${changeDesc}${meta?`<span style="color:#CBD5E1;margin:0 5px">·</span><span style="color:#94A3B8;font-size:9px">${rvEscapeHtml(meta)}</span>`:""}
         </div>
         ${item.reason ? `<div class="opt-sum-change-reason">${rvEscapeHtml(item.reason)}</div>` : ""}
+        ${detailHtml}
       </div>
     </div>`;
   }
@@ -5570,7 +6163,8 @@ function optSumShow(json) {
     rejected.forEach(item => {
       html += `<div class="opt-sum-change rejected"><div class="opt-sum-change-icon">✗</div><div class="opt-sum-change-body">
         <div class="opt-sum-change-title">${rvEscapeHtml(typeLabels[item.type||""]||item.type||"?")} — ${rvEscapeHtml(item.message||"")}</div>
-        ${item.reason ? `<div class="opt-sum-change-reason">${rvEscapeHtml(item.reason)}</div>` : ""}
+        ${item.reason ? `<div class="opt-sum-change-reason">AI attempted: ${rvEscapeHtml(item.reason)}</div>` : ""}
+        ${Array.isArray(item.validation) ? item.validation.slice(0, 4).map(line => `<div class="opt-sum-change-reason" style="color:#64748B">${rvEscapeHtml(line)}</div>`).join("") : ""}
       </div></div>`;
     });
     html += "</div>";
@@ -5700,7 +6294,7 @@ function renderControlCenterNav(){
 function renderControlCenterShell(){
   const box=document.getElementById("modal-box"); if(!box)return;
   box.className="modal-box control-center-modal";
-  box.innerHTML=`<div class="modal-hdr"><div><div class="modal-class-name">Settings Console</div><div class="modal-meta">Applied to every generation: targets, trainers, assignment days, off days, class mix, rules, pins, and AI configuration.</div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="cc-rail-header"><div class="cc-rail-title">Settings</div></div><div class="cc-rail-nav-wrap"><div class="control-center-nav">${renderControlCenterNav()}</div></div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Settings Console</div><div class="control-center-nav-desc" id="control-center-description"></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main><aside class="control-center-inspector"><div class="cc-inspector-card sett-generation-contract"><div class="cc-inspector-title">Generation Contract</div><div class="cc-inspector-copy">Saved settings are the canonical source for every Standard, AI, and repair generation. Trainer assignment days, week off dates, inactive status, class mix caps, and hard custom rules are validated before assignment.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Actions</div><div class="cc-inspector-actions"><button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save & Apply Changes</button><button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Configuration</button><button class="sett-ghost-btn" onclick="settExportConfig()">Export JSON</button></div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Selection Inspector</div><div class="sett-inspector-box" id="sett-inspector-selection">Select target or class-mix cells to apply bulk changes.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Active Health</div><div id="sett-conflict-list" class="sett-conflict-list"><div class="sett-conflict-item">Loading validation...</div></div></div></aside></div>`;
+  box.innerHTML=`<div class="modal-hdr"><div class="cc-title-stack"><div class="cc-title-mark">⚙</div><div><div class="cc-title-line"><div class="modal-class-name">Settings Console</div><span class="cc-live-chip">Persistent</span></div><div class="modal-meta">Applied to every generation: targets, trainers, assignment days, off days, class mix, rules, pins, and AI configuration.</div></div></div><button class="modal-close" onclick="closeModal()">✕</button></div><div class="control-center-shell"><aside class="control-center-rail"><div class="cc-rail-header"><div class="cc-rail-title">Control Room</div><div class="cc-rail-sub">Edit the generation contract from one organized command surface.</div></div><div class="cc-rail-nav-wrap"><div class="control-center-nav">${renderControlCenterNav()}</div></div></aside><main class="control-center-main"><section class="control-center-intro"><div class="control-center-nav-title" id="control-center-heading">Settings Console</div><div class="control-center-nav-desc" id="control-center-description"></div><div class="cc-status-strip"><div class="cc-status-tile"><span>Rules source</span><b>Canonical JSON</b></div><div class="cc-status-tile"><span>Save mode</span><b>Persistent</b></div><div class="cc-status-tile"><span>Generation</span><b>Standard + AI</b></div><div class="cc-status-tile"><span>Validation</span><b>Pre-assignment</b></div></div></section><section class="control-center-panel" id="control-center-settings-panel" hidden></section><section class="control-center-panel" id="control-center-rules-panel" hidden></section></main><aside class="control-center-inspector"><div class="cc-inspector-card accent sett-generation-contract"><div class="cc-inspector-title">Generation Contract</div><div class="cc-inspector-copy">Saved settings are the canonical source for every Standard, AI, and repair generation. Trainer assignment days, week off dates, inactive status, class mix caps, and hard custom rules are validated before assignment.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Actions</div><div class="cc-inspector-actions"><button class="sett-ghost-btn primary" onclick="settSaveCanonicalConfig()">Save & Apply Changes</button><button class="sett-ghost-btn" onclick="settValidateAndRender()">Validate Configuration</button><button class="sett-ghost-btn" onclick="settExportConfig()">Export JSON</button></div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Selection Inspector</div><div class="sett-inspector-box" id="sett-inspector-selection">Select target or class-mix cells to apply bulk changes.</div></div><div class="cc-inspector-card"><div class="cc-inspector-title">Active Health</div><div id="sett-conflict-list" class="sett-conflict-list"><div class="sett-conflict-item">Loading validation...</div></div></div></aside></div>`;
 }
 function controlCenterEnsurePanel(panelName){
   const panelId=panelName==="rules"?"control-center-rules-panel":"control-center-settings-panel";
@@ -6557,10 +7151,10 @@ function settDefaultConfig(){
       target_cap_buffer:1,
       target_selection_strategy:"seeded_range",
       weekly_hours_cap:15,
-      tier1_min_weekly_hours:12,
-      tier1_ideal_weekly_hours:13,
+      tier1_min_weekly_hours:13,
+      tier1_ideal_weekly_hours:15,
       max_daily_trainer_hours:4,
-      max_trainer_work_days:6,
+      max_trainer_work_days:5,
       max_classes_per_day_default:3,
       enforce_assignment_days:true,
       enforce_leave_and_off_days:true,
@@ -6570,11 +7164,17 @@ function settDefaultConfig(){
       hard_block_inactive_trainers:true,
       require_certified_format_match:true,
       conflict_policy:"settings_override_soft_rules",
+      deepseek_api_key:"",
+      deepseek_model:"deepseek-v4-flash",
+      deepseek_base_url:"https://api.deepseek.com",
       ai_api_key:"",
-      ai_provider:"openrouter",
+      ai_provider:"deepseek",
       ai_model:"openai/gpt-oss-120b:free",
       ai_backup_model:"z-ai/glm-4.5-air:free",
       ai_base_url:"",
+      ai_optimize_api_key:"",
+      ai_optimize_model:"deepseek-v4-flash",
+      ai_optimize_base_url:"https://api.deepseek.com",
     },
     source_of_truth:{
       owner:"settings-command-center",
@@ -6601,16 +7201,22 @@ function settNormalizeConfig(config){
   next.settings_options.tier1_min_weekly_hours=Number(next.settings_options.tier1_min_weekly_hours??base.settings_options.tier1_min_weekly_hours);
   next.settings_options.tier1_ideal_weekly_hours=Number(next.settings_options.tier1_ideal_weekly_hours??base.settings_options.tier1_ideal_weekly_hours);
   next.settings_options.max_daily_trainer_hours=Number(next.settings_options.max_daily_trainer_hours??base.settings_options.max_daily_trainer_hours);
-  next.settings_options.max_trainer_work_days=Math.max(1,Math.min(6,Number(next.settings_options.max_trainer_work_days??base.settings_options.max_trainer_work_days)));
+  next.settings_options.max_trainer_work_days=Math.max(1,Math.min(5,Number(next.settings_options.max_trainer_work_days??base.settings_options.max_trainer_work_days)));
   next.settings_options.max_classes_per_day_default=Number(next.settings_options.max_classes_per_day_default??base.settings_options.max_classes_per_day_default);
   next.settings_options.max_week_off_days=Math.max(0,Math.min(2,Number(next.settings_options.max_week_off_days??base.settings_options.max_week_off_days)));
   if(!["historic_lowest_days","manual_only"].includes(next.settings_options.trainer_week_off_strategy))next.settings_options.trainer_week_off_strategy=base.settings_options.trainer_week_off_strategy;
+  next.settings_options.deepseek_api_key=String(next.settings_options.deepseek_api_key||"");
+  next.settings_options.deepseek_model=String(next.settings_options.deepseek_model||base.settings_options.deepseek_model||"deepseek-v4-flash");
+  next.settings_options.deepseek_base_url=String(next.settings_options.deepseek_base_url||base.settings_options.deepseek_base_url||"https://api.deepseek.com");
   next.settings_options.ai_api_key=String(next.settings_options.ai_api_key||"");
-  next.settings_options.ai_provider=String(next.settings_options.ai_provider||"openrouter").toLowerCase();
-  if(!["openrouter","openai"].includes(next.settings_options.ai_provider))next.settings_options.ai_provider="openrouter";
+  next.settings_options.ai_provider=String(next.settings_options.ai_provider||"deepseek").toLowerCase();
+  if(!["deepseek","openrouter","openai"].includes(next.settings_options.ai_provider))next.settings_options.ai_provider="deepseek";
   next.settings_options.ai_model=String(next.settings_options.ai_model||base.settings_options.ai_model||"openai/gpt-oss-120b:free");
   next.settings_options.ai_backup_model=String(next.settings_options.ai_backup_model||base.settings_options.ai_backup_model||"z-ai/glm-4.5-air:free");
   next.settings_options.ai_base_url=String(next.settings_options.ai_base_url||"");
+  next.settings_options.ai_optimize_api_key=String(next.settings_options.ai_optimize_api_key||"");
+  next.settings_options.ai_optimize_model=String(next.settings_options.ai_optimize_model||base.settings_options.ai_optimize_model||"deepseek-v4-flash");
+  next.settings_options.ai_optimize_base_url=String(next.settings_options.ai_optimize_base_url||base.settings_options.ai_optimize_base_url||"https://api.deepseek.com");
   next.manual_protected=Array.isArray(next.manual_protected)?next.manual_protected:[];
   next.manual_excluded=Array.isArray(next.manual_excluded)?next.manual_excluded:[];
   next.custom_rules=Array.isArray(next.custom_rules)?next.custom_rules:[];
@@ -6730,7 +7336,7 @@ function settValidateConfig(config){
   if(Number(cfg.settings_options?.tier1_ideal_weekly_hours||0)<Number(cfg.settings_options?.tier1_min_weekly_hours||0))warnings.push("Advanced: Tier 1 ideal hours should be at least the Tier 1 minimum.");
   if(Number(cfg.settings_options?.tier1_ideal_weekly_hours||0)>Number(cfg.settings_options?.weekly_hours_cap||0))warnings.push("Advanced: Tier 1 ideal hours should not exceed the weekly cap.");
   if(Number(cfg.settings_options?.max_daily_trainer_hours||0)>4)warnings.push("Generation: max trainer hours/day is above the recommended 4-hour cap.");
-  if(Number(cfg.settings_options?.max_trainer_work_days||0)>6)errors.push("Generation: trainer work days cannot allow all 7 days.");
+  if(Number(cfg.settings_options?.max_trainer_work_days||0)>5)errors.push("Generation: trainer work days exceeds canonical 5-day cap (every trainer must have at least one off day).");
   if(Number(cfg.settings_options?.max_classes_per_day_default||0)<=0)errors.push("Advanced: default classes per day cap must be greater than zero.");
   if(Number(cfg.settings_options?.max_week_off_days||0)>2)errors.push("Advanced: max default week-off days cannot exceed 2.");
   if(!cfg.settings_options?.enforce_assignment_days)warnings.push("Generation: assignment-day enforcement is disabled.");
@@ -6871,8 +7477,37 @@ function renderSettingsView(area){
             <div id="trainer-mgr-wrap"></div>
           </div>
           <div class="sett-subpanel" data-section="trainers" data-subpanel="bulk">
-            <button class="sett-mini-btn" onclick="settTrainerBulkActive(true)">Activate Visible</button>
-            <button class="sett-mini-btn" onclick="settTrainerBulkActive(false)">Deactivate Visible</button>
+            <div class="trainer-mgr-bulk-grid">
+              <div class="trainer-mgr-bulk-card">
+                <div class="sett-section-kicker">Status</div>
+                <div class="sett-section-label" style="font-size:15px;margin-bottom:10px">Visible Trainers</div>
+                <div class="sett-control-strip" style="margin:0">
+                  <button class="sett-mini-btn" onclick="settTrainerBulkActive(true)">Activate Visible</button>
+                  <button class="sett-mini-btn" onclick="settTrainerBulkActive(false)">Deactivate Visible</button>
+                </div>
+              </div>
+              <div class="trainer-mgr-bulk-card">
+                <div class="sett-section-kicker">Tier Defaults</div>
+                <div class="sett-section-label" style="font-size:15px;margin-bottom:10px">Tier + Class Cap</div>
+                <div class="sett-control-strip" style="margin:0">
+                  <select class="sett-select" id="trainer-bulk-tier">
+                    <option value="1">Tier 1 · 4/day cap</option>
+                    <option value="2">Tier 2 · 3/day cap</option>
+                    <option value="3">Tier 3 · 2/day cap</option>
+                    <option value="4">Tier 4 · 2/day cap</option>
+                  </select>
+                  <button class="sett-mini-btn" onclick="settTrainerBulkTier()">Apply Tier</button>
+                </div>
+              </div>
+              <div class="trainer-mgr-bulk-card">
+                <div class="sett-section-kicker">Caps</div>
+                <div class="sett-section-label" style="font-size:15px;margin-bottom:10px">Manual Daily Cap</div>
+                <div class="sett-control-strip" style="margin:0">
+                  <input class="sett-input" id="trainer-bulk-cap" type="number" min="1" max="6" value="4" style="max-width:110px">
+                  <button class="sett-mini-btn" onclick="settTrainerBulkClassCap()">Set Visible Caps</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveTrainerManager()">Save Directory</button></div>
         </div>
@@ -6902,9 +7537,7 @@ function renderSettingsView(area){
             <button class="sett-subtab" data-section="availability" data-subtab="leave" onclick="settSetSub('availability','leave')">Leave & Off Days</button>
           </div>
           <div class="sett-subpanel active" data-section="availability" data-subpanel="weekly">
-          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-            <div id="avail-grid-wrap" class="avail-grid" style="min-width:640px"></div>
-          </div>
+          <div id="avail-grid-wrap" class="avail-workspace"></div>
           <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAvailability()">Save Availability</button></div>
           </div>
           <div class="sett-subpanel" data-section="availability" data-subpanel="leave">
@@ -6925,14 +7558,14 @@ function renderSettingsView(area){
             <button class="sett-subtab active" data-section="rules" data-subtab="targets" onclick="settSetSub('rules','targets')">Setup / Targets</button>
             <button class="sett-subtab" data-section="rules" data-subtab="classmix" onclick="settSetSub('rules','classmix')">Class Mix</button>
             <button class="sett-subtab" data-section="rules" data-subtab="priority" onclick="settSetSub('rules','priority')">Trainer Priority</button>
-            <button class="sett-subtab" data-section="rules" data-subtab="custom" onclick="settSetSub('rules','custom')">Pinned & Custom</button>
+            <button class="sett-subtab" id="stab-customrules" data-section="rules" data-subtab="custom" onclick="settSetSub('rules','custom')">Pinned & Custom</button>
             <button class="sett-subtab" data-section="rules" data-subtab="universal" onclick="settSetSub('rules','universal')">Universal</button>
           </div>
           <div class="sett-subpanel active" data-section="rules" data-subpanel="targets"><div id="targets-wrap"></div></div>
           <div class="sett-subpanel" data-section="rules" data-subpanel="classmix"><div id="classmix-wrap"></div></div>
           <div class="sett-subpanel" data-section="rules" data-subpanel="priority"><div id="priority-wrap"></div></div>
-          <div class="sett-subpanel" data-section="rules" data-subpanel="custom">
-            <div id="customrules-builder"></div>
+          <div class="sett-subpanel" id="ssec-customrules" data-section="rules" data-subpanel="custom">
+            <div id="customrules-builder" class="advanced-rule-builder"></div>
             <div id="customrules-list" class="rule-list" style="margin-top:16px"></div>
             <div id="manualpins-builder" style="margin-top:24px"></div>
             <div id="manualpins-list" class="rule-list" style="margin-top:16px"></div>
@@ -6951,7 +7584,7 @@ function renderSettingsView(area){
         </div>
 
         <div class="sett-section" id="ssec-advanced">
-          <div class="sett-section-label">Advanced Policy</div>
+          <div class="sett-section-label">Advanced Policy · Advanced Planner Settings</div>
           <div id="advanced-options-wrap"></div>
           <div class="sett-save-bar"><button class="sett-save-btn" onclick="settSaveAdvancedOptions()">Save Policy</button></div>
         </div>
@@ -7148,11 +7781,22 @@ function settRenderAdvancedOptions(){
     <div class="sett-config-panel">
       <div class="sett-section-kicker">AI Generation</div>
       <div class="sett-option-grid">
-        ${settAdvancedOptionCard("field","ai_provider","AI Provider","Choose where AI schedule generation requests are sent.",`<select onchange="settSetAdvancedOption('ai_provider',this.value,'string')"><option value="openrouter" ${o.ai_provider==="openrouter"?"selected":""}>OpenRouter</option><option value="openai" ${o.ai_provider==="openai"?"selected":""}>OpenAI-Compatible</option></select>`)}
-        ${settAdvancedOptionCard("field","ai_model","AI Model","Model name to use for Generate with AI.",`<input type="text" value="${rvEscapeAttr(o.ai_model||"openai/gpt-oss-120b:free")}" placeholder="openai/gpt-oss-120b:free" autocomplete="off" onchange="settSetAdvancedOption('ai_model',this.value,'string')">`)}
-        ${settAdvancedOptionCard("field","ai_backup_model","Backup AI Model","Second model retried automatically when the primary plan parses poorly or fails hard-limit enforcement.",`<input type="text" value="${rvEscapeAttr(o.ai_backup_model||"z-ai/glm-4.5-air:free")}" placeholder="z-ai/glm-4.5-air:free" autocomplete="off" onchange="settSetAdvancedOption('ai_backup_model',this.value,'string')">`)}
-        ${settAdvancedOptionCard("field","ai_base_url","AI Base URL (Optional)","Override provider base URL when needed.",`<input type="text" value="${rvEscapeAttr(o.ai_base_url||"")}" placeholder="https://openrouter.ai/api/v1" autocomplete="off" onchange="settSetAdvancedOption('ai_base_url',this.value,'string')">`)}
-        ${settAdvancedOptionCard("field","ai_api_key","AI API Key","Saved in Control Center and used only when you click Generate with AI.",`<input type="password" value="${rvEscapeAttr(o.ai_api_key||"")}" placeholder="Paste API key" autocomplete="off" onchange="settSetAdvancedOption('ai_api_key',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_provider","AI Provider","DeepSeek is used as the primary schedule planner when its key is set.",`<select onchange="settSetAdvancedOption('ai_provider',this.value,'string')"><option value="deepseek" ${o.ai_provider==="deepseek"?"selected":""}>DeepSeek</option><option value="openrouter" ${o.ai_provider==="openrouter"?"selected":""}>OpenRouter</option><option value="openai" ${o.ai_provider==="openai"?"selected":""}>OpenAI-Compatible</option></select>`)}
+        ${settAdvancedOptionCard("field","deepseek_api_key","DeepSeek API Key","Primary paid key for Generate with AI.",`<input type="password" value="${rvEscapeAttr(o.deepseek_api_key||"")}" placeholder="Paste DeepSeek key" autocomplete="off" onchange="settSetAdvancedOption('deepseek_api_key',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","deepseek_model","DeepSeek Model","Primary model for optimized schedule generation.",`<input type="text" value="${rvEscapeAttr(o.deepseek_model||"deepseek-v4-flash")}" placeholder="deepseek-v4-flash" autocomplete="off" onchange="settSetAdvancedOption('deepseek_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","deepseek_base_url","DeepSeek Base URL","DeepSeek OpenAI-compatible endpoint.",`<input type="text" value="${rvEscapeAttr(o.deepseek_base_url||"https://api.deepseek.com")}" placeholder="https://api.deepseek.com" autocomplete="off" onchange="settSetAdvancedOption('deepseek_base_url',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_api_key","AI API Key (OpenRouter Fallback)","Used only if the primary DeepSeek plan fails or if OpenRouter is selected.",`<input type="password" value="${rvEscapeAttr(o.ai_api_key||"")}" placeholder="Paste OpenRouter key" autocomplete="off" onchange="settSetAdvancedOption('ai_api_key',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_model","OpenRouter Fallback Model","First fallback model for Generate with AI.",`<input type="text" value="${rvEscapeAttr(o.ai_model||"openai/gpt-oss-120b:free")}" placeholder="openai/gpt-oss-120b:free" autocomplete="off" onchange="settSetAdvancedOption('ai_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_backup_model","Second Fallback Model","Retried if the first fallback parses poorly or fails hard-limit enforcement.",`<input type="text" value="${rvEscapeAttr(o.ai_backup_model||"z-ai/glm-4.5-air:free")}" placeholder="z-ai/glm-4.5-air:free" autocomplete="off" onchange="settSetAdvancedOption('ai_backup_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_base_url","OpenRouter Base URL (Optional)","Override the fallback provider endpoint when needed.",`<input type="text" value="${rvEscapeAttr(o.ai_base_url||"")}" placeholder="https://openrouter.ai/api/v1" autocomplete="off" onchange="settSetAdvancedOption('ai_base_url',this.value,'string')">`)}
+      </div>
+    </div>
+    <div class="sett-config-panel">
+      <div class="sett-section-kicker">AI Optimisation (Optimize with AI)</div>
+      <div class="sett-option-grid">
+        ${settAdvancedOptionCard("field","ai_optimize_model","Optimize Model","Model used by the Optimize with AI button.",`<input type="text" value="${rvEscapeAttr(o.ai_optimize_model||"deepseek-v4-flash")}" placeholder="deepseek-v4-flash" autocomplete="off" onchange="settSetAdvancedOption('ai_optimize_model',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_optimize_base_url","Optimize Base URL","Endpoint for the optimize model.",`<input type="text" value="${rvEscapeAttr(o.ai_optimize_base_url||"https://api.deepseek.com")}" placeholder="https://api.deepseek.com" autocomplete="off" onchange="settSetAdvancedOption('ai_optimize_base_url',this.value,'string')">`)}
+        ${settAdvancedOptionCard("field","ai_optimize_api_key","Optimize API Key","Separate key for Optimize with AI. Falls back to the DeepSeek key if blank.",`<input type="password" value="${rvEscapeAttr(o.ai_optimize_api_key||"")}" placeholder="Paste API key" autocomplete="off" onchange="settSetAdvancedOption('ai_optimize_api_key',this.value,'string')">`)}
       </div>
     </div>
     <div class="sett-config-panel">
@@ -7397,16 +8041,17 @@ function settRenderTrainerManager(){
       const img=trainerImage(t.name);
       const locNames=Object.keys(t.locations||{});
       const classCount=locNames.reduce((sum,loc)=>sum+((t.locations?.[loc]?.session_count)||0),0);
+      const tierCap=settTierDefaultCap(t.tier||3);
       return`<div class="trainer-mgr-card" data-index="${i}">
         <div class="trainer-mgr-top">
           <div class="trainer-mgr-avatar">${img?`<img src="${img}" alt="${rvEscapeAttr(t.name||"Trainer")}">`:trainerInitials(t.name||"New")}</div>
           <div class="trainer-mgr-fields">
             <input class="sett-input trainer-mgr-name" value="${rvEscapeAttr(t.name||"")}" placeholder="Trainer name" style="min-width:0">
-            <select class="sett-select trainer-mgr-tier">
+            <select class="sett-select trainer-mgr-tier" onchange="settTrainerTierChanged(this)">
               ${[1,2,3,4].map(v=>`<option value="${v}" ${Number(t.tier||3)===v?"selected":""}>Tier ${v}</option>`).join("")}
             </select>
-            <label style="font-size:11px;font-weight:700;color:${active?"#15803D":"#B91C1C"};display:flex;gap:4px;align-items:center;white-space:nowrap">
-              <input type="checkbox" class="trainer-mgr-active" ${active?"checked":""}> ${active?"Active":"Active"}
+            <label class="trainer-mgr-active-label${active?"":" off"}">
+              <input type="checkbox" class="trainer-mgr-active" ${active?"checked":""}> Active
             </label>
           </div>
         </div>
@@ -7414,6 +8059,7 @@ function settRenderTrainerManager(){
           <span class="trainer-mgr-pill">${classCount} historic sessions</span>
           <span class="trainer-mgr-pill">${locNames.length} locations</span>
           <span class="trainer-mgr-pill">${Object.values(t.qualifications||{}).filter(Boolean).length} qualifications</span>
+          <span class="trainer-mgr-pill trainer-mgr-cap-pill">Cap ${tierCap}/day</span>
         </div>
         <div class="trainer-mgr-locs">
           ${LOCS_ALL.map(loc=>{
@@ -7424,13 +8070,14 @@ function settRenderTrainerManager(){
             const weekOffs=settHistoricWeekOffDays(t);
             return`<div class="trainer-mgr-loc" data-loc="${rvEscapeAttr(loc)}">
               <div class="trainer-mgr-loc-head">
-                <label style="display:flex;gap:5px;align-items:center"><input type="checkbox" class="trainer-mgr-loc-enabled" ${enabled?"checked":""}> ${rvEscapeHtml(loc.split(",")[0])}</label>
-                <span style="font-size:9px;color:var(--text-muted)">${ld.session_count||0} sessions${weekOffs.length?` · off ${weekOffs.map(d=>d.slice(0,3)).join("/")}`:""}</span>
+                <label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0;font-size:11px;color:#334155"><input type="checkbox" class="trainer-mgr-loc-enabled" ${enabled?"checked":""}> ${rvEscapeHtml(loc.split(",")[0])}</label>
+                <span class="sett-badge" style="min-width:64px">${ld.session_count||0} cls</span>
               </div>
               <div class="avail-days">
                 ${DAYS_ALL.map(day=>`<span class="avail-day-chip${activeDays.has(day)?" on":""}" data-day="${day}" onclick="settToggleDay(this)">${day.slice(0,3)}</span>`).join("")}
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+              ${weekOffs.length?`<div style="font-size:10px;color:#64748B;margin:0 0 7px">Historic off: <b>${weekOffs.map(d=>d.slice(0,3)).join(", ")}</b></div>`:""}
+              <div class="trainer-mgr-loc-grid">
                 <input class="sett-input trainer-mgr-start" type="time" value="${tw.start||"06:00"}" style="min-width:0">
                 <input class="sett-input trainer-mgr-end" type="time" value="${tw.end||"22:00"}" style="min-width:0">
                 <input class="sett-input trainer-mgr-maxd" type="number" min="1" max="8" value="${ld.max_classes_per_day||4}" title="Max classes/day" style="min-width:0">
@@ -7444,6 +8091,22 @@ function settRenderTrainerManager(){
       </div>`;
     }).join("")}
   </div>`;
+}
+
+function settTierDefaultCap(tier){
+  const t=Number(tier||3);
+  if(t===1)return 4;
+  if(t===2)return 3;
+  return 2;
+}
+
+function settTrainerTierChanged(sel){
+  const cap=settTierDefaultCap(sel.value);
+  const card=sel.closest(".trainer-mgr-card");
+  if(!card)return;
+  card.querySelectorAll(".trainer-mgr-maxd").forEach(inp=>{inp.value=cap;});
+  const badge=card.querySelector(".trainer-mgr-cap-pill");
+  if(badge)badge.textContent=`Tier ${sel.value} default cap ${cap}/day`;
 }
 
 function settCollectTrainerManager(){
@@ -7549,36 +8212,67 @@ function settTrainerBulkActive(active){
   settSaveTrainerManager();
 }
 
+function settTrainerBulkTier(){
+  const tier=Number(document.getElementById("trainer-bulk-tier")?.value||1);
+  const cap=settTierDefaultCap(tier);
+  const visible=new Set(settFilteredTrainerIndexes().map(({i})=>i));
+  (_settTrainerProfiles||[]).forEach((t,i)=>{
+    if(!visible.has(i))return;
+    t.tier=tier;
+    Object.values(t.locations||{}).forEach(ld=>{ld.max_classes_per_day=cap;});
+  });
+  settRenderTrainerManager();settRenderQualifications();settRenderAvailability();
+  showToast(`${visible.size} visible trainer${visible.size===1?"":"s"} moved to Tier ${tier} with ${cap}/day cap — saving…`,"");
+  settSaveTrainerManager();
+}
+
+function settTrainerBulkClassCap(){
+  const cap=Math.max(1,Math.min(6,Number(document.getElementById("trainer-bulk-cap")?.value||4)));
+  const visible=new Set(settFilteredTrainerIndexes().map(({i})=>i));
+  (_settTrainerProfiles||[]).forEach((t,i)=>{
+    if(!visible.has(i))return;
+    Object.values(t.locations||{}).forEach(ld=>{ld.max_classes_per_day=cap;});
+  });
+  settRenderTrainerManager();settRenderAvailability();
+  showToast(`${visible.size} visible trainer${visible.size===1?"":"s"} set to ${cap}/day cap — saving…`,"");
+  settSaveTrainerManager();
+}
+
 function settRenderQualifications(){
   const wrap=document.getElementById("qual-table-wrap");
   if(!wrap||!_settTrainerProfiles)return;
   const trainers=Array.isArray(_settTrainerProfiles)?_settTrainerProfiles:[];
   const q=(_qualSearch||"").toLowerCase();
   const sorted=[...trainers].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).filter(t=>!q||(t.name||"").toLowerCase().includes(q));
-  wrap.innerHTML=`<div class="qual-wrap" style="background:#0F172A;border-color:rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,0.4)">
-    <table class="qual-table" id="qual-table" style="background:transparent">
+  wrap.innerHTML=`<div class="qual-wrap">
+    <table class="qual-table" id="qual-table">
+    <colgroup>
+      <col class="qual-name-col">
+      <col class="qual-tier-col">
+      ${QUAL_KEYS.map(()=>`<col class="qual-format-col">`).join("")}
+    </colgroup>
     <thead><tr>
-      <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Trainer</th>
-      <th style="background:#1E293B;color:#94A3B8;border-color:rgba(255,255,255,0.1)">Tier</th>
-      ${QUAL_KEYS.map(k=>`<th title="${rvEscapeAttr(QUAL_FORMAT_HINTS[k]||k)}" style="background:#1E293B;border-color:rgba(255,255,255,0.1)"><div class="qual-col-head">
-        <span style="font-size:8px;font-weight:900;color:#F8FAFC">${QUAL_LABELS[k]||k}</span>
-        <span style="font-size:7px;font-weight:700;color:#94A3B8;line-height:1.2">${rvEscapeHtml((QUAL_FORMAT_HINTS[k]||"").split(",").slice(0,2).join(", "))}</span>
+      <th>Trainer</th>
+      <th>Tier</th>
+      ${QUAL_KEYS.map(k=>`<th title="${rvEscapeAttr(QUAL_FORMAT_HINTS[k]||k)}"><div class="qual-col-head">
+        <span class="qual-format-label">${QUAL_LABELS[k]||k}</span>
+        <span class="qual-format-hint">${rvEscapeHtml((QUAL_FORMAT_HINTS[k]||"").split(",").slice(0,2).join(", "))}</span>
         <div class="qual-col-actions">
-          <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#3B82F6" title="Enable All" onclick="settQualColumn('${k}',true);event.stopPropagation()">+</button>
-          <button class="qual-col-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#EF4444" title="Disable All" onclick="settQualColumn('${k}',false);event.stopPropagation()">−</button>
+          <button class="qual-col-btn" title="Enable All" onclick="settQualColumn('${k}',true);event.stopPropagation()">+</button>
+          <button class="qual-col-btn" title="Disable All" onclick="settQualColumn('${k}',false);event.stopPropagation()">−</button>
         </div>
       </div></th>`).join("")}
     </tr></thead>
     <tbody>
-      ${sorted.map(t=>`<tr class="qual-row" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" style="border-color:rgba(255,255,255,0.05)">
-        <td style="font-weight:700;color:#F8FAFC;background:rgba(30,41,59,0.5);border-color:rgba(255,255,255,0.1)">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="trainer-mgr-avatar" style="width:24px;height:24px;background:#0F172A;border-color:rgba(255,255,255,0.1)">${trainerImage(t.name)?`<img src="${trainerImage(t.name)}">`:trainerInitials(t.name||"")}</span>
+      ${sorted.map(t=>`<tr class="qual-row" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}">
+        <td>
+          <div class="qual-row-name">
+            <span class="trainer-mgr-avatar" style="width:28px;height:28px">${trainerImage(t.name)?`<img src="${trainerImage(t.name)}">`:trainerInitials(t.name||"")}</span>
             <span style="font-size:11px">${rvEscapeHtml(t.name||"")}</span>
           </div>
         </td>
-        <td style="background:rgba(30,41,59,0.3);border-color:rgba(255,255,255,0.1)"><span class="qual-tier" style="background:#3B82F6;color:#fff">${t.tier||"?"}</span></td>
-        ${QUAL_KEYS.map(k=>`<td style="background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.05)"><input type="checkbox" class="qual-cb" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" data-key="${k}" ${(t.qualifications||{})[k]?"checked":""} onchange="settCollectQualsFromDom()"></td>`).join("")}
+        <td><span class="qual-tier">T${t.tier||"?"}</span></td>
+        ${QUAL_KEYS.map(k=>`<td><input type="checkbox" class="qual-cb" data-trainer="${(t.name||"").replace(/"/g,"&quot;")}" data-key="${k}" ${(t.qualifications||{})[k]?"checked":""} onchange="settCollectQualsFromDom()"></td>`).join("")}
       </tr>`).join("")}
     </tbody>
   </table></div>`;
@@ -7657,7 +8351,7 @@ function settRenderAvailability(){
 
   // toolbar
   const tb=document.createElement("div");
-  tb.style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px";
+  tb.className="sett-control-strip";
   tb.innerHTML=`
     <input type="text" placeholder="Search trainer…" oninput="settFilterAvail(this.value)" class="sett-input" style="min-width:160px;flex:1">
     <select class="sett-select" id="avail-loc-filter" onchange="settFilterAvailByLoc(this.value)" style="min-width:160px">
@@ -7675,7 +8369,6 @@ function settRenderAvailability(){
 
   const grid=document.createElement("div");
   grid.className="avail-cards-container";
-  grid.style="display:flex;flex-direction:column;gap:12px";
   grid.id="avail-cards-container";
 
   sorted.forEach(t=>{
@@ -7690,11 +8383,10 @@ function settRenderAvailability(){
     card.dataset.trainer=(t.name||"").toLowerCase();
     card.dataset.tier=String(t.tier||3);
     card.dataset.locs=locEntries.map(([l])=>l).join("|");
-    card.style="border:1px solid #E2E8F0;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 2px 6px rgba(15,23,42,.04)";
 
     // header
     const hdr=document.createElement("div");
-    hdr.style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;cursor:pointer;user-select:none";
+    hdr.className="avail-card-head";
     hdr.innerHTML=`
       <div style="width:36px;height:36px;border-radius:50%;background:${tierColor}22;border:2px solid ${tierColor};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:${tierColor};flex-shrink:0;overflow:hidden">
         ${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`<span>${trainerInitials(t.name||"")}</span>`}
@@ -7703,7 +8395,7 @@ function settRenderAvailability(){
         <div style="font-size:13px;font-weight:800;color:#0F172A">${rvEscapeHtml(t.name||"")}</div>
         <div style="font-size:10px;color:#64748B;margin-top:2px">${locEntries.map(([l])=>LOC_SHORT[l]||l).join(" · ")} &nbsp;·&nbsp; ${active?'<span style="color:#15803D;font-weight:700">Active</span>':'<span style="color:#B91C1C;font-weight:700">Inactive</span>'}${settHistoricWeekOffDays(t).length?` &nbsp;·&nbsp; Historic off: <b>${settHistoricWeekOffDays(t).map(d=>d.slice(0,3)).join(", ")}</b>`:""}</div>
       </div>
-      <span style="font-size:9px;font-weight:900;padding:2px 8px;border-radius:6px;background:${tierColor}22;color:${tierColor}">T${t.tier||3}</span>
+      <span class="sett-badge blue">Tier ${t.tier||3}</span>
       <span class="avail-card-chevron" style="font-size:14px;color:#94A3B8;transition:transform .2s">▾</span>`;
     hdr.onclick=()=>{
       const body=card.querySelector(".avail-card-body");
@@ -7717,7 +8409,6 @@ function settRenderAvailability(){
     // body
     const body=document.createElement("div");
     body.className="avail-card-body";
-    body.style="padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px";
 
     locEntries.forEach(([loc,ld],li)=>{
       const activeDays=new Set(settAvailabilityDaysFor(t,ld));
@@ -7727,23 +8418,22 @@ function settRenderAvailability(){
 
       const locBlock=document.createElement("div");
       locBlock.className="avail-location-card";
-      locBlock.style="border:1px solid #E2E8F0;border-radius:12px;background:#F8FAFC;padding:12px;min-width:0";
       locBlock.innerHTML=`
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#64748B;background:#F1F5F9;border-radius:6px;padding:3px 8px">${rvEscapeHtml(LOC_SHORT[loc]||loc)}</span>
           <span style="font-size:10px;color:#94A3B8">${rvEscapeHtml(loc)}</span>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start">
+        <div class="avail-loc-grid">
           <div>
             <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:#94A3B8;letter-spacing:.06em;margin-bottom:6px">Available Days</div>
-            <div style="display:flex;gap:4px">
+            <div class="avail-days-row">
               ${DAYS_ALL.map(d=>{
                 const on=activeDays.has(d);
                 const weekend=["Saturday","Sunday"].includes(d);
                 return `<button class="avail-day-chip${on?" on":""}"
                   data-trainer="${rvEscapeAttr(t.name)}" data-loc="${rvEscapeAttr(loc)}" data-day="${d}"
                   onclick="settToggleDay(this)"
-                  style="width:32px;height:32px;border-radius:7px;border:1px solid ${on?"#3B82F6":"#E2E8F0"};background:${on?"#3B82F6":"#F8FAFC"};color:${on?"#fff":"#94A3B8"};font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;${weekend&&on?"border-color:#6366F1;background:#6366F1":""}"
+                  style="border-color:${on?(weekend?"#6366F1":"#3B82F6"):"#E2E8F0"};background:${on?(weekend?"#6366F1":"#3B82F6"):"#F8FAFC"};color:${on?"#fff":"#94A3B8"};cursor:pointer;transition:all .15s"
                   title="${d}">${d.slice(0,2)}</button>`;
               }).join("")}
             </div>
@@ -8175,19 +8865,19 @@ function settRenderClassMix(){
   const cfg=_settSchedConfig.class_mix||{};
   const classes=[...new Set(LOCS_ALL.flatMap(loc=>Object.keys(CLASS_MIX_TARGETS[loc]||{})))];
   wrap.innerHTML=`
-    <div class="sett-matrix-toolbar" style="margin-top:8px;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);backdrop-filter:blur(8px)">
+    <div class="sett-toolbar-stack">
       ${settBulkToolbarHtml("classmix","Class Mix Operations")}
       ${settClassMixAdvancedBulkHtml(classes)}
     </div>
-    <div class="sett-matrix-wrap" style="background:#0F172A;border-color:rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,0.4)">
+    <div class="sett-matrix-wrap">
       <table class="sett-matrix" id="classmix-matrix">
         <thead><tr>
-          <th style="background:#1E293B;color:#94A3B8">Studio / Format</th>
-          ${classes.map(cls=>`<th style="background:#1E293B"><button class="sett-mini-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#F8FAFC" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls).slice(0,10))}${displayClass(cls).length>10?"…":""}</button></th>`).join("")}
+          <th>Studio / Format</th>
+          ${classes.map(cls=>`<th><button class="sett-mini-btn" onclick="settSelectMatrixColumn('classmix','${rvEscapeAttr(cls)}')" title="${rvEscapeAttr(displayClass(cls))}">${rvEscapeHtml(displayClass(cls).slice(0,10))}${displayClass(cls).length>10?"…":""}</button></th>`).join("")}
         </tr></thead>
         <tbody>
-          ${LOCS_ALL.map(loc=>`<tr style="border-color:rgba(255,255,255,0.05)">
-            <td class="sett-matrix-rowhead" style="background:#1E293B;border-right:1px solid rgba(255,255,255,0.1)"><button class="sett-mini-btn" style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#F8FAFC" onclick="settSelectMatrixRow('classmix','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button></td>
+          ${LOCS_ALL.map(loc=>`<tr>
+            <td class="sett-matrix-rowhead"><button class="sett-mini-btn" onclick="settSelectMatrixRow('classmix','${rvEscapeAttr(loc)}')">${LOC_SHORT[loc]||loc}</button></td>
             ${classes.map(cls=>{
               const supported=(CLASS_MIX_TARGETS[loc]||{})[cls];
               const cur=(cfg[loc]||{})[cls]||supported||{min:0,max:0};
@@ -8247,35 +8937,35 @@ function settRenderPriority(){
   const trainers=[..._settTrainerProfiles].sort((a,b)=>a.name.localeCompare(b.name));
   
   wrap.innerHTML=`
-    <div class="sett-matrix-toolbar" style="margin-bottom:16px;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)">
+    <div class="sett-matrix-toolbar">
       <div class="sett-bulk-field"><label>Bulk Priority (0-100)</label><input type="number" id="priority-bulk-val" value="50" min="0" max="100"></div>
       <button class="sett-ghost-btn" onclick="settApplyPriorityBulk()">Set All to Value</button>
       <button class="sett-ghost-btn" onclick="settApplyPriorityByTier()">Auto-Weight by Tier</button>
     </div>
-    <div class="trainer-mgr-grid">
+    <div class="priority-grid">
       ${trainers.map(t=>{
         const val=cfg[t.name]!==undefined?cfg[t.name]:50;
         return `
-          <div class="trainer-mgr-card" style="background:#1E293B;border-color:rgba(255,255,255,0.1);color:#F8FAFC">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="display:flex;align-items:center;gap:10px">
-                <span class="trainer-mgr-avatar" style="width:32px;height:32px;background:#0F172A;border-color:rgba(255,255,255,0.1)">
+          <div class="priority-card">
+            <div class="priority-card-head">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <span class="trainer-mgr-avatar" style="width:36px;height:36px">
                   ${trainerImage(t.name)?`<img src="${trainerImage(t.name)}">`:trainerInitials(t.name)}
                 </span>
-                <div>
+                <div style="min-width:0">
                   <div style="font-size:13px;font-weight:800">${rvEscapeHtml(t.name)}</div>
-                  <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;font-weight:900">Tier ${t.tier}</div>
+                  <div style="font-size:9px;color:#64748B;text-transform:uppercase;font-weight:900">Tier ${t.tier}</div>
                 </div>
               </div>
               <div style="text-align:right">
                 <label style="font-size:8px;font-weight:900;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:4px">Weight</label>
                 <input type="number" class="priority-inp" data-trainer="${rvEscapeAttr(t.name)}" value="${val}" min="0" max="100" 
-                       style="width:54px;text-align:center;background:#0F172A;border-color:rgba(255,255,255,0.2);color:#3B82F6;font-weight:900"
+                       style="width:60px;text-align:center;color:#1D4ED8;font-weight:900"
                        oninput="settCollectPriorityFromDom()">
               </div>
             </div>
-            <div style="margin-top:12px;height:4px;background:rgba(0,0,0,0.3);border-radius:999px;overflow:hidden">
-              <div style="height:100%;width:${val}%;background:linear-gradient(90deg,#3B82F6,#60A5FA);transition:width 0.2s"></div>
+            <div class="priority-bar">
+              <div class="priority-bar-fill" style="width:${val}%"></div>
             </div>
           </div>
         `;
@@ -8289,7 +8979,7 @@ function settCollectPriorityFromDom(){
   document.querySelectorAll(".priority-inp").forEach(inp=>{
     prio[inp.dataset.trainer]=parseInt(inp.value)||0;
     // Update progress bar
-    const bar=inp.closest(".trainer-mgr-card").querySelector("div[style*='width'] > div");
+    const bar=inp.closest(".priority-card")?.querySelector(".priority-bar-fill");
     if(bar)bar.style.width=`${inp.value}%`;
   });
   _settSchedConfig.trainer_priority=prio;
@@ -8482,16 +9172,16 @@ function settRenderCustomRuleList(){
   if(!wrap)return;
   const rules=(_settSchedConfig?.custom_rules)||[];
   if(!rules.length){
-    wrap.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No custom rules created.</div>`;
+    wrap.innerHTML=`<div class="rule-card"><div><div class="rule-title">No custom rules created.</div><div class="rule-meta"><span class="sett-badge">Empty</span></div></div></div>`;
     return;
   }
-  wrap.innerHTML=rules.map((r,i)=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r8);background:#fff;margin-bottom:6px">
+  wrap.innerHTML=`<div class="rule-list-grid">${rules.map((r,i)=>`<div class="rule-card">
     <div style="flex:1;min-width:0">
-      <div style="font-size:12px;font-weight:800;color:var(--text)">${rvEscapeHtml(settRuleSummary(r))}</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${rvEscapeHtml(r.priority||"soft").toUpperCase()} · ${rvEscapeHtml(r.location||"All studios")}</div>
+      <div class="rule-title">${rvEscapeHtml(settRuleSummary(r))}</div>
+      <div class="rule-meta"><span class="sett-badge ${r.priority==="hard"?"red":"blue"}">${rvEscapeHtml(r.priority||"soft")}</span><span class="sett-badge">${rvEscapeHtml(r.location||"All studios")}</span><span class="sett-badge">${rvEscapeHtml(r.rule_type||"rule")}</span></div>
     </div>
     <button class="sett-mini-btn danger" onclick="settRemoveCustomRule(${i})">Remove</button>
-  </div>`).join("");
+  </div>`).join("")}</div>`;
 }
 
 function settRuleSummary(r){
@@ -8509,16 +9199,16 @@ function settRenderCustomRuleBuilder(){
   if(!wrap)return;
   const classes=settAllClassOptions();
   const trainers=settTrainerOptions();
-  wrap.innerHTML=`<div class="advanced-rule-builder" style="border:1px solid #DCE3EB;border-radius:18px;background:linear-gradient(135deg,#FFFFFF,#F8FAFC);box-shadow:0 14px 32px rgba(15,23,42,.06);overflow:hidden">
-    <div style="display:grid;grid-template-columns:minmax(220px,.75fr) minmax(0,1.25fr);gap:0">
-      <aside style="padding:16px;border-right:1px solid #E2E8F0;background:#fff">
+  wrap.innerHTML=`<div class="rule-builder-card" style="padding:0;overflow:hidden">
+    <div class="rule-builder-layout">
+      <aside class="rule-builder-aside">
         <div style="font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:8px">Guided Rule Builder</div>
         <div style="font-size:18px;font-weight:900;color:#111820;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.15">Build complex scheduling logic without writing code.</div>
         <div id="cr-helper" style="font-size:12px;color:#64748B;line-height:1.5;margin-top:10px"></div>
         <div id="cr-preview" style="font-size:12px;font-weight:900;color:#111820;border:1px solid #DCE3EB;background:#F8FAFC;border-radius:12px;padding:11px 12px;margin-top:14px">Rule preview</div>
       </aside>
-      <main style="padding:16px">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end">
+      <main class="rule-builder-main">
+        <div class="form-grid-even">
       <div data-cr-field="type"><label style="font-size:10px;font-weight:800;color:var(--text-muted)">Rule goal</label><select class="sett-select" id="cr-type" style="width:100%" onchange="settUpdateCustomRuleBuilder()">
         ${Object.entries(CUSTOM_RULE_TEMPLATES).map(([id,t])=>`<option value="${id}">${rvEscapeHtml(t.label)}</option>`).join("")}
       </select></div>
@@ -8630,16 +9320,16 @@ function settRenderManualPinList(){
   if(!wrap)return;
   const pins=(_settSchedConfig?.manual_protected)||[];
   if(!pins.length){
-    wrap.innerHTML=`<div style="font-size:12px;color:var(--text-muted);padding:8px 0">No manual pinned classes created.</div>`;
+    wrap.innerHTML=`<div class="pin-card"><div><div class="pin-title">No manual pinned classes created.</div><div class="pin-meta"><span class="sett-badge">Empty</span></div></div></div>`;
     return;
   }
-  wrap.innerHTML=pins.map((p,i)=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:var(--r8);background:#fff;margin-bottom:6px">
+  wrap.innerHTML=`<div class="rule-list-grid">${pins.map((p,i)=>`<div class="pin-card">
     <div style="flex:1;min-width:0">
-      <div style="font-size:12px;font-weight:800;color:var(--text)">${rvEscapeHtml(p.day||p.day_of_week||"")} ${rvEscapeHtml(p.time||"")} · ${rvEscapeHtml(displayClass(p.class||p.class_name||""))}</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${rvEscapeHtml(p.location||"")} · ${rvEscapeHtml(p.trainer||p.trainer_1||"")} ${p.room?`· ${rvEscapeHtml(p.room)}`:""}</div>
+      <div class="pin-title">${rvEscapeHtml(p.day||p.day_of_week||"")} ${rvEscapeHtml(p.time||"")} · ${rvEscapeHtml(displayClass(p.class||p.class_name||""))}</div>
+      <div class="pin-meta"><span class="sett-badge blue">${rvEscapeHtml(p.location||"Studio")}</span><span class="sett-badge green">${rvEscapeHtml(p.trainer||p.trainer_1||"Trainer")}</span>${p.room?`<span class="sett-badge">${rvEscapeHtml(p.room)}</span>`:""}</div>
     </div>
     <button class="sett-mini-btn danger" onclick="settRemoveManualPin(${i})">Remove</button>
-  </div>`).join("");
+  </div>`).join("")}</div>`;
 }
 
 function settRenderManualPinBuilder(){
@@ -8647,7 +9337,7 @@ function settRenderManualPinBuilder(){
   if(!wrap)return;
   const classes=settAllClassOptions();
   const trainers=settTrainerOptions();
-  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;align-items:end">
+  wrap.innerHTML=`<div class="pin-builder-card"><div class="form-grid-even">
     <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Studio</label><select class="sett-select" id="pin-location" style="width:100%">${LOCS_ALL.map(l=>`<option value="${rvEscapeAttr(l)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
     <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Day</label><select class="sett-select" id="pin-day" style="width:100%">${DAYS_ALL.map(d=>`<option value="${d}">${d}</option>`).join("")}</select></div>
     <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Time</label><input class="sett-input" id="pin-time" type="time" value="09:00" style="width:100%;min-width:0"></div>
@@ -8656,7 +9346,7 @@ function settRenderManualPinBuilder(){
     <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Room</label><select class="sett-select" id="pin-room" style="width:100%">${settRoomOptions().map(([v,l])=>`<option value="${rvEscapeAttr(v)}">${rvEscapeHtml(l)}</option>`).join("")}</select></div>
     <div><label style="font-size:10px;font-weight:700;color:var(--text-muted)">Note</label><input class="sett-input" id="pin-note" placeholder="Optional" style="width:100%;min-width:0"></div>
     <button class="sett-save-btn" onclick="settAddManualPin()">Pin Class</button>
-  </div>`;
+  </div></div>`;
 }
 
 function settAddManualPin(){
@@ -9197,12 +9887,12 @@ function nlEditApply(_edits) {
 
 </script>
 <button class="chat-fab" id="chat-fab" onclick="chatToggle()" title="Ask AI about the schedule">
-  <img class="chat-fab-logo" src="images/plan57-speed-calendar-v2.png" alt="Plan 57 AI assistant">
+  <img class="chat-fab-logo" src="images/plan57-ai-agent-v2.png" alt="Plan 57 AI assistant">
   <span class="chat-fab-badge" id="chat-fab-badge">!</span>
 </button>
 <div class="chat-drawer" id="chat-drawer">
   <div class="chat-hdr">
-    <img class="chat-brand-mark" src="images/plan57-speed-calendar-v2.png" alt="Plan 57 AI assistant">
+    <img class="chat-brand-mark" src="images/plan57-ai-agent-v2.png" alt="Plan 57 AI assistant">
     <div>
       <div class="chat-hdr-title">Schedule Intelligence</div>
       <div class="chat-hdr-sub">Evidence-backed analysis, optimization, and substitutions</div>

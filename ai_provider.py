@@ -1,4 +1,6 @@
 import os
+import time
+import types
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -7,6 +9,17 @@ ENV_PATH = PROJECT_ROOT / ".env"
 DEFAULT_MODEL = "openai/gpt-oss-120b:free"
 DEFAULT_BACKUP_MODEL = "z-ai/glm-4.5-air:free"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash"
+DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+DEFAULT_TIMEOUT_SECONDS = 30
+PLACEHOLDER_VALUES = {
+    "your_openrouter_api_key_here",
+    "your_openai_api_key_here",
+    "your_deepseek_api_key_here",
+    "changeme",
+    "placeholder",
+}
 
 try:
     from openai import OpenAI
@@ -34,22 +47,90 @@ def load_dotenv_if_present() -> None:
         return
 
 
+def _clean_key(value: str | None) -> str:
+    key = str(value or "").strip()
+    if not key or key.lower() in PLACEHOLDER_VALUES:
+        return ""
+    return key
+
+
+def _timeout_seconds() -> float:
+    return float(os.environ.get("AI_REQUEST_TIMEOUT_SECONDS") or DEFAULT_TIMEOUT_SECONDS)
+
+
+def _settings(provider: str, api_key: str, model: str, base_url: str, backup_model: str = "") -> dict:
+    return {
+        "provider": provider,
+        "api_key": api_key,
+        "model": model,
+        "backup_model": backup_model,
+        "base_url": str(base_url or "").rstrip("/"),
+        "timeout": _timeout_seconds(),
+    }
+
+
 def get_ai_settings() -> Optional[dict]:
     load_dotenv_if_present()
-    api_key = (
-        os.environ.get("OPENROUTER_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-    )
-    placeholder_values = {"your_openrouter_api_key_here", "your_openai_api_key_here", "changeme", "placeholder"}
-    if not api_key or api_key.strip().lower() in placeholder_values:
-        return None
 
-    return {
-        "api_key": api_key,
-        "model": os.environ.get("OPENROUTER_MODEL") or os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL,
-        "backup_model": os.environ.get("AI_BACKUP_MODEL") or os.environ.get("OPENROUTER_BACKUP_MODEL") or DEFAULT_BACKUP_MODEL,
-        "base_url": os.environ.get("OPENROUTER_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or DEFAULT_BASE_URL,
-    }
+    deepseek_key = _clean_key(os.environ.get("DEEPSEEK_API_KEY"))
+    if deepseek_key:
+        return _settings(
+            provider="deepseek",
+            api_key=deepseek_key,
+            model=os.environ.get("DEEPSEEK_MODEL") or DEFAULT_DEEPSEEK_MODEL,
+            backup_model=os.environ.get("DEEPSEEK_BACKUP_MODEL") or "",
+            base_url=os.environ.get("DEEPSEEK_BASE_URL") or DEFAULT_DEEPSEEK_BASE_URL,
+        )
+
+    openrouter_key = _clean_key(os.environ.get("OPENROUTER_API_KEY"))
+    if openrouter_key:
+        return _settings(
+            provider="openrouter",
+            api_key=openrouter_key,
+            model=os.environ.get("OPENROUTER_MODEL") or DEFAULT_MODEL,
+            backup_model=os.environ.get("AI_BACKUP_MODEL") or os.environ.get("OPENROUTER_BACKUP_MODEL") or DEFAULT_BACKUP_MODEL,
+            base_url=os.environ.get("OPENROUTER_BASE_URL") or DEFAULT_BASE_URL,
+        )
+
+    openai_key = _clean_key(os.environ.get("OPENAI_API_KEY"))
+    if openai_key:
+        return _settings(
+            provider="openai",
+            api_key=openai_key,
+            model=os.environ.get("OPENAI_MODEL") or "gpt-4o-mini",
+            backup_model=os.environ.get("AI_BACKUP_MODEL") or "",
+            base_url=os.environ.get("OPENAI_BASE_URL") or DEFAULT_OPENAI_BASE_URL,
+        )
+
+    return None
+
+
+def get_ai_fallback_settings(primary_settings: Optional[dict] = None) -> list[dict]:
+    load_dotenv_if_present()
+    primary_provider = str((primary_settings or {}).get("provider") or "").lower()
+    primary_model = str((primary_settings or {}).get("model") or "")
+    fallbacks: list[dict] = []
+
+    openrouter_key = _clean_key(os.environ.get("OPENROUTER_API_KEY"))
+    if openrouter_key and primary_provider != "openrouter":
+        seen_models = {primary_model}
+        for model in (
+            os.environ.get("OPENROUTER_MODEL") or DEFAULT_MODEL,
+            os.environ.get("AI_BACKUP_MODEL") or os.environ.get("OPENROUTER_BACKUP_MODEL") or DEFAULT_BACKUP_MODEL,
+        ):
+            model = str(model or "").strip()
+            if not model or model in seen_models:
+                continue
+            seen_models.add(model)
+            fallbacks.append(_settings(
+                provider="openrouter",
+                api_key=openrouter_key,
+                model=model,
+                backup_model="",
+                base_url=os.environ.get("OPENROUTER_BASE_URL") or DEFAULT_BASE_URL,
+            ))
+
+    return fallbacks
 
 
 def create_ai_client() -> Tuple[Optional[OpenAI], Optional[dict]]:
@@ -63,6 +144,8 @@ def create_ai_client() -> Tuple[Optional[OpenAI], Optional[dict]]:
     client = OpenAI(
         api_key=settings["api_key"],
         base_url=settings["base_url"],
+        timeout=settings["timeout"],
+        max_retries=0,
         default_headers={
             "HTTP-Referer": "https://studio-scheduler.local",
             "X-Title": "Studio Scheduler",
@@ -71,15 +154,86 @@ def create_ai_client() -> Tuple[Optional[OpenAI], Optional[dict]]:
     return client, settings
 
 
-def create_chat_completion(client: OpenAI, system_prompt: str, user_prompt: str, model: str, max_tokens: int):
+def create_chat_completion(
+    client: OpenAI,
+    system_prompt: str,
+    user_prompt: str,
+    model: str,
+    max_tokens: int,
+    settings_override: Optional[dict] = None,
+):
+    try:
+        import httpx
+    except ImportError:
+        httpx = None
+
+    settings = settings_override or get_ai_settings()
+    timeout = float((settings or {}).get("timeout") or os.environ.get("AI_REQUEST_TIMEOUT_SECONDS") or DEFAULT_TIMEOUT_SECONDS)
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    # Use direct HTTP for schedule generation. The OpenAI SDK can keep large
+    # OpenRouter requests alive longer than expected; explicit httpx timeouts
+    # make Generate with AI fail or fall back instead of hanging indefinitely.
+    if httpx is not None:
+        if settings:
+            base_url = str(settings.get("base_url") or DEFAULT_BASE_URL).rstrip("/")
+            url = f"{base_url}/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {settings['api_key']}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://studio-scheduler.local",
+                "X-Title": "Studio Scheduler",
+            }
+            payload = {
+                "model": model,
+                "temperature": 0,
+                "max_tokens": max_tokens,
+                "messages": messages,
+            }
+            if str(settings.get("provider") or "").lower() == "deepseek":
+                payload["thinking"] = {"type": "disabled"}
+                payload["response_format"] = {"type": "json_object"}
+            http_timeout = httpx.Timeout(timeout, connect=min(10.0, timeout), read=timeout, write=min(20.0, timeout), pool=10.0)
+            max_attempts = int(os.environ.get("AI_RATE_LIMIT_RETRIES") or 3)
+            with httpx.Client(timeout=http_timeout) as http:
+                for attempt in range(max(1, max_attempts)):
+                    resp = http.post(url, headers=headers, json=payload)
+                    try:
+                        resp.raise_for_status()
+                    except Exception as exc:
+                        status_code = getattr(getattr(exc, "response", None), "status_code", None)
+                        if status_code == 429 and attempt < max_attempts - 1:
+                            retry_after = getattr(resp, "headers", {}).get("retry-after")
+                            try:
+                                sleep_seconds = float(retry_after)
+                            except (TypeError, ValueError):
+                                sleep_seconds = min(8.0, 1.5 * (attempt + 1))
+                            time.sleep(max(0.1, sleep_seconds))
+                            continue
+                        raise
+                    data = resp.json()
+                    break
+            choices = []
+            for choice in data.get("choices") or []:
+                msg = choice.get("message") or {}
+                choices.append(types.SimpleNamespace(message=types.SimpleNamespace(content=msg.get("content") or "")))
+            usage_data = data.get("usage") or {}
+            usage = types.SimpleNamespace(
+                prompt_tokens=usage_data.get("prompt_tokens", 0),
+                completion_tokens=usage_data.get("completion_tokens", 0),
+                total_tokens=usage_data.get("total_tokens", 0),
+            )
+            return types.SimpleNamespace(choices=choices, usage=usage)
+
     return client.chat.completions.create(
         model=model,
         temperature=0,
         max_tokens=max_tokens,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
+        timeout=timeout,
+        messages=messages,
     )
 
 # ---------------------------------------------------------------------------
@@ -114,7 +268,14 @@ def get_chat_reply(system_prompt: str, user_prompt: str) -> str:
     primary_settings = get_ai_settings()
     if primary_settings:
         try:
-            client = _make_client(primary_settings["api_key"])
+            client = OpenAI(
+                api_key=primary_settings["api_key"],
+                base_url=primary_settings.get("base_url") or DEFAULT_BASE_URL,
+                default_headers={
+                    "HTTP-Referer": "https://studio-scheduler.local",
+                    "X-Title": "Studio Scheduler",
+                },
+            )
             return _call_model(client, system_prompt, user_prompt, primary_settings["model"])
         except Exception as e:
             print(f"[AI] Primary model failed ({primary_settings['model']}): {e}")

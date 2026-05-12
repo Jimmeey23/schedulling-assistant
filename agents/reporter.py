@@ -627,6 +627,62 @@ class OutputReporter:
             1 for s in slots if any(kw in s["class_name"] for kw in barre_family_keywords)
         )
 
+        # ---- Production metrics: room util, peak-cluster fill, hour histogram ----
+        # Per-room minutes used (assume 13h available per active day; days with
+        # zero classes excluded so an unused day does not skew the denominator).
+        room_minutes_used: Dict[str, int] = defaultdict(int)
+        room_days_with_classes: Dict[str, Set[str]] = defaultdict(set)
+        for s in slots:
+            room_id = s.get("room") or "studio_a"
+            dur = int(s.get("duration_min") or 57)
+            day = s.get("day_of_week") or ""
+            room_minutes_used[room_id] += dur
+            if day:
+                room_days_with_classes[room_id].add(day)
+        room_utilisation = {}
+        for room_id, used in room_minutes_used.items():
+            day_count = max(1, len(room_days_with_classes[room_id]))
+            avail = day_count * 13 * 60
+            room_utilisation[room_id] = {
+                "used_min": used,
+                "avail_min": avail,
+                "pct": round(used / avail * 100.0, 1) if avail else 0.0,
+            }
+
+        # Peak-cluster parallel fill: count placements in canonical Mumbai
+        # demand clusters (08:00-08:45, 11:00-11:45, 18:00-18:45).
+        peak_windows = [("08:00", "08:45"), ("11:00", "11:45"), ("18:00", "18:45")]
+        def _in_peak(t: str) -> bool:
+            t5 = (t or "")[:5]
+            for s_, e_ in peak_windows:
+                if s_ <= t5 <= e_:
+                    return True
+            return False
+        peak_fill_count = sum(1 for s in slots if _in_peak(s.get("time", "")))
+
+        # Format mix variance (coefficient-of-variation across formats).
+        if class_counts:
+            shares = [v / total for v in class_counts.values()]
+            mean = sum(shares) / len(shares)
+            var = sum((x - mean) ** 2 for x in shares) / len(shares)
+            mix_cov = (var ** 0.5) / mean if mean else 0.0
+        else:
+            mix_cov = 0.0
+
+        # Trainer hours histogram (buckets).
+        trainer_minutes: Dict[str, int] = defaultdict(int)
+        for s in slots:
+            t = s.get("trainer_1") or ""
+            trainer_minutes[t] += int(s.get("duration_min") or 57)
+        hours_hist = {"<5h": 0, "5-10h": 0, "10-13h": 0, "13-15h": 0, ">15h": 0}
+        for mins in trainer_minutes.values():
+            h = mins / 60.0
+            if h < 5: hours_hist["<5h"] += 1
+            elif h < 10: hours_hist["5-10h"] += 1
+            elif h < 13: hours_hist["10-13h"] += 1
+            elif h <= 15: hours_hist["13-15h"] += 1
+            else: hours_hist[">15h"] += 1
+
         return {
             "total_classes": total,
             "target_schedule_score": int(target_schedule_score(location)),
@@ -645,6 +701,11 @@ class OutputReporter:
             "hard_constraint_violations": list(set(violations)),
             "soft_constraint_penalties": 0,
             "optimisation_opportunities": OPTIMISATION_OPPORTUNITIES,
+            "room_utilisation": room_utilisation,
+            "peak_cluster_fill_count": peak_fill_count,
+            "format_mix_cov": round(mix_cov, 3),
+            "trainer_hours_histogram": hours_hist,
+            "trainer_count": len(trainer_minutes),
         }
 
   def _validate_against_schedule_config(self, by_location: Dict[str, List[dict]]) -> tuple[list[str], list[str]]:

@@ -1,23 +1,29 @@
 ,4-May,,,,,,,,,,5-May,,,,,,,,,,6-May,,,,,,,,,,7-May,,,,,,,,,,8-May,,,,,,,,,,9-May,,,,,,,,,,10-May,,,,,,,,,
 ,Monday,,,,,,,,,,Tuesday,,,,,,,,,,Wednesday,,,,,,,,,,Thursday,,,,,,,,,,Friday,,,,,,,,,,Saturday,,,,,,,,,,Sunday,,,,,,,,,
 Time,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,,Class,Trainer,Room,Cap,Fill%,Hist Sessions,Hist Fill%,Hist Avg,Reason,
-08:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Atulan Purohit,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
-20:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57 Express,Pranjali Jain,Studio 1,14,20%,0,0%,0.0,,,,,,,,,,,,
+08:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio FIT,Karan Bhatia,Studio 1,14,51%,17,51%,8.7,Top trainer rejected: Pranjali,,,,,,,,,,,
+10:15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Karan Bhatia,Studio 1,14,47%,91,47%,6.6,Top trainer rejected: Rohan Da,
+17:45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Barre 57,Anmol Sharma,Studio 1,14,33%,56,33%,6.8,Top trainer rejected: Rohan Da,,,,,,,,,,,
+19:00,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Studio Mat 57,Pranjali Jain,Studio 1,14,20%,0,0%,0.0,Experimental: no historical da,,,,,,,,,,,
 
 
 === WEEKLY BREAKDOWN ===
 
 TRAINER ALLOCATION
 Trainer,Total Classes,Total Hours,Avg Fill%,Primary Classes
-Atulan Purohit,1,0.9,20%,Studio Mat 57
-Pranjali Jain,1,0.8,20%,Studio Barre 57 Express
+Anmol Sharma,1,0.9,33%,Studio Barre 57
+Karan Bhatia,2,1.9,49%,Studio FIT
+Pranjali Jain,1,0.9,20%,Studio Mat 57
 
 CLASS FORMAT ALLOCATION
 Class Format,Total Classes,Avg Fill%,Days Scheduled
-Studio Barre 57 Express,1,20%,1
+Studio Barre 57,2,40%,2
+Studio FIT,1,51%,1
 Studio Mat 57,1,20%,1
 
 TIMESLOT ALLOCATION
 Time,Mon,Tue,Wed,Thu,Fri,Sat,Sun,Total
-08:00,-,-,-,-,-,Studio Mat 57,-,1
-20:00,-,-,-,-,-,Studio Barre 57 Express,-,1
+08:45,-,-,-,-,-,Studio FIT,-,1
+10:15,-,-,-,-,-,-,Studio Barre 57,1
+17:45,-,-,-,-,-,Studio Barre 57,-,1
+19:00,-,-,-,-,-,Studio Mat 57,-,1

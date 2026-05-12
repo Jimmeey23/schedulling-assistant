@@ -37,6 +37,12 @@ MUMBAI_LOCATIONS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Courts
 BENGALURU_LOCATIONS = {"Kenkere House", "Copper & Cloves"}
 MAIN_STUDIOS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Kenkere House"}
 DERIVED_STUDIOS = {"Courtside", "Copper & Cloves"}
+DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash"
+DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-120b:free"
+DEFAULT_OPENROUTER_BACKUP_MODEL = "z-ai/glm-4.5-air:free"
+DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 
 def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
@@ -110,6 +116,796 @@ def _write_json_atomic(path: Path, payload) -> None:
     tmp.replace(path)
 
 
+def _load_optimizer_scores_context(limit: int = 80) -> dict:
+    scores_path = STATE_DIR / "03_scores.json"
+    if not scores_path.exists():
+        scores_path = OUTPUTS_DIR / "scorecard.json"
+    if not scores_path.exists():
+        return {"class_slot_ranking": []}
+    try:
+        data = json.loads(scores_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"class_slot_ranking": []}
+    rows = data.get("class_slot_ranking") or []
+    if not rows and data.get("locations"):
+        return {"scorecard": data.get("locations")}
+    compact_rows = []
+    for row in rows[:limit]:
+        compact_rows.append({
+            "location": row.get("location"),
+            "day": row.get("day_name") or row.get("day"),
+            "time": row.get("time"),
+            "class": row.get("class") or row.get("class_name"),
+            "trainer": row.get("trainer"),
+            "score": row.get("score"),
+            "fill": row.get("avg_fill_rate") or row.get("historical_avg_fill"),
+            "checkins": row.get("avg_checkin") or row.get("historical_avg_checkin"),
+            "sessions": row.get("session_count") or row.get("historical_session_count"),
+            "recommendation": row.get("recommendation"),
+        })
+    return {"class_slot_ranking": compact_rows}
+
+
+def _optimizer_history_evidence(slot: dict, scores_context: dict) -> list[str]:
+    rows = scores_context.get("class_slot_ranking") or []
+    if not rows:
+        return ["No history score rows were available to the optimiser endpoint."]
+    loc = slot.get("location")
+    day = slot.get("day_of_week") or slot.get("day")
+    time = slot.get("time")
+    class_name = slot.get("class_name") or slot.get("class")
+    trainer = slot.get("trainer_1") or slot.get("trainer")
+    exact_matches = []
+    for row in rows:
+        if (
+            (not loc or row.get("location") == loc)
+            and (not day or row.get("day") == day)
+            and (not time or row.get("time") == time)
+            and (not class_name or row.get("class") == class_name)
+            and (not trainer or row.get("trainer") == trainer)
+        ):
+            exact_matches.append(row)
+    exact_matches.sort(key=lambda row: -(float(row.get("score") or 0)))
+    if not exact_matches:
+        fill = slot.get("predicted_fill_rate")
+        score = slot.get("score")
+        fill_text = f"{float(fill):.0%}" if isinstance(fill, (int, float)) else "n/a"
+        return [
+            f"No exact historical evidence found for this class/trainer/day/time. Current slot metrics: projected fill {fill_text}, optimiser score {score if score is not None else 'n/a'}."
+        ]
+    row = exact_matches[0]
+    fill = row.get("fill")
+    fill_text = f"{float(fill):.0%}" if isinstance(fill, (int, float)) else "n/a"
+    return [
+        "history checked: "
+        f"{row.get('class') or class_name} with {row.get('trainer') or trainer} at "
+        f"{row.get('location') or loc} {row.get('day') or day} {row.get('time') or time}; "
+        f"score {row.get('score', 'n/a')}, fill {fill_text}, "
+        f"check-ins {row.get('checkins', 'n/a')}, sessions {row.get('sessions', 'n/a')}."
+    ]
+
+
+def _normalise_ai_add_slot(op: dict) -> dict:
+    slot = dict(op.get("slot") or {})
+    for key in ("location", "date", "day_of_week", "time", "class_name", "trainer_1", "room", "duration_min", "level", "class_level"):
+        if not slot.get(key) and op.get(key) is not None:
+            slot[key] = op.get(key)
+    return slot
+
+
+def _slot_metric_text(slot: dict) -> str:
+    fill = slot.get("predicted_fill_rate")
+    score = slot.get("score")
+    parts = []
+    if isinstance(fill, (int, float)):
+        parts.append(f"projected fill {float(fill):.0%}")
+    if score is not None:
+        parts.append(f"score {score}")
+    return ", ".join(parts) if parts else "no current metric fields"
+
+
+def _exact_history_rows(slot: dict, scores_context: dict, *, ignore_trainer: bool = False) -> list[dict]:
+    rows = scores_context.get("class_slot_ranking") or []
+    loc = slot.get("location")
+    day = slot.get("day_of_week") or slot.get("day")
+    time = slot.get("time")
+    class_name = slot.get("class_name") or slot.get("class")
+    trainer = slot.get("trainer_1") or slot.get("trainer")
+    matches = []
+    for row in rows:
+        if (
+            (not loc or row.get("location") == loc)
+            and (not day or row.get("day") == day)
+            and (not time or row.get("time") == time)
+            and (not class_name or row.get("class") == class_name)
+            and (ignore_trainer or not trainer or row.get("trainer") == trainer)
+        ):
+            matches.append(row)
+    return matches
+
+
+def _history_is_bad_over_time(slot: dict, scores_context: dict) -> bool:
+    rows = _exact_history_rows(slot, scores_context) or _exact_history_rows(slot, scores_context, ignore_trainer=True)
+    if not rows:
+        return False
+    total_sessions = sum(int(row.get("sessions") or row.get("session_count") or 0) for row in rows)
+    if total_sessions < 4:
+        return False
+    weighted_fill = 0.0
+    weighted_checkins = 0.0
+    for row in rows:
+        sessions = int(row.get("sessions") or row.get("session_count") or 0)
+        weighted_fill += float(row.get("fill") or row.get("avg_fill_rate") or 0) * sessions
+        weighted_checkins += float(row.get("checkins") or row.get("avg_checkin") or 0) * sessions
+    avg_fill = weighted_fill / total_sessions if total_sessions else 0.0
+    avg_checkins = weighted_checkins / total_sessions if total_sessions else 0.0
+    return avg_fill < 0.30 or avg_checkins < 4.0
+
+
+def _history_strength(slot: dict, scores_context: dict) -> dict | None:
+    rows = _exact_history_rows(slot, scores_context)
+    if not rows:
+        return None
+    total_sessions = sum(int(row.get("sessions") or row.get("session_count") or 0) for row in rows)
+    if total_sessions < 3:
+        return None
+    weighted_fill = sum(float(row.get("fill") or row.get("avg_fill_rate") or 0) * int(row.get("sessions") or row.get("session_count") or 0) for row in rows)
+    weighted_checkins = sum(float(row.get("checkins") or row.get("avg_checkin") or 0) * int(row.get("sessions") or row.get("session_count") or 0) for row in rows)
+    best_score = max(float(row.get("score") or 0) for row in rows)
+    return {
+        "sessions": total_sessions,
+        "fill": weighted_fill / total_sessions if total_sessions else 0.0,
+        "checkins": weighted_checkins / total_sessions if total_sessions else 0.0,
+        "score": best_score,
+    }
+
+
+def _candidate_has_stronger_history(before: dict, after: dict, scores_context: dict) -> bool:
+    after_hist = _history_strength(after, scores_context)
+    if not after_hist:
+        return False
+    before_hist = _history_strength(before, scores_context)
+    before_fill = before_hist["fill"] if before_hist else float(before.get("predicted_fill_rate") or 0)
+    before_score = before_hist["score"] if before_hist else float(before.get("score") or 0)
+    return after_hist["fill"] >= before_fill + 0.05 or after_hist["score"] >= before_score + 10
+
+
+def _has_direct_room_conflict(slot: dict, locations: dict) -> bool:
+    room = slot.get("room")
+    if not room:
+        return False
+    loc = slot.get("location")
+    day = slot.get("day_of_week")
+    time = slot.get("time")
+    for row in locations.get(loc, []) or []:
+        if row is slot:
+            continue
+        if (
+            row.get("room") == room
+            and row.get("day_of_week") == day
+            and row.get("time") == time
+            and not _same_schedule_slot(row, slot)
+        ):
+            return True
+    return False
+
+
+def _all_iteration_rows(schedule_data: dict, iteration: str) -> list[dict]:
+    rows = []
+    if iteration == "Main":
+        source = schedule_data.get("locations") or {}
+    else:
+        source = ((schedule_data.get("iterations") or {}).get(iteration) or {})
+    for loc_rows in source.values():
+        rows.extend(loc_rows or [])
+    return rows
+
+
+def _validate_ai_trainer_distribution(schedule_data: dict, iteration: str, slot: dict, original: dict | None = None) -> None:
+    trainer = slot.get("trainer_1")
+    if not trainer:
+        return
+    rows = [row for row in _all_iteration_rows(schedule_data, iteration) if not (original and row is original)]
+    trainer_rows = [row for row in rows if (row.get("trainer_1") or "") == trainer]
+    day_locations = {row.get("location") for row in trainer_rows if row.get("day_of_week") == slot.get("day_of_week") and row.get("location")}
+    if day_locations and slot.get("location") not in day_locations:
+        raise ValueError(f"{trainer} cannot be scheduled in more than one studio on {slot.get('day_of_week')}")
+    assigned_days = {row.get("day_of_week") for row in trainer_rows if row.get("day_of_week")}
+    assigned_days.add(slot.get("day_of_week"))
+    if len(assigned_days) > 5:
+        raise ValueError(f"{trainer} must keep at least 2 days off per week")
+
+
+def _trainer_load_context(schedule_data: dict, iteration: str, profiles: list[dict]) -> list[dict]:
+    rows = _all_iteration_rows(schedule_data, iteration)
+    tiers = {p.get("name"): p.get("tier") for p in profiles if p.get("name")}
+    result = []
+    for trainer in sorted({row.get("trainer_1") for row in rows if row.get("trainer_1")}):
+        trainer_rows = [row for row in rows if row.get("trainer_1") == trainer]
+        days = sorted({row.get("day_of_week") for row in trainer_rows if row.get("day_of_week")})
+        locations_by_day = {}
+        for row in trainer_rows:
+            day = row.get("day_of_week")
+            if not day:
+                continue
+            locations_by_day.setdefault(day, set()).add(row.get("location"))
+        result.append({
+            "trainer": trainer,
+            "tier": tiers.get(trainer),
+            "weekly_hours": round(sum(_slot_duration(row) for row in trainer_rows) / 60, 2),
+            "assigned_days": days,
+            "days_off_count": max(0, 7 - len(days)),
+            "multi_location_days": sorted(day for day, locs in locations_by_day.items() if len({loc for loc in locs if loc}) > 1),
+        })
+    return result
+
+
+def _peak_utilisation_context(schedule_data: dict, iteration: str) -> list[dict]:
+    rows = _all_iteration_rows(schedule_data, iteration)
+    peaks = [("08:00", "10:00"), ("11:00", "12:00"), ("18:00", "19:30")]
+    result = []
+    for row in rows:
+        start = _slot_minutes(row.get("time") or "00:00")
+        if not any(_slot_minutes(lo) <= start <= _slot_minutes(hi) for lo, hi in peaks):
+            continue
+        same_start = [
+            other for other in rows
+            if other.get("location") == row.get("location")
+            and other.get("day_of_week") == row.get("day_of_week")
+            and other.get("time") == row.get("time")
+        ]
+        rooms = sorted({other.get("room") for other in same_start if other.get("room")})
+        result.append({
+            "location": row.get("location"),
+            "day": row.get("day_of_week"),
+            "time": row.get("time"),
+            "parallel_classes": len(same_start),
+            "rooms_used": rooms,
+        })
+    return result[:80]
+
+
+def _server_change_reason(op_type: str, before: dict, after: dict, ai_reason: str) -> str:
+    if op_type == "remove_class":
+        return (
+            f"Removed {before.get('class_name', 'class')} at {before.get('day_of_week', '?')} {before.get('time', '?')} "
+            f"because the AI explicitly marked this as safe to delete and current slot metrics are weak ({_slot_metric_text(before)})."
+        )
+    if op_type == "add_class":
+        return (
+            f"Added {after.get('class_name', 'class')} at {after.get('day_of_week', '?')} {after.get('time', '?')} "
+            f"with {after.get('trainer_1', 'trainer')} to fill an available schedule opportunity after validation."
+        )
+    if op_type in {"move_class", "change_time"}:
+        return (
+            f"Moved {before.get('class_name', 'class')} from {before.get('day_of_week', '?')} {before.get('time', '?')} "
+            f"to {after.get('day_of_week', '?')} {after.get('time', '?')} after validating trainer availability and conflicts."
+        )
+    if op_type == "change_class":
+        return (
+            f"Changed class format from {before.get('class_name', '?')} to {after.get('class_name', '?')} "
+            f"at {after.get('day_of_week', '?')} {after.get('time', '?')} after validating the assigned trainer and studio constraints. Check the evidence line below for whether exact historical support exists."
+        )
+    if op_type == "swap_trainer":
+        return (
+            f"Changed trainer from {before.get('trainer_1', '?')} to {after.get('trainer_1', '?')} "
+            f"for {after.get('class_name', 'class')} after validating trainer availability, location rules, and load caps."
+        )
+    if op_type == "change_level":
+        return (
+            f"Changed level from {before.get('class_level') or before.get('level') or '?'} to {after.get('class_level') or after.get('level') or '?'} "
+            f"for {after.get('class_name', 'class')}."
+        )
+    return ai_reason or "AI optimisation change."
+
+
+def _optimizer_rule_evidence(settings_options: dict, schedule_config: dict) -> list[str]:
+    custom_rules = schedule_config.get("custom_rules") or []
+    manual_protected = schedule_config.get("manual_protected") or []
+    manual_excluded = schedule_config.get("manual_excluded") or []
+    return [
+        "Validated against trainer/studio constraints: active profile, enabled studio, availability, overlaps, shift/location lock, daily max, weekly cap.",
+        f"Rules context loaded: {len(custom_rules)} custom, {len(manual_protected)} protected, {len(manual_excluded)} excluded.",
+    ]
+
+
+def _parse_optimizer_ai_json(content: str) -> dict:
+    text = str(content or "").strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    try:
+        return json.loads(text or "{}")
+    except json.JSONDecodeError as exc:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            candidate = text[start:end + 1]
+            try:
+                return json.loads(candidate)
+            except json.JSONDecodeError:
+                pass
+        if text.count("{") > text.count("}") or text.count("[") > text.count("]"):
+            raise ValueError("AI response appears truncated before valid JSON completed. Try again with a narrower location scope.") from exc
+        raise ValueError(str(exc)) from exc
+
+
+def _slot_from_meta(meta: dict, locations: dict) -> dict:
+    slot = meta.get("slot")
+    if slot is not None:
+        return slot
+    return locations.get(meta["loc"], [])[meta["schedule_index"]]
+
+
+def _remove_meta_slot(meta: dict, locations: dict) -> dict:
+    rows = locations.get(meta["loc"], [])
+    slot = meta.get("slot")
+    if slot in rows:
+        rows.remove(slot)
+        return slot
+    idx = meta.get("schedule_index")
+    if isinstance(idx, int) and 0 <= idx < len(rows):
+        return rows.pop(idx)
+    raise ValueError("Slot index out of range")
+
+
+def _apply_ai_schedule_operations(schedule_data: dict, operations: list, compact: list, valid_trainers: set, iteration: str, scores_context: dict, schedule_config: dict) -> tuple[list, list]:
+    applied, rejected = [], []
+    slot_index = {s["id"]: s for s in compact}
+    rule_notes = _optimizer_rule_evidence(schedule_config.get("settings_options") or {}, schedule_config)
+    locations = schedule_data.get("locations") or {}
+
+    def reject(op, message):
+        rejected.append({
+            "type": op.get("type"),
+            "message": message,
+            "reason": op.get("reason") or message,
+            "validation": ["Rejected by server validation.", message],
+        })
+
+    def validate(slot, original=None):
+        _validate_ai_trainer_distribution(schedule_data, iteration, slot, original=original)
+        if slot.get("location") in (MUMBAI_LOCATIONS | BENGALURU_LOCATIONS):
+            _validate_manual_slot(schedule_data, iteration, slot, original_slot=original)
+
+    for op in operations:
+        op_type = op.get("type")
+        slot_id = str(op.get("id") or "").strip()
+        reason = op.get("reason") or "AI optimisation change."
+        meta = slot_index.get(slot_id) if slot_id else None
+        try:
+            if op_type == "add_class":
+                new_slot = _normalise_ai_add_slot(op)
+                missing = [k for k in ("location", "day_of_week", "time", "class_name", "trainer_1") if not new_slot.get(k)]
+                if missing:
+                    reject(op, f"Missing slot field(s): {', '.join(missing)}")
+                    continue
+                if valid_trainers and new_slot.get("trainer_1") not in valid_trainers:
+                    reject(op, f"Trainer '{new_slot.get('trainer_1')}' not in roster")
+                    continue
+                new_slot.setdefault("recommendation", "AI_OPTIMIZED")
+                new_slot["ai_added"] = True
+                new_slot["ai_optimized"] = True
+                new_slot["scheduling_reason"] = reason
+                validate(new_slot)
+                locations.setdefault(new_slot["location"], []).append(new_slot)
+                applied.append({
+                    "type": op_type,
+                    "before": {},
+                    "after": dict(new_slot),
+                    "reason": _server_change_reason(op_type, {}, new_slot, reason),
+                    "validation": ["Server validation passed for add_class.", *rule_notes],
+                    "evidence": _optimizer_history_evidence(new_slot, scores_context),
+                })
+                continue
+
+            if not meta:
+                reject(op, f"Unknown slot id {slot_id}")
+                continue
+            current = _slot_from_meta(meta, locations)
+            before = dict(current)
+
+            if op_type == "swap_trainer":
+                new_trainer = op.get("new_trainer")
+                if not new_trainer:
+                    reject(op, "Missing new_trainer")
+                    continue
+                if valid_trainers and new_trainer not in valid_trainers:
+                    reject(op, f"Trainer '{new_trainer}' not in roster")
+                    continue
+                candidate = dict(current)
+                candidate["trainer_1"] = new_trainer
+                candidate["ai_optimized"] = True
+                candidate["scheduling_reason"] = reason
+                validate(candidate, original=current)
+                current.update(candidate)
+            elif op_type == "remove_class":
+                if not (op.get("allow_delete") is True or op.get("confirm_delete") is True):
+                    reject(op, "Deletion not applied: remove_class requires allow_delete=true. Use change_class, change_time, or move_class when replacing a weak slot.")
+                    continue
+                if not (_history_is_bad_over_time(current, scores_context) or _has_direct_room_conflict(current, locations)):
+                    reject(op, "Deletion not applied: class can only be deleted when exact historical class average/fill is weak over time or a direct studio/room conflict is detected.")
+                    continue
+                _remove_meta_slot(meta, locations)
+            elif op_type in {"move_class", "change_time"}:
+                target = op.get("target") or {}
+                candidate = dict(current)
+                candidate.update({
+                    "location": target.get("location") or candidate.get("location"),
+                    "date": target.get("date", candidate.get("date", "")),
+                    "day_of_week": target.get("day_of_week") or target.get("day") or candidate.get("day_of_week"),
+                    "time": target.get("time") or op.get("new_time") or candidate.get("time"),
+                    "ai_optimized": True,
+                    "ai_moved": True,
+                    "scheduling_reason": reason,
+                })
+                if not _candidate_has_stronger_history(current, candidate, scores_context):
+                    reject(op, "Change not applied: proposed time/location does not have exact stronger historical evidence than the current slot.")
+                    continue
+                validate(candidate, original=current)
+                _remove_meta_slot(meta, locations)
+                locations.setdefault(candidate["location"], []).append(candidate)
+                meta["slot"] = candidate
+                meta["loc"] = candidate["location"]
+                current = candidate
+            elif op_type == "change_class":
+                new_class = op.get("new_class") or (op.get("slot") or {}).get("class_name")
+                if not new_class:
+                    reject(op, "Missing new_class")
+                    continue
+                candidate = dict(current)
+                candidate["class_name"] = new_class
+                candidate["ai_optimized"] = True
+                candidate["scheduling_reason"] = reason
+                if not _candidate_has_stronger_history(current, candidate, scores_context):
+                    reject(op, "Change not applied: proposed class format does not have exact stronger historical evidence than the current slot.")
+                    continue
+                validate(candidate, original=current)
+                current.update(candidate)
+            elif op_type == "change_level":
+                new_level = op.get("new_level") or op.get("level")
+                if not new_level:
+                    reject(op, "Missing new_level")
+                    continue
+                current["level"] = new_level
+                current["class_level"] = new_level
+                current["ai_optimized"] = True
+                current["scheduling_reason"] = reason
+            else:
+                reject(op, "Unsupported or incomplete operation")
+                continue
+
+            after = dict(current)
+            applied.append({
+                "type": op_type,
+                "before": before,
+                "after": after,
+                "reason": _server_change_reason(op_type, before, after, reason),
+                "validation": [f"Server validation passed for {op_type}.", *rule_notes],
+                "evidence": _optimizer_history_evidence(after if op_type != "remove_class" else before, scores_context),
+            })
+        except Exception as exc:
+            reject(op, str(exc))
+    return applied, rejected
+
+
+def _deterministic_fallback_operations(compact: list, scores_context: dict, valid_trainers: set) -> list[dict]:
+    rows = scores_context.get("class_slot_ranking") or []
+    operations = []
+    for meta in sorted(compact, key=lambda item: (float(item.get("fill") or 0), float(item.get("score") or 0))):
+        slot = meta.get("slot") or {}
+        current_trainer = slot.get("trainer_1")
+        current_score = float(slot.get("score") or 0)
+        current_fill = float(slot.get("predicted_fill_rate") or 0)
+        candidates = []
+        for row in rows:
+            if (
+                row.get("location") == slot.get("location")
+                and row.get("day") == slot.get("day_of_week")
+                and row.get("time") == slot.get("time")
+                and row.get("class") == slot.get("class_name")
+                and row.get("trainer")
+                and row.get("trainer") != current_trainer
+                and (not valid_trainers or row.get("trainer") in valid_trainers)
+            ):
+                score = float(row.get("score") or 0)
+                fill = float(row.get("fill") or 0)
+                sessions = int(row.get("sessions") or 0)
+                if sessions >= 3 and (score >= current_score + 10 or fill >= current_fill + 0.05):
+                    candidates.append((score, fill, row))
+        candidates.sort(key=lambda item: (-item[0], -item[1]))
+        if candidates:
+            row = candidates[0][2]
+            operations.append({
+                "type": "swap_trainer",
+                "id": meta["id"],
+                "new_trainer": row.get("trainer"),
+                "reason": (
+                    "Deterministic fallback: exact historical trainer-slot evidence "
+                    f"score {row.get('score')}, fill {float(row.get('fill') or 0):.0%}, sessions {row.get('sessions')}."
+                ),
+            })
+        if len(operations) >= 3:
+            break
+    return operations
+
+
+def _run_optimize_with_ai(payload: dict) -> dict:
+    """Synchronous Optimize-with-AI endpoint. Uses DeepSeek by default."""
+    import os
+    schedule_path = WEB_DIR / "schedule_data.json"
+    if not schedule_path.exists():
+        return {"ok": False, "error": "No active schedule found. Generate one first."}
+
+    cfg_path = _schedule_config_path()
+    schedule_config = {}
+    settings_options = {}
+    if cfg_path.exists():
+        try:
+            schedule_config = json.loads(cfg_path.read_text())
+            settings_options = (schedule_config.get("settings_options") or {})
+        except Exception:
+            schedule_config = {}
+            settings_options = {}
+
+    api_key = (
+        str(payload.get("api_key") or "").strip()
+        or str(settings_options.get("ai_optimize_api_key") or "").strip()
+        or str(settings_options.get("deepseek_api_key") or "").strip()
+        or str(settings_options.get("ai_api_key") or "").strip()
+        or os.environ.get("DEEPSEEK_API_KEY")
+        or os.environ.get("OPENAI_API_KEY")
+        or os.environ.get("OPENROUTER_API_KEY")
+        or ""
+    )
+    if not api_key:
+        return {"ok": False, "error": "Add a DeepSeek API Key in Settings → AI Generation."}
+
+    model = str(
+        settings_options.get("ai_optimize_model")
+        or settings_options.get("deepseek_model")
+        or DEFAULT_DEEPSEEK_MODEL
+    ).strip()
+    base_url = str(
+        settings_options.get("ai_optimize_base_url")
+        or settings_options.get("deepseek_base_url")
+        or DEFAULT_DEEPSEEK_BASE_URL
+    ).strip().rstrip("/")
+
+    try:
+        schedule_data = json.loads(schedule_path.read_text())
+    except Exception as exc:
+        return {"ok": False, "error": f"Schedule file unreadable: {exc}"}
+
+    location_filter = str(payload.get("location") or "").strip()
+    locations = schedule_data.get("locations") or {}
+    if not locations:
+        return {"ok": False, "error": "Active schedule has no locations."}
+
+    # Build compact slot list (only essentials)
+    compact = []
+    for loc_name, slots in locations.items():
+        if location_filter and loc_name != location_filter:
+            continue
+        for i, s in enumerate(slots):
+            slot_id = str(len(compact) + 1)
+            compact.append({
+                "id": slot_id,
+                "schedule_index": i,
+                "slot": s,
+                "loc": loc_name,
+                "day": s.get("day_of_week"),
+                "time": s.get("time"),
+                "class": s.get("class_name"),
+                "trainer": s.get("trainer_1"),
+                "fill": round(float(s.get("predicted_fill_rate") or 0), 2),
+                "score": round(float(s.get("score") or 0), 1),
+            })
+    if not compact:
+        return {"ok": False, "error": "No slots matched the requested scope."}
+
+    scores_context = _load_optimizer_scores_context()
+
+    # Trainer roster summary
+    profiles_path = _trainer_profiles_path()
+    trainer_summary = []
+    try:
+        profiles = json.loads(profiles_path.read_text())
+        for p in profiles[:60]:
+            name = p.get("name")
+            tier = p.get("tier")
+            quals = [k for k, v in (p.get("qualifications") or {}).items() if v]
+            if name:
+                trainer_summary.append(f"T{tier} {name} | {','.join(quals[:6])}")
+    except Exception:
+        pass
+
+    iteration = str(payload.get("iteration") or "Main")
+    trainer_load_context = _trainer_load_context(schedule_data, iteration, profiles if 'profiles' in locals() else [])
+    peak_context = _peak_utilisation_context(schedule_data, iteration)
+
+    system_prompt = (
+        "You optimise a studio fitness weekly schedule. Return JSON only. "
+        "Propose up to 6 high-impact operations that raise predicted fill rate, improve class mix, fix weak slots, or satisfy rules. "
+        'Schema: {"summary":"...","operations":[{"type":"swap_trainer|add_class|remove_class|move_class|change_time|change_class|change_level","id":"<slot id for existing-slot ops>","new_trainer":"<name>","new_class":"<class>","new_time":"HH:MM","new_level":"<level>","target":{"location":"...","day_of_week":"...","time":"HH:MM"},"slot":{"location":"...","day_of_week":"...","time":"HH:MM","class_name":"...","trainer_1":"..."},"reason":"specific rule/history justification"}]} '
+        "Use swap_trainer for trainer changes, add_class for new schedule rows, remove_class for removals, move_class/change_time for timing changes, change_class for format changes, and change_level for level changes. "
+        "Prefer change_class or move_class/change_time when replacing a weak class. Do not use remove_class unless the class should truly disappear from the schedule; if deleting is intentional, set allow_delete true and explain why no replacement is needed. "
+        "Hard delete rule: delete only when exact class/trainer/day/time history is weak over time, or when there is a direct same-room/studio conflict. If the issue is a trainer conflict, use swap_trainer instead of deleting. "
+        "Hard change rule: change_class, change_time, and move_class require exact stronger historical evidence for the proposed after-state than the current slot. Do not propose cosmetic 15-minute moves without evidence. "
+        "Trainer optimisation goals: move Tier 1 trainers closer to 15 weekly hours where constraints allow; every trainer must retain at least 2 days with no assignments; do not schedule a trainer in more than one studio on the same day or shift. "
+        "Peak utilisation goal: during 08:00-10:00, 11:00-12:00, and 18:00-19:30, add validated parallel classes where rooms and trainer constraints allow. "
+        "For add_class, put full required fields inside slot: location, day_of_week, time, class_name, trainer_1. "
+        "Use the exact numeric string from each slot's id field for existing-slot operations. "
+        "Do not invent ids and do not use row numbers outside the provided id field. Use exact trainer names from the roster. "
+        "Never assign a trainer not in the roster. Every operation reason must cite at least one of: historic data, universal rules, studio/trainer custom rules, class mix, trainer qualification, or schedule conflict."
+    )
+    user_prompt = (
+        "Active schedule slots JSON. Use only the id value exactly as shown:\n"
+        + json.dumps([
+            {
+                "id": s["id"],
+                "location": s["loc"],
+                "day": s["day"],
+                "time": s["time"],
+                "class": s["class"],
+                "trainer": s["trainer"],
+                "fill": s["fill"],
+                "score": s["score"],
+            }
+            for s in compact
+        ], ensure_ascii=False)
+        + "\n\nTrainer roster:\n"
+        + "\n".join(trainer_summary)
+        + "\n\nSaved schedule rules/config JSON:\n"
+        + json.dumps({
+            "targets": schedule_config.get("targets", {}),
+            "custom_rules": schedule_config.get("custom_rules", []),
+            "manual_protected": schedule_config.get("manual_protected", []),
+            "manual_excluded": schedule_config.get("manual_excluded", []),
+        }, ensure_ascii=False)[:12000]
+        + "\n\nHistoric score context JSON:\n"
+        + json.dumps(scores_context, ensure_ascii=False)[:18000]
+        + "\n\nTrainer load context JSON:\n"
+        + json.dumps(trainer_load_context, ensure_ascii=False)[:12000]
+        + "\n\nPeak slot utilisation context JSON:\n"
+        + json.dumps(peak_context, ensure_ascii=False)[:8000]
+        + "\n\nReturn JSON object only."
+    )
+
+    try:
+        import httpx
+    except ImportError:
+        return {"ok": False, "error": "httpx not installed on server"}
+
+    url = f"{base_url}/chat/completions"
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    body = {
+        "model": model,
+        "temperature": 0,
+        "max_tokens": int(settings_options.get("ai_optimize_max_tokens") or 4000),
+        "response_format": {"type": "json_object"},
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    }
+    if "deepseek" in base_url.lower() or str(model).startswith("deepseek-"):
+        body["thinking"] = {"type": "disabled"}
+    try:
+        with httpx.Client(timeout=httpx.Timeout(60.0, connect=10.0)) as http:
+            resp = http.post(url, headers=headers, json=body)
+            if resp.status_code >= 400:
+                return {"ok": False, "error": f"AI provider {resp.status_code}: {resp.text[:300]}"}
+            data = resp.json()
+    except httpx.TimeoutException:
+        return {"ok": False, "error": "Optimize AI request timed out after 60s. Try again or shorten scope."}
+    except Exception as exc:
+        return {"ok": False, "error": f"Optimize call failed: {exc}"}
+
+    try:
+        content = (data.get("choices") or [{}])[0].get("message", {}).get("content") or "{}"
+        parsed = _parse_optimizer_ai_json(content)
+    except Exception as exc:
+        return {"ok": False, "error": f"Could not parse AI response: {exc}"}
+
+    valid_trainers = {p.get("name") for p in (profiles if 'profiles' in locals() else []) if p.get("name")}
+    operations = parsed.get("operations") or []
+    applied, rejected = _apply_ai_schedule_operations(
+        schedule_data,
+        operations,
+        compact,
+        valid_trainers,
+        iteration,
+        scores_context,
+        schedule_config,
+    )
+    if operations and not applied and rejected:
+        retry_body = dict(body)
+        rejection_feedback = [
+            {
+                "type": item.get("type"),
+                "reason": item.get("message") or item.get("reason"),
+            }
+            for item in rejected[:8]
+        ]
+        retry_body["messages"] = [
+            *body["messages"],
+            {
+                "role": "user",
+                "content": (
+                    "Previous operations were all rejected by server validation. "
+                    "Return a new JSON object with only operations that avoid these rejection reasons. "
+                    "Prefer safe trainer swaps or peak add_class operations with trainers who have no overlap, no same-day cross-studio assignment, and at least 2 days off. "
+                    "Do not repeat any operation shape that was rejected.\n"
+                    + json.dumps(rejection_feedback, ensure_ascii=False)
+                ),
+            },
+        ]
+        try:
+            with httpx.Client(timeout=httpx.Timeout(60.0, connect=10.0)) as http:
+                retry_resp = http.post(url, headers=headers, json=retry_body)
+                if retry_resp.status_code < 400:
+                    retry_data = retry_resp.json()
+                    retry_content = (retry_data.get("choices") or [{}])[0].get("message", {}).get("content") or "{}"
+                    retry_parsed = _parse_optimizer_ai_json(retry_content)
+                    retry_operations = retry_parsed.get("operations") or []
+                    retry_applied, retry_rejected = _apply_ai_schedule_operations(
+                        schedule_data,
+                        retry_operations,
+                        compact,
+                        valid_trainers,
+                        iteration,
+                        scores_context,
+                        schedule_config,
+                    )
+                    if retry_applied:
+                        parsed = retry_parsed
+                        operations = retry_operations
+                        applied = retry_applied
+                        rejected = rejected + retry_rejected
+        except Exception:
+            pass
+    if operations and not applied and rejected:
+        fallback_operations = _deterministic_fallback_operations(compact, scores_context, valid_trainers)
+        if fallback_operations:
+            fallback_applied, fallback_rejected = _apply_ai_schedule_operations(
+                schedule_data,
+                fallback_operations,
+                compact,
+                valid_trainers,
+                iteration,
+                scores_context,
+                schedule_config,
+            )
+            if fallback_applied:
+                parsed = {"summary": "Deterministic fallback applied exact-history trainer swap(s)."}
+                operations = fallback_operations
+                applied = fallback_applied
+                rejected = rejected + fallback_rejected
+
+    if applied:
+        _write_json_atomic(schedule_path, schedule_data)
+
+    summary = parsed.get("summary") or f"Applied {len(applied)} schedule change(s)."
+    return {
+        "ok": True,
+        "applied": applied,
+        "rejected": rejected,
+        "applied_count": len(applied),
+        "rejected_count": len(rejected),
+        "summary": summary,
+        "model": model,
+    }
+
+
+def _optimize_schedule_request(payload: dict) -> dict:
+    return _run_optimize_with_ai(payload)
+
+
 def _trainer_profiles_path() -> Path:
     if TRAINER_PROFILES_PATH != DEFAULT_TRAINER_PROFILES_PATH:
         return TRAINER_PROFILES_PATH
@@ -129,10 +925,35 @@ def _normalize_pipeline_week(value: str | None, default_week: str) -> str:
 def _saved_ai_api_key() -> str:
     try:
         data = json.loads(_schedule_config_path().read_text())
+        settings = data.get("settings_options") or {}
+        cfg_key = str(settings.get("ai_api_key") or "").strip()
+        if cfg_key:
+            return cfg_key
     except Exception:
-        return ""
-    settings = data.get("settings_options") or {}
-    return str(settings.get("ai_api_key") or "").strip()
+        pass
+    try:
+        from ai_provider import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+    return (os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY") or "").strip()
+
+
+def _saved_deepseek_api_key() -> str:
+    try:
+        data = json.loads(_schedule_config_path().read_text())
+        settings = data.get("settings_options") or {}
+        cfg_key = str(settings.get("deepseek_api_key") or "").strip()
+        if cfg_key:
+            return cfg_key
+    except Exception:
+        pass
+    try:
+        from ai_provider import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+    return (os.environ.get("DEEPSEEK_API_KEY") or "").strip()
 
 
 def _saved_ai_runtime_settings() -> dict:
@@ -142,19 +963,27 @@ def _saved_ai_runtime_settings() -> dict:
         return {}
     settings = data.get("settings_options") or {}
     return {
-        "provider": str(settings.get("ai_provider") or "openrouter").strip().lower(),
-        "model": str(settings.get("ai_model") or "").strip(),
-        "backup_model": str(settings.get("ai_backup_model") or "z-ai/glm-4.5-air:free").strip(),
+        "provider": str(settings.get("ai_provider") or "deepseek").strip().lower(),
+        "model": str(settings.get("ai_model") or DEFAULT_OPENROUTER_MODEL).strip(),
+        "backup_model": str(settings.get("ai_backup_model") or DEFAULT_OPENROUTER_BACKUP_MODEL).strip(),
         "base_url": str(settings.get("ai_base_url") or "").strip(),
+        "deepseek_model": str(settings.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip(),
+        "deepseek_base_url": str(settings.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).strip(),
+        "deepseek_api_key": _saved_deepseek_api_key(),
     }
 
 
-def _inject_ai_key_env(child_env: dict, api_key: str) -> None:
+def _inject_ai_key_env(child_env: dict, api_key: str, provider: str = "openrouter") -> None:
     key = str(api_key or "").strip()
     if not key:
         return
-    child_env["OPENROUTER_API_KEY"] = key
-    child_env["OPENAI_API_KEY"] = key
+    provider = str(provider or "openrouter").strip().lower()
+    if provider == "deepseek":
+        child_env["DEEPSEEK_API_KEY"] = key
+    elif provider == "openai":
+        child_env["OPENAI_API_KEY"] = key
+    else:
+        child_env["OPENROUTER_API_KEY"] = key
 
 
 def _inject_ai_runtime_env(child_env: dict, runtime: dict) -> None:
@@ -162,10 +991,21 @@ def _inject_ai_runtime_env(child_env: dict, runtime: dict) -> None:
     model = str(runtime.get("model") or "").strip()
     backup_model = str(runtime.get("backup_model") or "").strip()
     base_url = str(runtime.get("base_url") or "").strip()
+    deepseek_model = str(runtime.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip()
+    deepseek_base_url = str(runtime.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).strip()
     if backup_model:
         child_env["AI_BACKUP_MODEL"] = backup_model
         child_env["OPENROUTER_BACKUP_MODEL"] = backup_model
-    if provider == "openai":
+    if provider == "deepseek":
+        child_env["DEEPSEEK_MODEL"] = deepseek_model or DEFAULT_DEEPSEEK_MODEL
+        child_env["DEEPSEEK_BASE_URL"] = deepseek_base_url or DEFAULT_DEEPSEEK_BASE_URL
+        if model:
+            child_env["OPENROUTER_MODEL"] = model
+        if base_url:
+            child_env["OPENROUTER_BASE_URL"] = base_url
+        elif model:
+            child_env["OPENROUTER_BASE_URL"] = DEFAULT_OPENROUTER_BASE_URL
+    elif provider == "openai":
         if model:
             child_env["OPENAI_MODEL"] = model
         if base_url:
@@ -194,22 +1034,48 @@ def _resolve_pipeline_request_options(payload: dict | None, default_week: str) -
     use_ai = _request_bool(payload.get("use_ai"))
     child_env = os.environ.copy()
     child_env["PIPELINE_WEEK"] = week
+    child_env["PYTHONUNBUFFERED"] = "1"
 
     if use_ai:
         api_key = str(payload.get("api_key") or "").strip() or _saved_ai_api_key()
+        deepseek_api_key = (
+            str(payload.get("deepseek_api_key") or "").strip()
+            or _saved_deepseek_api_key()
+        )
         runtime = _saved_ai_runtime_settings()
         payload_provider = str(payload.get("ai_provider") or "").strip().lower()
         payload_model = str(payload.get("ai_model") or "").strip()
         payload_base_url = str(payload.get("ai_base_url") or "").strip()
+        payload_backup_model = str(payload.get("ai_backup_model") or "").strip()
+        payload_deepseek_model = str(payload.get("deepseek_model") or "").strip()
+        payload_deepseek_base_url = str(payload.get("deepseek_base_url") or "").strip()
         if payload_provider:
             runtime["provider"] = payload_provider
+        elif deepseek_api_key:
+            runtime["provider"] = "deepseek"
         if payload_model:
             runtime["model"] = payload_model
         if payload_base_url:
             runtime["base_url"] = payload_base_url
+        if payload_backup_model:
+            runtime["backup_model"] = payload_backup_model
+        if payload_deepseek_model:
+            runtime["deepseek_model"] = payload_deepseek_model
+        if payload_deepseek_base_url:
+            runtime["deepseek_base_url"] = payload_deepseek_base_url
+        if deepseek_api_key:
+            runtime["deepseek_api_key"] = deepseek_api_key
         child_env.pop("SCHEDULER_FORCE_GREEDY", None)
         child_env["SCHEDULER_FORCE_AI_ONLY"] = "1"
-        _inject_ai_key_env(child_env, api_key)
+        if runtime.get("provider") == "deepseek":
+            if deepseek_api_key:
+                _inject_ai_key_env(child_env, deepseek_api_key, "deepseek")
+                _inject_ai_key_env(child_env, api_key, "openrouter")
+            else:
+                runtime["provider"] = "openrouter"
+                _inject_ai_key_env(child_env, api_key, "openrouter")
+        else:
+            _inject_ai_key_env(child_env, api_key, runtime.get("provider") or "openrouter")
         _inject_ai_runtime_env(child_env, runtime)
     else:
         child_env["SCHEDULER_FORCE_GREEDY"] = "1"
@@ -604,6 +1470,7 @@ MIME_TYPES = {
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ".png": "image/png",
     ".ico": "image/x-icon",
+    ".svg": "image/svg+xml",
 }
 
 
@@ -954,15 +1821,23 @@ class RulesHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"ok": False, "error": str(e)})
                 return
             if options["use_ai"] and not (
-                options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+                options["child_env"].get("DEEPSEEK_API_KEY")
+                or options["child_env"].get("OPENROUTER_API_KEY")
+                or options["child_env"].get("OPENAI_API_KEY")
             ):
-                _inject_ai_key_env(options["child_env"], _saved_ai_api_key())
+                deepseek_key = _saved_deepseek_api_key()
+                if deepseek_key:
+                    _inject_ai_key_env(options["child_env"], deepseek_key, "deepseek")
+                else:
+                    _inject_ai_key_env(options["child_env"], _saved_ai_api_key())
             if options["use_ai"] and not (
-                options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+                options["child_env"].get("DEEPSEEK_API_KEY")
+                or options["child_env"].get("OPENROUTER_API_KEY")
+                or options["child_env"].get("OPENAI_API_KEY")
             ):
                 self._send_json(400, {
                     "ok": False,
-                    "error": "Add an AI API key in Control Center before using Generate with AI.",
+                    "error": "Add a DeepSeek API key in Control Center before using Generate with AI.",
                 })
                 return
             _run_counter += 1
@@ -974,8 +1849,11 @@ class RulesHandler(BaseHTTPRequestHandler):
             print(
                 "  [API] run-pipeline mode="
                 f"{'ai' if options['use_ai'] else 'standard'} "
+                f"deepseek_key={'yes' if bool(options['child_env'].get('DEEPSEEK_API_KEY')) else 'no'} "
                 f"openrouter_key={'yes' if bool(options['child_env'].get('OPENROUTER_API_KEY')) else 'no'} "
                 f"openai_key={'yes' if bool(options['child_env'].get('OPENAI_API_KEY')) else 'no'} "
+                f"deepseek_model={options['child_env'].get('DEEPSEEK_MODEL') or '-'} "
+                f"openrouter_model={options['child_env'].get('OPENROUTER_MODEL') or '-'} "
                 f"week={week}"
             )
             print(f"  [API] Spawning pipeline: {' '.join(cmd)}")
@@ -1071,8 +1949,14 @@ class RulesHandler(BaseHTTPRequestHandler):
         if path == "/api/save-schedule-config":
             try:
                 payload = json.loads(body_raw)
+                # Never persist API keys to disk. Keys must live in env vars only.
+                opts = payload.get("settings_options")
+                if isinstance(opts, dict):
+                    for k in ("deepseek_api_key", "ai_api_key", "ai_optimize_api_key"):
+                        if k in opts:
+                            opts[k] = ""
                 _write_json_atomic(_schedule_config_path(), payload)
-                print("  [API] Schedule config saved")
+                print("  [API] Schedule config saved (api_keys scrubbed)")
                 self._send_json(200, {"ok": True})
             except Exception as e:
                 self._send_json(500, {"error": str(e)})
@@ -1191,7 +2075,7 @@ class RulesHandler(BaseHTTPRequestHandler):
                     sys.path.insert(0, str(PROJECT_ROOT))
                     from ai_provider import create_ai_client, OPENAI_AVAILABLE
                     if not OPENAI_AVAILABLE:
-                        self._send_json(200, {"reply": "AI client not available. Install the openai package and set OPENROUTER_API_KEY in .env to enable chat."})
+                        self._send_json(200, {"reply": "AI client not available. Install the openai package and set a DeepSeek API key to enable chat."})
                         return
                     client, settings = create_ai_client()
                     if not client:
@@ -1200,16 +2084,30 @@ class RulesHandler(BaseHTTPRequestHandler):
                         if cfg_path.exists():
                             try:
                                 cfg = json.loads(cfg_path.read_text())
-                                api_key = (cfg.get("settings_options") or {}).get("ai_api_key","").strip()
+                                opts = cfg.get("settings_options") or {}
+                                provider = str(opts.get("ai_provider") or "deepseek").strip().lower()
+                                api_key = str(opts.get("deepseek_api_key") if provider == "deepseek" else opts.get("ai_api_key") or "").strip()
+                                if not api_key and provider == "deepseek":
+                                    provider = "openrouter"
+                                    api_key = str(opts.get("ai_api_key") or "").strip()
                                 if api_key:
                                     from openai import OpenAI
-                                    client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1",
+                                    if provider == "deepseek":
+                                        base_url = str(opts.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).rstrip("/")
+                                        model = str(opts.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip()
+                                    elif provider == "openai":
+                                        base_url = str(opts.get("ai_base_url") or DEFAULT_OPENAI_BASE_URL).rstrip("/")
+                                        model = str(opts.get("ai_model") or "gpt-4o-mini").strip()
+                                    else:
+                                        base_url = str(opts.get("ai_base_url") or DEFAULT_OPENROUTER_BASE_URL).rstrip("/")
+                                        model = str(opts.get("ai_model") or DEFAULT_OPENROUTER_MODEL).strip()
+                                    client = OpenAI(api_key=api_key, base_url=base_url,
                                                    default_headers={"HTTP-Referer":"https://studio-scheduler.local","X-Title":"Studio Scheduler"})
-                                    settings = {"model": "openai/gpt-oss-120b:free"}
+                                    settings = {"model": model}
                             except Exception:
                                 pass
                     if not client:
-                        self._send_json(200, {"reply": "AI not configured. Add OPENROUTER_API_KEY to your .env file or set the API key in Settings → Advanced."})
+                        self._send_json(200, {"reply": "AI not configured. Add a DeepSeek API key in Settings → Advanced."})
                         return
 
                     messages = [{"role": "system", "content": system_prompt}]
@@ -1230,6 +2128,18 @@ class RulesHandler(BaseHTTPRequestHandler):
                     self._send_json(200, {"reply": reply})
                 except Exception as ai_err:
                     self._send_json(200, {"reply": f"AI error: {ai_err}"})
+            except json.JSONDecodeError as e:
+                self._send_json(400, {"error": f"Invalid JSON: {e}"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+
+        if path in {"/api/optimize-schedule", "/api/optimise-schedule"}:
+            try:
+                payload = json.loads(body_raw) if body_raw else {}
+                result = _optimize_schedule_request(payload)
+                status = 200 if result.get("ok") else 400
+                self._send_json(status, result)
             except json.JSONDecodeError as e:
                 self._send_json(400, {"error": f"Invalid JSON: {e}"})
             except Exception as e:

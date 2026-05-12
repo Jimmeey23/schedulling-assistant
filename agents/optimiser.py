@@ -21,12 +21,62 @@ MAX_TRAINER_WEEKLY_MINUTES_T1 = 15 * 60
 MAX_TRAINER_WEEKLY_MINUTES_T2 = 15 * 60
 MAX_TRAINER_WEEKLY_MINUTES_T3 = 12 * 60
 MAX_TRAINER_WEEKLY_MINUTES = MAX_TRAINER_WEEKLY_MINUTES_T2  # Legacy alias
-TIER1_WEEKLY_TARGET_MIN = 12 * 60
-TIER1_WEEKLY_TARGET_IDEAL = 13 * 60
+TIER1_WEEKLY_TARGET_MIN = 13 * 60
+TIER1_WEEKLY_TARGET_IDEAL = 15 * 60
 TIER2_WEEKLY_TARGET_MIN = 10 * 60
 TIER3_WEEKLY_TARGET_MAX = 6 * 60
 MAX_TRAINER_DAILY_MINUTES = 4 * 60
-MAX_TRAINER_WORK_DAYS = 6
+MAX_TRAINER_WORK_DAYS = 5
+
+
+def apply_settings_caps_from_config(config: Optional[dict] = None) -> dict:
+    """Override runtime caps from settings_options. Falls back to CLAUDE.md
+    canonical values. Mutates module globals so TrainerState picks them up."""
+    global MAX_TRAINER_WORK_DAYS, MAX_TRAINER_DAILY_MINUTES
+    global MAX_TRAINER_WEEKLY_MINUTES_T1, MAX_TRAINER_WEEKLY_MINUTES_T2
+    global MAX_TRAINER_WEEKLY_MINUTES_T3, MAX_TRAINER_WEEKLY_MINUTES
+    global TIER1_WEEKLY_TARGET_MIN, TIER1_WEEKLY_TARGET_IDEAL
+    try:
+        if config is None:
+            path = CONFIG_DIR / "schedule_config.json"
+            config = json.loads(path.read_text()) if path.exists() else {}
+        opts = (config.get("settings_options") or {})
+    except Exception:
+        opts = {}
+
+    def _hours_to_min(v, default):
+        try:
+            return int(round(float(v) * 60))
+        except (TypeError, ValueError):
+            return default
+
+    weekly_cap_min = _hours_to_min(opts.get("weekly_hours_cap"), MAX_TRAINER_WEEKLY_MINUTES_T1)
+    MAX_TRAINER_WEEKLY_MINUTES_T1 = weekly_cap_min
+    MAX_TRAINER_WEEKLY_MINUTES_T2 = weekly_cap_min
+    MAX_TRAINER_WEEKLY_MINUTES = weekly_cap_min
+    # T3 cap: keep at 12h unless explicitly set
+    MAX_TRAINER_WEEKLY_MINUTES_T3 = _hours_to_min(opts.get("tier3_weekly_hours_cap"), 12 * 60)
+
+    TIER1_WEEKLY_TARGET_MIN = _hours_to_min(opts.get("tier1_min_weekly_hours"), 13 * 60)
+    TIER1_WEEKLY_TARGET_IDEAL = _hours_to_min(opts.get("tier1_ideal_weekly_hours"), 15 * 60)
+    MAX_TRAINER_DAILY_MINUTES = _hours_to_min(opts.get("max_daily_trainer_hours"), 4 * 60)
+    try:
+        MAX_TRAINER_WORK_DAYS = max(1, min(7, int(opts.get("max_trainer_work_days") or 5)))
+    except (TypeError, ValueError):
+        MAX_TRAINER_WORK_DAYS = 5
+
+    return {
+        "weekly_cap_min": MAX_TRAINER_WEEKLY_MINUTES_T1,
+        "tier1_min": TIER1_WEEKLY_TARGET_MIN,
+        "tier1_ideal": TIER1_WEEKLY_TARGET_IDEAL,
+        "daily_min": MAX_TRAINER_DAILY_MINUTES,
+        "work_days": MAX_TRAINER_WORK_DAYS,
+    }
+
+
+# Apply once at module import for any callers that import this module
+# without instantiating an Optimiser.
+apply_settings_caps_from_config()
 SUPREME_LOCATION = "Supreme HQ, Bandra"
 KWALITY_LOCATION = "Kwality House, Kemps Corner"
 LOCATION_WEEKLY_CLASS_BOUNDS = {
@@ -802,6 +852,19 @@ class TrainerState:
         self._schedule[day].append((time_str, location, class_name))
         self.weekly_minutes += get_class_duration(class_name)
 
+    def remove(self, day: str, time_str: str, location: str, class_name: str) -> bool:
+        """Remove a previously-added placement. Returns True if found and removed."""
+        entries = self._schedule.get(day) or []
+        target = (time_str, location, class_name)
+        for i, ent in enumerate(entries):
+            if ent == target:
+                entries.pop(i)
+                self.weekly_minutes -= get_class_duration(class_name)
+                if not entries:
+                    self._schedule.pop(day, None)
+                return True
+        return False
+
     def at_weekly_target(self) -> bool:
         if self.tier == 1:
             return self.weekly_minutes >= TIER1_WEEKLY_TARGET_MIN
@@ -855,11 +918,35 @@ class RoomOccupancy:
                 return room_id
         return None
 
+    def used_minutes(self, day: str, room_id: str) -> int:
+        return sum((e - s) for (s, e, _, _) in self._occ.get((day, room_id), []))
+
+    def utilisation_summary(self, available_minutes_per_day: int = 13 * 60) -> Dict[str, Dict]:
+        """Return per-(day, room) and per-room utilisation %.
+        Available window defaults to 07:00–20:00 (13h). Days that have no class
+        placements are excluded so an entire un-scheduled day does not drag the
+        denominator."""
+        out: Dict[str, Dict] = {"per_day_room": {}, "per_room": {}}
+        days_with_classes: Set[str] = {d for (d, _r) in self._occ.keys()}
+        for room_id in self.rooms:
+            room_total_used = 0
+            room_total_avail = 0
+            for day in days_with_classes:
+                used = self.used_minutes(day, room_id)
+                avail = available_minutes_per_day
+                pct = (used / avail * 100.0) if avail else 0.0
+                out["per_day_room"][f"{day}|{room_id}"] = {"used_min": used, "avail_min": avail, "pct": round(pct, 1)}
+                room_total_used += used
+                room_total_avail += avail
+            room_pct = (room_total_used / room_total_avail * 100.0) if room_total_avail else 0.0
+            out["per_room"][room_id] = {"used_min": room_total_used, "avail_min": room_total_avail, "pct": round(room_pct, 1)}
+        return out
+
 
 class ScheduleOptimiser:
     def __init__(self, target_week_start: str, locations: List[str] = None,
                  overrides_path: Optional[str] = None,
-                 variation_seed: int = 0,
+                 variation_seed: Optional[int] = None,
                  output_suffix: str = "",
                  optimization_mode: str = "max_score"):
         valid_modes = {"max_score", "trainer_hours", "class_variety"}
@@ -875,14 +962,32 @@ class ScheduleOptimiser:
         ]
         self.overrides = self._load_overrides(overrides_path)
         self.schedule_config = self._load_schedule_config()
+        # Apply runtime caps from saved settings (work-days, weekly/daily hour caps,
+        # T1 targets). Overrides the module-level defaults so TrainerState picks them up.
+        self.runtime_caps = apply_settings_caps_from_config(self.schedule_config)
         self.ai_brief: dict = {}
         self._ai_boost: Dict[tuple, float] = {}
         self._ai_penalty: Dict[tuple, float] = {}
         self._ai_mix_boost: Dict[tuple, float] = {}
+        # variation_seed semantics:
+        #   None  -> auto-seed from time+urandom (production: every run unique)
+        #   0     -> deterministic mode (test fixtures rely on this; noise disabled)
+        #   int>0 -> reproducible run with that seed
+        import time as _time
+        import os as _os
+        deterministic = variation_seed == 0
+        if variation_seed is None:
+            variation_seed = int.from_bytes(_os.urandom(4), "big") ^ int(_time.time_ns() & 0x7FFFFFFF)
+            variation_seed &= 0x7FFFFFFF
+            if variation_seed == 0:
+                variation_seed = 1
         self._variation_seed = variation_seed
         self._output_suffix = output_suffix
         self._optimization_mode = optimization_mode
-        self._rng = random.Random(variation_seed) if variation_seed else None
+        self._deterministic = deterministic
+        # In deterministic mode, keep an rng for any non-noise rng users but
+        # _score_noise returns 0 (see method).
+        self._rng = None if deterministic else random.Random(variation_seed)
         self._weekly_location_targets: Dict[str, int] = {}
         self._weekly_location_overflow_minutes: Dict[str, int] = {}
         self._time_class_counts: Dict[Tuple[str, str, str], int] = defaultdict(int)
@@ -980,10 +1085,33 @@ class ScheduleOptimiser:
             if normalize_trainer_name(p["trainer"]) != normalize_trainer_name(trainer): continue
             if p.get("location") and p["location"] != location: continue
             if p["from_date"] <= date_str <= p["to_date"]: return True
+        # Compute day name from date_str so recurring weekday off-days can match.
+        day_name = ""
+        try:
+            day_name = DOW_MAP[date.fromisoformat(date_str).weekday()]
+        except Exception:
+            day_name = ""
         for o in self.overrides.get("off_days", []):
             if normalize_trainer_name(o["trainer"]) != normalize_trainer_name(trainer): continue
             if o.get("location") and o["location"] != location: continue
-            if o["date"] == date_str: return True
+            if o.get("date") and o["date"] == date_str: return True
+            # Recurring weekly off-day: { trainer, day_of_week } or { trainer, weekday: "Monday" }
+            recurring = o.get("day_of_week") or o.get("weekday") or o.get("recurring_day")
+            if recurring and day_name and str(recurring).strip().lower() == day_name.lower():
+                return True
+        # Profile-level recurring off-days (under trainer_profiles[name].off_day_weekly or .week_off).
+        try:
+            prof = self.trainer_profiles.get(trainer) or {}
+            for key in ("off_day_weekly", "week_off", "recurring_off_day"):
+                val = prof.get(key)
+                if not val:
+                    continue
+                days = val if isinstance(val, list) else [val]
+                for d in days:
+                    if day_name and str(d).strip().lower() == day_name.lower():
+                        return True
+        except Exception:
+            pass
         return False
 
     def _date_for_day(self, day_name: str) -> Optional[str]:
@@ -1423,12 +1551,17 @@ class ScheduleOptimiser:
 
         self._final_weekly_floor_repair(all_slots, week_start)
         all_slots = self._drop_inactive_slots(all_slots)
+        # T1 pull-up: try to lift under-target T1 trainers by swapping eligible
+        # T2/T3 placements to a free T1, only when score regression is bounded.
+        self._tier1_pull_up_pass(all_slots)
         self._print_utilisation()
 
         output = {
             "target_week_start": self.target_week_start,
             "schedule": [asdict(s) for s in all_slots],
             "optimization_mode": self._optimization_mode,
+            "floor_repair_log": getattr(self, "_floor_repair_log", []),
+            "variation_seed": self._variation_seed,
         }
         STATE_DIR.mkdir(exist_ok=True)
         suffix = f"_{self._output_suffix}" if self._output_suffix else ""
@@ -1515,14 +1648,87 @@ class ScheduleOptimiser:
             )
         return kept
 
+    def _tier1_pull_up_pass(self, all_slots: List[ScheduleSlot]) -> None:
+        """Post-pass: for each Tier-1 trainer below TIER1_WEEKLY_TARGET_MIN, scan
+        T2/T3-held INCLUDE slots they're qualified for and swap if the candidate
+        passes hard limits and the score delta is acceptable. Bounded to a few
+        swaps per trainer to avoid thrashing."""
+        try:
+            t1_underused = [
+                (name, state) for name, state in self.trainer_states.items()
+                if state.tier == 1 and state.weekly_minutes < TIER1_WEEKLY_TARGET_MIN
+            ]
+            if not t1_underused:
+                return
+            for t1_name, t1_state in t1_underused:
+                swaps_done = 0
+                for slot in all_slots:
+                    if swaps_done >= 3:
+                        break
+                    if slot.recommendation in {"PINNED", "PROTECT", "PROTECT_EXACT"}:
+                        continue
+                    if slot.trainer_1 == t1_name:
+                        continue
+                    current = self.trainer_states.get(slot.trainer_1)
+                    if not current or current.tier == 1:
+                        continue
+                    # T1 must be qualified for this class.
+                    prof = self.trainer_profiles.get(t1_name) or {}
+                    quals = prof.get("qualifications", {}) or {}
+                    cname = slot.class_name
+                    if "PowerCycle" in cname and not quals.get("powercycle"):
+                        continue
+                    if "Strength Lab" in cname and not quals.get("strength_lab"):
+                        continue
+                    if "Foundations" in cname and not quals.get("foundations"):
+                        continue
+                    if self._is_inactive(t1_name) or self._on_leave(t1_name, slot.date, slot.location):
+                        continue
+                    if self._loc_excluded(t1_name, slot.location):
+                        continue
+                    loc_data = self._profile_location_data(prof, slot.location)
+                    if not loc_data:
+                        continue
+                    avail_days = self._available_days(t1_name, slot.location, loc_data.get("available_days", []))
+                    if slot.day_of_week not in avail_days:
+                        continue
+                    tw = loc_data.get("time_window", {})
+                    win_s, win_e = self._time_window(t1_name, slot.location, tw.get("start", "06:00"), tw.get("end", "22:00"))
+                    max_d = self._max_per_day(t1_name, slot.location, loc_data.get("max_classes_per_day", 4))
+                    if not t1_state.can_add(slot.day_of_week, slot.time, slot.location, cname, max_d, win_s, win_e):
+                        continue
+                    # Perform swap.
+                    current.remove(slot.day_of_week, slot.time, slot.location, cname)
+                    t1_state.add(slot.day_of_week, slot.time, slot.location, cname)
+                    slot.trainer_1 = t1_name
+                    slot.scheduling_reason = (slot.scheduling_reason or "") + " | T1 pull-up swap"
+                    swaps_done += 1
+                    if t1_state.weekly_minutes >= TIER1_WEEKLY_TARGET_MIN:
+                        break
+        except Exception as e:
+            print(f"[Agent 5] T1 pull-up pass error: {e}")
+
     def _final_weekly_floor_repair(self, all_slots: List[ScheduleSlot], week_start: date):
-        """Add conservative filler classes only when a location misses its hard weekly floor."""
+        """Add conservative filler classes only when a location misses its hard weekly floor.
+        Floor repairs are logged onto ``self._floor_repair_log`` for scorecard warnings."""
+        # Pull canonical floors from settings_options if available, fall back to CLAUDE.md values.
         weekly_min = {
             "Kwality House, Kemps Corner": 70,
             "Supreme HQ, Bandra": 65,
             "Kenkere House": 55,
             "Courtside": 4,
         }
+        try:
+            saved = (self.schedule_config.get("settings_options") or {}).get("location_weekly_floors") or {}
+            for k, v in saved.items():
+                weekly_min[k] = int(v)
+        except Exception:
+            pass
+        for location in list(weekly_min):
+            if location in LOCATION_WEEKLY_CLASS_BOUNDS:
+                weekly_min[location] = self._weekly_target_for_location(location)
+        if not hasattr(self, "_floor_repair_log"):
+            self._floor_repair_log: List[dict] = []
         reserve_times = ["07:00", "07:45", "08:15", "12:00", "12:30", "13:00", "16:00", "17:00", "20:00"]
         filler_classes = [
             "Studio FIT", "Studio Cardio Barre", "Studio Mat 57", "Studio Barre 57",
@@ -1605,6 +1811,10 @@ class ScheduleOptimiser:
                                 if not state or not state.can_add(day_name, time_str, location, class_name, max_d, win_s, win_e):
                                     continue
                                 hist = self._get_hist(location, class_name, trainer, day_idx, time_str)
+                                # Refuse to backfill a proven weak combination — keeping the
+                                # quality gate symmetric with the main candidate path.
+                                if is_low_performing_history(hist):
+                                    continue
                                 recommendation = "PROTECT_EXACT" if is_protected_strength_lab_history(class_name, hist) else "INCLUDE"
                                 public_score, placement_score, recommendation, slot_is_exp = self._public_score_fields(
                                     68.0, 68.0, hist.get("session_count", 0), recommendation, False
@@ -1626,6 +1836,11 @@ class ScheduleOptimiser:
                                 )
                                 all_slots.append(slot)
                                 state.add(day_name, time_str, location, class_name)
+                                self._floor_repair_log.append({
+                                    "location": location, "day": day_name, "time": time_str,
+                                    "class": class_name, "trainer": trainer,
+                                    "score": public_score,
+                                })
                                 placed = True
                                 break
                             if placed:
@@ -1928,7 +2143,7 @@ class ScheduleOptimiser:
             date_str = slot_date.isoformat()
             target = self._pick_daily_target(location, day_name)
             day_slots = self._schedule_day(location, day_name, date_str, target,
-                                           am_slots, pm_slots, room_occ,
+                                           target, am_slots, pm_slots, room_occ,
                                            weekly_class_counts)
             all_slots.extend(day_slots)
             # Update weekly counts from today's schedule
@@ -1965,9 +2180,11 @@ class ScheduleOptimiser:
         hi = int(bounds.get("max", lo) or lo)
         if hi < lo:
             hi = lo
-        rng = self._rng or random.Random()
-        target = rng.randint(lo, hi) if hi > lo else lo
-        overflow_hours = rng.randint(1, 3)
+        selectable_lo = lo + 1 if location in MAIN_STUDIOS and hi > lo else lo
+        target = self._pick_value_in_range(location, "WEEKLY", selectable_lo, hi) if hi > selectable_lo else selectable_lo
+        overflow_key = f"{self.target_week_start}|{location}|WEEKLY_OVERFLOW|{self._variation_seed}|{self._optimization_mode}"
+        overflow_digest = hashlib.sha256(overflow_key.encode("utf-8")).hexdigest()
+        overflow_hours = 1 + (int(overflow_digest[:8], 16) % 3)
         self._weekly_location_targets[location] = target
         self._weekly_location_overflow_minutes[location] = overflow_hours * 60
         print(
@@ -2270,8 +2487,16 @@ class ScheduleOptimiser:
     # ------------------------------------------------------------------ #
 
     def _schedule_day(self, location, day_name, date_str, target_count,
-                      am_slots, pm_slots, room_occ: RoomOccupancy,
+                      day_max=None, am_slots=None, pm_slots=None, room_occ: RoomOccupancy = None,
                       weekly_class_counts: Optional[Dict[str, int]] = None) -> List[ScheduleSlot]:
+        if am_slots is None:
+            am_slots = []
+        if pm_slots is None:
+            pm_slots = []
+        if room_occ is None:
+            room_occ = RoomOccupancy({})
+        if day_max is None:
+            day_max = target_count
         is_sunday = day_name == "Sunday"
         slots_today: List[ScheduleSlot] = []
         used_at_time: Dict[str, Set[str]] = {}
@@ -2752,16 +2977,28 @@ class ScheduleOptimiser:
             if not times:
                 return []
             offset = DOW_REVERSE.get(day_name, 0) % len(times)
-            return times[offset:] + times[:offset]
+            rotated = times[offset:] + times[:offset]
+            # Inject rng-shuffled order so successive generations don't
+            # always award the earliest cluster slot to the best candidate.
+            if getattr(self, "_rng", None):
+                rotated = list(rotated)
+                self._rng.shuffle(rotated)
+            return rotated
 
         if location in {KWALITY_LOCATION, SUPREME_LOCATION}:
-            peak_source = (
-                _rotated_cluster(MUMBAI_PARALLEL_AM_EARLY)
-                + _rotated_cluster(MUMBAI_PARALLEL_AM_LATE)
-                + _rotated_cluster(MUMBAI_PARALLEL_PM)
-            )
+            clusters = [
+                _rotated_cluster(MUMBAI_PARALLEL_AM_EARLY),
+                _rotated_cluster(MUMBAI_PARALLEL_AM_LATE),
+                _rotated_cluster(MUMBAI_PARALLEL_PM),
+            ]
+            # Shuffle cluster order itself (AM-early / AM-late / PM)
+            if getattr(self, "_rng", None):
+                self._rng.shuffle(clusters)
+            peak_source = [t for cluster in clusters for t in cluster]
         else:
             peak_source = sorted(PRIME_AM_SLOTS | PRIME_PM_SLOTS)
+            if getattr(self, "_rng", None):
+                self._rng.shuffle(peak_source)
 
         peak_fill_slots = [
             t for t in peak_source
@@ -2803,7 +3040,9 @@ class ScheduleOptimiser:
             )
         barre_shift_times = {
             "morning": ["09:00", "08:30", "09:30", "10:15", "11:00", "11:30"],
-            "midday":  ["12:30", "13:00", "12:00"],
+            # 13:00 falls in BLOCKED_MIDDAY 13:00-15:00, 12:00 is too early.
+            # Use legal midday/early-evening slots only.
+            "midday":  ["12:15", "12:30", "15:15", "15:30"],
             "evening": ["19:00", "18:00", "19:15", "17:45", "18:15"],
         }
         for sh, times in barre_shift_times.items():
@@ -2941,6 +3180,12 @@ class ScheduleOptimiser:
                 if location != "Kwality House, Kemps Corner" and "Strength Lab" in cname:
                     continue
                 trainer = r["trainer"]
+                # Hard guard: PowerCycle never at Bengaluru locations (Kenkere/Copper).
+                # Strength Lab only at Kwality House.
+                if "PowerCycle" in cname and location in BENGALURU_LOCATIONS:
+                    continue
+                if "Strength Lab" in cname and location != KWALITY_LOCATION:
+                    continue
                 if "PowerCycle" in cname:
                     if not self.trainer_profiles.get(trainer, {}).get("qualifications", {}).get("powercycle", False):
                         continue
@@ -3065,6 +3310,8 @@ class ScheduleOptimiser:
                     cname,
                     self._weekly_count(wcc, slots_today, cname),
                 )
+                intraday_div = self._intraday_cluster_diversity_penalty(slots_today, time_str, cname)
+                weekly_mix_bonus = self._weekly_mix_variance_bonus(location, cname)
                 
                 rec_for_noise = r.get("recommendation", "INCLUDE")
                 ai_delta = self._get_ai_hint_delta(location, cname, trainer, dow)
@@ -3073,7 +3320,7 @@ class ScheduleOptimiser:
                     shift_bonus=shift_bonus,
                     diversity_adjustment=div_adj,
                     hours_bonus=hours_bonus,
-                    popularity_bonus=popularity_bonus + horizontal_bonus + level_bonus + express_bonus + target_penalty,
+                    popularity_bonus=popularity_bonus + horizontal_bonus + level_bonus + express_bonus + target_penalty + intraday_div + weekly_mix_bonus,
                     ai_delta=ai_delta,
                     time_penalty=time_penalty,
                     recommendation=rec_for_noise,
@@ -3081,17 +3328,26 @@ class ScheduleOptimiser:
                 effective_score += self._tier_priority_score(trainer)
                 effective_score += self._location_tier_priority_score(trainer, location)
                 effective_score += self._format_trainer_priority_score(trainer, location, cname)
+                rec_protect = {"PINNED", "PROTECT", "PROTECT_EXACT"}
                 if (
                     is_prime
                     and location == "Supreme HQ, Bandra"
-                    and r.get("recommendation") not in {"PINNED", "PROTECT", "PROTECT_EXACT"}
-                    and float(r.get("score", 0.0)) < 55.0
+                    and r.get("recommendation") not in rec_protect
+                    and min(100.0, max(0.0, effective_score)) < 55.0
                 ):
                     continue
 
                 # Experimental quota: only boost truly untested combos when quota is open.
                 if want_experimental and is_exp:
                     effective_score += 15.0
+
+                # Hard quality gate: non-pinned candidates whose adjusted score
+                # falls below MIN_SCHEDULABLE_SCORE must not enter the pool.
+                if (
+                    r.get("recommendation") not in rec_protect
+                    and min(100.0, max(0.0, effective_score)) < MIN_SCHEDULABLE_SCORE
+                ):
+                    continue
 
                 cands.append((effective_score, r, room, dur, is_exp))
             return cands
@@ -3576,6 +3832,58 @@ class ScheduleOptimiser:
             return 8.0
         return -min(80.0, (class_count * 28.0) + (format_count * 14.0))
 
+    def _weekly_mix_variance_bonus(self, location: str, class_name: str) -> float:
+        """Soft bonus when a class family is below the location's median weekly share.
+        Prevents two-format dominance across the week. Reads cumulative counts from
+        ``_time_format_counts`` aggregated across times for this location."""
+        try:
+            counts: Dict[str, int] = defaultdict(int)
+            for (loc, _t, fam), n in (self._time_format_counts or {}).items():
+                if loc == location and fam:
+                    counts[fam] += int(n)
+            if not counts:
+                return 0.0
+            cand_fam = get_class_format(class_name)
+            if not cand_fam:
+                return 0.0
+            values = sorted(counts.values())
+            mid = values[len(values) // 2]
+            cand_count = counts.get(cand_fam, 0)
+            if cand_count == 0 and len(counts) >= 2:
+                return 18.0
+            if cand_count + 1 <= mid:
+                return 10.0
+            if cand_count >= mid * 2 and mid > 0:
+                return -22.0
+            return 0.0
+        except Exception:
+            return 0.0
+
+    def _intraday_cluster_diversity_penalty(self, slots_today: list, time_str: str, class_name: str) -> float:
+        """Soft penalty when the same family/class already exists within +/-30 minutes today.
+        Encourages parallel-room peak clusters to span multiple families/levels."""
+        try:
+            target_min = slot_time_to_minutes(time_str)
+        except Exception:
+            return 0.0
+        cand_fam = get_class_format(class_name)
+        cand_class = canonical_class_key(class_name)
+        penalty = 0.0
+        for s in slots_today or []:
+            try:
+                s_min = slot_time_to_minutes(s.time[:5])
+            except Exception:
+                continue
+            delta = abs(s_min - target_min)
+            if delta > 30:
+                continue
+            window_scale = 1.0 if delta <= 15 else 0.5
+            if canonical_class_key(s.class_name) == cand_class:
+                penalty -= 30.0 * window_scale
+            elif get_class_format(s.class_name) == cand_fam and cand_fam:
+                penalty -= 14.0 * window_scale
+        return max(-60.0, penalty)
+
     def _horizontal_mix_allows_candidate(self, location: str, time_str: str, class_name: str) -> bool:
         """Hard cap repeated class/format columns across the week for a location+time."""
         class_count = getattr(self, "_time_class_counts", {}).get(
@@ -3734,23 +4042,28 @@ class ScheduleOptimiser:
         if not state:
             return 0.0
         if self._optimization_mode == "trainer_hours":
-            worked_hours = state.weekly_minutes / 60
-            # Reward moving trainers toward a useful weekly block without letting
-            # utilization swamp proven class/trainer/time performance.
-            if state.weekly_minutes == 0:
-                bonus = 48.0 if state.tier == 1 else 12.0
-            elif worked_hours < 6:
-                bonus = 58.0 + worked_hours * (4.0 if state.tier == 1 else 3.0)
-            elif worked_hours < 12:
-                bonus = 78.0 + (worked_hours - 6.0) * (5.0 if state.tier == 1 else 3.5)
-            elif worked_hours < 13:
-                bonus = 86.0 if state.tier == 1 else 58.0
-            elif worked_hours < 14:
-                bonus = 62.0 if state.tier == 1 else 58.0 + (worked_hours - 10.0) * 2.0
+            # Smooth concave curve: bonus = K * (1 - exp(-worked / tau)).
+            # Tier-1 weighted higher (priority pool); never lets T2 outscore an
+            # under-target T1 in this branch. Penalise the gap-to-target rather
+            # than absolute hours so over-target trainers don't get penalised
+            # more than equivalent under-target trainers in lower tiers.
+            import math as _math
+            worked_hours = state.weekly_minutes / 60.0
+            if state.tier == 1:
+                K, tau = 90.0, 7.0
+            elif state.tier == 2:
+                K, tau = 55.0, 8.0
             else:
-                bonus = 20.0 if state.tier == 1 else 44.0
-            if day_name not in state.worked_days() and state.worked_days_count() < 5:
+                K, tau = 30.0, 9.0
+            bonus = K * (1.0 - _math.exp(-worked_hours / tau))
+            # Pull-to-target: linear sweetener for T1 under min weekly hours.
+            if state.tier == 1:
+                gap_min = max(0, TIER1_WEEKLY_TARGET_MIN - state.weekly_minutes)
+                bonus += min(28.0, gap_min / 60.0 * 4.0)
+            # First-class-of-the-day bump if trainer still has off-day budget.
+            if day_name not in state.worked_days() and state.worked_days_count() < MAX_TRAINER_WORK_DAYS:
                 bonus += 5.0
+            # Approaching weekly cap — gentle taper so we don't overshoot.
             if state.weekly_minutes >= state.max_weekly_minutes - 60:
                 bonus -= 22.0
             return max(0.0, min(96.0, bonus))
@@ -4001,23 +4314,33 @@ class ScheduleOptimiser:
         return -80.0 - loc_count * 34.0
 
     def _format_trainer_priority_score(self, trainer: str, location: str, class_name: str) -> float:
-        """Business-priority boost for named trainers and specialist formats."""
+        """Business-priority boost for named trainers and specialist formats.
+        Priority pool bonus is gated to Tier-1 (per CLAUDE.md: T1-first capacity)."""
         score = 0.0
-        if trainer in HIGH_PRIORITY_TRAINERS:
-            state = getattr(self, "trainer_states", {}).get(trainer)
-            if state and state.weekly_minutes < MAX_TRAINER_WEEKLY_MINUTES_T1:
+        state = getattr(self, "trainer_states", {}).get(trainer)
+        if trainer in HIGH_PRIORITY_TRAINERS and state and state.tier == 1:
+            if state.weekly_minutes < MAX_TRAINER_WEEKLY_MINUTES_T1:
                 score += 90.0 + max(0.0, (MAX_TRAINER_WEEKLY_MINUTES_T1 - state.weekly_minutes) / 60.0) * 10.0
+        canonical = canonical_class_key(class_name) or str(class_name or "")
         lower = str(class_name or "").lower()
-        if location in MUMBAI_LOCATIONS and "powercycle" in lower:
+        is_powercycle = ("powercycle" in lower) or canonical == "Studio PowerCycle" or canonical == "Studio PowerCycle Express"
+        is_strength_lab = canonical == "Studio Strength Lab"
+        is_fit = canonical in {"Studio FIT", "Copper + Cloves FIT"} or lower.strip().endswith(" fit") or lower.strip() == "studio fit"
+        if location in MUMBAI_LOCATIONS and is_powercycle:
             if trainer in MUMBAI_POWERCYCLE_PRIORITY_TRAINERS:
                 score += 260.0
             else:
                 score -= 70.0
-        if "strength lab" in lower or "fit" in lower:
+        if is_strength_lab:
             if trainer in STRENGTH_FIT_PRIORITY_TRAINERS:
                 score += 220.0
-            elif "strength lab" in lower:
+            else:
                 score -= 90.0
+        elif is_fit:
+            if trainer in STRENGTH_FIT_PRIORITY_TRAINERS:
+                score += 140.0
+            else:
+                score -= 30.0
         return score
 
     def _apply_optimization_mode_adjustments(

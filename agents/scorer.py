@@ -525,7 +525,7 @@ class ClassScorer:
             volume_bonus = min(5.0, sc / 12.0)
             # Fill-rate absolute floor bonus: if avg fill > 60% it's genuinely performing
             fill_val = float(r.get("avg_fill_rate", 0.0))
-            fill_abs_bonus = 6.0 if fill_val >= 0.60 else (3.0 if fill_val >= 0.45 else 0.0)
+            fill_abs_bonus = 4.0 if fill_val >= 0.60 else (2.0 if fill_val >= 0.45 else 0.0)
             score = round(float(np.clip(base + prime_bonus + volume_bonus + fill_abs_bonus, 0, 100)), 2)
             return score, {
                 "total_score": score,
@@ -553,8 +553,8 @@ class ClassScorer:
                         "label": "Fill Rate Absolute Bonus",
                         "raw_value": round(fill_val, 4),
                         "points": round(fill_abs_bonus, 2),
-                        "max_points": 6.0,
-                        "explanation": "+6 pts if avg fill >= 60%, +3 if >= 45%.",
+                        "max_points": 4.0,
+                        "explanation": "+4 pts if avg fill >= 60%, +2 if >= 45%.",
                     },
                 ],
                 "formula": (

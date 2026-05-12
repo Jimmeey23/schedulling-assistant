@@ -34,6 +34,12 @@ MUMBAI_LOCATIONS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Courts
 BENGALURU_LOCATIONS = {"Kenkere House", "Copper & Cloves"}
 MAIN_STUDIOS = {"Kwality House, Kemps Corner", "Supreme HQ, Bandra", "Kenkere House"}
 DERIVED_STUDIOS = {"Courtside", "Copper & Cloves"}
+DEFAULT_DEEPSEEK_MODEL = "deepseek-v4-flash"
+DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-120b:free"
+DEFAULT_OPENROUTER_BACKUP_MODEL = "z-ai/glm-4.5-air:free"
+DEFAULT_OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 
 def load_env_file(path: Path = PROJECT_ROOT / ".env") -> None:
@@ -121,12 +127,8 @@ def _require_admin_for_unsafe_request():
     if _is_local_request():
         return None
     token = os.environ.get("SCHEDULER_ADMIN_TOKEN", "")
-    # If no token is configured, allow all requests (open access mode).
-    # If a token IS configured, require the caller to supply the correct one.
-    if not token:
-        return None
     provided = request.headers.get("X-Scheduler-Admin-Token", "")
-    if provided == token:
+    if token and provided == token:
         return None
     return _json({"error": "Admin token required"}, 401)
 
@@ -167,12 +169,40 @@ def _normalize_pipeline_week(value: str | None) -> str:
 
 
 def _saved_ai_api_key() -> str:
+    # Prefer saved config when present (backward compatible); otherwise fall
+    # back to env vars (production deployment pattern — config no longer
+    # persists keys to disk; see _scrub in save endpoint).
     try:
         data = json.loads(_schedule_config_path().read_text())
+        settings = data.get("settings_options") or {}
+        cfg_key = str(settings.get("ai_api_key") or "").strip()
+        if cfg_key:
+            return cfg_key
     except Exception:
-        return ""
-    settings = data.get("settings_options") or {}
-    return str(settings.get("ai_api_key") or "").strip()
+        pass
+    try:
+        from ai_provider import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+    return (os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY") or "").strip()
+
+
+def _saved_deepseek_api_key() -> str:
+    try:
+        data = json.loads(_schedule_config_path().read_text())
+        settings = data.get("settings_options") or {}
+        cfg_key = str(settings.get("deepseek_api_key") or "").strip()
+        if cfg_key:
+            return cfg_key
+    except Exception:
+        pass
+    try:
+        from ai_provider import load_dotenv_if_present
+        load_dotenv_if_present()
+    except Exception:
+        pass
+    return (os.environ.get("DEEPSEEK_API_KEY") or "").strip()
 
 def _saved_ai_runtime_settings() -> dict:
     try:
@@ -181,10 +211,13 @@ def _saved_ai_runtime_settings() -> dict:
         return {}
     settings = data.get("settings_options") or {}
     return {
-        "provider": str(settings.get("ai_provider") or "openrouter").strip().lower(),
-        "model": str(settings.get("ai_model") or "").strip(),
-        "backup_model": str(settings.get("ai_backup_model") or "z-ai/glm-4.5-air:free").strip(),
+        "provider": str(settings.get("ai_provider") or "deepseek").strip().lower(),
+        "model": str(settings.get("ai_model") or DEFAULT_OPENROUTER_MODEL).strip(),
+        "backup_model": str(settings.get("ai_backup_model") or DEFAULT_OPENROUTER_BACKUP_MODEL).strip(),
         "base_url": str(settings.get("ai_base_url") or "").strip(),
+        "deepseek_model": str(settings.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip(),
+        "deepseek_base_url": str(settings.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).strip(),
+        "deepseek_api_key": str(settings.get("deepseek_api_key") or "").strip(),
     }
 
 
@@ -211,18 +244,25 @@ def _build_chat_reply(payload: dict) -> str:
 
     client, settings = create_ai_client()
     if not client:
-        api_key = _saved_ai_api_key()
         runtime = _saved_ai_runtime_settings()
+        provider = runtime.get("provider") or "deepseek"
+        api_key = _saved_deepseek_api_key() if provider == "deepseek" else _saved_ai_api_key()
+        if not api_key and provider == "deepseek":
+            provider = "openrouter"
+            api_key = _saved_ai_api_key()
         if api_key:
             try:
                 from openai import OpenAI
-                provider = runtime.get("provider") or "openrouter"
-                base_url = runtime.get("base_url") or (
-                    "https://api.openai.com/v1" if provider == "openai" else "https://openrouter.ai/api/v1"
-                )
-                model = runtime.get("model") or (
-                    os.environ.get("OPENAI_MODEL") if provider == "openai" else os.environ.get("OPENROUTER_MODEL")
-                ) or "openai/gpt-oss-120b:free"
+                if provider == "deepseek":
+                    base_url = runtime.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL
+                    model = runtime.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL
+                else:
+                    base_url = runtime.get("base_url") or (
+                        DEFAULT_OPENAI_BASE_URL if provider == "openai" else DEFAULT_OPENROUTER_BASE_URL
+                    )
+                    model = runtime.get("model") or (
+                        os.environ.get("OPENAI_MODEL") if provider == "openai" else os.environ.get("OPENROUTER_MODEL")
+                    ) or DEFAULT_OPENROUTER_MODEL
                 client = OpenAI(
                     api_key=api_key,
                     base_url=base_url,
@@ -236,7 +276,7 @@ def _build_chat_reply(payload: dict) -> str:
                 client = None
 
     if not client:
-        return "AI not configured. Add an AI API key in Control Center or set OPENROUTER_API_KEY/OPENAI_API_KEY."
+        return "AI not configured. Add a DeepSeek API key in Control Center or set DEEPSEEK_API_KEY."
 
     messages = [{"role": "system", "content": build_chat_context(
         WEB_DIR / "schedule_data.json",
@@ -262,23 +302,38 @@ def _build_chat_reply(payload: dict) -> str:
     except Exception as exc:
         return f"AI error: {exc}"
 
-def _inject_ai_key_env(child_env: dict, api_key: str) -> None:
+def _inject_ai_key_env(child_env: dict, api_key: str, provider: str = "openrouter") -> None:
     key = str(api_key or "").strip()
     if not key:
         return
-    # Set both vars so either provider path can work.
-    child_env["OPENROUTER_API_KEY"] = key
-    child_env["OPENAI_API_KEY"] = key
+    provider = str(provider or "openrouter").strip().lower()
+    if provider == "deepseek":
+        child_env["DEEPSEEK_API_KEY"] = key
+    elif provider == "openai":
+        child_env["OPENAI_API_KEY"] = key
+    else:
+        child_env["OPENROUTER_API_KEY"] = key
 
 def _inject_ai_runtime_env(child_env: dict, runtime: dict) -> None:
     provider = str(runtime.get("provider") or "openrouter").strip().lower()
     model = str(runtime.get("model") or "").strip()
     backup_model = str(runtime.get("backup_model") or "").strip()
     base_url = str(runtime.get("base_url") or "").strip()
+    deepseek_model = str(runtime.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip()
+    deepseek_base_url = str(runtime.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).strip()
     if backup_model:
         child_env["AI_BACKUP_MODEL"] = backup_model
         child_env["OPENROUTER_BACKUP_MODEL"] = backup_model
-    if provider == "openai":
+    if provider == "deepseek":
+        child_env["DEEPSEEK_MODEL"] = deepseek_model or DEFAULT_DEEPSEEK_MODEL
+        child_env["DEEPSEEK_BASE_URL"] = deepseek_base_url or DEFAULT_DEEPSEEK_BASE_URL
+        if model:
+            child_env["OPENROUTER_MODEL"] = model
+        if base_url:
+            child_env["OPENROUTER_BASE_URL"] = base_url
+        elif model:
+            child_env["OPENROUTER_BASE_URL"] = DEFAULT_OPENROUTER_BASE_URL
+    elif provider == "openai":
         if model:
             child_env["OPENAI_MODEL"] = model
         if base_url:
@@ -306,22 +361,48 @@ def _resolve_pipeline_request_options(payload=None) -> dict:
     use_ai = _request_bool(payload.get("use_ai"))
     child_env = os.environ.copy()
     child_env["PIPELINE_WEEK"] = week
+    child_env["PYTHONUNBUFFERED"] = "1"
 
     if use_ai:
         api_key = str(payload.get("api_key") or "").strip() or _saved_ai_api_key()
+        deepseek_api_key = (
+            str(payload.get("deepseek_api_key") or "").strip()
+            or _saved_deepseek_api_key()
+        )
         runtime = _saved_ai_runtime_settings()
         payload_provider = str(payload.get("ai_provider") or "").strip().lower()
         payload_model = str(payload.get("ai_model") or "").strip()
         payload_base_url = str(payload.get("ai_base_url") or "").strip()
+        payload_backup_model = str(payload.get("ai_backup_model") or "").strip()
+        payload_deepseek_model = str(payload.get("deepseek_model") or "").strip()
+        payload_deepseek_base_url = str(payload.get("deepseek_base_url") or "").strip()
         if payload_provider:
             runtime["provider"] = payload_provider
+        elif deepseek_api_key:
+            runtime["provider"] = "deepseek"
         if payload_model:
             runtime["model"] = payload_model
         if payload_base_url:
             runtime["base_url"] = payload_base_url
+        if payload_backup_model:
+            runtime["backup_model"] = payload_backup_model
+        if payload_deepseek_model:
+            runtime["deepseek_model"] = payload_deepseek_model
+        if payload_deepseek_base_url:
+            runtime["deepseek_base_url"] = payload_deepseek_base_url
+        if deepseek_api_key:
+            runtime["deepseek_api_key"] = deepseek_api_key
         child_env.pop("SCHEDULER_FORCE_GREEDY", None)
         child_env["SCHEDULER_FORCE_AI_ONLY"] = "1"
-        _inject_ai_key_env(child_env, api_key)
+        if runtime.get("provider") == "deepseek":
+            if deepseek_api_key:
+                _inject_ai_key_env(child_env, deepseek_api_key, "deepseek")
+                _inject_ai_key_env(child_env, api_key, "openrouter")
+            else:
+                runtime["provider"] = "openrouter"
+                _inject_ai_key_env(child_env, api_key, "openrouter")
+        else:
+            _inject_ai_key_env(child_env, api_key, runtime.get("provider") or "openrouter")
         _inject_ai_runtime_env(child_env, runtime)
     else:
         child_env["SCHEDULER_FORCE_GREEDY"] = "1"
@@ -365,24 +446,26 @@ def _pipeline_process_alive(pid) -> bool:
     return True
 
 
-def _refresh_pipeline_state() -> None:
-    state = _read_pipeline_state()
+def _refresh_pipeline_state(state=None) -> None:
+    external = state is not None
+    if not external:
+        state = _read_pipeline_state()
     if not state.get("running"):
         return
     if _pipeline_process_alive(state.get("pid")):
         return
-    
-    # Process is dead. Give monitor thread a chance to write its state before assuming failure.
-    _time.sleep(1.0)
-    state = _read_pipeline_state()
-    if not state.get("running"):
-        return
-
+    if not external:
+        # Process is dead. Give monitor thread a chance to write its state before assuming failure.
+        _time.sleep(1.0)
+        state = _read_pipeline_state()
+        if not state.get("running"):
+            return
     state["running"] = False
     state["status"] = "failed"
     state["pid"] = None
     state["message"] = "Previous pipeline process stopped before completion. Generate can be run again."
-    _write_pipeline_state(state)
+    if not external:
+        _write_pipeline_state(state)
 
 
 def _json(data, status=200):
@@ -959,17 +1042,128 @@ def supabase_pull():
         return _json({"ok": False, "error": str(e)}, 500)
 
 
+def _latest_schedule_payload():
+    schedule_path = WEB_DIR / "schedule_data.json"
+    if not schedule_path.exists():
+        return {"locations": {}}
+    with open(schedule_path) as f:
+        return json.load(f)
+
+
+def _build_schedule_optimizer_prompt(payload):
+    location = payload.get("location", "")
+    schedule = _latest_schedule_payload()
+    loc_slots = schedule.get("locations", {}).get(location, []) if location else []
+    return (
+        "You are a studio schedule optimizer. Review this schedule and suggest specific improvements. "
+        f"Location: {location}\n\n"
+        f"Schedule:\n{json.dumps(loc_slots, indent=2)}\n\n"
+        "Return JSON only with this exact structure:\n"
+        '{"summary": "brief summary", "operations": [...]}\n\n'
+        "Supported operation types: swap_trainer, remove_class, move_class, add_class, change_class\n\n"
+        "Every operation will be server-validated before being applied. "
+        "Each operation must include a 'slot' object identifying the target slot, "
+        "and 'reason' explaining the change."
+    )
+
+
+def _call_schedule_optimizer_ai(payload):
+    prompt = _build_schedule_optimizer_prompt(payload)
+    import ai_provider as _aip
+    try:
+        raw = _aip.call_ai(prompt=prompt, max_tokens=2000)
+        import re
+        m = re.search(r'\{.*\}', raw, re.DOTALL)
+        if m:
+            return json.loads(m.group())
+    except Exception:
+        pass
+    return {"summary": "AI optimization unavailable.", "operations": []}
+
+
 @app.route("/api/optimize-schedule", methods=["POST"])
 def optimize_schedule():
     try:
-        payload = request.get_json(force=True)
-        # Placeholder for full synchronous AI optimization planner
+        payload = request.get_json(force=True) or {}
+        iteration = payload.get("iteration", "Main")
+
+        schedule_path = WEB_DIR / "schedule_data.json"
+        if not schedule_path.exists():
+            return _json({"error": "No schedule data found"}, 404)
+
+        with open(schedule_path) as f:
+            data = json.load(f)
+
+        result = _call_schedule_optimizer_ai(payload)
+        operations = result.get("operations", []) or []
+        summary = result.get("summary", "")
+
+        applied = 0
+        rejected = 0
+
+        for op in operations:
+            op_type = op.get("type", "")
+            slot_spec = op.get("slot") or {}
+            target_location = slot_spec.get("location") or payload.get("location", "")
+            if not target_location:
+                rejected += 1
+                continue
+
+            loc_rows = data.get("locations", {}).get(target_location) or []
+            target_slot = None
+            for row in loc_rows:
+                if (
+                    row.get("location") == slot_spec.get("location")
+                    and row.get("day_of_week") == slot_spec.get("day_of_week")
+                    and row.get("time") == slot_spec.get("time")
+                    and row.get("class_name") == slot_spec.get("class_name")
+                    and row.get("trainer_1") == slot_spec.get("trainer_1")
+                ):
+                    target_slot = row
+                    break
+
+            if target_slot is None:
+                rejected += 1
+                continue
+
+            new_slot = {**target_slot}
+            if op_type == "swap_trainer":
+                new_slot["trainer_1"] = op.get("new_trainer", new_slot["trainer_1"])
+            elif op_type == "change_class":
+                new_slot["class_name"] = op.get("new_class", new_slot["class_name"])
+            elif op_type == "move_class":
+                new_slot["time"] = op.get("new_time", new_slot["time"])
+            elif op_type == "remove_class":
+                pass
+            else:
+                rejected += 1
+                continue
+
+            try:
+                _validate_manual_slot(data, iteration, new_slot, original_slot=target_slot)
+            except (ValueError, Exception):
+                rejected += 1
+                continue
+
+            idx = loc_rows.index(target_slot)
+            if op_type == "remove_class":
+                loc_rows.pop(idx)
+            else:
+                new_slot["ai_optimized"] = True
+                loc_rows[idx] = new_slot
+            applied += 1
+
+        if applied > 0:
+            _write_json_atomic(schedule_path, data)
+            _regenerate_index_from_template(data)
+            _save_schedule_to_supabase(data)
+
         return _json({
             "ok": True,
-            "applied_count": 0,
-            "rejected_count": 0,
-            "summary": "AI schedule optimization is not yet implemented synchronously. Please run the full AI Pipeline.",
-            "operations": []
+            "applied_count": applied,
+            "rejected_count": rejected,
+            "summary": summary,
+            "operations": operations,
         })
     except Exception as e:
         return _json({"error": str(e)}, 500)
@@ -993,21 +1187,31 @@ def run_pipeline():
         return _json({"ok": False, "error": str(exc)}, 400)
     # Runtime fallback in case payload omitted key but config was just saved.
     if options["use_ai"] and not (
-        options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+        options["child_env"].get("DEEPSEEK_API_KEY")
+        or options["child_env"].get("OPENROUTER_API_KEY")
+        or options["child_env"].get("OPENAI_API_KEY")
     ):
-        _inject_ai_key_env(options["child_env"], _saved_ai_api_key())
+        deepseek_key = _saved_deepseek_api_key()
+        if deepseek_key:
+            _inject_ai_key_env(options["child_env"], deepseek_key, "deepseek")
+        else:
+            _inject_ai_key_env(options["child_env"], _saved_ai_api_key())
     if options["use_ai"] and not (
-        options["child_env"].get("OPENROUTER_API_KEY") or options["child_env"].get("OPENAI_API_KEY")
+        options["child_env"].get("DEEPSEEK_API_KEY")
+        or options["child_env"].get("OPENROUTER_API_KEY")
+        or options["child_env"].get("OPENAI_API_KEY")
     ):
         return _json({
             "ok": False,
-            "error": "Add an AI API key in Control Center before using Generate with AI.",
+            "error": "Add a DeepSeek API key in Control Center before using Generate with AI.",
         }, 400)
     print(
         "  [API] run-pipeline mode="
         f"{'ai' if options['use_ai'] else 'standard'} "
+        f"deepseek_key={'yes' if bool(options['child_env'].get('DEEPSEEK_API_KEY')) else 'no'} "
         f"openrouter_key={'yes' if bool(options['child_env'].get('OPENROUTER_API_KEY')) else 'no'} "
         f"openai_key={'yes' if bool(options['child_env'].get('OPENAI_API_KEY')) else 'no'} "
+        f"deepseek_model={options['child_env'].get('DEEPSEEK_MODEL') or '-'} "
         f"openrouter_model={options['child_env'].get('OPENROUTER_MODEL') or '-'} "
         f"openai_model={options['child_env'].get('OPENAI_MODEL') or '-'} "
         f"week={options['week']}"

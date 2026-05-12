@@ -64,7 +64,15 @@
       "pre_post_natal": false,
       "amped_up": true,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -150,7 +158,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -248,7 +264,15 @@
       "pre_post_natal": false,
       "amped_up": true,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -334,7 +358,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -415,7 +447,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -478,7 +518,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -550,7 +598,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -639,7 +695,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -720,7 +784,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -801,7 +873,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -873,7 +953,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -961,7 +1049,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1042,7 +1138,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1127,7 +1231,15 @@
       "pre_post_natal": false,
       "amped_up": true,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1212,7 +1324,15 @@
       "pre_post_natal": false,
       "amped_up": true,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1301,7 +1421,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1386,7 +1514,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1449,7 +1585,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1470,7 +1614,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "locations": {
       "Kwality House, Kemps Corner": {
@@ -1627,7 +1779,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "active": true,
     "historic_week_off_days": [
@@ -1648,7 +1808,15 @@
       "pre_post_natal": false,
       "amped_up": false,
       "hiit": false,
-      "recovery": false
+      "recovery": false,
+      "cardio_barre": true,
+      "fit": false,
+      "back_body_blaze": false,
+      "express_barre": false,
+      "express_cycle": false,
+      "studio_recovery": false,
+      "barre_flow": false,
+      "special": false
     },
     "locations": {
       "Kwality House, Kemps Corner": {

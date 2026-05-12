@@ -84,8 +84,8 @@ def state_exists(filename: str) -> bool:
     "--variation-seed",
     "variation_seed",
     type=int,
-    default=0,
-    help="Optional seed to vary schedule generation",
+    default=None,
+    help="Optional seed to vary schedule generation (None = auto-seed each run; 0 = deterministic test mode)",
 )
 @click.option(
     "--output-suffix",
