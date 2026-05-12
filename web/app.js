@@ -41,6 +41,39 @@ const FAM_BG = {
   recovery:"#F0FDF4",foundations:"#FFFBEB",mat_57:"#F0F9FF",
   hiit:"#FDF2F8",default:"#F9FAFB"
 };
+const SCHEDULER_ADMIN_TOKEN_KEY = "scheduler_admin_token";
+
+function schedulerAdminToken(){
+  try{return localStorage.getItem(SCHEDULER_ADMIN_TOKEN_KEY)||"";}catch(_){return"";}
+}
+
+function schedulerSetAdminToken(token){
+  try{
+    const clean=String(token||"").trim();
+    if(clean)localStorage.setItem(SCHEDULER_ADMIN_TOKEN_KEY,clean);
+  }catch(_){}
+}
+
+async function schedulerFetch(url,options={}){
+  const opts={...options};
+  const headers=new Headers(opts.headers||{});
+  const token=schedulerAdminToken();
+  if(token)headers.set("X-Scheduler-Admin-Token",token);
+  opts.headers=headers;
+  const resp=await fetch(url,opts);
+  if(resp.status!==401)return resp;
+
+  let error="";
+  try{error=String((await resp.clone().json()).error||"");}catch(_){}
+  if(!/admin token required/i.test(error))return resp;
+
+  const entered=window.prompt("Admin token required. Enter the Scheduler admin token for this browser:");
+  if(!entered)return resp;
+  schedulerSetAdminToken(entered);
+  const retryHeaders=new Headers(opts.headers||{});
+  retryHeaders.set("X-Scheduler-Admin-Token",String(entered).trim());
+  return fetch(url,{...opts,headers:retryHeaders});
+}
 // Timeline groups variants into shared visual families.
 const TIMELINE_GROUP_COLOR = {
   strength_lab:"#2563EB",
@@ -2063,12 +2096,12 @@ async function applyAnalyticsInsight(encoded,btn){
   if(btn){btn.disabled=true;btn.textContent="Applying…";}
   try{
     if(insight.type==="remove"){
-      const resp=await fetch("/api/remove-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot:insight.slot})});
+      const resp=await schedulerFetch("/api/remove-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot:insight.slot})});
       const data=await resp.json();
       if(!resp.ok||data.error)throw new Error(data.error||"Could not apply insight");
       updateClientScheduleRemove(insight.slot);
     }else if(insight.type==="move"){
-      const resp=await fetch("/api/move-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot:insight.slot,target:insight.target})});
+      const resp=await schedulerFetch("/api/move-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot:insight.slot,target:insight.target})});
       const data=await resp.json();
       if(!resp.ok||data.error)throw new Error(data.error||"Could not apply insight");
       updateClientScheduleMove(insight.slot,insight.target,data.slot);
@@ -2395,12 +2428,12 @@ function drillMetrics(s){
 async function ensureReplacementConfigLoaded(){
   const tasks=[];
   if(!_settTrainerProfiles){
-    tasks.push(fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
+    tasks.push(schedulerFetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
       _settTrainerProfiles=Array.isArray(d)?d:(Array.isArray(d?.data)?d.data:[]);
     }).catch(()=>{_settTrainerProfiles=[];}));
   }
   if(!_settSchedConfig){
-    tasks.push(fetch("/api/schedule-config").then(r=>r.json()).then(d=>{
+    tasks.push(schedulerFetch("/api/schedule-config").then(r=>r.json()).then(d=>{
       _settSchedConfig=(d&&!d.error)?d:{targets:{},manual_protected:[],manual_excluded:[],leave_periods:[],off_days:[],class_mix:{},inactive_trainers:[]};
     }).catch(()=>{_settSchedConfig={targets:{},manual_protected:[],manual_excluded:[],leave_periods:[],off_days:[],class_mix:{},inactive_trainers:[]};}));
   }
@@ -2647,7 +2680,7 @@ function openModal(s){
 async function ensureHistoricSlotsLoaded(){
   if(_historicSlotsCache)return _historicSlotsCache;
   try{
-    const d=await fetch("/api/historic-slots").then(r=>r.json());
+    const d=await schedulerFetch("/api/historic-slots").then(r=>r.json());
     _historicSlotsCache=d||{};
   }catch(e){
     _historicSlotsCache={class_slot_ranking:[],slot_group_ranking:[],trainer_metrics:[],class_metrics:[]};
@@ -3063,7 +3096,7 @@ async function applyManualClassAdd(slot,btn){
     const slots=Array.isArray(slot)?slot:[slot];
     const endpoint=slots.length>1?"/api/add-classes":"/api/add-class";
     const body=slots.length>1?{iteration:_iter,slots}:{iteration:_iter,slot:slots[0]};
-    const resp=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const resp=await schedulerFetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     const data=await resp.json();
     if(!resp.ok||data.error)throw new Error(data.error||"Could not add class");
     slots.forEach(s=>{
@@ -3580,7 +3613,7 @@ async function pasteCopiedClass(target){
     scheduling_reason:`Manual copy/paste from ${_copiedClassSlot.day_of_week} ${_copiedClassSlot.time}`
   };
   try{
-    const resp=await fetch("/api/add-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot})});
+    const resp=await schedulerFetch("/api/add-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot})});
     const data=await resp.json();
     if(!resp.ok||data.error)throw new Error(data.error||"Could not paste class");
     updateClientScheduleAdd(slot);
@@ -3591,7 +3624,7 @@ async function pasteCopiedClass(target){
 async function confirmClearCalendar(){
   if(!confirm("Clear the full active calendar? This removes all scheduled classes for the current schedule view."))return;
   try{
-    const resp=await fetch("/api/clear-schedule",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter})});
+    const resp=await schedulerFetch("/api/clear-schedule",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter})});
     const data=await resp.json();
     if(!resp.ok||data.error)throw new Error(data.error||"Could not clear calendar");
     if(_iter==="Main"){
@@ -3611,7 +3644,7 @@ function confirmManualClassRemove(s){
 
 async function applyManualClassRemove(slot){
   try{
-    const resp=await fetch("/api/remove-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot})});
+    const resp=await schedulerFetch("/api/remove-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot})});
     const data=await resp.json();
     if(!resp.ok||data.error)throw new Error(data.error||"Could not remove class");
     updateClientScheduleRemove(slot);
@@ -3623,7 +3656,7 @@ async function applyManualClassMove(slot,target){
   if(!slot||!target||!target.day_of_week||!target.time)return;
   if(slot.location===target.location&&slot.day_of_week===target.day_of_week&&slot.time===target.time)return;
   try{
-    const resp=await fetch("/api/move-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot,target})});
+    const resp=await schedulerFetch("/api/move-class",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({iteration:_iter,slot,target})});
     const data=await resp.json();
     if(!resp.ok||data.error)throw new Error(data.error||"Could not move class");
     updateClientScheduleMove(slot,target,data.slot);
@@ -3663,7 +3696,7 @@ async function applyTrainerReplacement(payload,btn){
   const originalText=btn?btn.textContent:"";
   if(btn){btn.disabled=true;btn.textContent="Replacing…";}
   try{
-    const resp=await fetch("/api/replace-trainer",{
+    const resp=await schedulerFetch("/api/replace-trainer",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify(payload)
@@ -3769,11 +3802,11 @@ async function hydrateLatestScheduleIfEmpty(){
   try{
     _setLdStatus("Fetching latest schedule…");
     // Kick off both requests in parallel — resolve file name then fetch data
-    const metaP=fetch("/api/latest-schedule-file").then(r=>r.ok?r.json():{});
+    const metaP=schedulerFetch("/api/latest-schedule-file").then(r=>r.ok?r.json():{});
     const meta=await metaP;
     const file=meta&&meta.file?meta.file:"schedule_data.json";
     _setLdStatus("Reading schedule data…");
-    const latest=await fetch(`/${file}?ts=${Date.now()}`).then(r=>r.json());
+    const latest=await schedulerFetch(`/${file}?ts=${Date.now()}`).then(r=>r.json());
     if(latest&&latest.locations&&Object.keys(latest.locations).length){
       Object.keys(SCHEDULE_DATA).forEach(k=>delete SCHEDULE_DATA[k]);
       Object.assign(SCHEDULE_DATA,latest);
@@ -3895,7 +3928,7 @@ function runPipelineFromHeader(useAi=false){
     payload.deepseek_model = String(aiOpts.deepseek_model||"deepseek-v4-flash");
     payload.deepseek_base_url = String(aiOpts.deepseek_base_url||"https://api.deepseek.com");
   }
-  fetch("/api/run-pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+  schedulerFetch("/api/run-pipeline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(r=>r.json())
     .then(res=>{
       if(res.ok){
@@ -3932,7 +3965,7 @@ function optimizeScheduleWithAI(){
   const msg=document.getElementById("pb-msg");
   if(bar)bar.className="visible";
   if(msg)msg.textContent="AI is reviewing the active schedule and validating proposed changes…";
-  fetch("/api/optimize-schedule",{
+  schedulerFetch("/api/optimize-schedule",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
@@ -4058,7 +4091,7 @@ function optSumClose() {
 function finaliseSchedule(){
   const btn=document.getElementById("finalise-btn");
   if(btn){btn.disabled=true;btn.textContent="Finalising…";}
-  fetch("/api/finalise-schedule",{method:"POST"})
+  schedulerFetch("/api/finalise-schedule",{method:"POST"})
     .then(r=>r.json().then(j=>({ok:r.ok,json:j})))
     .then(({ok,json})=>{
       if(!ok||!json.ok)throw new Error(json.error||"Could not finalise schedule");
@@ -4087,7 +4120,7 @@ function pollPipelineStatus(){
       showToast("Pipeline exceeded 30 min — check server logs","warn");
       return;
     }
-    fetch("/api/pipeline-status?ts="+Date.now())
+    schedulerFetch("/api/pipeline-status?ts="+Date.now())
       .then(r=>r.json())
       .then(d=>{
         const bar=document.getElementById("pipeline-bar");
@@ -4536,7 +4569,7 @@ function rvRunPipeline(){
   rvValidateRules();
   const btn=document.getElementById("rv-run-btn");
   if(btn){btn.disabled=true;btn.textContent="Starting…";}
-  fetch("/api/run-pipeline",{method:"POST"})
+  schedulerFetch("/api/run-pipeline",{method:"POST"})
     .then(r=>r.json())
     .then(res=>{
       if(res.ok){
@@ -4555,7 +4588,7 @@ function rvRunPipeline(){
 }
 
 function rvLoadRules(){
-  fetch("/api/rules-config")
+  schedulerFetch("/api/rules-config")
     .then(r=>r.ok?r.json():Promise.reject("not ok"))
     .then(data=>{
       if(data&&Array.isArray(data.groups)&&data.groups.length){
@@ -4705,7 +4738,7 @@ function rvGlobalBulk(enable){
 }
 
 function rvPostUpdate(payload,successMsg,rerender){
-  fetch("/api/save-rules",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+  schedulerFetch("/api/save-rules",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
     .then(r=>r.json())
     .then(res=>{
       if(!res.ok&&res.error)throw new Error(res.error);
@@ -4760,7 +4793,7 @@ function renderHistoryView(area){
   if(_histData){histRenderContent();}
   else{
     document.getElementById("hist-content").innerHTML=`<div class="hist-empty">Loading historical data…</div>`;
-    fetch("/api/historic-slots")
+    schedulerFetch("/api/historic-slots")
       .then(r=>r.json())
       .then(d=>{_histData=d;histRenderContent();})
       .catch(()=>{document.getElementById("hist-content").innerHTML=`<div class="hist-empty">Could not load historical data. Run the pipeline first to generate scores.</div>`;});
@@ -5291,7 +5324,7 @@ function settSaveCanonicalConfig(statusId="settings",successMsg="Canonical setti
     settSetTab("overview");
     return Promise.resolve({ok:false});
   }
-  return fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig)})
+  return schedulerFetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig)})
     .then(r=>r.json())
     .then(res=>{
       const s=document.getElementById(`${statusId}-save-status`);
@@ -5505,7 +5538,7 @@ function settExplainConflict(btn,text){
   const original=btn.innerHTML;
   btn.innerHTML="✨ Thinking...";
   btn.disabled=true;
-  fetch("/api/chat",{
+  schedulerFetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
@@ -5867,11 +5900,11 @@ function settSaveAISettings(){
 }
 
 function settLoadData(){
-  const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):fetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
+  const p1=_settTrainerProfiles?Promise.resolve(_settTrainerProfiles):schedulerFetch("/api/trainer-profiles").then(r=>r.json()).then(d=>{
     _settTrainerProfiles=Array.isArray(d)?d:(Array.isArray(d?.data)?d.data:[]);
     return _settTrainerProfiles;
   }).catch(()=>{_settTrainerProfiles=[];return[];});
-  const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):fetch("/api/schedule-config").then(r=>r.json()).then(d=>{
+  const p2=_settSchedConfig?Promise.resolve(_settSchedConfig):schedulerFetch("/api/schedule-config").then(r=>r.json()).then(d=>{
     _settSchedConfig=settNormalizeConfig((d&&!d.error)?d:settDefaultConfig());
     return _settSchedConfig;
   }).catch(()=>{_settSchedConfig=settNormalizeConfig(settDefaultConfig());return _settSchedConfig;});
@@ -6028,8 +6061,8 @@ function settSaveTrainerManager(){
   _settTrainerProfiles=updated;
   _settSchedConfig=settNormalizeConfig(_settSchedConfig||{});
   Promise.all([
-    fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)}).then(r=>r.json()),
-    fetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig||{})}).then(r=>r.json()),
+    schedulerFetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)}).then(r=>r.json()),
+    schedulerFetch("/api/save-schedule-config",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_settSchedConfig||{})}).then(r=>r.json()),
   ]).then(([a,b])=>{
     const ok=a.ok&&b.ok;
     const s=document.getElementById("trainer-mgr-save-status");
@@ -6204,7 +6237,7 @@ function settSaveQualifications(){
     return t;
   });
   _settTrainerProfiles=updated;
-  fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
+  schedulerFetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
     .then(r=>r.json())
     .then(res=>{
       const s=document.getElementById("qual-save-status");
@@ -6418,7 +6451,7 @@ function settSaveAvailability(){
     return{...t,locations:locs};
   });
   _settTrainerProfiles=updated;
-  fetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
+  schedulerFetch("/api/save-trainer-profiles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)})
     .then(r=>r.json())
     .then(res=>{
       const s=document.getElementById("avail-save-status");
@@ -6979,7 +7012,7 @@ function settRenderUniversalRulesPanel(){
     _settRenderUnivCards(host,allRules);
     return;
   }
-  fetch("/api/rules-config")
+  schedulerFetch("/api/rules-config")
     .then(r=>r.ok?r.json():{})
     .then(data=>{
       let rules=[];
@@ -7021,7 +7054,7 @@ function _settRenderUnivCards(host,rules){
 }
 
 function settToggleUniversalRule(ruleId,enabled){
-  fetch("/api/update-rules-config",{
+  schedulerFetch("/api/update-rules-config",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({rules:{[ruleId]:{enabled}}})
@@ -7432,7 +7465,7 @@ function chatSend(text){
   const sugg=document.getElementById("chat-suggestions");
   if(sugg)sugg.style.display="none";
   _chatWaiting=true;
-  fetch("/api/chat",{
+  schedulerFetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({message:msg,history:_chatHistory.slice(-8),dashboard_context:chatDashboardContext()})
@@ -7563,7 +7596,7 @@ function nlEditRequest(instruction) {
     locations: (typeof SCHEDULE_DATA !== "undefined" && SCHEDULE_DATA) ? (SCHEDULE_DATA.locations || {}) : {},
     generated_for_week: (typeof SCHEDULE_DATA !== "undefined" && SCHEDULE_DATA) ? (SCHEDULE_DATA.generated_for_week || "") : "",
   };
-  fetch("/api/nl-edit", {
+  schedulerFetch("/api/nl-edit", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
@@ -7601,7 +7634,7 @@ function nlEditRender(result, instruction) {
     };
     setOptimizeButtonLoading && setOptimizeButtonLoading(true);
     chatAppendMsg("bot", `🔄 Routing to AI optimizer scoped to ${scope.day || scope.time_from || "active view"}…`);
-    fetch("/api/optimize-schedule", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+    schedulerFetch("/api/optimize-schedule", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
       .then(r=>r.json())
       .then(json => { setOptimizeButtonLoading && setOptimizeButtonLoading(false); optSumShow(json); })
       .catch(err => { setOptimizeButtonLoading && setOptimizeButtonLoading(false); chatAppendMsg("bot","❌ Optimizer error: "+err); });
@@ -7793,7 +7826,7 @@ function nlEditConfirm() {
 
   const iteration = (typeof _iter !== "undefined" && _iter) ? _iter : "Main";
 
-  fetch("/api/nl-edit-apply", {
+  schedulerFetch("/api/nl-edit-apply", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({edits, iteration}),
@@ -7820,7 +7853,7 @@ function nlEditConfirm() {
 }
 
 function nlEditReloadSchedule() {
-  fetch("/schedule_data.json")
+  schedulerFetch("/schedule_data.json")
     .then(r => r.json())
     .then(fresh => {
       if (typeof SCHEDULE_DATA !== "undefined" && fresh) {
