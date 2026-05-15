@@ -131,7 +131,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 #initial-loader .ld-logo-img {
   width: 64px; height: 64px; border-radius: 18px;
-  background: url("images/planner57-logo-final.png") center/178% no-repeat;
+  background:
+    #FFFFFF
+    url("images/planner57-logo-final.png") center/142% no-repeat;
+  border: 1px solid rgba(255,255,255,.72);
+  box-shadow:
+    0 16px 36px rgba(0,0,0,.38),
+    0 0 0 6px rgba(255,255,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
   position: relative;
   animation: ldLogoLoop 3.8s cubic-bezier(.45,0,.55,1) infinite;
 }

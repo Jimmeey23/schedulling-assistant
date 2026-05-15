@@ -1209,13 +1209,36 @@ def _call_schedule_optimizer_ai(payload):
     prompt = _build_schedule_optimizer_prompt(payload)
     import ai_provider as _aip
     try:
-        raw = _aip.call_ai(prompt=prompt, max_tokens=2000)
+        runtime = _saved_ai_runtime_settings()
+        provider = str(payload.get("ai_provider") or runtime.get("provider") or "deepseek").strip().lower()
+        if provider == "openai":
+            model = str(payload.get("ai_model") or runtime.get("model") or "gpt-4o-mini").strip()
+            base_url = str(payload.get("ai_base_url") or runtime.get("base_url") or DEFAULT_OPENAI_BASE_URL).strip()
+        elif provider == "openrouter":
+            model = str(payload.get("ai_model") or runtime.get("model") or DEFAULT_OPENROUTER_MODEL).strip()
+            base_url = str(payload.get("ai_base_url") or runtime.get("base_url") or DEFAULT_OPENROUTER_BASE_URL).strip()
+        else:
+            provider = "deepseek"
+            model = str(payload.get("deepseek_model") or runtime.get("deepseek_model") or DEFAULT_DEEPSEEK_MODEL).strip()
+            base_url = str(payload.get("deepseek_base_url") or runtime.get("deepseek_base_url") or DEFAULT_DEEPSEEK_BASE_URL).strip()
+        api_key = (
+            str(payload.get("api_key") or "").strip()
+            or (str(_saved_deepseek_api_key() or "").strip() if provider == "deepseek" else str(_saved_ai_api_key() or "").strip())
+        )
+        raw = _aip.call_ai(
+            prompt=prompt,
+            max_tokens=2000,
+            api_key=api_key or None,
+            provider=provider,
+            model=model,
+            base_url=base_url,
+        )
         import re
         m = re.search(r'\{.*\}', raw, re.DOTALL)
         if m:
             return json.loads(m.group())
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f"  [API] optimize-schedule AI failed: {exc}")
     return {"summary": "AI optimization unavailable.", "operations": []}
 
 

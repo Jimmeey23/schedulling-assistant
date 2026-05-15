@@ -50,6 +50,50 @@ def test_get_ai_fallback_settings_uses_openrouter_free_models(monkeypatch):
     assert all(f["api_key"] == "fallback-key" for f in fallbacks)
 
 
+def test_call_ai_uses_supplied_runtime_settings(monkeypatch):
+    captured = {}
+
+    monkeypatch.setattr(ai_provider, "OPENAI_AVAILABLE", True)
+
+    class FakeOpenAI:
+        def __init__(self, **kwargs):
+            captured["client_kwargs"] = kwargs
+
+    def fake_completion(client, system_prompt, user_prompt, model, max_tokens, settings_override=None):
+        captured["system_prompt"] = system_prompt
+        captured["user_prompt"] = user_prompt
+        captured["model"] = model
+        captured["max_tokens"] = max_tokens
+        captured["settings_override"] = settings_override
+        return types.SimpleNamespace(
+            choices=[
+                types.SimpleNamespace(
+                    message=types.SimpleNamespace(content='{"summary":"ok","operations":[]}')
+                )
+            ]
+        )
+
+    monkeypatch.setattr(ai_provider, "OpenAI", FakeOpenAI)
+    monkeypatch.setattr(ai_provider, "create_chat_completion", fake_completion)
+
+    raw = ai_provider.call_ai(
+        prompt="optimise this schedule",
+        max_tokens=321,
+        api_key="deepseek-key",
+        provider="deepseek",
+        model="deepseek-v4-flash",
+        base_url="https://api.deepseek.com",
+    )
+
+    assert raw == '{"summary":"ok","operations":[]}'
+    assert captured["client_kwargs"]["api_key"] == "deepseek-key"
+    assert captured["client_kwargs"]["base_url"] == "https://api.deepseek.com"
+    assert captured["model"] == "deepseek-v4-flash"
+    assert captured["max_tokens"] == 321
+    assert captured["user_prompt"] == "optimise this schedule"
+    assert captured["settings_override"]["provider"] == "deepseek"
+
+
 def test_deepseek_chat_completion_disables_thinking_and_requests_json(monkeypatch):
     calls = []
 

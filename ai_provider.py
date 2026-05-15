@@ -236,6 +236,67 @@ def create_chat_completion(
         messages=messages,
     )
 
+
+def call_ai(
+    prompt: str,
+    max_tokens: int = 1024,
+    system_prompt: str = "Return JSON only.",
+    api_key: str | None = None,
+    provider: str | None = None,
+    model: str | None = None,
+    base_url: str | None = None,
+) -> str:
+    """Return raw assistant text using either explicit runtime settings or env config."""
+    if not OPENAI_AVAILABLE:
+        raise RuntimeError("AI client not available. Install the openai package.")
+
+    explicit_key = _clean_key(api_key)
+    if explicit_key:
+        provider_name = str(provider or "deepseek").strip().lower()
+        if provider_name == "openai":
+            default_model = "gpt-4o-mini"
+            default_base_url = DEFAULT_OPENAI_BASE_URL
+        elif provider_name == "openrouter":
+            default_model = DEFAULT_MODEL
+            default_base_url = DEFAULT_BASE_URL
+        else:
+            provider_name = "deepseek"
+            default_model = DEFAULT_DEEPSEEK_MODEL
+            default_base_url = DEFAULT_DEEPSEEK_BASE_URL
+        settings = _settings(
+            provider=provider_name,
+            api_key=explicit_key,
+            model=str(model or default_model).strip(),
+            base_url=str(base_url or default_base_url).strip(),
+        )
+        client = OpenAI(
+            api_key=settings["api_key"],
+            base_url=settings["base_url"],
+            timeout=settings["timeout"],
+            max_retries=0,
+            default_headers={
+                "HTTP-Referer": "https://studio-scheduler.local",
+                "X-Title": "Studio Scheduler",
+            },
+        )
+    else:
+        client, settings = create_ai_client()
+        if not client or not settings:
+            raise RuntimeError("All AI providers failed - configure at least one API key.")
+
+    response = create_chat_completion(
+        client=client,
+        system_prompt=system_prompt,
+        user_prompt=prompt,
+        model=settings["model"],
+        max_tokens=max_tokens,
+        settings_override=settings,
+    )
+    content = (response.choices[0].message.content or "").strip()
+    if not content:
+        raise RuntimeError("AI provider returned an empty response.")
+    return content
+
 # ---------------------------------------------------------------------------
 # Fallback chat implementation – tries primary model first, then GLM‑4.5‑air, then Owl‑Alpha
 # ---------------------------------------------------------------------------
